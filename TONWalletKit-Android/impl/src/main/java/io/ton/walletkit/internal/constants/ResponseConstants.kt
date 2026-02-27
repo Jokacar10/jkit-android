@@ -422,14 +422,9 @@ internal object ResponseConstants {
     const val KEY_ID = "id"
 
     /**
-     * JSON key for method name (used by diagnostic-call messages)
+     * JSON key for method name.
      */
     const val KEY_METHOD = "method"
-
-    /**
-     * JSON key for diagnostic stage (start/checkpoint/success/error)
-     */
-    const val KEY_STAGE = "stage"
 
     // Kind/Type values
     /**
@@ -451,11 +446,6 @@ internal object ResponseConstants {
      * Value for JS bridge diagnostic events.
      */
     const val VALUE_KIND_JS_BRIDGE_EVENT = "jsBridgeEvent"
-
-    /**
-     * Value for diagnostic call messages emitted from JS bridge.
-     */
-    const val VALUE_KIND_DIAGNOSTIC_CALL = "diagnostic-call"
 
     /**
      * Value for 'request' message kind (JS→Kotlin reverse RPC).
