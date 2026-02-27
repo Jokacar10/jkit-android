@@ -41,9 +41,9 @@ import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONRawStackItem
 import io.ton.walletkit.api.isTestnet
 import io.ton.walletkit.bridge.BuildConfig
+import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.config.SignDataType
 import io.ton.walletkit.config.TONWalletKitConfiguration
-import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.engine.state.AdapterManager
 import io.ton.walletkit.internal.constants.JsonConstants
 import io.ton.walletkit.internal.constants.LogConstants

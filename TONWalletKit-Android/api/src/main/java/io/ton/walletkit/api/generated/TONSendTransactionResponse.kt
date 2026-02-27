@@ -50,7 +50,7 @@ data class TONSendTransactionResponse(
     val normalizedBoc: io.ton.walletkit.model.TONBase64,
 
     @Contextual @SerialName(value = "normalizedHash")
-    val normalizedHash: io.ton.walletkit.model.TONBase64,
+    val normalizedHash: io.ton.walletkit.model.TONHex,
 
 ) {
 

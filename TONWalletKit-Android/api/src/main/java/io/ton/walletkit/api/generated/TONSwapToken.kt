@@ -28,97 +28,41 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.descriptors.buildClassSerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.JsonDecoder
-import kotlinx.serialization.json.JsonEncoder
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.serializer
 
 /**
+ * Token type for swap
  *
- *
- * This is a discriminated union type. Use the appropriate subclass based on the `type` field.
+ * @param address
+ * @param decimals
+ * @param name
+ * @param symbol
+ * @param image
+ * @param chainId
  */
-@Serializable(with = TONSwapToken.Serializer::class)
-sealed class TONSwapToken {
+@Serializable
+data class TONSwapToken(
 
-    /**
-     * The discriminator value for this union type
-     */
-    abstract val type: String
+    @SerialName(value = "address")
+    val address: kotlin.String,
 
-    /**
-     *
-     */
-    @Serializable
-    data class Jetton(
-        @SerialName("value")
-        val value: io.ton.walletkit.model.TONUserFriendlyAddress,
-    ) : TONSwapToken() {
-        override val type: String = "jetton"
-    }
+    @SerialName(value = "decimals")
+    val decimals: kotlin.Int,
 
-    /**
-     * Case without associated value: ton
-     */
-    @Serializable
-    object Ton : TONSwapToken() {
-        override val type: String = "ton"
-    }
+    @SerialName(value = "name")
+    val name: kotlin.String? = null,
 
-    internal object Serializer : KSerializer<TONSwapToken> {
-        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("TONSwapToken")
+    @SerialName(value = "symbol")
+    val symbol: kotlin.String? = null,
 
-        @Suppress("UNCHECKED_CAST")
-        override fun serialize(encoder: Encoder, value: TONSwapToken) {
-            val jsonEncoder = encoder as? JsonEncoder
-                ?: throw SerializationException("TONSwapToken can only be serialized with JSON")
+    @SerialName(value = "image")
+    val image: kotlin.String? = null,
 
-            val jsonObject = when (value) {
-                is Jetton -> {
-                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<io.ton.walletkit.model.TONUserFriendlyAddress>(), value.value)
-                    buildJsonObject {
-                        put("type", JsonPrimitive("jetton"))
-                        put("value", valueJson)
-                    }
-                }
-                is Ton -> JsonObject(mapOf("type" to JsonPrimitive("ton")))
-            }
-            jsonEncoder.encodeJsonElement(jsonObject)
-        }
+    @SerialName(value = "chainId")
+    val chainId: kotlin.String? = null,
 
-        override fun deserialize(decoder: Decoder): TONSwapToken {
-            val jsonDecoder = decoder as? JsonDecoder
-                ?: throw SerializationException("TONSwapToken can only be deserialized from JSON")
+) {
 
-            val jsonObject = jsonDecoder.decodeJsonElement().jsonObject
-            val typeValue = jsonObject["type"]?.jsonPrimitive?.content
-                ?: throw SerializationException("Missing 'type' discriminator for TONSwapToken")
-
-            return when (typeValue) {
-                "jetton" -> {
-                    val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONSwapToken.Jetton")
-                    Jetton(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<io.ton.walletkit.model.TONUserFriendlyAddress>(), valueJson),
-                    )
-                }
-                "ton" -> Ton
-                else -> throw SerializationException("Unknown type '$typeValue' for TONSwapToken")
-            }
-        }
-    }
+    companion object
 }
