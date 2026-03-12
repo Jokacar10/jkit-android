@@ -1,7 +1,19 @@
+{{#vendorExtensions.x-skip-model}}
+{{! Suppressed model (e.g., single-field variant inlined into parent union) }}
+{{/vendorExtensions.x-skip-model}}
+{{^vendorExtensions.x-skip-model}}
+{{#vendorExtensions.x-type-alias}}
+typealias {{{classname}}} = {{modelNamePrefix}}{{{vendorExtensions.x-alias-target}}}
+{{/vendorExtensions.x-type-alias}}
+{{^vendorExtensions.x-type-alias}}
 {{#vendorExtensions.x-discriminated-union}}
 {{>modelDiscriminatedUnion}}
 {{/vendorExtensions.x-discriminated-union}}
 {{^vendorExtensions.x-discriminated-union}}
+{{#vendorExtensions.x-is-generic}}
+{{>modelGeneric}}
+{{/vendorExtensions.x-is-generic}}
+{{^vendorExtensions.x-is-generic}}
 {{^multiplatform}}
 {{#kotlinx_serialization}}
 import kotlinx.serialization.Serializable
@@ -150,4 +162,7 @@ import kotlinx.parcelize.Parcelize
 {{/vars}}
 {{/hasEnums}}
 }
+{{/vendorExtensions.x-is-generic}}
 {{/vendorExtensions.x-discriminated-union}}
+{{/vendorExtensions.x-type-alias}}
+{{/vendorExtensions.x-skip-model}}
