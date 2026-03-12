@@ -288,7 +288,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-api-35-x86_64
+          key: avd-api-35-x86_64-pixel6
 
       - name: Create AVD and generate snapshot
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -297,6 +297,7 @@ jobs:
           api-level: 35
           arch: x86_64
           target: google_apis
+          profile: pixel_6
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
@@ -418,6 +419,7 @@ jobs:
           api-level: 35
           arch: x86_64
           target: google_apis
+          profile: pixel_6
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
@@ -449,20 +451,24 @@ jobs:
             # Clear logcat before tests
             adb logcat -c
             
-            # Start screen recording in background (single 3-min segment)
+            # Write recording loop script (chains 3-min segments for full test coverage)
             mkdir -p test-artifacts
-            adb shell "screenrecord --time-limit 180 /sdcard/recording_1.mp4" &
+            printf '#!/bin/sh\ni=1\nwhile [ "$i" -le 6 ]; do\n  adb shell "screenrecord --time-limit 180 /sdcard/recording_${i}.mp4" 2>/dev/null || true\n  i=$((i + 1))\ndone\n' > /tmp/record_loop.sh
+            chmod +x /tmp/record_loop.sh
+            /tmp/record_loop.sh &
+            RECORD_PID=$!
             
             # Run tests, capture exit code
             TEST_EXIT=0
             /tmp/run_tests.sh || TEST_EXIT=$?
             
             # Stop screen recording
+            kill $RECORD_PID 2>/dev/null || true
             adb shell "pkill -INT screenrecord" 2>/dev/null || true
             sleep 3
             
-            # Pull recording
-            adb pull "/sdcard/recording_1.mp4" "test-artifacts/recording_1.mp4" 2>/dev/null || true
+            # Pull all recording segments
+            for i in 1 2 3 4 5 6; do adb pull "/sdcard/recording_${i}.mp4" "test-artifacts/recording_${i}.mp4" 2>/dev/null || true; done
             
             # Take final screenshot of emulator state
             adb shell screencap -p /sdcard/final_state.png
