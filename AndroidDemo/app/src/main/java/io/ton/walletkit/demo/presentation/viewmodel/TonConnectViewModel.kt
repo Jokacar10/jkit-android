@@ -94,11 +94,11 @@ class TonConnectViewModel(
      * Parse a TON Connect URL inline without routing through event handlers.
      * On success the connection request is immediately approved with the specified wallet.
      */
-    fun connectionEventFromUrl(url: String, walletAddress: String) {
+    fun connectionEventFromUrl(url: String, walletId: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isProcessing = true, error = null)
 
-            val wallet = getWalletByAddress(walletAddress)
+            val wallet = walletKit().getWallet(walletId)
             if (wallet == null) {
                 _state.value = _state.value.copy(
                     isProcessing = false,
