@@ -3,8 +3,8 @@ function getDefaultExportFromCjs(x2) {
 }
 function getAugmentedNamespace(n) {
   if (Object.prototype.hasOwnProperty.call(n, "__esModule")) return n;
-  var f = n.default;
-  if (typeof f == "function") {
+  var f2 = n.default;
+  if (typeof f2 == "function") {
     var a2 = function a3() {
       var isInstance = false;
       try {
@@ -12,11 +12,11 @@ function getAugmentedNamespace(n) {
       } catch {
       }
       if (isInstance) {
-        return Reflect.construct(f, arguments, this.constructor);
+        return Reflect.construct(f2, arguments, this.constructor);
       }
-      return f.apply(this, arguments);
+      return f2.apply(this, arguments);
     };
-    a2.prototype = f.prototype;
+    a2.prototype = f2.prototype;
   } else a2 = {};
   Object.defineProperty(a2, "__esModule", { value: true });
   Object.keys(n).forEach(function(k2) {
@@ -1907,7 +1907,7 @@ function setupNativeBridge() {
   }
 }
 setupNativeBridge();
-var __async$d = (__this, __arguments, generator) => {
+var __async$c = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
       try {
@@ -1936,7 +1936,7 @@ let DefaultSignature$1 = null;
 let WalletV4R2Adapter$1 = null;
 let WalletV5R1Adapter$1 = null;
 function ensureWalletKitLoaded() {
-  return __async$d(this, null, function* () {
+  return __async$c(this, null, function* () {
     var _a, _b, _c, _d, _e, _f;
     if (TonWalletKit$1 && Signer$1 && MnemonicToKeyPair$1 && DefaultSignature$1 && WalletV4R2Adapter$1 && WalletV5R1Adapter$1) {
       return;
@@ -1963,12 +1963,12 @@ function requireNaclUtil() {
   if (hasRequiredNaclUtil) return naclUtil$1.exports;
   hasRequiredNaclUtil = 1;
   (function(module) {
-    (function(root, f) {
-      if (module.exports) module.exports = f();
-      else if (root.nacl) root.nacl.util = f();
+    (function(root, f2) {
+      if (module.exports) module.exports = f2();
+      else if (root.nacl) root.nacl.util = f2();
       else {
         root.nacl = {};
-        root.nacl.util = f();
+        root.nacl.util = f2();
       }
     })(naclUtil, function() {
       var util2 = {};
@@ -2025,7 +2025,7 @@ function requireNaclUtil() {
   return naclUtil$1.exports;
 }
 var naclUtilExports = requireNaclUtil();
-const nacl$2 = /* @__PURE__ */ getDefaultExportFromCjs(naclUtilExports);
+const nacl$1 = /* @__PURE__ */ getDefaultExportFromCjs(naclUtilExports);
 function commonjsRequire(path) {
   throw new Error('Could not dynamically require "' + path + '". Please configure the dynamicRequireTargets or/and ignoreDynamicRequires option of @rollup/plugin-commonjs appropriately for this require call to work.');
 }
@@ -2637,7 +2637,7 @@ function requireNaclFast() {
       };
       poly1305.prototype.finish = function(mac, macpos) {
         var g = new Uint16Array(10);
-        var c, mask, f, i;
+        var c, mask, f2, i;
         if (this.leftover) {
           i = this.leftover;
           this.buffer[i++] = 1;
@@ -2680,11 +2680,11 @@ function requireNaclFast() {
         this.h[5] = (this.h[6] >>> 2 | this.h[7] << 11) & 65535;
         this.h[6] = (this.h[7] >>> 5 | this.h[8] << 8) & 65535;
         this.h[7] = (this.h[8] >>> 8 | this.h[9] << 5) & 65535;
-        f = this.h[0] + this.pad[0];
-        this.h[0] = f & 65535;
+        f2 = this.h[0] + this.pad[0];
+        this.h[0] = f2 & 65535;
         for (i = 1; i < 8; i++) {
-          f = (this.h[i] + this.pad[i] | 0) + (f >>> 16) | 0;
-          this.h[i] = f & 65535;
+          f2 = (this.h[i] + this.pad[i] | 0) + (f2 >>> 16) | 0;
+          this.h[i] = f2 & 65535;
         }
         mac[macpos + 0] = this.h[0] >>> 0 & 255;
         mac[macpos + 1] = this.h[0] >>> 8 & 255;
@@ -3258,7 +3258,7 @@ function requireNaclFast() {
       function crypto_scalarmult(q, n, p2) {
         var z = new Uint8Array(32);
         var x2 = new Float64Array(80), r, i;
-        var a2 = gf(), b2 = gf(), c = gf(), d = gf(), e = gf(), f = gf();
+        var a2 = gf(), b2 = gf(), c = gf(), d = gf(), e = gf(), f2 = gf();
         for (i = 0; i < 31; i++) z[i] = n[i];
         z[31] = n[31] & 127 | 64;
         z[0] &= 248;
@@ -3277,17 +3277,17 @@ function requireNaclFast() {
           A(c, b2, d);
           Z(b2, b2, d);
           S2(d, e);
-          S2(f, a2);
+          S2(f2, a2);
           M2(a2, c, a2);
           M2(c, b2, e);
           A(e, a2, c);
           Z(a2, a2, c);
           S2(b2, a2);
-          Z(c, d, f);
+          Z(c, d, f2);
           M2(a2, c, _121665);
           A(a2, a2, d);
           M2(c, c, a2);
-          M2(a2, d, f);
+          M2(a2, d, f2);
           M2(d, b2, x2);
           S2(b2, e);
           sel25519(a2, b2, r);
@@ -3819,7 +3819,7 @@ function requireNaclFast() {
         return 0;
       }
       function add2(p2, q) {
-        var a2 = gf(), b2 = gf(), c = gf(), d = gf(), e = gf(), f = gf(), g = gf(), h2 = gf(), t = gf();
+        var a2 = gf(), b2 = gf(), c = gf(), d = gf(), e = gf(), f2 = gf(), g = gf(), h2 = gf(), t = gf();
         Z(a2, p2[1], p2[0]);
         Z(t, q[1], q[0]);
         M2(a2, a2, t);
@@ -3831,12 +3831,12 @@ function requireNaclFast() {
         M2(d, p2[2], q[2]);
         A(d, d, d);
         Z(e, b2, a2);
-        Z(f, d, c);
+        Z(f2, d, c);
         A(g, d, c);
         A(h2, b2, a2);
-        M2(p2[0], e, f);
+        M2(p2[0], e, f2);
         M2(p2[1], h2, g);
-        M2(p2[2], g, f);
+        M2(p2[2], g, f2);
         M2(p2[3], e, h2);
       }
       function cswap(p2, q, b2) {
@@ -4262,7 +4262,7 @@ function requireNaclFast() {
   return naclFast.exports;
 }
 var naclFastExports = requireNaclFast();
-const nacl$1 = /* @__PURE__ */ getDefaultExportFromCjs(naclFastExports);
+const f = /* @__PURE__ */ getDefaultExportFromCjs(naclFastExports);
 var CONNECT_EVENT_ERROR_CODES;
 (function(CONNECT_EVENT_ERROR_CODES2) {
   CONNECT_EVENT_ERROR_CODES2[CONNECT_EVENT_ERROR_CODES2["UNKNOWN_ERROR"] = 0] = "UNKNOWN_ERROR";
@@ -4307,7 +4307,7 @@ var CHAIN;
   CHAIN2["TESTNET"] = "-3";
 })(CHAIN || (CHAIN = {}));
 function encodeUint8Array(value, urlSafe) {
-  const encoded = nacl$2.encodeBase64(value);
+  const encoded = nacl$1.encodeBase64(value);
   if (!urlSafe) {
     return encoded;
   }
@@ -4317,7 +4317,7 @@ function decodeToUint8Array(value, urlSafe) {
   if (urlSafe) {
     value = decodeURIComponent(value);
   }
-  return nacl$2.decodeBase64(value);
+  return nacl$1.decodeBase64(value);
 }
 function encode(value, urlSafe = false) {
   let uint8Array;
@@ -4327,7 +4327,7 @@ function encode(value, urlSafe = false) {
     if (typeof value !== "string") {
       value = JSON.stringify(value);
     }
-    uint8Array = nacl$2.decodeUTF8(value);
+    uint8Array = nacl$1.decodeUTF8(value);
   }
   return encodeUint8Array(uint8Array, urlSafe);
 }
@@ -4335,11 +4335,11 @@ function decode(value, urlSafe = false) {
   const decodedUint8Array = decodeToUint8Array(value, urlSafe);
   return {
     toString() {
-      return nacl$2.encodeUTF8(decodedUint8Array);
+      return nacl$1.encodeUTF8(decodedUint8Array);
     },
     toObject() {
       try {
-        return JSON.parse(nacl$2.encodeUTF8(decodedUint8Array));
+        return JSON.parse(nacl$1.encodeUTF8(decodedUint8Array));
       } catch (e) {
         return null;
       }
@@ -4391,7 +4391,7 @@ class SessionCrypto {
     this.sessionId = toHexString(this.keyPair.publicKey);
   }
   createKeypair() {
-    return nacl$1.box.keyPair();
+    return f.box.keyPair();
   }
   createKeypairFromString(keyPair) {
     return {
@@ -4400,17 +4400,17 @@ class SessionCrypto {
     };
   }
   createNonce() {
-    return nacl$1.randomBytes(this.nonceLength);
+    return f.randomBytes(this.nonceLength);
   }
   encrypt(message, receiverPublicKey) {
     const encodedMessage = new TextEncoder().encode(message);
     const nonce = this.createNonce();
-    const encrypted = nacl$1.box(encodedMessage, nonce, receiverPublicKey, this.keyPair.secretKey);
+    const encrypted = f.box(encodedMessage, nonce, receiverPublicKey, this.keyPair.secretKey);
     return concatUint8Arrays(nonce, encrypted);
   }
   decrypt(message, senderPublicKey) {
     const [nonce, internalMessage] = splitToUint8Arrays(message, this.nonceLength);
-    const decrypted = nacl$1.box.open(internalMessage, nonce, senderPublicKey, this.keyPair.secretKey);
+    const decrypted = f.box.open(internalMessage, nonce, senderPublicKey, this.keyPair.secretKey);
     if (!decrypted) {
       throw new Error(`Decryption error: 
  message: ${message.toString()} 
@@ -7652,9 +7652,9 @@ function requireSha() {
     })(sha, (function() {
       var n = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
       function r(n2, r2, t2, e2) {
-        var i2, o5, u2, f2 = r2 || [0], w2 = (t2 = t2 || 0) >>> 3, s3 = -1 === e2 ? 3 : 0;
-        for (i2 = 0; i2 < n2.length; i2 += 1) o5 = (u2 = i2 + w2) >>> 2, f2.length <= o5 && f2.push(0), f2[o5] |= n2[i2] << 8 * (s3 + e2 * (u2 % 4));
-        return { value: f2, binLen: 8 * n2.length + t2 };
+        var i2, o5, u2, f3 = r2 || [0], w2 = (t2 = t2 || 0) >>> 3, s3 = -1 === e2 ? 3 : 0;
+        for (i2 = 0; i2 < n2.length; i2 += 1) o5 = (u2 = i2 + w2) >>> 2, f3.length <= o5 && f3.push(0), f3[o5] |= n2[i2] << 8 * (s3 + e2 * (u2 % 4));
+        return { value: f3, binLen: 8 * n2.length + t2 };
       }
       function t(t2, e2, i2) {
         switch (e2) {
@@ -7669,13 +7669,13 @@ function requireSha() {
           case "HEX":
             return function(n2, r2, t3) {
               return (function(n3, r3, t4, e3) {
-                var i3, o5, u2, f2;
+                var i3, o5, u2, f3;
                 if (0 != n3.length % 2) throw new Error("String of HEX type must be in byte increments");
                 var w2 = r3 || [0], s3 = (t4 = t4 || 0) >>> 3, a3 = -1 === e3 ? 3 : 0;
                 for (i3 = 0; i3 < n3.length; i3 += 2) {
                   if (o5 = parseInt(n3.substr(i3, 2), 16), isNaN(o5)) throw new Error("String of HEX type contains invalid characters");
-                  for (u2 = (f2 = (i3 >>> 1) + s3) >>> 2; w2.length <= u2; ) w2.push(0);
-                  w2[u2] |= o5 << 8 * (a3 + e3 * (f2 % 4));
+                  for (u2 = (f3 = (i3 >>> 1) + s3) >>> 2; w2.length <= u2; ) w2.push(0);
+                  w2[u2] |= o5 << 8 * (a3 + e3 * (f3 % 4));
                 }
                 return { value: w2, binLen: 4 * n3.length + t4 };
               })(n2, r2, t3, i2);
@@ -7683,13 +7683,13 @@ function requireSha() {
           case "TEXT":
             return function(n2, r2, t3) {
               return (function(n3, r3, t4, e3, i3) {
-                var o5, u2, f2, w2, s3, a3, h3, c2, v3 = 0, A2 = t4 || [0], E3 = (e3 = e3 || 0) >>> 3;
-                if ("UTF8" === r3) for (h3 = -1 === i3 ? 3 : 0, f2 = 0; f2 < n3.length; f2 += 1) for (u2 = [], 128 > (o5 = n3.charCodeAt(f2)) ? u2.push(o5) : 2048 > o5 ? (u2.push(192 | o5 >>> 6), u2.push(128 | 63 & o5)) : 55296 > o5 || 57344 <= o5 ? u2.push(224 | o5 >>> 12, 128 | o5 >>> 6 & 63, 128 | 63 & o5) : (f2 += 1, o5 = 65536 + ((1023 & o5) << 10 | 1023 & n3.charCodeAt(f2)), u2.push(240 | o5 >>> 18, 128 | o5 >>> 12 & 63, 128 | o5 >>> 6 & 63, 128 | 63 & o5)), w2 = 0; w2 < u2.length; w2 += 1) {
+                var o5, u2, f3, w2, s3, a3, h3, c2, v3 = 0, A2 = t4 || [0], E3 = (e3 = e3 || 0) >>> 3;
+                if ("UTF8" === r3) for (h3 = -1 === i3 ? 3 : 0, f3 = 0; f3 < n3.length; f3 += 1) for (u2 = [], 128 > (o5 = n3.charCodeAt(f3)) ? u2.push(o5) : 2048 > o5 ? (u2.push(192 | o5 >>> 6), u2.push(128 | 63 & o5)) : 55296 > o5 || 57344 <= o5 ? u2.push(224 | o5 >>> 12, 128 | o5 >>> 6 & 63, 128 | 63 & o5) : (f3 += 1, o5 = 65536 + ((1023 & o5) << 10 | 1023 & n3.charCodeAt(f3)), u2.push(240 | o5 >>> 18, 128 | o5 >>> 12 & 63, 128 | o5 >>> 6 & 63, 128 | 63 & o5)), w2 = 0; w2 < u2.length; w2 += 1) {
                   for (s3 = (a3 = v3 + E3) >>> 2; A2.length <= s3; ) A2.push(0);
                   A2[s3] |= u2[w2] << 8 * (h3 + i3 * (a3 % 4)), v3 += 1;
                 }
-                else for (h3 = -1 === i3 ? 2 : 0, c2 = "UTF16LE" === r3 && 1 !== i3 || "UTF16LE" !== r3 && 1 === i3, f2 = 0; f2 < n3.length; f2 += 1) {
-                  for (o5 = n3.charCodeAt(f2), true === c2 && (o5 = (w2 = 255 & o5) << 8 | o5 >>> 8), s3 = (a3 = v3 + E3) >>> 2; A2.length <= s3; ) A2.push(0);
+                else for (h3 = -1 === i3 ? 2 : 0, c2 = "UTF16LE" === r3 && 1 !== i3 || "UTF16LE" !== r3 && 1 === i3, f3 = 0; f3 < n3.length; f3 += 1) {
+                  for (o5 = n3.charCodeAt(f3), true === c2 && (o5 = (w2 = 255 & o5) << 8 | o5 >>> 8), s3 = (a3 = v3 + E3) >>> 2; A2.length <= s3; ) A2.push(0);
                   A2[s3] |= o5 << 8 * (h3 + i3 * (a3 % 4)), v3 += 2;
                 }
                 return { value: A2, binLen: 8 * v3 + e3 };
@@ -7698,14 +7698,14 @@ function requireSha() {
           case "B64":
             return function(r2, t3, e3) {
               return (function(r3, t4, e4, i3) {
-                var o5, u2, f2, w2, s3, a3, h3 = 0, c2 = t4 || [0], v3 = (e4 = e4 || 0) >>> 3, A2 = -1 === i3 ? 3 : 0, E3 = r3.indexOf("=");
+                var o5, u2, f3, w2, s3, a3, h3 = 0, c2 = t4 || [0], v3 = (e4 = e4 || 0) >>> 3, A2 = -1 === i3 ? 3 : 0, E3 = r3.indexOf("=");
                 if (-1 === r3.search(/^[a-zA-Z0-9=+/]+$/)) throw new Error("Invalid character in base-64 string");
                 if (r3 = r3.replace(/=/g, ""), -1 !== E3 && E3 < r3.length) throw new Error("Invalid '=' found in base-64 string");
                 for (o5 = 0; o5 < r3.length; o5 += 4) {
-                  for (w2 = r3.substr(o5, 4), f2 = 0, u2 = 0; u2 < w2.length; u2 += 1) f2 |= n.indexOf(w2.charAt(u2)) << 18 - 6 * u2;
+                  for (w2 = r3.substr(o5, 4), f3 = 0, u2 = 0; u2 < w2.length; u2 += 1) f3 |= n.indexOf(w2.charAt(u2)) << 18 - 6 * u2;
                   for (u2 = 0; u2 < w2.length - 1; u2 += 1) {
                     for (s3 = (a3 = h3 + v3) >>> 2; c2.length <= s3; ) c2.push(0);
-                    c2[s3] |= (f2 >>> 16 - 8 * u2 & 255) << 8 * (A2 + i3 * (a3 % 4)), h3 += 1;
+                    c2[s3] |= (f3 >>> 16 - 8 * u2 & 255) << 8 * (A2 + i3 * (a3 % 4)), h3 += 1;
                   }
                 }
                 return { value: c2, binLen: 8 * h3 + e4 };
@@ -7714,8 +7714,8 @@ function requireSha() {
           case "BYTES":
             return function(n2, r2, t3) {
               return (function(n3, r3, t4, e3) {
-                var i3, o5, u2, f2, w2 = r3 || [0], s3 = (t4 = t4 || 0) >>> 3, a3 = -1 === e3 ? 3 : 0;
-                for (o5 = 0; o5 < n3.length; o5 += 1) i3 = n3.charCodeAt(o5), u2 = (f2 = o5 + s3) >>> 2, w2.length <= u2 && w2.push(0), w2[u2] |= i3 << 8 * (a3 + e3 * (f2 % 4));
+                var i3, o5, u2, f3, w2 = r3 || [0], s3 = (t4 = t4 || 0) >>> 3, a3 = -1 === e3 ? 3 : 0;
+                for (o5 = 0; o5 < n3.length; o5 += 1) i3 = n3.charCodeAt(o5), u2 = (f3 = o5 + s3) >>> 2, w2.length <= u2 && w2.push(0), w2[u2] |= i3 << 8 * (a3 + e3 * (f3 % 4));
                 return { value: w2, binLen: 8 * n3.length + t4 };
               })(n2, r2, t3, i2);
             };
@@ -7748,24 +7748,24 @@ function requireSha() {
           case "HEX":
             return function(n2) {
               return (function(n3, r3, t3, e3) {
-                var i3, o5, u2 = "", f2 = r3 / 8, w2 = -1 === t3 ? 3 : 0;
-                for (i3 = 0; i3 < f2; i3 += 1) o5 = n3[i3 >>> 2] >>> 8 * (w2 + t3 * (i3 % 4)), u2 += "0123456789abcdef".charAt(o5 >>> 4 & 15) + "0123456789abcdef".charAt(15 & o5);
+                var i3, o5, u2 = "", f3 = r3 / 8, w2 = -1 === t3 ? 3 : 0;
+                for (i3 = 0; i3 < f3; i3 += 1) o5 = n3[i3 >>> 2] >>> 8 * (w2 + t3 * (i3 % 4)), u2 += "0123456789abcdef".charAt(o5 >>> 4 & 15) + "0123456789abcdef".charAt(15 & o5);
                 return e3.outputUpper ? u2.toUpperCase() : u2;
               })(n2, t2, e2, i2);
             };
           case "B64":
             return function(r3) {
               return (function(r4, t3, e3, i3) {
-                var o5, u2, f2, w2, s3, a3 = "", h3 = t3 / 8, c2 = -1 === e3 ? 3 : 0;
-                for (o5 = 0; o5 < h3; o5 += 3) for (w2 = o5 + 1 < h3 ? r4[o5 + 1 >>> 2] : 0, s3 = o5 + 2 < h3 ? r4[o5 + 2 >>> 2] : 0, f2 = (r4[o5 >>> 2] >>> 8 * (c2 + e3 * (o5 % 4)) & 255) << 16 | (w2 >>> 8 * (c2 + e3 * ((o5 + 1) % 4)) & 255) << 8 | s3 >>> 8 * (c2 + e3 * ((o5 + 2) % 4)) & 255, u2 = 0; u2 < 4; u2 += 1) a3 += 8 * o5 + 6 * u2 <= t3 ? n.charAt(f2 >>> 6 * (3 - u2) & 63) : i3.b64Pad;
+                var o5, u2, f3, w2, s3, a3 = "", h3 = t3 / 8, c2 = -1 === e3 ? 3 : 0;
+                for (o5 = 0; o5 < h3; o5 += 3) for (w2 = o5 + 1 < h3 ? r4[o5 + 1 >>> 2] : 0, s3 = o5 + 2 < h3 ? r4[o5 + 2 >>> 2] : 0, f3 = (r4[o5 >>> 2] >>> 8 * (c2 + e3 * (o5 % 4)) & 255) << 16 | (w2 >>> 8 * (c2 + e3 * ((o5 + 1) % 4)) & 255) << 8 | s3 >>> 8 * (c2 + e3 * ((o5 + 2) % 4)) & 255, u2 = 0; u2 < 4; u2 += 1) a3 += 8 * o5 + 6 * u2 <= t3 ? n.charAt(f3 >>> 6 * (3 - u2) & 63) : i3.b64Pad;
                 return a3;
               })(r3, t2, e2, i2);
             };
           case "BYTES":
             return function(n2) {
               return (function(n3, r3, t3) {
-                var e3, i3, o5 = "", u2 = r3 / 8, f2 = -1 === t3 ? 3 : 0;
-                for (e3 = 0; e3 < u2; e3 += 1) i3 = n3[e3 >>> 2] >>> 8 * (f2 + t3 * (e3 % 4)) & 255, o5 += String.fromCharCode(i3);
+                var e3, i3, o5 = "", u2 = r3 / 8, f3 = -1 === t3 ? 3 : 0;
+                for (e3 = 0; e3 < u2; e3 += 1) i3 = n3[e3 >>> 2] >>> 8 * (f3 + t3 * (e3 % 4)) & 255, o5 += String.fromCharCode(i3);
                 return o5;
               })(n2, t2, e2);
             };
@@ -7777,8 +7777,8 @@ function requireSha() {
             }
             return function(n2) {
               return (function(n3, r3, t3) {
-                var e3, i3 = r3 / 8, o5 = new ArrayBuffer(i3), u2 = new Uint8Array(o5), f2 = -1 === t3 ? 3 : 0;
-                for (e3 = 0; e3 < i3; e3 += 1) u2[e3] = n3[e3 >>> 2] >>> 8 * (f2 + t3 * (e3 % 4)) & 255;
+                var e3, i3 = r3 / 8, o5 = new ArrayBuffer(i3), u2 = new Uint8Array(o5), f3 = -1 === t3 ? 3 : 0;
+                for (e3 = 0; e3 < i3; e3 += 1) u2[e3] = n3[e3 >>> 2] >>> 8 * (f3 + t3 * (e3 % 4)) & 255;
                 return o5;
               })(n2, t2, e2);
             };
@@ -7799,11 +7799,11 @@ function requireSha() {
             throw new Error("format must be HEX, B64, BYTES, ARRAYBUFFER, or UINT8ARRAY");
         }
       }
-      var i = [1116352408, 1899447441, 3049323471, 3921009573, 961987163, 1508970993, 2453635748, 2870763221, 3624381080, 310598401, 607225278, 1426881987, 1925078388, 2162078206, 2614888103, 3248222580, 3835390401, 4022224774, 264347078, 604807628, 770255983, 1249150122, 1555081692, 1996064986, 2554220882, 2821834349, 2952996808, 3210313671, 3336571891, 3584528711, 113926993, 338241895, 666307205, 773529912, 1294757372, 1396182291, 1695183700, 1986661051, 2177026350, 2456956037, 2730485921, 2820302411, 3259730800, 3345764771, 3516065817, 3600352804, 4094571909, 275423344, 430227734, 506948616, 659060556, 883997877, 958139571, 1322822218, 1537002063, 1747873779, 1955562222, 2024104815, 2227730452, 2361852424, 2428436474, 2756734187, 3204031479, 3329325298], o4 = [3238371032, 914150663, 812702999, 4144912697, 4290775857, 1750603025, 1694076839, 3204075428], u = [1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225], f = "Chosen SHA variant is not supported";
+      var i = [1116352408, 1899447441, 3049323471, 3921009573, 961987163, 1508970993, 2453635748, 2870763221, 3624381080, 310598401, 607225278, 1426881987, 1925078388, 2162078206, 2614888103, 3248222580, 3835390401, 4022224774, 264347078, 604807628, 770255983, 1249150122, 1555081692, 1996064986, 2554220882, 2821834349, 2952996808, 3210313671, 3336571891, 3584528711, 113926993, 338241895, 666307205, 773529912, 1294757372, 1396182291, 1695183700, 1986661051, 2177026350, 2456956037, 2730485921, 2820302411, 3259730800, 3345764771, 3516065817, 3600352804, 4094571909, 275423344, 430227734, 506948616, 659060556, 883997877, 958139571, 1322822218, 1537002063, 1747873779, 1955562222, 2024104815, 2227730452, 2361852424, 2428436474, 2756734187, 3204031479, 3329325298], o4 = [3238371032, 914150663, 812702999, 4144912697, 4290775857, 1750603025, 1694076839, 3204075428], u = [1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225], f2 = "Chosen SHA variant is not supported";
       function w(n2, r2) {
-        var t2, e2, i2 = n2.binLen >>> 3, o5 = r2.binLen >>> 3, u2 = i2 << 3, f2 = 4 - i2 << 3;
+        var t2, e2, i2 = n2.binLen >>> 3, o5 = r2.binLen >>> 3, u2 = i2 << 3, f3 = 4 - i2 << 3;
         if (i2 % 4 != 0) {
-          for (t2 = 0; t2 < o5; t2 += 4) e2 = i2 + t2 >>> 2, n2.value[e2] |= r2.value[t2 >>> 2] << u2, n2.value.push(0), n2.value[e2 + 1] |= r2.value[t2 >>> 2] >>> f2;
+          for (t2 = 0; t2 < o5; t2 += 4) e2 = i2 + t2 >>> 2, n2.value[e2] |= r2.value[t2 >>> 2] << u2, n2.value.push(0), n2.value[e2 + 1] |= r2.value[t2 >>> 2] >>> f3;
           return (n2.value.length << 2) - 4 >= o5 + i2 && n2.value.pop(), { value: n2.value, binLen: n2.binLen + r2.binLen };
         }
         return { value: n2.value.concat(r2.value), binLen: n2.binLen + r2.binLen };
@@ -7837,8 +7837,8 @@ function requireSha() {
           this.o = n3, this.u = [], this.s = 0, this.h = false, this.v = 0, this.A = false, this.l = [], this.H = [];
         }
         return n2.prototype.update = function(n3) {
-          var r2, t2 = 0, e2 = this.S >>> 5, i2 = this.p(n3, this.u, this.s), o5 = i2.binLen, u2 = i2.value, f2 = o5 >>> 5;
-          for (r2 = 0; r2 < f2; r2 += e2) t2 + this.S <= o5 && (this.m = this.R(u2.slice(r2, r2 + e2), this.m), t2 += this.S);
+          var r2, t2 = 0, e2 = this.S >>> 5, i2 = this.p(n3, this.u, this.s), o5 = i2.binLen, u2 = i2.value, f3 = o5 >>> 5;
+          for (r2 = 0; r2 < f3; r2 += e2) t2 + this.S <= o5 && (this.m = this.R(u2.slice(r2, r2 + e2), this.m), t2 += this.S);
           this.v += t2, this.u = u2.slice(t2 >>> 5), this.s = o5 % this.S, this.h = true;
         }, n2.prototype.getHash = function(n3, r2) {
           var t2, i2, o5 = this.U, u2 = s2(r2);
@@ -7846,10 +7846,10 @@ function requireSha() {
             if (-1 === u2.outputLen) throw new Error("Output length must be specified in options");
             o5 = u2.outputLen;
           }
-          var f2 = e(n3, o5, this.C, u2);
-          if (this.A && this.F) return f2(this.F(u2));
+          var f3 = e(n3, o5, this.C, u2);
+          if (this.A && this.F) return f3(this.F(u2));
           for (i2 = this.K(this.u.slice(), this.s, this.v, this.B(this.m), o5), t2 = 1; t2 < this.numRounds; t2 += 1) this.T && o5 % 32 != 0 && (i2[i2.length - 1] &= 16777215 >>> 24 - o5 % 32), i2 = this.K(i2, o5, 0, this.L(this.o), o5);
-          return f2(i2);
+          return f3(i2);
         }, n2.prototype.setHMACKey = function(n3, r2, e2) {
           if (!this.g) throw new Error("Variant does not support HMAC");
           if (this.h) throw new Error("Cannot set MAC key after calling update");
@@ -7927,8 +7927,8 @@ function requireSha() {
         return [1732584193, 4023233417, 2562383102, 271733878, 3285377520];
       }
       function C2(n2, r2) {
-        var t2, e2, i2, o5, u2, f2, w2, s3 = [];
-        for (t2 = r2[0], e2 = r2[1], i2 = r2[2], o5 = r2[3], u2 = r2[4], w2 = 0; w2 < 80; w2 += 1) s3[w2] = w2 < 16 ? n2[w2] : A(s3[w2 - 3] ^ s3[w2 - 8] ^ s3[w2 - 14] ^ s3[w2 - 16], 1), f2 = w2 < 20 ? y2(A(t2, 5), H(e2, i2, o5), u2, 1518500249, s3[w2]) : w2 < 40 ? y2(A(t2, 5), b2(e2, i2, o5), u2, 1859775393, s3[w2]) : w2 < 60 ? y2(A(t2, 5), d(e2, i2, o5), u2, 2400959708, s3[w2]) : y2(A(t2, 5), b2(e2, i2, o5), u2, 3395469782, s3[w2]), u2 = o5, o5 = i2, i2 = A(e2, 30), e2 = t2, t2 = f2;
+        var t2, e2, i2, o5, u2, f3, w2, s3 = [];
+        for (t2 = r2[0], e2 = r2[1], i2 = r2[2], o5 = r2[3], u2 = r2[4], w2 = 0; w2 < 80; w2 += 1) s3[w2] = w2 < 16 ? n2[w2] : A(s3[w2 - 3] ^ s3[w2 - 8] ^ s3[w2 - 14] ^ s3[w2 - 16], 1), f3 = w2 < 20 ? y2(A(t2, 5), H(e2, i2, o5), u2, 1518500249, s3[w2]) : w2 < 40 ? y2(A(t2, 5), b2(e2, i2, o5), u2, 1859775393, s3[w2]) : w2 < 60 ? y2(A(t2, 5), d(e2, i2, o5), u2, 2400959708, s3[w2]) : y2(A(t2, 5), b2(e2, i2, o5), u2, 3395469782, s3[w2]), u2 = o5, o5 = i2, i2 = A(e2, 30), e2 = t2, t2 = f3;
         return r2[0] = p2(t2, r2[0]), r2[1] = p2(e2, r2[1]), r2[2] = p2(i2, r2[2]), r2[3] = p2(o5, r2[3]), r2[4] = p2(u2, r2[4]), r2;
       }
       function F(n2, r2, t2, e2) {
@@ -7939,7 +7939,7 @@ function requireSha() {
       var K = (function(n2) {
         function r2(r3, e2, i2) {
           var o5 = this;
-          if ("SHA-1" !== r3) throw new Error(f);
+          if ("SHA-1" !== r3) throw new Error(f2);
           var u2 = i2 || {};
           return (o5 = n2.call(this, r3, e2, i2) || this).g = true, o5.F = o5.Y, o5.C = -1, o5.p = t(o5.t, o5.i, o5.C), o5.R = C2, o5.B = function(n3) {
             return n3.slice();
@@ -7951,21 +7951,21 @@ function requireSha() {
         return "SHA-224" == n2 ? o4.slice() : u.slice();
       }
       function L(n2, r2) {
-        var t2, e2, o5, u2, f2, w2, s3, a3, h3, c2, v3, A2, b3 = [];
-        for (t2 = r2[0], e2 = r2[1], o5 = r2[2], u2 = r2[3], f2 = r2[4], w2 = r2[5], s3 = r2[6], a3 = r2[7], v3 = 0; v3 < 64; v3 += 1) b3[v3] = v3 < 16 ? n2[v3] : m(E2(A2 = b3[v3 - 2], 17) ^ E2(A2, 19) ^ l(A2, 10), b3[v3 - 7], R(b3[v3 - 15]), b3[v3 - 16]), h3 = y2(a3, U2(f2), H(f2, w2, s3), i[v3], b3[v3]), c2 = p2(S2(t2), d(t2, e2, o5)), a3 = s3, s3 = w2, w2 = f2, f2 = p2(u2, h3), u2 = o5, o5 = e2, e2 = t2, t2 = p2(h3, c2);
-        return r2[0] = p2(t2, r2[0]), r2[1] = p2(e2, r2[1]), r2[2] = p2(o5, r2[2]), r2[3] = p2(u2, r2[3]), r2[4] = p2(f2, r2[4]), r2[5] = p2(w2, r2[5]), r2[6] = p2(s3, r2[6]), r2[7] = p2(a3, r2[7]), r2;
+        var t2, e2, o5, u2, f3, w2, s3, a3, h3, c2, v3, A2, b3 = [];
+        for (t2 = r2[0], e2 = r2[1], o5 = r2[2], u2 = r2[3], f3 = r2[4], w2 = r2[5], s3 = r2[6], a3 = r2[7], v3 = 0; v3 < 64; v3 += 1) b3[v3] = v3 < 16 ? n2[v3] : m(E2(A2 = b3[v3 - 2], 17) ^ E2(A2, 19) ^ l(A2, 10), b3[v3 - 7], R(b3[v3 - 15]), b3[v3 - 16]), h3 = y2(a3, U2(f3), H(f3, w2, s3), i[v3], b3[v3]), c2 = p2(S2(t2), d(t2, e2, o5)), a3 = s3, s3 = w2, w2 = f3, f3 = p2(u2, h3), u2 = o5, o5 = e2, e2 = t2, t2 = p2(h3, c2);
+        return r2[0] = p2(t2, r2[0]), r2[1] = p2(e2, r2[1]), r2[2] = p2(o5, r2[2]), r2[3] = p2(u2, r2[3]), r2[4] = p2(f3, r2[4]), r2[5] = p2(w2, r2[5]), r2[6] = p2(s3, r2[6]), r2[7] = p2(a3, r2[7]), r2;
       }
       var g = (function(n2) {
         function r2(r3, e2, i2) {
           var o5 = this;
-          if ("SHA-224" !== r3 && "SHA-256" !== r3) throw new Error(f);
+          if ("SHA-224" !== r3 && "SHA-256" !== r3) throw new Error(f2);
           var u2 = i2 || {};
           return (o5 = n2.call(this, r3, e2, i2) || this).F = o5.Y, o5.g = true, o5.C = -1, o5.p = t(o5.t, o5.i, o5.C), o5.R = L, o5.B = function(n3) {
             return n3.slice();
           }, o5.L = B2, o5.K = function(n3, t2, e3, i3) {
             return (function(n4, r4, t3, e4, i4) {
-              for (var o6, u3 = 15 + (r4 + 65 >>> 9 << 4), f2 = r4 + t3; n4.length <= u3; ) n4.push(0);
-              for (n4[r4 >>> 5] |= 128 << 24 - r4 % 32, n4[u3] = 4294967295 & f2, n4[u3 - 1] = f2 / 4294967296 | 0, o6 = 0; o6 < n4.length; o6 += 16) e4 = L(n4.slice(o6, o6 + 16), e4);
+              for (var o6, u3 = 15 + (r4 + 65 >>> 9 << 4), f3 = r4 + t3; n4.length <= u3; ) n4.push(0);
+              for (n4[r4 >>> 5] |= 128 << 24 - r4 % 32, n4[u3] = 4294967295 & f3, n4[u3 - 1] = f3 / 4294967296 | 0, o6 = 0; o6 < n4.length; o6 += 16) e4 = L(n4.slice(o6, o6 + 16), e4);
               return "SHA-224" === i4 ? [e4[0], e4[1], e4[2], e4[3], e4[4], e4[5], e4[6]] : e4;
             })(n3, t2, e3, i3, r3);
           }, o5.m = B2(r3), o5.S = 512, o5.U = "SHA-224" === r3 ? 224 : 256, o5.T = false, u2.hmacKey && o5.k(a2("hmacKey", u2.hmacKey, o5.C)), o5;
@@ -8010,8 +8010,8 @@ function requireSha() {
       function _(n2, r2, t2, e2, i2) {
         var o5, u2;
         o5 = (65535 & n2.I) + (65535 & r2.I) + (65535 & t2.I) + (65535 & e2.I) + (65535 & i2.I);
-        var f2 = (65535 & (u2 = (n2.I >>> 16) + (r2.I >>> 16) + (t2.I >>> 16) + (e2.I >>> 16) + (i2.I >>> 16) + (o5 >>> 16))) << 16 | 65535 & o5;
-        return o5 = (65535 & n2.N) + (65535 & r2.N) + (65535 & t2.N) + (65535 & e2.N) + (65535 & i2.N) + (u2 >>> 16), u2 = (n2.N >>> 16) + (r2.N >>> 16) + (t2.N >>> 16) + (e2.N >>> 16) + (i2.N >>> 16) + (o5 >>> 16), new k2((65535 & u2) << 16 | 65535 & o5, f2);
+        var f3 = (65535 & (u2 = (n2.I >>> 16) + (r2.I >>> 16) + (t2.I >>> 16) + (e2.I >>> 16) + (i2.I >>> 16) + (o5 >>> 16))) << 16 | 65535 & o5;
+        return o5 = (65535 & n2.N) + (65535 & r2.N) + (65535 & t2.N) + (65535 & e2.N) + (65535 & i2.N) + (u2 >>> 16), u2 = (n2.N >>> 16) + (r2.N >>> 16) + (t2.N >>> 16) + (e2.N >>> 16) + (i2.N >>> 16) + (o5 >>> 16), new k2((65535 & u2) << 16 | 65535 & o5, f3);
       }
       function P2(n2, r2) {
         return new k2(n2.N ^ r2.N, n2.I ^ r2.I);
@@ -8029,21 +8029,21 @@ function requireSha() {
         return "SHA-384" === n2 ? [new k2(3418070365, o4[0]), new k2(1654270250, o4[1]), new k2(2438529370, o4[2]), new k2(355462360, o4[3]), new k2(1731405415, o4[4]), new k2(41048885895, o4[5]), new k2(3675008525, o4[6]), new k2(1203062813, o4[7])] : [new k2(u[0], 4089235720), new k2(u[1], 2227873595), new k2(u[2], 4271175723), new k2(u[3], 1595750129), new k2(u[4], 2917565137), new k2(u[5], 725511199), new k2(u[6], 4215389547), new k2(u[7], 327033209)];
       }
       function D2(n2, r2) {
-        var t2, e2, i2, o5, u2, f2, w2, s3, a3, h3, c2, v3, A2, E3, l2, b3, H2 = [];
-        for (t2 = r2[0], e2 = r2[1], i2 = r2[2], o5 = r2[3], u2 = r2[4], f2 = r2[5], w2 = r2[6], s3 = r2[7], c2 = 0; c2 < 80; c2 += 1) c2 < 16 ? (v3 = 2 * c2, H2[c2] = new k2(n2[v3], n2[v3 + 1])) : H2[c2] = j((A2 = H2[c2 - 2], E3 = void 0, l2 = void 0, b3 = void 0, E3 = N(A2, 19), l2 = N(A2, 61), b3 = I2(A2, 6), new k2(E3.N ^ l2.N ^ b3.N, E3.I ^ l2.I ^ b3.I)), H2[c2 - 7], x2(H2[c2 - 15]), H2[c2 - 16]), a3 = _(s3, V(u2), M2(u2, f2, w2), Z[c2], H2[c2]), h3 = O2(z(t2), X(t2, e2, i2)), s3 = w2, w2 = f2, f2 = u2, u2 = O2(o5, a3), o5 = i2, i2 = e2, e2 = t2, t2 = O2(a3, h3);
-        return r2[0] = O2(t2, r2[0]), r2[1] = O2(e2, r2[1]), r2[2] = O2(i2, r2[2]), r2[3] = O2(o5, r2[3]), r2[4] = O2(u2, r2[4]), r2[5] = O2(f2, r2[5]), r2[6] = O2(w2, r2[6]), r2[7] = O2(s3, r2[7]), r2;
+        var t2, e2, i2, o5, u2, f3, w2, s3, a3, h3, c2, v3, A2, E3, l2, b3, H2 = [];
+        for (t2 = r2[0], e2 = r2[1], i2 = r2[2], o5 = r2[3], u2 = r2[4], f3 = r2[5], w2 = r2[6], s3 = r2[7], c2 = 0; c2 < 80; c2 += 1) c2 < 16 ? (v3 = 2 * c2, H2[c2] = new k2(n2[v3], n2[v3 + 1])) : H2[c2] = j((A2 = H2[c2 - 2], E3 = void 0, l2 = void 0, b3 = void 0, E3 = N(A2, 19), l2 = N(A2, 61), b3 = I2(A2, 6), new k2(E3.N ^ l2.N ^ b3.N, E3.I ^ l2.I ^ b3.I)), H2[c2 - 7], x2(H2[c2 - 15]), H2[c2 - 16]), a3 = _(s3, V(u2), M2(u2, f3, w2), Z[c2], H2[c2]), h3 = O2(z(t2), X(t2, e2, i2)), s3 = w2, w2 = f3, f3 = u2, u2 = O2(o5, a3), o5 = i2, i2 = e2, e2 = t2, t2 = O2(a3, h3);
+        return r2[0] = O2(t2, r2[0]), r2[1] = O2(e2, r2[1]), r2[2] = O2(i2, r2[2]), r2[3] = O2(o5, r2[3]), r2[4] = O2(u2, r2[4]), r2[5] = O2(f3, r2[5]), r2[6] = O2(w2, r2[6]), r2[7] = O2(s3, r2[7]), r2;
       }
       var G2 = (function(n2) {
         function r2(r3, e2, i2) {
           var o5 = this;
-          if ("SHA-384" !== r3 && "SHA-512" !== r3) throw new Error(f);
+          if ("SHA-384" !== r3 && "SHA-512" !== r3) throw new Error(f2);
           var u2 = i2 || {};
           return (o5 = n2.call(this, r3, e2, i2) || this).F = o5.Y, o5.g = true, o5.C = -1, o5.p = t(o5.t, o5.i, o5.C), o5.R = D2, o5.B = function(n3) {
             return n3.slice();
           }, o5.L = q, o5.K = function(n3, t2, e3, i3) {
             return (function(n4, r4, t3, e4, i4) {
-              for (var o6, u3 = 31 + (r4 + 129 >>> 10 << 5), f2 = r4 + t3; n4.length <= u3; ) n4.push(0);
-              for (n4[r4 >>> 5] |= 128 << 24 - r4 % 32, n4[u3] = 4294967295 & f2, n4[u3 - 1] = f2 / 4294967296 | 0, o6 = 0; o6 < n4.length; o6 += 32) e4 = D2(n4.slice(o6, o6 + 32), e4);
+              for (var o6, u3 = 31 + (r4 + 129 >>> 10 << 5), f3 = r4 + t3; n4.length <= u3; ) n4.push(0);
+              for (n4[r4 >>> 5] |= 128 << 24 - r4 % 32, n4[u3] = 4294967295 & f3, n4[u3 - 1] = f3 / 4294967296 | 0, o6 = 0; o6 < n4.length; o6 += 32) e4 = D2(n4.slice(o6, o6 + 32), e4);
               return "SHA-384" === i4 ? [(e4 = e4)[0].N, e4[0].I, e4[1].N, e4[1].I, e4[2].N, e4[2].I, e4[3].N, e4[3].I, e4[4].N, e4[4].I, e4[5].N, e4[5].I] : [e4[0].N, e4[0].I, e4[1].N, e4[1].I, e4[2].N, e4[2].I, e4[3].N, e4[3].I, e4[4].N, e4[4].I, e4[5].N, e4[5].I, e4[6].N, e4[6].I, e4[7].N, e4[7].I];
             })(n3, t2, e3, i3, r3);
           }, o5.m = q(r3), o5.S = 1024, o5.U = "SHA-384" === r3 ? 384 : 512, o5.T = false, u2.hmacKey && o5.k(a2("hmacKey", u2.hmacKey, o5.C)), o5;
@@ -8061,10 +8061,10 @@ function requireSha() {
         return t2;
       }
       function nn(n2, r2) {
-        var t2, e2, i2, o5, u2, f2, w2, s3, a3, h3 = [], c2 = [];
+        var t2, e2, i2, o5, u2, f3, w2, s3, a3, h3 = [], c2 = [];
         if (null !== n2) for (e2 = 0; e2 < n2.length; e2 += 2) r2[(e2 >>> 1) % 5][(e2 >>> 1) / 5 | 0] = P2(r2[(e2 >>> 1) % 5][(e2 >>> 1) / 5 | 0], new k2(n2[e2 + 1], n2[e2]));
         for (t2 = 0; t2 < 24; t2 += 1) {
-          for (o5 = W(), e2 = 0; e2 < 5; e2 += 1) h3[e2] = (u2 = r2[e2][0], f2 = r2[e2][1], w2 = r2[e2][2], s3 = r2[e2][3], a3 = r2[e2][4], new k2(u2.N ^ f2.N ^ w2.N ^ s3.N ^ a3.N, u2.I ^ f2.I ^ w2.I ^ s3.I ^ a3.I));
+          for (o5 = W(), e2 = 0; e2 < 5; e2 += 1) h3[e2] = (u2 = r2[e2][0], f3 = r2[e2][1], w2 = r2[e2][2], s3 = r2[e2][3], a3 = r2[e2][4], new k2(u2.N ^ f3.N ^ w2.N ^ s3.N ^ a3.N, u2.I ^ f3.I ^ w2.I ^ s3.I ^ a3.I));
           for (e2 = 0; e2 < 5; e2 += 1) c2[e2] = P2(h3[(e2 + 4) % 5], Y(h3[(e2 + 1) % 5], 1));
           for (e2 = 0; e2 < 5; e2 += 1) for (i2 = 0; i2 < 5; i2 += 1) r2[e2][i2] = P2(r2[e2][i2], c2[e2]);
           for (e2 = 0; e2 < 5; e2 += 1) for (i2 = 0; i2 < 5; i2 += 1) o5[i2][(2 * e2 + 3 * i2) % 5] = Y(r2[e2][i2], Q[e2][i2]);
@@ -8125,14 +8125,14 @@ function requireSha() {
               o5.S = w2 = 1088, u2 = o5.O(i2), o5.U = -1, o5.T = true, o5.g = false, o5.F = null;
               break;
             default:
-              throw new Error(f);
+              throw new Error(f2);
           }
           return o5.K = function(n3, r4, t2, e3, i3) {
             return (function(n4, r5, t3, e4, i4, o6, u3) {
-              var f2, w3, s4 = 0, a3 = [], h3 = i4 >>> 5, c2 = r5 >>> 5;
-              for (f2 = 0; f2 < c2 && r5 >= i4; f2 += h3) e4 = nn(n4.slice(f2, f2 + h3), e4), r5 -= i4;
-              for (n4 = n4.slice(f2), r5 %= i4; n4.length < h3; ) n4.push(0);
-              for (n4[(f2 = r5 >>> 3) >> 2] ^= o6 << f2 % 4 * 8, n4[h3 - 1] ^= 2147483648, e4 = nn(n4, e4); 32 * a3.length < u3 && (w3 = e4[s4 % 5][s4 / 5 | 0], a3.push(w3.I), !(32 * a3.length >= u3)); ) a3.push(w3.N), 0 == 64 * (s4 += 1) % i4 && (nn(null, e4), s4 = 0);
+              var f3, w3, s4 = 0, a3 = [], h3 = i4 >>> 5, c2 = r5 >>> 5;
+              for (f3 = 0; f3 < c2 && r5 >= i4; f3 += h3) e4 = nn(n4.slice(f3, f3 + h3), e4), r5 -= i4;
+              for (n4 = n4.slice(f3), r5 %= i4; n4.length < h3; ) n4.push(0);
+              for (n4[(f3 = r5 >>> 3) >> 2] ^= o6 << f3 % 4 * 8, n4[h3 - 1] ^= 2147483648, e4 = nn(n4, e4); 32 * a3.length < u3 && (w3 = e4[s4 % 5][s4 / 5 | 0], a3.push(w3.I), !(32 * a3.length >= u3)); ) a3.push(w3.N), 0 == 64 * (s4 += 1) % i4 && (nn(null, e4), s4 = 0);
               return a3;
             })(n3, r4, 0, e3, w2, u2, i3);
           }, s3.hmacKey && o5.k(a2("hmacKey", s3.hmacKey, o5.C)), o5;
@@ -8172,7 +8172,7 @@ function requireSha() {
           else if ("SHA-224" == n3 || "SHA-256" == n3) this.j = new g(n3, r2, t2);
           else if ("SHA-384" == n3 || "SHA-512" == n3) this.j = new G2(n3, r2, t2);
           else {
-            if ("SHA3-224" != n3 && "SHA3-256" != n3 && "SHA3-384" != n3 && "SHA3-512" != n3 && "SHAKE128" != n3 && "SHAKE256" != n3 && "CSHAKE128" != n3 && "CSHAKE256" != n3 && "KMAC128" != n3 && "KMAC256" != n3) throw new Error(f);
+            if ("SHA3-224" != n3 && "SHA3-256" != n3 && "SHA3-384" != n3 && "SHA3-512" != n3 && "SHAKE128" != n3 && "SHAKE256" != n3 && "CSHAKE128" != n3 && "CSHAKE256" != n3 && "KMAC128" != n3 && "KMAC256" != n3) throw new Error(f2);
             this.j = new on(n3, r2, t2);
           }
         }
@@ -23493,7 +23493,7 @@ function Base64Normalize(data) {
 }
 function Base64NormalizeUrl(data) {
   const normalized = Base64Normalize(data);
-  const burl = normalized.replace(/-/g, "+").replace(/\//g, "_").replace(/=/g, "");
+  const burl = normalized.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
   return burl;
 }
 function ParseBase64(data) {
@@ -24664,6 +24664,12 @@ var LogLevel;
   LogLevel2[LogLevel2["ERROR"] = 3] = "ERROR";
   LogLevel2[LogLevel2["NONE"] = 4] = "NONE";
 })(LogLevel || (LogLevel = {}));
+function getDefaultLogLevel() {
+  if (typeof process === "undefined" || typeof process?.env === "undefined") {
+    return LogLevel.ERROR;
+  }
+  return process?.env?.WALLETKIT_LOG_LEVEL === "debug" ? LogLevel.DEBUG : process?.env?.WALLETKIT_LOG_LEVEL === "none" ? LogLevel.NONE : process?.env?.WALLETKIT_LOG_LEVEL === "info" ? LogLevel.INFO : process?.env?.WALLETKIT_LOG_LEVEL === "warn" ? LogLevel.WARN : process?.env?.WALLETKIT_LOG_LEVEL === "off" ? LogLevel.NONE : LogLevel.ERROR;
+}
 class Logger {
   config;
   parent;
@@ -24796,7 +24802,7 @@ class Logger {
   }
 }
 const globalLogger = new Logger({
-  level: LogLevel.DEBUG,
+  level: getDefaultLogLevel(),
   enableStackTrace: true
 });
 function delay(ms) {
@@ -24917,13 +24923,13 @@ class MemoryStorageAdapter {
     return Array.from(this.store.keys());
   }
 }
-const log$n = globalLogger.createChild("StorageAdapter");
+const log$l = globalLogger.createChild("StorageAdapter");
 function createStorageAdapter(config = {}) {
   if (typeof localStorage !== "undefined") {
     try {
       return new LocalStorageAdapter(config);
     } catch (error2) {
-      log$n.warn("Failed to create LocalStorageAdapter, falling back to memory", { error: error2 });
+      log$l.warn("Failed to create LocalStorageAdapter, falling back to memory", { error: error2 });
     }
   }
   if (config.allowMemory) {
@@ -24980,7 +24986,7 @@ class ExtensionStorageAdapter {
     return CallForSuccess(operation, this.maxRetries, this.retryDelay);
   }
 }
-const log$m = globalLogger.createChild("Storage");
+const log$k = globalLogger.createChild("Storage");
 class Storage {
   adapter;
   constructor(adapter) {
@@ -24999,7 +25005,7 @@ class Storage {
       }
       return JSON.parse(value);
     } catch (error2) {
-      log$m.warn("Failed to parse stored value", { key, error: error2 });
+      log$k.warn("Failed to parse stored value", { key, error: error2 });
       return null;
     }
   }
@@ -25013,7 +25019,7 @@ class Storage {
       const serialized = JSON.stringify(value);
       await this.adapter.set(key, serialized);
     } catch (error2) {
-      log$m.error("Failed to serialize value for storage", { key, error: error2 });
+      log$k.error("Failed to serialize value for storage", { key, error: error2 });
       throw error2;
     }
   }
@@ -25279,7 +25285,7 @@ class WalletManager {
     return wallet2.getWalletId();
   }
 }
-const log$l = globalLogger.createChild("TONConnectStoredSessionManager");
+const log$j = globalLogger.createChild("TONConnectStoredSessionManager");
 class TONConnectStoredSessionManager {
   sessions = /* @__PURE__ */ new Map();
   storage;
@@ -25441,16 +25447,16 @@ class TONConnectStoredSessionManager {
             if (wallet2) {
               session.walletAddress = wallet2.getAddress();
             } else {
-              log$l.warn("Session Wallet not found for session", { sessionId: session.sessionId });
+              log$j.warn("Session Wallet not found for session", { sessionId: session.sessionId });
               continue;
             }
           }
           this.sessions.set(session.sessionId, session);
         }
-        log$l.debug("Loaded session metadata", { count: storedSessions.length });
+        log$j.debug("Loaded session metadata", { count: storedSessions.length });
       }
     } catch (error2) {
-      log$l.warn("Failed to load sessions from storage", { error: error2 });
+      log$j.warn("Failed to load sessions from storage", { error: error2 });
     }
   }
   /**
@@ -25461,7 +25467,7 @@ class TONConnectStoredSessionManager {
       const sessionsToStore = Array.from(this.sessions.values());
       await this.storage.set(this.storageKey, sessionsToStore);
     } catch (error2) {
-      log$l.warn("Failed to persist sessions to storage", { error: error2 });
+      log$j.warn("Failed to persist sessions to storage", { error: error2 });
     }
   }
   async migrateSessions() {
@@ -25500,7 +25506,7 @@ function requireUtil() {
     }
     return ret;
   }
-  function toHex(bytes) {
+  function toHex2(bytes) {
     return Array.prototype.map.call(bytes, function(n) {
       return (n < 16 ? "0" : "") + n.toString(16);
     }).join("");
@@ -25549,7 +25555,7 @@ function requireUtil() {
   }
   util = {
     normalizeInput,
-    toHex,
+    toHex: toHex2,
     debugPrint,
     testSpeed
   };
@@ -26564,12 +26570,12 @@ function x(o4, e) {
   return true;
 }
 function G(o4, e) {
-  let t = h.blake2bInit(nacl$1.box.nonceLength);
+  let t = h.blake2bInit(f.box.nonceLength);
   return h.blake2bUpdate(t, o4), h.blake2bUpdate(t, e), h.blake2bFinal(t);
 }
 function I(o4, e, t) {
-  let r = o4.subarray(0, nacl$1.box.publicKeyLength), n = G(r, e), i = o4.subarray(nacl$1.box.publicKeyLength);
-  return nacl$1.box.open(i, n, r, t);
+  let r = o4.subarray(0, f.box.publicKeyLength), n = G(r, e), i = o4.subarray(f.box.publicKeyLength);
+  return f.box.open(i, n, r, t);
 }
 var C = class o3 {
   constructor(e, t = null, r = null, n = void 0) {
@@ -26953,7 +26959,7 @@ const RESTORE_CONNECTION_TIMEOUT = 1e4;
 const TONCONNECT_BRIDGE_RESPONSE = "TONCONNECT_BRIDGE_RESPONSE";
 const TONCONNECT_BRIDGE_EVENT = "TONCONNECT_BRIDGE_EVENT";
 globalLogger.createChild("ExtensionTransport");
-const log$k = globalLogger.createChild("BridgeManager");
+const log$i = globalLogger.createChild("BridgeManager");
 class BridgeManager {
   config;
   bridgeProvider;
@@ -27009,7 +27015,7 @@ class BridgeManager {
    */
   async start() {
     if (this.bridgeProvider) {
-      log$k.warn("Bridge already initialized");
+      log$i.warn("Bridge already initialized");
       return;
     }
     try {
@@ -27021,7 +27027,7 @@ class BridgeManager {
         this.reconnectAttempts = 0;
       }
     } catch (error2) {
-      log$k.error("Failed to start bridge", { error: error2 });
+      log$i.error("Failed to start bridge", { error: error2 });
       throw error2;
     }
     const requestProcessing = () => {
@@ -27034,7 +27040,7 @@ class BridgeManager {
    * Create new session for a dApp connection
    */
   async createSession(appSessionId) {
-    log$k.info("[BRIDGE] Creating session", { appSessionId });
+    log$i.info("[BRIDGE] Creating session", { appSessionId });
     const session = await this.sessionManager.getSession(appSessionId);
     if (!session) {
       throw new WalletKitError(ERROR_CODES.SESSION_NOT_FOUND, `Session not found`, void 0, {
@@ -27042,7 +27048,7 @@ class BridgeManager {
       });
     }
     if (this.bridgeProvider && this.isConnected) {
-      log$k.info("[BRIDGE] Updating clients");
+      log$i.info("[BRIDGE] Updating clients");
       await this.updateClients();
     }
   }
@@ -27053,7 +27059,7 @@ class BridgeManager {
     if (this.bridgeProvider && this.isConnected) {
       await this.updateClients();
     }
-    log$k.debug("Session removed", { appSessionId });
+    log$i.debug("Session removed", { appSessionId });
   }
   /**
    * Send response to dApp
@@ -27093,32 +27099,14 @@ class BridgeManager {
       await this.bridgeProvider.send(response, sessionCrypto, sessionId, {
         traceId: event?.traceId
       });
-      log$k.debug("Response sent successfully", { sessionId, requestId: event.id });
+      log$i.debug("Response sent successfully", { sessionId, requestId: event.id });
     } catch (error2) {
-      log$k.error("Failed to send response through bridge", {
+      log$i.error("Failed to send response through bridge", {
         sessionId,
         requestId: event.id,
         error: error2
       });
       throw WalletKitError.fromError(ERROR_CODES.BRIDGE_RESPONSE_SEND_FAILED, "Failed to send response through bridge", error2, { sessionId, requestId: event.id });
-    }
-  }
-  /**
-   * Send an intent response to a client identified by clientId.
-   * Creates a new ephemeral SessionCrypto for one-way intent responses.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async sendIntentResponse(clientId, response, traceId) {
-    if (!this.bridgeProvider) {
-      throw new WalletKitError(ERROR_CODES.BRIDGE_NOT_INITIALIZED, "Bridge not initialized for sending intent response");
-    }
-    const sessionCrypto = new SessionCrypto();
-    try {
-      await this.bridgeProvider.send(response, sessionCrypto, clientId, { traceId });
-      log$k.debug("Intent response sent", { clientId, traceId });
-    } catch (error2) {
-      log$k.error("Failed to send intent response", { clientId, error: error2 });
-      throw WalletKitError.fromError(ERROR_CODES.BRIDGE_RESPONSE_SEND_FAILED, "Failed to send intent response through bridge", error2, { clientId });
     }
   }
   async sendJsBridgeResponse(sessionId, _isJsBridge, requestId, response, options) {
@@ -27208,7 +27196,7 @@ class BridgeManager {
         listener: this.queueBridgeEvent.bind(this),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         errorListener: (error2) => {
-          log$k.error("Bridge listener error", { error: error2.toString() });
+          log$i.error("Bridge listener error", { error: error2.toString() });
           this.analytics?.emitBridgeClientConnectError({
             error_message: `${error2?.toString() || "Unknown error"}${error2?.errorCode ? ` (Code: ${error2?.errorCode})` : ""}`,
             trace_id: error2?.traceId ?? connectTraceId,
@@ -27222,7 +27210,7 @@ class BridgeManager {
       });
       this.isConnected = true;
       this.reconnectAttempts = 0;
-      log$k.info("Bridge connected successfully");
+      log$i.info("Bridge connected successfully");
       if (this.analytics) {
         const client = clients[0];
         this.analytics.emitBridgeClientConnectEstablished({
@@ -27231,7 +27219,7 @@ class BridgeManager {
         });
       }
     } catch (error2) {
-      log$k.error("Bridge connection failed", { error: error2?.toString() });
+      log$i.error("Bridge connection failed", { error: error2?.toString() });
       this.analytics?.emitBridgeClientConnectError({
         error_message: `${error2?.toString() || "Unknown error"}${error2?.errorCode ? ` (Code: ${error2?.errorCode})` : ""}`,
         trace_id: error2?.traceId ?? connectTraceId,
@@ -27240,9 +27228,9 @@ class BridgeManager {
       if (!this.config.disableHttpConnection) {
         if (this.reconnectAttempts < (this.config.maxReconnectAttempts || 5)) {
           this.reconnectAttempts++;
-          log$k.info("Bridge reconnection attempt", { attempt: this.reconnectAttempts });
+          log$i.info("Bridge reconnection attempt", { attempt: this.reconnectAttempts });
           setTimeout(() => {
-            this.connectToSSEBridge().catch((error3) => log$k.error("Bridge reconnection failed", { error: error3 }));
+            this.connectToSSEBridge().catch((error3) => log$i.error("Bridge reconnection failed", { error: error3 }));
           }, this.config.reconnectInterval);
         }
       }
@@ -27263,10 +27251,10 @@ class BridgeManager {
    * Add client to existing bridge connection
    */
   async updateClients() {
-    log$k.debug("Updating clients");
+    log$i.debug("Updating clients");
     if (this.bridgeProvider) {
       const clients = await this.getClients();
-      log$k.info("[BRIDGE] Restoring connection", { clients: clients.length });
+      log$i.info("[BRIDGE] Restoring connection", { clients: clients.length });
       await this.bridgeProvider.restoreConnection(clients, {
         lastEventId: this.lastEventId
       });
@@ -27277,14 +27265,14 @@ class BridgeManager {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   queueBridgeEvent(event) {
-    log$k.debug("Bridge event queued", { eventId: event?.id, event });
+    log$i.debug("Bridge event queued", { eventId: event?.id, event });
     this.eventQueue.push(event);
     this.processBridgeEvents().catch((error2) => {
-      log$k.error("Error in background event processing", { error: error2 });
+      log$i.error("Error in background event processing", { error: error2 });
     });
   }
   queueJsBridgeEvent(messageInfo, event) {
-    log$k.debug("JS Bridge event queued", { eventId: messageInfo?.messageId });
+    log$i.debug("JS Bridge event queued", { eventId: messageInfo?.messageId });
     if (!event) {
       return;
     }
@@ -27321,7 +27309,7 @@ class BridgeManager {
       });
     }
     this.processBridgeEvents().catch((error2) => {
-      log$k.error("Error in background event processing", { error: error2 });
+      log$i.error("Error in background event processing", { error: error2 });
     });
   }
   /**
@@ -27333,7 +27321,7 @@ class BridgeManager {
    */
   async processBridgeEvents() {
     if (this.isProcessing) {
-      log$k.debug("Event processing already in progress, skipping");
+      log$i.debug("Event processing already in progress, skipping");
       return;
     }
     this.isProcessing = true;
@@ -27346,7 +27334,7 @@ class BridgeManager {
         }
       }
     } catch (error2) {
-      log$k.error("Error during event processing", { error: error2 });
+      log$i.error("Error during event processing", { error: error2 });
       this.isProcessing = false;
       this.restartConnection();
       return;
@@ -27360,7 +27348,7 @@ class BridgeManager {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async handleBridgeEvent(event) {
     try {
-      log$k.info("Bridge event received", { event });
+      log$i.info("Bridge event received", { event });
       const rawEvent = {
         id: event.id || crypto.randomUUID(),
         method: event.method || "unknown",
@@ -27433,21 +27421,21 @@ class BridgeManager {
         if (this.eventEmitter) {
           this.eventEmitter.emit("bridge-storage-updated");
         }
-        log$k.info("Event stored durably", { eventId: rawEvent.id, method: rawEvent.method });
+        log$i.info("Event stored durably", { eventId: rawEvent.id, method: rawEvent.method });
       } catch (error2) {
-        log$k.error("Failed to store event durably", {
+        log$i.error("Failed to store event durably", {
           eventId: rawEvent.id,
           error: error2.message
         });
         throw WalletKitError.fromError(ERROR_CODES.EVENT_STORE_OPERATION_FAILED, "Failed to store event durably", error2, { eventId: rawEvent.id, method: rawEvent.method });
       }
-      log$k.info("Bridge event processed", { rawEvent });
+      log$i.info("Bridge event processed", { rawEvent });
       if (event?.lastEventId && event.lastEventId !== this.lastEventId) {
         this.lastEventId = event.lastEventId;
         await this.saveLastEventId();
       }
     } catch (error2) {
-      log$k.error("Error handling bridge event", { error: error2 });
+      log$i.error("Error handling bridge event", { error: error2 });
     }
   }
   /**
@@ -27458,11 +27446,11 @@ class BridgeManager {
       const savedEventId = await this.storage.get(this.storageKey);
       if (savedEventId) {
         this.lastEventId = savedEventId;
-        log$k.debug("Loaded last event ID from storage", { lastEventId: this.lastEventId });
+        log$i.debug("Loaded last event ID from storage", { lastEventId: this.lastEventId });
       }
     } catch (error2) {
       const storageError = WalletKitError.fromError(ERROR_CODES.STORAGE_READ_FAILED, "Failed to load last event ID from storage", error2);
-      log$k.warn("Failed to load last event ID from storage", { error: storageError });
+      log$i.warn("Failed to load last event ID from storage", { error: storageError });
     }
   }
   /**
@@ -27472,11 +27460,11 @@ class BridgeManager {
     try {
       if (this.lastEventId) {
         await this.storage.set(this.storageKey, this.lastEventId);
-        log$k.debug("Saved last event ID to storage", { lastEventId: this.lastEventId });
+        log$i.debug("Saved last event ID to storage", { lastEventId: this.lastEventId });
       }
     } catch (error2) {
       const storageError = WalletKitError.fromError(ERROR_CODES.STORAGE_WRITE_FAILED, "Failed to save last event ID to storage", error2);
-      log$k.warn("Failed to save last event ID to storage", { error: storageError });
+      log$i.warn("Failed to save last event ID to storage", { error: storageError });
     }
   }
 }
@@ -27500,7 +27488,7 @@ function isValidHost(host) {
   const parts = host.split(".");
   return parts.every((part) => part.length > 0);
 }
-const log$j = globalLogger.createChild("ConnectHandler");
+const log$h = globalLogger.createChild("ConnectHandler");
 class ConnectHandler extends BasicHandler {
   config;
   analytics;
@@ -27522,7 +27510,7 @@ class ConnectHandler extends BasicHandler {
         manifest = result.manifest;
         manifestFetchErrorCode = result.manifestFetchErrorCode;
       } catch (error2) {
-        log$j.warn("Failed to fetch manifest", { error: error2 });
+        log$h.warn("Failed to fetch manifest", { error: error2 });
       }
     }
     const preview = this.createPreview(event, manifestUrl, manifest, manifestFetchErrorCode);
@@ -27591,14 +27579,14 @@ class ConnectHandler extends BasicHandler {
         try {
           const parsedDAppUrl = new URL(dAppUrl);
           if (!isValidHost(parsedDAppUrl.host)) {
-            log$j.warn("Invalid dApp URL in manifest - invalid host format", {
+            log$h.warn("Invalid dApp URL in manifest - invalid host format", {
               dAppUrl,
               host: parsedDAppUrl.host
             });
             finalManifestFetchErrorCode = CONNECT_EVENT_ERROR_CODES.MANIFEST_CONTENT_ERROR;
           }
         } catch (_) {
-          log$j.warn("Invalid dApp URL in manifest - failed to parse", { dAppUrl });
+          log$h.warn("Invalid dApp URL in manifest - failed to parse", { dAppUrl });
           finalManifestFetchErrorCode = CONNECT_EVENT_ERROR_CODES.MANIFEST_CONTENT_ERROR;
         }
       }
@@ -27661,7 +27649,7 @@ class ConnectHandler extends BasicHandler {
     if (directResult.manifest) {
       return directResult;
     }
-    log$j.info("Direct manifest fetch failed, trying proxy", { manifestUrl });
+    log$h.info("Direct manifest fetch failed, trying proxy", { manifestUrl });
     const proxyUrl = `${ConnectHandler.MANIFEST_PROXY_URL}${manifestUrl}`;
     return this.tryFetchManifest(proxyUrl);
   }
@@ -27669,7 +27657,7 @@ class ConnectHandler extends BasicHandler {
     try {
       const response = await fetch(url);
       if (!response.ok) {
-        log$j.error("Failed to fetch manifest not ok", { url, status: response.status });
+        log$h.error("Failed to fetch manifest not ok", { url, status: response.status });
         return {
           manifest: null,
           manifestFetchErrorCode: CONNECT_EVENT_ERROR_CODES.MANIFEST_CONTENT_ERROR
@@ -27681,7 +27669,7 @@ class ConnectHandler extends BasicHandler {
         manifestFetchErrorCode: void 0
       };
     } catch (e) {
-      log$j.error("Failed to fetch manifest catched", { url, error: e });
+      log$h.error("Failed to fetch manifest catched", { url, error: e });
       return {
         manifest: null,
         manifestFetchErrorCode: CONNECT_EVENT_ERROR_CODES.MANIFEST_CONTENT_ERROR
@@ -27842,8 +27830,8 @@ function toTransaction(tx) {
     traceId: tx.trace_id ?? void 0,
     previousTransactionHash: tx.prev_trans_hash ? Base64ToHex(tx.prev_trans_hash) : void 0,
     previousTransactionLogicalTime: tx.prev_trans_lt ?? void 0,
-    origStatus: toAccountStatus(tx.orig_status),
-    endStatus: toAccountStatus(tx.end_status),
+    origStatus: toAccountStatus$1(tx.orig_status),
+    endStatus: toAccountStatus$1(tx.end_status),
     totalFees: tx.total_fees,
     totalFeesExtraCurrencies: tx.total_fees_extra_currencies,
     blockRef: toTransactionBlockRef(tx.block_ref),
@@ -27852,7 +27840,7 @@ function toTransaction(tx) {
     isEmulated: tx.emulated
   };
 }
-function toAccountStatus(status) {
+function toAccountStatus$1(status) {
   if (status === "active") {
     return { type: "active" };
   } else if (status === "frozen") {
@@ -27949,7 +27937,7 @@ function toAccountState(state) {
     hash: Base64ToHex(state.hash),
     balance: state.balance,
     extraCurrencies: state.extra_currencies ?? void 0,
-    accountStatus: state.account_status ? toAccountStatus(state.account_status) : void 0,
+    accountStatus: state.account_status ? toAccountStatus$1(state.account_status) : void 0,
     frozenHash: state.frozen_hash ? Base64ToHex(state.frozen_hash) : void 0,
     dataHash: state.data_hash ? Base64ToHex(state.data_hash) : void 0,
     codeHash: state.code_hash ? Base64ToHex(state.code_hash) : void 0
@@ -28239,7 +28227,7 @@ async function createTransactionPreview(client, request, wallet2) {
     moneyFlow
   };
 }
-const log$i = globalLogger.createChild("TransactionHandler");
+const log$g = globalLogger.createChild("TransactionHandler");
 class TransactionHandler extends BasicHandler {
   config;
   walletManager;
@@ -28262,7 +28250,7 @@ class TransactionHandler extends BasicHandler {
     const walletId = event.walletId;
     const walletAddress = event.walletAddress;
     if (!walletId && !walletAddress) {
-      log$i.error("Wallet ID not found", { event });
+      log$g.error("Wallet ID not found", { event });
       return {
         error: {
           code: SEND_TRANSACTION_ERROR_CODES.UNKNOWN_APP_ERROR,
@@ -28273,7 +28261,7 @@ class TransactionHandler extends BasicHandler {
     }
     const wallet2 = walletId ? this.walletManager.getWallet(walletId) : void 0;
     if (!wallet2) {
-      log$i.error("Wallet not found", { event, walletId, walletAddress });
+      log$g.error("Wallet not found", { event, walletId, walletAddress });
       return {
         error: {
           code: SEND_TRANSACTION_ERROR_CODES.UNKNOWN_APP_ERROR,
@@ -28284,7 +28272,7 @@ class TransactionHandler extends BasicHandler {
     }
     const requestValidation = this.parseTonConnectTransactionRequest(event, wallet2);
     if (!requestValidation.result || !requestValidation?.validation?.isValid) {
-      log$i.error("Failed to parse transaction request", { event, requestValidation });
+      log$g.error("Failed to parse transaction request", { event, requestValidation });
       this.eventEmitter.emit("event:error", event);
       return {
         error: {
@@ -28303,11 +28291,11 @@ class TransactionHandler extends BasicHandler {
           try {
             this.eventEmitter.emit("emulation:result", preview.trace);
           } catch (error2) {
-            log$i.warn("Error emitting emulation result event", { error: error2 });
+            log$g.warn("Error emitting emulation result event", { error: error2 });
           }
         }
       } catch (error2) {
-        log$i.error("Failed to create transaction preview", { error: error2 });
+        log$g.error("Failed to create transaction preview", { error: error2 });
         preview = {
           error: {
             code: ERROR_CODES.UNKNOWN_EMULATION_ERROR,
@@ -28380,7 +28368,7 @@ class TransactionHandler extends BasicHandler {
         validation: { isValid: errors.length === 0, errors }
       };
     } catch (error2) {
-      log$i.error("Failed to parse transaction request", { error: error2 });
+      log$g.error("Failed to parse transaction request", { error: error2 });
       errors.push("Failed to parse transaction request");
       return {
         result: void 0,
@@ -28537,7 +28525,7 @@ function validateSignDataPayloadCell(data) {
   }
   return null;
 }
-const log$h = globalLogger.createChild("SignDataHandler");
+const log$f = globalLogger.createChild("SignDataHandler");
 class SignDataHandler extends BasicHandler {
   analytics;
   walletManager;
@@ -28562,14 +28550,14 @@ class SignDataHandler extends BasicHandler {
     const wallet2 = walletId ? this.walletManager.getWallet(walletId) : void 0;
     const payload = this.parseDataToSign(event);
     if (!payload) {
-      log$h.error("No data to sign found in request", { event });
+      log$f.error("No data to sign found in request", { event });
       throw new WalletKitError(ERROR_CODES.INVALID_REQUEST_EVENT, "No data to sign found in request", void 0, {
         eventId: event.id
       });
     }
     const preview = this.createDataPreview(payload.data, event);
     if (!preview) {
-      log$h.error("No preview found for data", { data: payload });
+      log$f.error("No preview found for data", { data: payload });
       throw new WalletKitError(ERROR_CODES.RESPONSE_CREATION_FAILED, "Failed to create preview for sign data request", void 0, { eventId: event.id, data: payload });
     }
     const signEvent = {
@@ -28605,7 +28593,7 @@ class SignDataHandler extends BasicHandler {
       const parsed = JSON.parse(event.params[0]);
       const validationResult = validateSignDataPayload(parsed);
       if (validationResult) {
-        log$h.error("Invalid data to sign found in request", { validationResult });
+        log$f.error("Invalid data to sign found in request", { validationResult });
         return void 0;
       }
       if (parsed === void 0) {
@@ -28643,7 +28631,7 @@ class SignDataHandler extends BasicHandler {
         data: signData
       };
     } catch (error2) {
-      log$h.error("Invalid data to sign found in request", { error: error2 });
+      log$f.error("Invalid data to sign found in request", { error: error2 });
       return void 0;
     }
   }
@@ -28678,7 +28666,7 @@ class SignDataHandler extends BasicHandler {
           }
         };
       } catch (error2) {
-        log$h.error("Error deserializing cell", { error: error2 });
+        log$f.error("Error deserializing cell", { error: error2 });
         return {
           type: "cell",
           value: {
@@ -28734,7 +28722,7 @@ class DisconnectHandler extends BasicHandler {
     return void 0;
   }
 }
-const log$g = globalLogger.createChild("EventRouter");
+const log$e = globalLogger.createChild("EventRouter");
 class EventRouter {
   config;
   eventEmitter;
@@ -28766,7 +28754,7 @@ class EventRouter {
   async routeEvent(event) {
     const validation = validateBridgeEvent(event);
     if (!validation.isValid) {
-      log$g.error("Invalid bridge event", { errors: validation.errors });
+      log$e.error("Invalid bridge event", { errors: validation.errors });
       return;
     }
     try {
@@ -28778,7 +28766,7 @@ class EventRouter {
             try {
               await this.bridgeManager.sendResponse(event, result);
             } catch (error2) {
-              log$g.error("Error sending response for error event", { error: error2, event, result });
+              log$e.error("Error sending response for error event", { error: error2, event, result });
             }
             return;
           }
@@ -28787,7 +28775,7 @@ class EventRouter {
         }
       }
     } catch (error2) {
-      log$g.error("Error routing event", { error: error2 });
+      log$e.error("Error routing event", { error: error2 });
       throw error2;
     }
   }
@@ -29030,7 +29018,7 @@ function PrepareSignData(data) {
     hash: Uint8ArrayToHex(finalHash)
   };
 }
-const log$f = globalLogger.createChild("RequestProcessor");
+const log$d = globalLogger.createChild("RequestProcessor");
 class RequestProcessor {
   walletKitOptions;
   sessionManager;
@@ -29118,7 +29106,7 @@ class RequestProcessor {
       }
       return;
     } catch (error2) {
-      log$f.error("Failed to approve connect request", { error: error2 });
+      log$d.error("Failed to approve connect request", { error: error2 });
       throw error2;
     }
   }
@@ -29127,7 +29115,7 @@ class RequestProcessor {
    */
   async rejectConnectRequest(event, reason, errorCode) {
     try {
-      log$f.info("Connect request rejected", {
+      log$d.info("Connect request rejected", {
         id: event.id,
         dAppName: event.preview.dAppInfo?.name || "",
         reason: reason || "User rejected connection"
@@ -29145,7 +29133,7 @@ class RequestProcessor {
       try {
         await this.bridgeManager.sendResponse(event, response, new SessionCrypto());
       } catch (error2) {
-        log$f.error("Failed to send connect request rejection response", { error: error2 });
+        log$d.error("Failed to send connect request rejection response", { error: error2 });
       }
       if (this.analytics) {
         const sessionData = event.from ? await this.sessionManager.getSession(sessionId) : void 0;
@@ -29174,7 +29162,7 @@ class RequestProcessor {
       }
       return;
     } catch (error2) {
-      log$f.error("Failed to reject connect request", { error: error2 });
+      log$d.error("Failed to reject connect request", { error: error2 });
       throw error2;
     }
   }
@@ -29206,7 +29194,7 @@ class RequestProcessor {
         return { signedBoc };
       }
     } catch (error2) {
-      log$f.error("Failed to approve transaction request", { error: error2 });
+      log$d.error("Failed to approve transaction request", { error: error2 });
       if (error2 instanceof WalletKitError) {
         throw error2;
       }
@@ -29261,7 +29249,7 @@ class RequestProcessor {
       }
       return;
     } catch (error2) {
-      log$f.error("Failed to reject transaction request", { error: error2 });
+      log$d.error("Failed to reject transaction request", { error: error2 });
       throw error2;
     }
   }
@@ -29368,7 +29356,7 @@ class RequestProcessor {
         };
       }
     } catch (error2) {
-      log$f.error("Failed to approve sign data request", {
+      log$d.error("Failed to approve sign data request", {
         error: error2?.message?.toString() ?? error2?.toString()
       });
       if (error2 instanceof WalletKitError) {
@@ -29407,7 +29395,7 @@ class RequestProcessor {
       }
       return;
     } catch (error2) {
-      log$f.error("Failed to reject sign data request", { error: error2 });
+      log$d.error("Failed to reject sign data request", { error: error2 });
       throw error2;
     }
   }
@@ -29500,7 +29488,7 @@ async function signTransactionInternal(wallet2, request) {
   const signedBoc = await wallet2.getSignedSendTransaction(request, {
     fakeSignature: false
   });
-  log$f.debug("Signing transaction", {
+  log$d.debug("Signing transaction", {
     messagesNumber: request.messages.length,
     fromAddress: request.fromAddress,
     validUntil: request.validUntil
@@ -29555,7 +29543,7 @@ function parseDomain(url) {
       value: parsedUrl.host
     };
   } catch (error2) {
-    log$f.error("Failed to parse domain", { error: error2 });
+    log$d.error("Failed to parse domain", { error: error2 });
     return { lengthBytes: 0, value: "" };
   }
 }
@@ -29587,7 +29575,7 @@ function toTonConnectSignDataPayload(payload) {
 const getEventUUID = () => {
   return crypto.randomUUID();
 };
-const log$e = globalLogger.createChild("EventStore");
+const log$c = globalLogger.createChild("EventStore");
 const MAX_EVENT_SIZE_BYTES = 100 * 1024;
 class StorageEventStore {
   storage;
@@ -29621,7 +29609,7 @@ class StorageEventStore {
       sizeBytes
     };
     await this.saveEvent(storedEvent);
-    log$e.info("Event stored", {
+    log$c.info("Event stored", {
       eventId: storedEvent.id,
       eventType,
       sizeBytes,
@@ -29660,11 +29648,11 @@ class StorageEventStore {
       const allEvents = await this.getAllEventsFromStorage();
       const event = allEvents[eventId];
       if (!event) {
-        log$e.warn("Cannot lock non-existent event", { eventId });
+        log$c.warn("Cannot lock non-existent event", { eventId });
         return void 0;
       }
       if (event.status !== "new") {
-        log$e.debug("Cannot lock event - not in new status", {
+        log$c.debug("Cannot lock event - not in new status", {
           eventId,
           status: event.status,
           lockedBy: event.lockedBy
@@ -29679,7 +29667,7 @@ class StorageEventStore {
       };
       allEvents[eventId] = updatedEvent;
       await this.storage.set(this.storageKey, allEvents);
-      log$e.debug("Event lock acquired", { eventId, walletAddress: walletId });
+      log$c.debug("Event lock acquired", { eventId, walletAddress: walletId });
       return updatedEvent;
     });
   }
@@ -29707,7 +29695,7 @@ class StorageEventStore {
       };
       allEvents[eventId] = updatedEvent;
       await this.storage.set(this.storageKey, allEvents);
-      log$e.debug("Event retry count incremented", {
+      log$c.debug("Event retry count incremented", {
         eventId,
         retryCount: updatedEvent.retryCount,
         error: error2
@@ -29737,7 +29725,7 @@ class StorageEventStore {
       }
       allEvents[eventId] = updatedEvent;
       await this.storage.set(this.storageKey, allEvents);
-      log$e.debug("Event status updated", { eventId, oldStatus, newStatus: status });
+      log$c.debug("Event status updated", { eventId, oldStatus, newStatus: status });
       return updatedEvent;
     });
   }
@@ -29749,7 +29737,7 @@ class StorageEventStore {
       const allEvents = await this.getAllEventsFromStorage();
       return allEvents[eventId] || null;
     } catch (error2) {
-      log$e.warn("Failed to get event", { eventId, error: error2 });
+      log$c.warn("Failed to get event", { eventId, error: error2 });
       return null;
     }
   }
@@ -29769,7 +29757,7 @@ class StorageEventStore {
         };
         await this.saveEvent(recoveredEvent);
         recoveredCount++;
-        log$e.info("Recovered stale event", {
+        log$c.info("Recovered stale event", {
           eventId: event.id,
           lockedBy: event.lockedBy,
           staleMinutes: Math.round((now - event.processingStartedAt) / 6e4),
@@ -29778,7 +29766,7 @@ class StorageEventStore {
       }
     }
     if (recoveredCount > 0) {
-      log$e.info("Event recovery completed", { recoveredCount });
+      log$c.info("Event recovery completed", { recoveredCount });
     }
     return recoveredCount;
   }
@@ -29793,7 +29781,7 @@ class StorageEventStore {
     for (const event of events) {
       if (event.status === "completed" && event.completedAt && event.completedAt < cutoffTime || event.status === "errored" && event.createdAt < cutoffTime) {
         eventsToRemove.push(event.id);
-        log$e.debug("Marked event for cleanup", { eventId: event.id, status: event.status });
+        log$c.debug("Marked event for cleanup", { eventId: event.id, status: event.status });
       }
     }
     if (eventsToRemove.length > 0) {
@@ -29805,7 +29793,7 @@ class StorageEventStore {
         }
         await this.storage.set(this.storageKey, allEvents);
       });
-      log$e.info("Event cleanup completed", { cleanedUpCount });
+      log$c.info("Event cleanup completed", { cleanedUpCount });
     }
     return cleanedUpCount;
   }
@@ -29817,7 +29805,7 @@ class StorageEventStore {
       const allEvents = await this.getAllEventsFromStorage();
       return Object.values(allEvents);
     } catch (error2) {
-      log$e.warn("Failed to get all events", { error: error2 });
+      log$c.warn("Failed to get all events", { error: error2 });
       return [];
     }
   }
@@ -29845,7 +29833,7 @@ class StorageEventStore {
       const eventsData = await this.storage.get(this.storageKey);
       return eventsData || {};
     } catch (error2) {
-      log$e.warn("Failed to get events from storage", { error: error2 });
+      log$c.warn("Failed to get events from storage", { error: error2 });
       return {};
     }
   }
@@ -29880,7 +29868,7 @@ class StorageEventStore {
     }
   }
 }
-const log$d = globalLogger.createChild("EventProcessor");
+const log$b = globalLogger.createChild("EventProcessor");
 class StorageEventProcessor {
   eventStore;
   config;
@@ -29921,15 +29909,15 @@ class StorageEventProcessor {
     }
     if (walletId) {
       if (this.registeredWallets.has(walletId)) {
-        log$d.debug("Processing already registered for wallet", { walletId });
+        log$b.debug("Processing already registered for wallet", { walletId });
       } else {
         this.registeredWallets.add(walletId);
-        log$d.info("Registered wallet for event processing", { walletId });
+        log$b.info("Registered wallet for event processing", { walletId });
       }
     }
     if (!this.isProcessing) {
       this.isProcessing = true;
-      log$d.info("Started global event processing loop");
+      log$b.info("Started global event processing loop");
       this.processEventsLoop();
     } else {
       this.triggerProcessing();
@@ -29944,7 +29932,7 @@ class StorageEventProcessor {
     }
     if (walletId) {
       this.registeredWallets.delete(walletId);
-      log$d.info("Unregistered wallet from event processing", { walletId });
+      log$b.info("Unregistered wallet from event processing", { walletId });
     }
     if (this.registeredWallets.size === 0 && this.isProcessing && !walletId) {
       this.isProcessing = false;
@@ -29952,12 +29940,12 @@ class StorageEventProcessor {
         this.wakeUpResolver();
         this.wakeUpResolver = void 0;
       }
-      log$d.info("Stopped global event processing loop (no more wallets)");
+      log$b.info("Stopped global event processing loop (no more wallets)");
     }
   }
   async clearRegisteredWallets() {
     this.registeredWallets.clear();
-    log$d.info("Cleared registered wallets from event processing");
+    log$b.info("Cleared registered wallets from event processing");
   }
   /**
    * Process next available event from any source (wallet or no-wallet)
@@ -29991,7 +29979,7 @@ class StorageEventProcessor {
       const processed = await this.processEvent(eventToUse, walletId);
       return processed;
     } catch (error2) {
-      log$d.error("Error in processNextAvailableEvent", {
+      log$b.error("Error in processNextAvailableEvent", {
         error: error2.message
       });
       return false;
@@ -30003,9 +29991,9 @@ class StorageEventProcessor {
   async completeEvent(eventId) {
     try {
       await this.eventStore.updateEventStatus(eventId, "completed", "processing");
-      log$d.debug("Event marked as completed", { eventId });
+      log$b.debug("Event marked as completed", { eventId });
     } catch (error2) {
-      log$d.error("Failed to mark event as completed", {
+      log$b.error("Failed to mark event as completed", {
         eventId,
         error: error2.message
       });
@@ -30016,7 +30004,7 @@ class StorageEventProcessor {
    */
   startRecoveryLoop() {
     if (this.recoveryTimeoutId) {
-      log$d.debug("Recovery loop already running");
+      log$b.debug("Recovery loop already running");
       return;
     }
     const recoveryLoop = async () => {
@@ -30026,7 +30014,7 @@ class StorageEventProcessor {
           this.triggerProcessing();
         }
       } catch (error2) {
-        log$d.error("Error in recovery loop", { error: error2.message });
+        log$b.error("Error in recovery loop", { error: error2.message });
       }
       if (this.recoveryTimeoutId !== void 0) {
         this.recoveryTimeoutId = setTimeout(recoveryLoop, this.config.recoveryIntervalMs);
@@ -30036,7 +30024,7 @@ class StorageEventProcessor {
       try {
         await this.eventStore.cleanupOldEvents(this.config.retentionMs);
       } catch (error2) {
-        log$d.error("Error in cleanup loop", { error: error2.message });
+        log$b.error("Error in cleanup loop", { error: error2.message });
       }
       if (this.cleanupTimeoutId !== void 0) {
         this.cleanupTimeoutId = setTimeout(cleanupLoop, this.config.cleanupIntervalMs);
@@ -30044,7 +30032,7 @@ class StorageEventProcessor {
     };
     this.recoveryTimeoutId = setTimeout(recoveryLoop, this.config.recoveryIntervalMs);
     this.cleanupTimeoutId = setTimeout(cleanupLoop, this.config.cleanupIntervalMs);
-    log$d.info("Recovery and cleanup loops started");
+    log$b.info("Recovery and cleanup loops started");
   }
   /**
    * Stop the recovery process
@@ -30058,7 +30046,7 @@ class StorageEventProcessor {
       clearTimeout(this.cleanupTimeoutId);
       this.cleanupTimeoutId = void 0;
     }
-    log$d.info("Recovery and cleanup loops stopped");
+    log$b.info("Recovery and cleanup loops stopped");
   }
   // Private helper methods
   /**
@@ -30068,12 +30056,12 @@ class StorageEventProcessor {
   async processEvent(event, walletId) {
     const acquiredEvent = await this.eventStore.acquireLock(event.id, walletId);
     if (!acquiredEvent) {
-      log$d.debug("Failed to acquire lock on event", { eventId: event.id, walletId });
+      log$b.debug("Failed to acquire lock on event", { eventId: event.id, walletId });
       return false;
     }
     const retryCount = event.retryCount || 0;
     if (retryCount >= this.config.maxRetries) {
-      log$d.error("Event exceeded max retries, marking as errored", {
+      log$b.error("Event exceeded max retries, marking as errored", {
         eventId: event.id,
         retryCount,
         maxRetries: this.config.maxRetries
@@ -30081,14 +30069,14 @@ class StorageEventProcessor {
       try {
         await this.eventStore.updateEventStatus(event.id, "errored", "processing");
       } catch (error2) {
-        log$d.error("Failed to mark event as errored", {
+        log$b.error("Failed to mark event as errored", {
           eventId: event.id,
           error: error2.message
         });
       }
       return false;
     }
-    log$d.info("Processing event", {
+    log$b.info("Processing event", {
       eventId: event.id,
       eventType: event.eventType,
       walletId,
@@ -30108,11 +30096,11 @@ class StorageEventProcessor {
         ...walletAddress ? { walletAddress } : {}
       });
       await this.eventStore.updateEventStatus(event.id, "completed", "processing");
-      log$d.info("Event processing completed", { eventId: event.id });
+      log$b.info("Event processing completed", { eventId: event.id });
       return true;
     } catch (error2) {
       const errorMessage = error2.message ?? "Unknown error";
-      log$d.error("Error processing event", {
+      log$b.error("Error processing event", {
         eventId: event.id,
         error: errorMessage,
         retryCount
@@ -30120,7 +30108,7 @@ class StorageEventProcessor {
       try {
         await this.eventStore.releaseLock(event.id, errorMessage);
       } catch (updateError) {
-        log$d.error("Failed to increment retry count", {
+        log$b.error("Failed to increment retry count", {
           eventId: event.id,
           error: updateError.message
         });
@@ -30139,21 +30127,21 @@ class StorageEventProcessor {
           await this.waitForWakeUpOrTimeout(500);
         }
       } catch (error2) {
-        log$d.error("Error in global processing loop", {
+        log$b.error("Error in global processing loop", {
           error: error2.message
         });
         await this.waitForWakeUpOrTimeout(500);
       }
     }
     this.wakeUpResolver = void 0;
-    log$d.debug("Global processing loop ended");
+    log$b.debug("Global processing loop ended");
   }
   /**
    * Trigger the global processing loop
    */
   triggerProcessing() {
     if (this.isProcessing && this.wakeUpResolver) {
-      log$d.debug("Waking up global processing loop");
+      log$b.debug("Waking up global processing loop");
       this.wakeUpResolver();
     }
   }
@@ -30934,6 +30922,9 @@ async function getJettonWalletAddressFromClient(client, jettonAddress, ownerAddr
 async function getJettonBalanceFromClient(client, jettonWalletAddress) {
   try {
     const result = await client.runGetMethod(jettonWalletAddress, "get_wallet_data");
+    if (result.exitCode !== 0) {
+      return "0";
+    }
     const parsedStack = ParseStack(result.stack);
     const balance = parsedStack[0].type === "int" ? parsedStack[0].value : 0n;
     return balance.toString();
@@ -31184,7 +31175,7 @@ function createTransferTransaction(params) {
     fromAddress: params.fromAddress
   };
 }
-const log$c = globalLogger.createChild("WalletTonClass");
+const log$a = globalLogger.createChild("WalletTonClass");
 class WalletTonClass {
   async createTransferTonTransaction(param) {
     if (!isValidAddress(param.recipientAddress)) {
@@ -31260,7 +31251,7 @@ class WalletTonClass {
       const { hash: normalizedHash, boc: normalizedBoc } = getNormalizedExtMessageHash(boc);
       return { boc, normalizedBoc, normalizedHash };
     } catch (error2) {
-      log$c.error("Failed to send transaction", { error: error2 });
+      log$a.error("Failed to send transaction", { error: error2 });
       if (error2 instanceof WalletKitError) {
         throw error2;
       }
@@ -31347,7 +31338,7 @@ class WalletNftClass {
     });
   }
 }
-const log$b = globalLogger.createChild("Initializer");
+const log$9 = globalLogger.createChild("Initializer");
 class Initializer {
   config;
   networkManager;
@@ -31363,12 +31354,12 @@ class Initializer {
    */
   async initialize(options, networkManager) {
     try {
-      log$b.info("Initializing TonWalletKit...");
+      log$9.info("Initializing TonWalletKit...");
       this.networkManager = networkManager;
       const storage = this.initializeStorage(options);
       const { walletManager, sessionManager, bridgeManager, eventRouter, eventProcessor } = await this.initializeManagers(options, storage);
       const { requestProcessor } = this.initializeProcessors(sessionManager, bridgeManager, walletManager);
-      log$b.info("TonWalletKit initialized successfully");
+      log$9.info("TonWalletKit initialized successfully");
       return {
         walletManager,
         sessionManager,
@@ -31379,7 +31370,7 @@ class Initializer {
         eventProcessor
       };
     } catch (error2) {
-      log$b.error("Failed to initialize TonWalletKit", { error: error2 });
+      log$9.error("Failed to initialize TonWalletKit", { error: error2 });
       throw error2;
     }
   }
@@ -31420,9 +31411,9 @@ class Initializer {
     const bridgeManager = new BridgeManager(options?.walletManifest, options?.bridge, sessionManager, storage, eventStore, eventRouter, options, this.eventEmitter, this.analyticsManager);
     eventRouter.setBridgeManager(bridgeManager);
     bridgeManager.start().then(() => {
-      log$b.info("Bridge manager started successfully");
+      log$9.info("Bridge manager started successfully");
     }).catch((e) => {
-      log$b.error("Could not start bridge manager", { error: e?.toString?.() });
+      log$9.error("Could not start bridge manager", { error: e?.toString?.() });
     });
     const eventProcessor = new StorageEventProcessor(options?.eventProcessor, eventStore, DEFAULT_DURABLE_EVENTS_CONFIG, walletManager, sessionManager, eventRouter, this.eventEmitter);
     return {
@@ -31447,7 +31438,7 @@ class Initializer {
    */
   async cleanup(components) {
     try {
-      log$b.info("Cleaning up TonWalletKit components...");
+      log$9.info("Cleaning up TonWalletKit components...");
       if (components.eventProcessor) {
         components.eventProcessor.stopRecoveryLoop();
         await components.eventProcessor.clearRegisteredWallets();
@@ -31459,9 +31450,9 @@ class Initializer {
       if (components.eventRouter) {
         components.eventRouter.clearCallbacks();
       }
-      log$b.info("TonWalletKit cleanup completed");
+      log$9.info("TonWalletKit cleanup completed");
     } catch (error2) {
-      log$b.error("Error during cleanup", { error: error2 });
+      log$9.error("Error during cleanup", { error: error2 });
     }
   }
 }
@@ -32904,7 +32895,7 @@ class LRUCache {
     }
   }
 }
-const log$a = globalLogger.createChild("JettonsManager");
+const log$8 = globalLogger.createChild("JettonsManager");
 function createCacheKey(network, address) {
   return `${network.chainId}:${address}`;
 }
@@ -32925,7 +32916,7 @@ class JettonsManager {
     for (const network of this.networkManager.getConfiguredNetworks()) {
       this.addTonToCache(network);
     }
-    log$a.info("JettonsManager initialized", { cacheSize });
+    log$8.info("JettonsManager initialized", { cacheSize });
     this.eventEmitter.on("emulation:result", (emulationResult) => {
       if (emulationResult && typeof emulationResult === "object" && "metadata" in emulationResult && "network" in emulationResult) {
         const network = emulationResult.network;
@@ -32963,13 +32954,13 @@ class JettonsManager {
       const cacheKey = this.normalizedCacheKey(targetNetwork, jettonAddress);
       const cachedInfo = this.cache.get(cacheKey);
       if (cachedInfo) {
-        log$a.debug("Jetton info found in cache", { jettonAddress, network: targetNetwork });
+        log$8.debug("Jetton info found in cache", { jettonAddress, network: targetNetwork });
         return cachedInfo;
       }
-      log$a.debug("Jetton info not found in cache", { jettonAddress, network: targetNetwork });
+      log$8.debug("Jetton info not found in cache", { jettonAddress, network: targetNetwork });
       const address = asMaybeAddressFriendly(jettonAddress);
       if (!address) {
-        log$a.error("Invalid jetton address format", { jettonAddress, network: targetNetwork });
+        log$8.error("Invalid jetton address format", { jettonAddress, network: targetNetwork });
         return null;
       }
       const apiClient = this.networkManager.getClient(targetNetwork);
@@ -33003,7 +32994,7 @@ class JettonsManager {
       }
       return null;
     } catch (error2) {
-      log$a.error("Error getting jetton info", { error: error2, jettonAddress, network: targetNetwork });
+      log$8.error("Error getting jetton info", { error: error2, jettonAddress, network: targetNetwork });
       return null;
     }
   }
@@ -33018,7 +33009,7 @@ class JettonsManager {
     const targetNetwork = network;
     try {
       const apiClient = this.networkManager.getClient(targetNetwork);
-      log$a.debug("Getting address jettons", {
+      log$8.debug("Getting address jettons", {
         userAddress,
         network: targetNetwork,
         offset,
@@ -33036,10 +33027,10 @@ class JettonsManager {
       for (const item of response.jettons) {
         addressJettons.push(item);
       }
-      log$a.debug("Retrieved address jettons", { count: addressJettons.length, network: targetNetwork });
+      log$8.debug("Retrieved address jettons", { count: addressJettons.length, network: targetNetwork });
       return addressJettons;
     } catch (error2) {
-      log$a.error("Failed to get address jettons", { error: error2, userAddress, network: targetNetwork });
+      log$8.error("Failed to get address jettons", { error: error2, userAddress, network: targetNetwork });
       throw new JettonError(`Failed to get jettons for address: ${error2 instanceof Error ? error2.message : "Unknown error"}`, JettonErrorCode.NETWORK_ERROR, error2);
     }
   }
@@ -33059,14 +33050,14 @@ class JettonsManager {
         uri: emulationInfo.extra.uri
       };
       this.cache.set(cacheKey, jettonInfo);
-      log$a.debug("Added jetton info from emulation to cache", {
+      log$8.debug("Added jetton info from emulation to cache", {
         jettonAddress,
         network,
         name: jettonInfo.name,
         symbol: jettonInfo.symbol
       });
     } catch (error2) {
-      log$a.error("Error adding jetton from emulation", { error: error2, jettonAddress, network });
+      log$8.error("Error adding jetton from emulation", { error: error2, jettonAddress, network });
     }
   }
   /**
@@ -33081,16 +33072,16 @@ class JettonsManager {
         }
         const jettonMasterInfo = addressMetadata.token_info.find((info2) => typeof info2 === "object" && info2 !== null && "type" in info2 && info2.type === "jetton_masters");
         if (jettonMasterInfo) {
-          log$a.debug("Adding jetton from emulation metadata", { jettonAddress, network });
+          log$8.debug("Adding jetton from emulation metadata", { jettonAddress, network });
           this.addJettonFromEmulation(network, jettonAddress, jettonMasterInfo);
           addedCount++;
         }
       }
       if (addedCount > 0) {
-        log$a.info("Added jettons from emulation metadata", { addedCount, network });
+        log$8.info("Added jettons from emulation metadata", { addedCount, network });
       }
     } catch (error2) {
-      log$a.error("Error adding jettons from emulation metadata", { error: error2, network });
+      log$8.error("Error adding jettons from emulation metadata", { error: error2, network });
     }
   }
   /**
@@ -33136,13 +33127,13 @@ class JettonsManager {
         }
       }
       this.addTonToCache(network);
-      log$a.info("Jetton cache cleared for network", { network });
+      log$8.info("Jetton cache cleared for network", { network });
     } else {
       this.cache.clear();
       for (const net of this.networkManager.getConfiguredNetworks()) {
         this.addTonToCache(net);
       }
-      log$a.info("Jetton cache cleared for all networks");
+      log$8.info("Jetton cache cleared for all networks");
     }
   }
 }
@@ -33246,7 +33237,7 @@ class DefiManager {
     return this.providers.has(providerId);
   }
 }
-const log$9 = globalLogger.createChild("SwapManager");
+const log$7 = globalLogger.createChild("SwapManager");
 class SwapManager extends DefiManager {
   /**
    * Get a quote for swapping tokens
@@ -33255,7 +33246,7 @@ class SwapManager extends DefiManager {
    * @returns Promise resolving to swap quote
    */
   async getQuote(params, providerId) {
-    log$9.debug("Getting swap quote", {
+    log$7.debug("Getting swap quote", {
       fromToken: params.from,
       toToken: params.to,
       amount: params.amount,
@@ -33264,14 +33255,14 @@ class SwapManager extends DefiManager {
     });
     try {
       const quote = await this.getProvider(providerId || this.defaultProviderId).getQuote(params);
-      log$9.debug("Received swap quote", {
+      log$7.debug("Received swap quote", {
         fromAmount: quote.fromAmount,
         toAmount: quote.toAmount,
         priceImpact: quote.priceImpact
       });
       return quote;
     } catch (error2) {
-      log$9.error("Failed to get swap quote", { error: error2, params });
+      log$7.error("Failed to get swap quote", { error: error2, params });
       throw error2;
     }
   }
@@ -33282,16 +33273,16 @@ class SwapManager extends DefiManager {
    */
   async buildSwapTransaction(params) {
     const providerId = params.quote.providerId || this.defaultProviderId;
-    log$9.debug("Building swap transaction", {
+    log$7.debug("Building swap transaction", {
       providerId,
       userAddress: params.userAddress
     });
     try {
       const transaction = await this.getProvider(providerId).buildSwapTransaction(params);
-      log$9.debug("Built swap transaction", params.quote);
+      log$7.debug("Built swap transaction", params.quote);
       return transaction;
     } catch (error2) {
-      log$9.error("Failed to build swap transaction", { error: error2, params });
+      log$7.error("Failed to build swap transaction", { error: error2, params });
       throw error2;
     }
   }
@@ -33299,7 +33290,7 @@ class SwapManager extends DefiManager {
     return new SwapError(message, code, details);
   }
 }
-const log$8 = globalLogger.createChild("EventEmitter");
+const log$6 = globalLogger.createChild("EventEmitter");
 class EventEmitter {
   listeners = /* @__PURE__ */ new Map();
   /**
@@ -33310,7 +33301,7 @@ class EventEmitter {
       this.listeners.set(eventName, /* @__PURE__ */ new Set());
     }
     this.listeners.get(eventName).add(listener);
-    log$8.debug("Event listener added", { eventName, totalListeners: this.listeners.get(eventName).size });
+    log$6.debug("Event listener added", { eventName, totalListeners: this.listeners.get(eventName).size });
   }
   /**
    * Subscribe to an event once (automatically removes after first emission)
@@ -33329,7 +33320,7 @@ class EventEmitter {
     const eventListeners2 = this.listeners.get(eventName);
     if (eventListeners2) {
       eventListeners2.delete(listener);
-      log$8.debug("Event listener removed", { eventName, totalListeners: eventListeners2.size });
+      log$6.debug("Event listener removed", { eventName, totalListeners: eventListeners2.size });
       if (eventListeners2.size === 0) {
         this.listeners.delete(eventName);
       }
@@ -33341,12 +33332,12 @@ class EventEmitter {
   emit(eventName, data) {
     const eventListeners2 = this.listeners.get(eventName);
     if (eventListeners2) {
-      log$8.debug("Emitting event", { eventName, listenerCount: eventListeners2.size });
+      log$6.debug("Emitting event", { eventName, listenerCount: eventListeners2.size });
       eventListeners2.forEach((listener) => {
         try {
           listener(data);
         } catch (error2) {
-          log$8.error("Error in event listener", { eventName, error: error2 });
+          log$6.error("Error in event listener", { eventName, error: error2 });
         }
       });
     }
@@ -33357,10 +33348,10 @@ class EventEmitter {
   removeAllListeners(eventName) {
     if (eventName) {
       this.listeners.delete(eventName);
-      log$8.debug("All listeners removed for event", { eventName });
+      log$6.debug("All listeners removed for event", { eventName });
     } else {
       this.listeners.clear();
-      log$8.debug("All event listeners cleared");
+      log$6.debug("All event listeners cleared");
     }
   }
   /**
@@ -33528,7 +33519,7 @@ class Api extends HttpClient {
 function pascalToKebab(value) {
   return value.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 }
-const log$7 = globalLogger.createChild("AnalyticsManager");
+const log$5 = globalLogger.createChild("AnalyticsManager");
 class AnalyticsManager {
   api;
   baseEvent;
@@ -33604,12 +33595,12 @@ class AnalyticsManager {
     if (this.appInfo?.getCurrentUserId) {
       enhancedEvent.user_id = this.appInfo.getCurrentUserId();
     }
-    log$7.debug("Analytics event emitted", { event: enhancedEvent });
+    log$5.debug("Analytics event emitted", { event: enhancedEvent });
     this.events.push(enhancedEvent);
     if (this.events.length > this.maxQueueSize) {
       const removed = this.events.length - this.maxQueueSize;
       this.events = this.events.slice(removed);
-      log$7.warn("Analytics queue overflow, dropped oldest events", { count: removed });
+      log$5.warn("Analytics queue overflow, dropped oldest events", { count: removed });
     }
     if (this.events.length >= this.maxBatchSize) {
       void this.flush();
@@ -33634,10 +33625,10 @@ class AnalyticsManager {
     const eventsToSend = this.extractEventsToSend();
     try {
       await this.processEventsBatch(eventsToSend);
-      log$7.debug("Analytics events sent successfully");
+      log$5.debug("Analytics events sent successfully");
     } catch (error2) {
       this.restoreEvents(eventsToSend);
-      log$7.error("Failed to send analytics events", { error: error2 });
+      log$5.error("Failed to send analytics events", { error: error2 });
     } finally {
       this.isProcessing = false;
       this.scheduleNextFlushIfNeeded();
@@ -33655,7 +33646,7 @@ class AnalyticsManager {
     return eventsToSend;
   }
   async processEventsBatch(eventsToSend) {
-    log$7.debug("Sending analytics events", { count: eventsToSend.length });
+    log$5.debug("Sending analytics events", { count: eventsToSend.length });
     try {
       const response = await this.sendEvents(eventsToSend);
       this.handleResponse(response);
@@ -33678,7 +33669,7 @@ class AnalyticsManager {
     if (this.events.length > this.maxQueueSize) {
       const removed = this.events.length - this.maxQueueSize;
       this.events = this.events.slice(0, this.maxQueueSize);
-      log$7.warn("Analytics queue overflow after restore, dropped oldest events", { count: removed });
+      log$5.warn("Analytics queue overflow after restore, dropped oldest events", { count: removed });
     }
   }
   scheduleNextFlushIfNeeded() {
@@ -33699,7 +33690,7 @@ class AnalyticsManager {
     return status === AnalyticsManager.HTTP_STATUS.TOO_MANY_REQUESTS;
   }
   handleClientError(status, statusText) {
-    log$7.error("Analytics API client error", { status, statusText });
+    log$5.error("Analytics API client error", { status, statusText });
   }
   handleUnknownError(error2) {
     if (this.backoff < AnalyticsManager.MAX_BACKOFF_ATTEMPTS) {
@@ -34025,7 +34016,7 @@ const parseInternalTransactionId = (data) => {
   }
   return null;
 };
-const log$6 = globalLogger.createChild("ApiClientToncenter");
+const log$4 = globalLogger.createChild("ApiClientToncenter");
 class ApiClientToncenter extends BaseApiClient {
   constructor(config = {}) {
     const defaultEndpoint = config.network?.chainId === Network.mainnet().chainId ? "https://toncenter.com" : "https://testnet.toncenter.com";
@@ -34185,7 +34176,7 @@ class ApiClientToncenter extends BaseApiClient {
     }
     results.forEach((result) => {
       if (result.status === "rejected") {
-        log$6.error("Error fetching trace", { error: result.reason });
+        log$4.error("Error fetching trace", { error: result.reason });
       }
     });
     throw new Error("Failed to fetch trace");
@@ -34207,7 +34198,7 @@ class ApiClientToncenter extends BaseApiClient {
         return response;
       }
     } catch (error2) {
-      log$6.error("Error fetching pending trace", { error: error2 });
+      log$4.error("Error fetching pending trace", { error: error2 });
     }
     throw new Error("Failed to fetch pending trace");
   }
@@ -34332,8 +34323,18 @@ class ApiClientToncenter extends BaseApiClient {
     }
     return out;
   }
+  async getMasterchainInfo() {
+    const raw = await this.getJson("/api/v3/masterchainInfo");
+    return {
+      workchain: raw.last.workchain,
+      seqno: raw.last.seqno,
+      shard: raw.last.shard,
+      fileHash: Base64ToHex(raw.last.file_hash),
+      rootHash: Base64ToHex(raw.last.root_hash)
+    };
+  }
 }
-const log$5 = globalLogger.createChild("NetworkManager");
+const log$3 = globalLogger.createChild("NetworkManager");
 class KitNetworkManager {
   clients = /* @__PURE__ */ new Map();
   constructor(options) {
@@ -34349,7 +34350,7 @@ class KitNetworkManager {
   initializeClients(options) {
     const networks = options.networks;
     if (!networks) {
-      log$5.warn("No networks configured in TonWalletKitOptions");
+      log$3.warn("No networks configured in TonWalletKitOptions");
       return;
     }
     for (const [chainId, networkConfig] of Object.entries(networks)) {
@@ -34358,7 +34359,7 @@ class KitNetworkManager {
         continue;
       const client = this.createClient(network, networkConfig.apiClient, options);
       this.clients.set(network.chainId, client);
-      log$5.info("Initialized network client", { chainId });
+      log$3.info("Initialized network client", { chainId });
     }
   }
   /**
@@ -34423,918 +34424,7 @@ class KitNetworkManager {
    */
   setClient(network, client) {
     this.clients.set(network.chainId, client);
-    log$5.info("Added/updated network client", { network });
-  }
-}
-const INTENT_INLINE_SCHEME = "tc://intent_inline";
-const INTENT_SCHEME = "tc://intent";
-const VALID_METHODS = ["txIntent", "signMsg", "signIntent", "actionIntent"];
-const INTENT_ERROR_CODES = {
-  UNKNOWN: 0,
-  BAD_REQUEST: 1,
-  UNKNOWN_APP: 100,
-  ACTION_URL_UNREACHABLE: 200,
-  USER_DECLINED: 300,
-  METHOD_NOT_SUPPORTED: 400
-};
-class IntentParser {
-  /**
-   * Check if a URL is a TonConnect intent deep link.
-   */
-  isIntentUrl(url) {
-    const normalized = url.trim().toLowerCase();
-    return normalized.startsWith(INTENT_INLINE_SCHEME) || normalized.startsWith(INTENT_SCHEME);
-  }
-  /**
-   * Parse an intent URL into a typed IntentRequestEvent.
-   * Supports both `tc://intent_inline` (URL-embedded) and `tc://intent` (object storage).
-   */
-  async parse(url) {
-    const parsed = await this.parseUrl(url);
-    return this.toIntentEvent(parsed);
-  }
-  // -- URL parsing ----------------------------------------------------------
-  async parseUrl(url) {
-    try {
-      const parsedUrl = new URL(url);
-      const clientId = parsedUrl.searchParams.get("id") || void 0;
-      const normalized = url.trim().toLowerCase();
-      if (normalized.startsWith(INTENT_INLINE_SCHEME)) {
-        return this.parseInlinePayload(parsedUrl, clientId);
-      }
-      if (normalized.startsWith(INTENT_SCHEME)) {
-        if (!clientId) {
-          throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Missing client ID (id) in object storage intent URL (required for decryption)");
-        }
-        return this.parseObjectStoragePayload(parsedUrl, clientId);
-      }
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Unknown intent URL scheme");
-    } catch (error2) {
-      if (error2 instanceof WalletKitError)
-        throw error2;
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Invalid intent URL format", error2);
-    }
-  }
-  parseInlinePayload(parsedUrl, clientId) {
-    const encoded = parsedUrl.searchParams.get("r");
-    if (!encoded) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Missing payload (r) in intent URL");
-    }
-    const traceId = parsedUrl.searchParams.get("trace_id") || void 0;
-    const json = this.decodePayload(encoded);
-    let request;
-    try {
-      request = JSON.parse(json);
-    } catch (error2) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Invalid JSON in intent payload", error2);
-    }
-    this.validateRequest(request);
-    return { clientId, request, origin: "deepLink", traceId };
-  }
-  /**
-   * Parse an object storage intent URL.
-   * Fetches encrypted payload from `get_url`, decrypts with NaCl using
-   * the provided wallet private key and client public key.
-   */
-  async parseObjectStoragePayload(parsedUrl, clientId) {
-    const walletPrivateKey = parsedUrl.searchParams.get("pk");
-    const getUrl = parsedUrl.searchParams.get("get_url");
-    const traceId = parsedUrl.searchParams.get("trace_id") || void 0;
-    if (!walletPrivateKey) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Missing wallet private key (pk) in intent URL");
-    }
-    if (!getUrl) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Missing get_url in intent URL");
-    }
-    const encryptedPayload = await this.fetchObjectStoragePayload(getUrl);
-    const json = this.decryptPayload(encryptedPayload, clientId, walletPrivateKey);
-    let request;
-    try {
-      request = JSON.parse(json);
-    } catch (error2) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, `Invalid JSON in decrypted intent payload: ${json.substring(0, 100)}`, error2);
-    }
-    this.validateRequest(request);
-    return { clientId, request, origin: "objectStorage", traceId };
-  }
-  /**
-   * Fetch encrypted payload from object storage URL.
-   * Handles both raw binary and base64-encoded text responses.
-   */
-  async fetchObjectStoragePayload(getUrl) {
-    try {
-      const response = await fetch(getUrl);
-      if (!response.ok) {
-        throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, `Object storage fetch failed: ${response.status} ${response.statusText}`);
-      }
-      const contentType = response.headers.get("content-type") || "";
-      const buffer2 = await response.arrayBuffer();
-      const raw = new Uint8Array(buffer2);
-      if (contentType.includes("text") || contentType.includes("json")) {
-        const text = new TextDecoder().decode(raw).trim();
-        try {
-          const jsonResp = JSON.parse(text);
-          const b64Data = jsonResp.data || jsonResp.payload || jsonResp.body;
-          if (typeof b64Data === "string") {
-            return this.base64ToBytes(b64Data);
-          }
-        } catch {
-        }
-        if (/^[A-Za-z0-9+/=_-]+$/.test(text) && text.length > 24) {
-          return this.base64ToBytes(text);
-        }
-      }
-      return raw;
-    } catch (error2) {
-      if (error2 instanceof WalletKitError)
-        throw error2;
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, `Failed to fetch intent payload from object storage: ${error2.message}`, error2);
-    }
-  }
-  base64ToBytes(b64) {
-    let base64 = b64.replace(/-/g, "+").replace(/_/g, "/");
-    const padding = base64.length % 4;
-    if (padding)
-      base64 += "=".repeat(4 - padding);
-    if (typeof atob === "function") {
-      const binaryString = atob(base64);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      return bytes;
-    }
-    return new Uint8Array(Buffer.from(base64, "base64"));
-  }
-  /**
-   * Decrypt an object storage payload using NaCl crypto_box.
-   * Format: nonce (24 bytes) || ciphertext
-   */
-  decryptPayload(encrypted, clientPubKeyHex, walletPrivateKeyHex) {
-    if (encrypted.length <= 24) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, `Encrypted payload too short (${encrypted.length} bytes, need >24)`);
-    }
-    const clientPubKey = this.hexToBytes(clientPubKeyHex);
-    const walletPrivateKey = this.hexToBytes(walletPrivateKeyHex);
-    if (clientPubKey.length !== 32) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, `Invalid client public key length: ${clientPubKey.length} (expected 32)`);
-    }
-    if (walletPrivateKey.length !== 32) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, `Invalid wallet private key length: ${walletPrivateKey.length} (expected 32)`);
-    }
-    const nonce = encrypted.slice(0, 24);
-    const ciphertext = encrypted.slice(24);
-    const decrypted = nacl$1.box.open(ciphertext, nonce, clientPubKey, walletPrivateKey);
-    if (!decrypted) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Failed to decrypt intent payload");
-    }
-    return new TextDecoder().decode(decrypted);
-  }
-  hexToBytes(hex) {
-    const bytes = new Uint8Array(hex.length / 2);
-    for (let i = 0; i < hex.length; i += 2) {
-      bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
-    }
-    return bytes;
-  }
-  // -- Payload decoding -----------------------------------------------------
-  decodePayload(encoded) {
-    if (encoded.startsWith("%7B") || encoded.startsWith("%257B") || encoded.startsWith("{")) {
-      let decoded = decodeURIComponent(encoded);
-      if (decoded.startsWith("%7B") || decoded.startsWith("%")) {
-        decoded = decodeURIComponent(decoded);
-      }
-      return decoded;
-    }
-    return this.decodeBase64Url(encoded);
-  }
-  decodeBase64Url(encoded) {
-    let base64 = encoded.replace(/-/g, "+").replace(/_/g, "/");
-    const padding = base64.length % 4;
-    if (padding)
-      base64 += "=".repeat(4 - padding);
-    if (typeof atob === "function") {
-      return atob(base64);
-    }
-    return Buffer.from(base64, "base64").toString("utf-8");
-  }
-  // -- Validation -----------------------------------------------------------
-  validateRequest(request) {
-    if (!request.id) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Intent request missing id");
-    }
-    if (!request.m || !VALID_METHODS.includes(request.m)) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, `Invalid intent method: ${request.m}`);
-    }
-    switch (request.m) {
-      case "txIntent":
-      case "signMsg":
-        this.validateTransactionItems(request);
-        break;
-      case "signIntent":
-        this.validateSignData(request);
-        break;
-      case "actionIntent":
-        this.validateAction(request);
-        break;
-    }
-  }
-  validateTransactionItems(request) {
-    if (!request.i || !Array.isArray(request.i) || request.i.length === 0) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Transaction intent missing items (i)");
-    }
-    for (const item of request.i) {
-      this.validateItem(item);
-    }
-  }
-  validateItem(item) {
-    const validTypes = ["ton", "jetton", "nft"];
-    if (!item.t || !validTypes.includes(item.t)) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, `Invalid intent item type: ${item.t}`);
-    }
-    switch (item.t) {
-      case "ton":
-        if (!item.a)
-          throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "TON item missing address (a)");
-        if (!item.am)
-          throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "TON item missing amount (am)");
-        break;
-      case "jetton":
-        if (!item.ma)
-          throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Jetton item missing master address (ma)");
-        if (!item.ja)
-          throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Jetton item missing amount (ja)");
-        if (!item.d)
-          throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Jetton item missing destination (d)");
-        break;
-      case "nft":
-        if (!item.na)
-          throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "NFT item missing address (na)");
-        if (!item.no)
-          throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "NFT item missing new owner (no)");
-        break;
-    }
-  }
-  validateSignData(request) {
-    const manifestUrl = request.mu || request.c?.manifestUrl;
-    if (!manifestUrl) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Sign data intent missing manifest URL");
-    }
-    if (!request.p || !request.p.type) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Sign data intent missing payload");
-    }
-  }
-  validateAction(request) {
-    if (!request.a) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Action intent missing action URL (a)");
-    }
-  }
-  /**
-   * Parse an action URL response payload into a typed intent event.
-   *
-   * Action URLs return standard TonConnect payloads:
-   * - `{ action_type: 'sendTransaction', action: { messages, valid_until?, network? } }`
-   * - `{ action_type: 'signData', action: { type, text?|bytes?|cell?, schema? } }`
-   */
-  parseActionResponse(payload, sourceEvent) {
-    const { action_type, action } = payload;
-    if (!action_type || !action) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Action URL response missing action_type or action");
-    }
-    const base = {
-      id: sourceEvent.id,
-      origin: sourceEvent.origin,
-      clientId: sourceEvent.clientId
-    };
-    switch (action_type) {
-      case "sendTransaction":
-        return this.parseActionTransaction(base, action);
-      case "signData":
-        return this.parseActionSignData(base, action, sourceEvent.actionUrl);
-      default:
-        throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, `Action URL returned unsupported action_type: ${action_type}`);
-    }
-  }
-  parseActionTransaction(base, action) {
-    const rawMessages = action.messages;
-    if (!rawMessages || !Array.isArray(rawMessages) || rawMessages.length === 0) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Action sendTransaction missing messages");
-    }
-    const messages = rawMessages.map((msg) => ({
-      address: msg.address,
-      amount: msg.amount,
-      payload: msg.payload,
-      stateInit: msg.stateInit ?? msg.state_init,
-      extraCurrency: msg.extraCurrency ?? msg.extra_currency
-    }));
-    const network = action.network ? { chainId: action.network } : void 0;
-    const resolvedTransaction = {
-      messages,
-      network,
-      validUntil: action.valid_until ?? action.validUntil
-    };
-    return {
-      type: "transaction",
-      ...base,
-      deliveryMode: "send",
-      network,
-      validUntil: resolvedTransaction.validUntil,
-      items: [],
-      resolvedTransaction
-    };
-  }
-  parseActionSignData(base, action, actionUrl) {
-    const wirePayload = {
-      type: action.type,
-      text: action.text,
-      bytes: action.bytes,
-      cell: action.cell,
-      schema: action.schema
-    };
-    if (!wirePayload.type) {
-      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Action signData missing type");
-    }
-    return {
-      type: "signData",
-      ...base,
-      network: action.network ? { chainId: action.network } : void 0,
-      manifestUrl: actionUrl,
-      payload: this.wirePayloadToSignDataPayload(wirePayload)
-    };
-  }
-  // -- Wire → Model mapping -------------------------------------------------
-  toIntentEvent(parsed) {
-    const { clientId, request, origin, traceId } = parsed;
-    const base = {
-      id: request.id,
-      origin,
-      clientId,
-      traceId,
-      returnStrategy: void 0
-    };
-    let event;
-    switch (request.m) {
-      case "txIntent":
-      case "signMsg": {
-        const deliveryMode = request.m === "txIntent" ? "send" : "signOnly";
-        event = {
-          type: "transaction",
-          ...base,
-          deliveryMode,
-          network: request.n ? { chainId: request.n } : void 0,
-          validUntil: request.vu,
-          items: this.mapItems(request.i)
-        };
-        break;
-      }
-      case "signIntent": {
-        const manifestUrl = request.mu || request.c?.manifestUrl || "";
-        event = {
-          type: "signData",
-          ...base,
-          network: request.n ? { chainId: request.n } : void 0,
-          manifestUrl,
-          payload: this.wirePayloadToSignDataPayload(request.p)
-        };
-        break;
-      }
-      case "actionIntent": {
-        event = {
-          type: "action",
-          ...base,
-          actionUrl: request.a
-        };
-        break;
-      }
-    }
-    return { event, connectRequest: request.c };
-  }
-  mapItems(wireItems) {
-    return wireItems.map((item) => this.mapItem(item));
-  }
-  mapItem(item) {
-    switch (item.t) {
-      case "ton":
-        return {
-          type: "sendTon",
-          address: item.a,
-          amount: item.am,
-          payload: item.p,
-          stateInit: item.si,
-          extraCurrency: item.ec
-        };
-      case "jetton":
-        return {
-          type: "sendJetton",
-          jettonMasterAddress: item.ma,
-          jettonAmount: item.ja,
-          destination: item.d,
-          responseDestination: item.rd,
-          customPayload: item.cp,
-          forwardTonAmount: item.fta,
-          forwardPayload: item.fp,
-          queryId: item.qi
-        };
-      case "nft":
-        return {
-          type: "sendNft",
-          nftAddress: item.na,
-          newOwnerAddress: item.no,
-          responseDestination: item.rd,
-          customPayload: item.cp,
-          forwardTonAmount: item.fta,
-          forwardPayload: item.fp,
-          queryId: item.qi
-        };
-    }
-  }
-  /**
-   * Convert a wire-format sign data payload to SignDataPayload model.
-   */
-  wirePayloadToSignDataPayload(wire) {
-    let data;
-    switch (wire.type) {
-      case "text":
-        data = { type: "text", value: { content: wire.text || "" } };
-        break;
-      case "binary":
-        data = { type: "binary", value: { content: wire.bytes || "" } };
-        break;
-      case "cell":
-        data = {
-          type: "cell",
-          value: { schema: wire.schema || "", content: wire.cell || "" }
-        };
-        break;
-      default:
-        throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, `Unsupported sign data type: ${wire.type}`);
-    }
-    return { data };
-  }
-}
-const log$4 = globalLogger.createChild("IntentResolver");
-class IntentResolver {
-  /**
-   * Convert intent action items into a TransactionRequest.
-   * Resolves jetton wallet addresses and builds TEP-74 / TEP-62 message bodies.
-   */
-  async intentItemsToTransactionRequest(items, wallet2, network, validUntil) {
-    const messages = [];
-    for (const item of items) {
-      const message = await this.resolveItem(item, wallet2);
-      messages.push(message);
-    }
-    return {
-      messages,
-      network,
-      validUntil,
-      fromAddress: wallet2.getAddress()
-    };
-  }
-  /**
-   * Fetch an action URL and return the raw response.
-   */
-  async fetchActionUrl(actionUrl, walletAddress) {
-    const separator = actionUrl.includes("?") ? "&" : "?";
-    const url = `${actionUrl}${separator}address=${encodeURIComponent(walletAddress)}`;
-    log$4.info("Fetching action URL", { url });
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new WalletKitError(ERROR_CODES.NETWORK_ERROR, `Action URL returned ${response.status}: ${response.statusText}`);
-    }
-    return response.json();
-  }
-  // -- Item resolution ------------------------------------------------------
-  async resolveItem(item, wallet2) {
-    switch (item.type) {
-      case "sendTon":
-        return this.resolveTonItem(item);
-      case "sendJetton":
-        return this.resolveJettonItem(item, wallet2);
-      case "sendNft":
-        return this.resolveNftItem(item, wallet2);
-    }
-  }
-  resolveTonItem(item) {
-    return {
-      address: item.address,
-      amount: item.amount,
-      payload: item.payload,
-      stateInit: item.stateInit,
-      extraCurrency: item.extraCurrency
-    };
-  }
-  async resolveJettonItem(item, wallet2) {
-    const jettonWalletAddress = await wallet2.getJettonWalletAddress(item.jettonMasterAddress);
-    const forwardPayload = item.forwardPayload ? distExports$1.Cell.fromBase64(item.forwardPayload) : null;
-    const customPayload = item.customPayload ? distExports$1.Cell.fromBase64(item.customPayload) : null;
-    const body = distExports$1.beginCell().store(storeJettonTransferMessage({
-      queryId: BigInt(item.queryId ?? 0),
-      amount: BigInt(item.jettonAmount),
-      destination: distExports$1.Address.parse(item.destination),
-      responseDestination: item.responseDestination ? distExports$1.Address.parse(item.responseDestination) : distExports$1.Address.parse(wallet2.getAddress()),
-      customPayload,
-      forwardAmount: item.forwardTonAmount ? BigInt(item.forwardTonAmount) : DEFAULT_FORWARD_AMOUNT,
-      forwardPayload
-    })).endCell();
-    return {
-      address: jettonWalletAddress,
-      amount: DEFAULT_JETTON_GAS_FEE,
-      payload: body.toBoc().toString("base64")
-    };
-  }
-  async resolveNftItem(item, wallet2) {
-    const forwardPayload = item.forwardPayload ? distExports$1.Cell.fromBase64(item.forwardPayload) : null;
-    const customPayload = item.customPayload ? distExports$1.Cell.fromBase64(item.customPayload) : null;
-    const body = distExports$1.beginCell().store(storeNftTransferMessage({
-      queryId: BigInt(item.queryId ?? 0),
-      newOwner: distExports$1.Address.parse(item.newOwnerAddress),
-      responseDestination: item.responseDestination ? distExports$1.Address.parse(item.responseDestination) : distExports$1.Address.parse(wallet2.getAddress()),
-      customPayload,
-      forwardAmount: item.forwardTonAmount ? BigInt(item.forwardTonAmount) : DEFAULT_FORWARD_AMOUNT,
-      forwardPayload
-    })).endCell();
-    return {
-      address: item.nftAddress,
-      amount: DEFAULT_NFT_GAS_FEE,
-      payload: body.toBoc().toString("base64")
-    };
-  }
-}
-const log$3 = globalLogger.createChild("IntentHandler");
-class IntentHandler {
-  walletKitOptions;
-  bridgeManager;
-  walletManager;
-  analyticsManager;
-  parser = new IntentParser();
-  resolver = new IntentResolver();
-  callbacks = [];
-  constructor(walletKitOptions, bridgeManager, walletManager, analyticsManager) {
-    this.walletKitOptions = walletKitOptions;
-    this.bridgeManager = bridgeManager;
-    this.walletManager = walletManager;
-    this.analyticsManager = analyticsManager;
-  }
-  // -- Public: Parsing ------------------------------------------------------
-  isIntentUrl(url) {
-    return this.parser.isIntentUrl(url);
-  }
-  /**
-   * Parse an intent URL, resolve items, emulate preview, and emit the event.
-   *
-   * When a connect request is present, the result is always a
-   * {@link BatchedIntentEvent} with the connect as the first item.
-   * Multi-item transaction intents are also batched (one item per action).
-   */
-  async handleIntentUrl(url, walletId) {
-    const { event, connectRequest } = await this.parser.parse(url);
-    if (event.type === "connect")
-      return;
-    let connectItem;
-    if (connectRequest) {
-      const connectionEvent = await this.resolveConnectRequest(connectRequest, event);
-      connectItem = { ...connectionEvent, type: "connect" };
-    }
-    if (event.type === "transaction") {
-      if (connectItem || event.items.length > 1) {
-        await this.resolveAndEmitBatchedTransaction(event, walletId, connectItem);
-      } else {
-        await this.resolveAndEmitTransaction(event, walletId);
-      }
-    } else {
-      if (connectItem) {
-        const batch = {
-          id: event.id,
-          origin: event.origin,
-          clientId: event.clientId,
-          traceId: event.traceId,
-          returnStrategy: event.returnStrategy,
-          intents: [connectItem, event]
-        };
-        this.emit(batch);
-      } else {
-        this.emit(event);
-      }
-    }
-  }
-  // -- Public: Callbacks ----------------------------------------------------
-  onIntentRequest(callback) {
-    this.callbacks.push(callback);
-  }
-  removeIntentRequestCallback(callback) {
-    this.callbacks = this.callbacks.filter((cb) => cb !== callback);
-  }
-  // -- Public: Approval -----------------------------------------------------
-  async approveTransactionIntent(event, walletId) {
-    const wallet2 = this.getWallet(walletId);
-    const transactionRequest = event.resolvedTransaction ?? await this.resolveTransaction(event, wallet2);
-    const signedBoc = await wallet2.getSignedSendTransaction(transactionRequest, {
-      internal: event.deliveryMode === "signOnly"
-    });
-    if (event.deliveryMode === "send" && !this.walletKitOptions.dev?.disableNetworkSend) {
-      await CallForSuccess(() => wallet2.getClient().sendBoc(signedBoc));
-    }
-    const result = {
-      type: "transaction",
-      boc: signedBoc
-    };
-    await this.sendResponse(event, result);
-    return result;
-  }
-  /**
-   * Approve a batched intent event.
-   *
-   * Collects all items from the inner transaction events, builds a single
-   * combined {@link TransactionRequest}, signs it as one transaction, and
-   * sends a single response back to the dApp.
-   */
-  async approveBatchedIntent(batch, walletId) {
-    const wallet2 = this.getWallet(walletId);
-    const allItems = [];
-    let deliveryMode = "send";
-    for (const intent of batch.intents) {
-      if (intent.type === "transaction") {
-        allItems.push(...intent.items);
-        if (intent.deliveryMode === "signOnly") {
-          deliveryMode = "signOnly";
-        }
-      }
-    }
-    if (allItems.length > 0) {
-      const firstTx = batch.intents.find((i) => i.type === "transaction");
-      const network = firstTx?.type === "transaction" ? firstTx.network : void 0;
-      const validUntil = firstTx?.type === "transaction" ? firstTx.validUntil : void 0;
-      const transactionRequest = await this.resolver.intentItemsToTransactionRequest(allItems, wallet2, network, validUntil);
-      const signedBoc = await wallet2.getSignedSendTransaction(transactionRequest, {
-        internal: deliveryMode === "signOnly"
-      });
-      if (deliveryMode === "send" && !this.walletKitOptions.dev?.disableNetworkSend) {
-        await CallForSuccess(() => wallet2.getClient().sendBoc(signedBoc));
-      }
-      const result = {
-        type: "transaction",
-        boc: signedBoc
-      };
-      await this.sendBatchResponse(batch, result);
-      return result;
-    }
-    const signDataIntent = batch.intents.find((i) => i.type === "signData");
-    if (signDataIntent && signDataIntent.type === "signData") {
-      const event = signDataIntent;
-      let domain = event.manifestUrl;
-      try {
-        domain = new URL(event.manifestUrl).host;
-      } catch {
-      }
-      const signData = PrepareSignData({
-        payload: event.payload,
-        domain,
-        address: wallet2.getAddress()
-      });
-      const signature = await wallet2.getSignedSignData(signData);
-      const signatureBase64 = HexToBase64(signature);
-      const result = {
-        type: "signData",
-        signature: signatureBase64,
-        address: wallet2.getAddress(),
-        timestamp: signData.timestamp,
-        domain: signData.domain,
-        payload: event.payload
-      };
-      await this.sendBatchResponse(batch, result);
-      return result;
-    }
-    throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Batched intent contains no transaction or signData items");
-  }
-  async approveSignDataIntent(event, walletId) {
-    const wallet2 = this.getWallet(walletId);
-    let domain = event.manifestUrl;
-    try {
-      domain = new URL(event.manifestUrl).host;
-    } catch {
-    }
-    const signData = PrepareSignData({
-      payload: event.payload,
-      domain,
-      address: wallet2.getAddress()
-    });
-    const signature = await wallet2.getSignedSignData(signData);
-    const signatureBase64 = HexToBase64(signature);
-    const result = {
-      type: "signData",
-      signature: signatureBase64,
-      address: wallet2.getAddress(),
-      timestamp: signData.timestamp,
-      domain: signData.domain,
-      payload: event.payload
-    };
-    await this.sendResponse(event, result);
-    return result;
-  }
-  async approveActionIntent(event, walletId) {
-    const wallet2 = this.getWallet(walletId);
-    const actionResponse = await this.resolver.fetchActionUrl(event.actionUrl, wallet2.getAddress());
-    const resolvedEvent = this.parser.parseActionResponse(actionResponse, event);
-    if (resolvedEvent.type === "transaction") {
-      if (resolvedEvent.resolvedTransaction) {
-        resolvedEvent.resolvedTransaction.fromAddress = wallet2.getAddress();
-      }
-      return this.approveTransactionIntent(resolvedEvent, walletId);
-    } else if (resolvedEvent.type === "signData") {
-      return this.approveSignDataIntent(resolvedEvent, walletId);
-    }
-    throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, `Action URL resolved to unsupported intent type: ${resolvedEvent.type}`);
-  }
-  // -- Public: Rejection ----------------------------------------------------
-  async rejectIntent(event, reason, errorCode) {
-    const result = {
-      type: "error",
-      error: {
-        code: errorCode ?? INTENT_ERROR_CODES.USER_DECLINED,
-        message: reason || "User declined the request"
-      }
-    };
-    const isBatched = "intents" in event;
-    if (isBatched) {
-      await this.sendBatchResponse(event, result);
-    } else if (event.type !== "connect") {
-      await this.sendResponse(event, result);
-    }
-    return result;
-  }
-  // -- Public: Utilities ----------------------------------------------------
-  async intentItemsToTransactionRequest(items, walletId) {
-    const wallet2 = this.getWallet(walletId);
-    return this.resolver.intentItemsToTransactionRequest(items, wallet2);
-  }
-  // -- Private: Resolution & Emulation --------------------------------------
-  async resolveAndEmitTransaction(event, walletId) {
-    const wallet2 = this.getWallet(walletId);
-    const transactionRequest = await this.resolveTransaction(event, wallet2);
-    event.resolvedTransaction = transactionRequest;
-    try {
-      const preview = await wallet2.getTransactionPreview(transactionRequest);
-      event.preview = preview;
-    } catch (error2) {
-      log$3.warn("Failed to emulate transaction preview", { error: error2 });
-      event.preview = void 0;
-    }
-    this.emit(event);
-  }
-  /**
-   * Resolve a `ConnectRequest` (manifestUrl + items) into a full
-   * `ConnectionRequestEvent` by fetching the manifest.
-   */
-  async resolveConnectRequest(connectRequest, event) {
-    const bridgeEvent = {
-      from: event.clientId || "",
-      id: event.id,
-      method: "connect",
-      params: {
-        manifest: { url: connectRequest.manifestUrl },
-        items: connectRequest.items
-      },
-      timestamp: Date.now(),
-      domain: ""
-    };
-    const connectHandler = new ConnectHandler(() => {
-    }, this.walletKitOptions, this.analyticsManager);
-    return connectHandler.handle(bridgeEvent);
-  }
-  /**
-   * Split a multi-item transaction intent into per-item events,
-   * resolve and emulate each, then emit as a {@link BatchedIntentEvent}.
-   *
-   * If `connectItem` is provided it is prepended to the batch so the
-   * wallet can display the connect alongside the transaction items.
-   */
-  async resolveAndEmitBatchedTransaction(event, walletId, connectItem) {
-    const wallet2 = this.getWallet(walletId);
-    const perItemEvents = [];
-    for (let i = 0; i < event.items.length; i++) {
-      const item = event.items[i];
-      const itemEvent = {
-        type: "transaction",
-        id: `${event.id}_${i}`,
-        origin: event.origin,
-        clientId: event.clientId,
-        traceId: event.traceId,
-        returnStrategy: event.returnStrategy,
-        deliveryMode: event.deliveryMode,
-        network: event.network,
-        validUntil: event.validUntil,
-        items: [item]
-      };
-      try {
-        const resolved = await this.resolveTransaction(itemEvent, wallet2);
-        itemEvent.resolvedTransaction = resolved;
-        const preview = await wallet2.getTransactionPreview(resolved);
-        itemEvent.preview = preview;
-      } catch (error2) {
-        log$3.warn("Failed to resolve/emulate batched item", { error: error2, index: i });
-      }
-      perItemEvents.push(itemEvent);
-    }
-    const intents = [];
-    if (connectItem)
-      intents.push(connectItem);
-    intents.push(...perItemEvents);
-    const batch = {
-      id: event.id,
-      origin: event.origin,
-      clientId: event.clientId,
-      traceId: event.traceId,
-      returnStrategy: event.returnStrategy,
-      intents
-    };
-    this.emit(batch);
-  }
-  async resolveTransaction(event, wallet2) {
-    return this.resolver.intentItemsToTransactionRequest(event.items, wallet2, event.network, event.validUntil);
-  }
-  // -- Private: Response sending --------------------------------------------
-  async sendResponse(event, result) {
-    if (!event.clientId) {
-      log$3.debug("No clientId on intent event, skipping response send");
-      return;
-    }
-    const wireResponse = this.toWireResponse(event.id, result);
-    try {
-      await this.bridgeManager.sendIntentResponse(event.clientId, wireResponse, event.traceId);
-    } catch (error2) {
-      log$3.error("Failed to send intent response", { error: error2, eventId: event.id });
-    }
-  }
-  async sendBatchResponse(batch, result) {
-    if (!batch.clientId) {
-      log$3.debug("No clientId on batched intent, skipping response send");
-      return;
-    }
-    const wireResponse = this.toWireResponse(batch.id, result);
-    try {
-      await this.bridgeManager.sendIntentResponse(batch.clientId, wireResponse, batch.traceId);
-    } catch (error2) {
-      log$3.error("Failed to send batched intent response", { error: error2, batchId: batch.id });
-    }
-  }
-  /**
-   * Convert SDK response model to TonConnect wire format.
-   * - Transaction: `{ result: "<boc>", id }`
-   * - SignData: `{ result: { signature, address, timestamp, domain, payload }, id }`
-   * - Error: `{ error: { code, message }, id }`
-   */
-  toWireResponse(eventId, result) {
-    if (result.type === "error") {
-      return {
-        error: { code: result.error.code, message: result.error.message },
-        id: eventId
-      };
-    }
-    if (result.type === "transaction") {
-      return { result: result.boc, id: eventId };
-    }
-    return {
-      result: {
-        signature: result.signature,
-        address: result.address,
-        timestamp: result.timestamp,
-        domain: result.domain,
-        payload: this.signDataPayloadToWire(result.payload)
-      },
-      id: eventId
-    };
-  }
-  /**
-   * Convert SignDataPayload model back to wire format.
-   */
-  signDataPayloadToWire(payload) {
-    const { data } = payload;
-    switch (data.type) {
-      case "text":
-        return { type: "text", text: data.value.content };
-      case "binary":
-        return { type: "binary", bytes: data.value.content };
-      case "cell":
-        return { type: "cell", cell: data.value.content, schema: data.value.schema };
-    }
-  }
-  // -- Private: Helpers -----------------------------------------------------
-  getWallet(walletId) {
-    const wallet2 = this.walletManager.getWallet(walletId);
-    if (!wallet2) {
-      throw new WalletKitError(ERROR_CODES.WALLET_NOT_FOUND, "Wallet not found for intent processing", void 0, { walletId });
-    }
-    return wallet2;
-  }
-  emit(event) {
-    for (const callback of this.callbacks) {
-      try {
-        callback(event);
-      } catch (error2) {
-        log$3.error("Intent callback error", { error: error2 });
-      }
-    }
+    log$3.info("Added/updated network client", { network });
   }
 }
 const log$2 = globalLogger.createChild("TonWalletKit");
@@ -35351,7 +34441,6 @@ class TonWalletKit {
   initializer;
   eventProcessor;
   bridgeManager;
-  intentHandler;
   config;
   // Event emitter for this kit instance
   eventEmitter;
@@ -35461,7 +34550,6 @@ class TonWalletKit {
     this.requestProcessor = components.requestProcessor;
     this.eventProcessor = components.eventProcessor;
     this.bridgeManager = components.bridgeManager;
-    this.intentHandler = new IntentHandler(this.config, this.bridgeManager, this.walletManager, this.analyticsManager);
   }
   /**
    * Setup event routing from bridge to handlers
@@ -35669,57 +34757,21 @@ class TonWalletKit {
   removeErrorCallback() {
     this.eventRouter.removeErrorCallback();
   }
-  // === Intent API ===
-  isIntentUrl(url) {
-    const normalized = url.trim().toLowerCase();
-    return normalized.startsWith("tc://intent_inline") || normalized.startsWith("tc://intent");
-  }
-  async handleIntentUrl(url, walletId) {
+  // === URL Parsing API ===
+  /**
+   * Allow to convert url to ConnectionRequestEvent to use inline way
+   */
+  async connectionEventFromUrl(url) {
     await this.ensureInitialized();
-    return this.intentHandler.handleIntentUrl(url, walletId);
-  }
-  onIntentRequest(cb) {
-    if (this.intentHandler) {
-      this.intentHandler.onIntentRequest(cb);
-    } else {
-      this.ensureInitialized().then(() => {
-        this.intentHandler.onIntentRequest(cb);
-      });
+    try {
+      const bridgeEvent = this.parseBridgeConnectEventFromUrl(url);
+      const handler = new ConnectHandler(() => {
+      }, this.config, this.analyticsManager);
+      return await handler.handle(bridgeEvent);
+    } catch (error2) {
+      log$2.error("Failed to create connection event from URL", { error: error2, url });
+      throw error2;
     }
-  }
-  removeIntentRequestCallback(cb) {
-    this.intentHandler.removeIntentRequestCallback(cb);
-  }
-  async approveTransactionIntent(event, walletId) {
-    await this.ensureInitialized();
-    return this.intentHandler.approveTransactionIntent(event, walletId);
-  }
-  async approveSignDataIntent(event, walletId) {
-    await this.ensureInitialized();
-    return this.intentHandler.approveSignDataIntent(event, walletId);
-  }
-  async approveActionIntent(event, walletId) {
-    await this.ensureInitialized();
-    return this.intentHandler.approveActionIntent(event, walletId);
-  }
-  async approveBatchedIntent(batch, walletId, proof) {
-    await this.ensureInitialized();
-    const connectItems = batch.intents.filter((i) => i.type === "connect");
-    for (const item of connectItems) {
-      if (item.type === "connect") {
-        item.walletId = walletId;
-        await this.requestProcessor.approveConnectRequest(item, proof ? { proof } : void 0);
-      }
-    }
-    return this.intentHandler.approveBatchedIntent(batch, walletId);
-  }
-  async rejectIntent(event, reason, errorCode) {
-    await this.ensureInitialized();
-    return this.intentHandler.rejectIntent(event, reason, errorCode);
-  }
-  async intentItemsToTransactionRequest(items, walletId) {
-    await this.ensureInitialized();
-    return this.intentHandler.intentItemsToTransactionRequest(items, walletId);
   }
   // === URL Processing API ===
   /**
@@ -35729,19 +34781,7 @@ class TonWalletKit {
   async handleTonConnectUrl(url) {
     await this.ensureInitialized();
     try {
-      if (this.isIntentUrl(url)) {
-        throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "This is an intent URL. Use handleIntentUrl(url, walletId) instead of handleTonConnectUrl(url).", void 0, { url });
-      }
-      const parsedUrl = this.parseTonConnectUrl(url);
-      if (!parsedUrl) {
-        throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Invalid TON Connect URL format", void 0, {
-          url
-        });
-      }
-      const bridgeEvent = this.createConnectEventFromUrl(parsedUrl);
-      if (!bridgeEvent) {
-        throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Invalid TON Connect URL - unable to create bridge event", void 0, { parsedUrl });
-      }
+      const bridgeEvent = this.parseBridgeConnectEventFromUrl(url);
       await this.eventRouter.routeEvent(bridgeEvent);
     } catch (error2) {
       log$2.error("Failed to handle TON Connect URL", { error: error2, url });
@@ -35764,6 +34804,22 @@ class TonWalletKit {
       walletAddress: asAddressFriendly(wallet2.getAddress())
     };
     await this.eventRouter.routeEvent(bridgeEvent);
+  }
+  /**
+   * Parse and validate TON Connect URL into a RawBridgeEventConnect
+   */
+  parseBridgeConnectEventFromUrl(url) {
+    const parsedUrl = this.parseTonConnectUrl(url);
+    if (!parsedUrl) {
+      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Invalid TON Connect URL format", void 0, {
+        url
+      });
+    }
+    const bridgeEvent = this.createConnectEventFromUrl(parsedUrl);
+    if (!bridgeEvent) {
+      throw new WalletKitError(ERROR_CODES.VALIDATION_ERROR, "Invalid TON Connect URL - unable to create bridge event", void 0, { parsedUrl });
+    }
+    return bridgeEvent;
   }
   /**
    * Parse TON Connect URL to extract connection parameters
@@ -36006,9 +35062,9 @@ function mapJettonMasters(jettonInfo) {
         balance: "0",
         owner: jettonInfo.admin ? toRaw(jettonInfo.admin.address) : "",
         jetton: jettonRaw,
-        last_transaction_lt: "0",
-        code_hash: "",
-        data_hash: ""
+        last_transaction_lt: jettonInfo.last_transaction_lt?.toString() ?? "0",
+        code_hash: jettonInfo.code_hash ?? "",
+        data_hash: jettonInfo.data_hash ?? ""
       }
     ],
     address_book: addressBook,
@@ -36052,8 +35108,7 @@ function mapUserJettons(rawResponse) {
       balance: wallet2.balance,
       info: {
         name: wallet2.jetton.name,
-        description: "",
-        // TonApi does not provide description here
+        description: wallet2.jetton.description ?? "",
         image: {
           url: wallet2.jetton.image
         },
@@ -36102,6 +35157,7 @@ function mapNftItem(item) {
     })),
     extra: {
       isVerified,
+      trust: item.trust,
       contentUrl: item.metadata.content_url,
       previews: item.previews,
       approvedBy: item.approved_by
@@ -36131,6 +35187,17 @@ function mapNftItemsResponse(items) {
 const hexBocToBase64 = (hex) => {
   return Buffer.from(hex, "hex").toString("base64");
 };
+const decimalToInt257Hex = (value) => {
+  const normalized = value.trim();
+  if (!/^-?\d+$/.test(normalized)) {
+    throw new Error(`Invalid decimal stack number: ${value}`);
+  }
+  const parsed = BigInt(normalized);
+  if (parsed < 0n) {
+    return `-0x${(-parsed).toString(16)}`;
+  }
+  return `0x${parsed.toString(16)}`;
+};
 const mapTonApiGetMethodArgs = (stack) => {
   return (stack || []).map((item) => {
     switch (item.type) {
@@ -36143,7 +35210,7 @@ const mapTonApiGetMethodArgs = (stack) => {
         if (item.value.startsWith("0x") || item.value.startsWith("-0x")) {
           return { type: "int257", value: item.value };
         }
-        return { type: "tinyint", value: item.value };
+        return { type: "int257", value: decimalToInt257Hex(item.value) };
       case "cell":
         return { type: "cell_boc_base64", value: item.value };
       case "slice":
@@ -36176,6 +35243,383 @@ const mapTonApiTvmStackRecord = (item) => {
       throw new Error(`Unsupported TonApi stack item type: ${item.type}`);
   }
 };
+function toHex(value) {
+  const normalized = value.trim();
+  if (!normalized) {
+    throw new Error("Invalid hex value: empty input");
+  }
+  if (isHex(normalized)) {
+    return normalized.toLowerCase();
+  }
+  if (/^[0-9a-fA-F]+$/.test(normalized) && normalized.length % 2 === 0) {
+    return `0x${normalized.toLowerCase()}`;
+  }
+  try {
+    return Base64ToHex(Base64Normalize(normalized)).toLowerCase();
+  } catch {
+  }
+  throw new Error(`Invalid hex value: ${value}`);
+}
+function parseBlockRef(block) {
+  if (!block) {
+    return { workchain: 0, shard: "", seqno: 0 };
+  }
+  const matches = block.match(/\(\s*(-?\d+)\s*,\s*([^,]+)\s*,\s*(-?\d+)\s*\)/);
+  if (!matches) {
+    return { workchain: 0, shard: block, seqno: 0 };
+  }
+  const workchain = Number(matches[1]);
+  const seqno = Number(matches[3]);
+  return {
+    workchain: Number.isFinite(workchain) ? workchain : 0,
+    shard: matches[2].trim(),
+    seqno: Number.isFinite(seqno) ? seqno : 0
+  };
+}
+function toAccountStatus(status) {
+  if (!status)
+    return void 0;
+  if (status === "active")
+    return { type: "active" };
+  if (status === "frozen")
+    return { type: "frozen" };
+  if (status === "uninit")
+    return { type: "uninit" };
+  if (status === "nonexist")
+    return { type: "unknown", value: "nonexist" };
+  return { type: "unknown", value: status };
+}
+function mapTonApiMessage(raw) {
+  const extra = {};
+  for (const currency of raw.value_extra ?? []) {
+    extra[Number(currency.id)] = String(currency.amount ?? 0);
+  }
+  return {
+    hash: toHex(raw.hash),
+    source: raw.source ? asAddressFriendly(raw.source.address) : void 0,
+    destination: raw.destination ? asAddressFriendly(raw.destination.address) : void 0,
+    value: raw.value !== void 0 && raw.value !== null ? String(raw.value) : void 0,
+    valueExtraCurrencies: extra,
+    fwdFee: raw.fwd_fee !== void 0 && raw.fwd_fee !== null ? String(raw.fwd_fee) : void 0,
+    ihrFee: raw.ihr_fee !== void 0 && raw.ihr_fee !== null ? String(raw.ihr_fee) : void 0,
+    creationLogicalTime: raw.created_lt !== void 0 && raw.created_lt !== null ? String(raw.created_lt) : void 0,
+    createdAt: raw.created_at ? Number(raw.created_at) : void 0,
+    opcode: raw.op_code ?? void 0,
+    ihrDisabled: raw.ihr_disabled ?? void 0,
+    isBounce: raw.bounce ?? void 0,
+    isBounced: raw.bounced ?? void 0,
+    importFee: raw.import_fee !== void 0 && raw.import_fee !== null ? String(raw.import_fee) : void 0,
+    messageContent: {
+      body: void 0,
+      decoded: raw.decoded_body
+    }
+  };
+}
+function mapTonApiDescription(raw) {
+  return {
+    type: raw.transaction_type ?? "ord",
+    isAborted: raw.aborted ?? !(raw.success ?? true),
+    isDestroyed: raw.destroyed ?? false,
+    isCreditFirst: false,
+    isTock: false,
+    isInstalled: false,
+    storagePhase: {
+      storageFeesCollected: String(raw.storage_phase?.storage_fees_collected ?? 0),
+      statusChange: raw.storage_phase?.status_change ?? "unchanged"
+    },
+    creditPhase: raw.credit_phase?.credit !== void 0 && raw.credit_phase?.credit !== null ? {
+      credit: String(raw.credit_phase.credit)
+    } : void 0,
+    computePhase: {
+      isSkipped: raw.compute_phase?.skipped ?? false,
+      isSuccess: raw.compute_phase?.success ?? raw.success ?? true,
+      isMessageStateUsed: false,
+      isAccountActivated: false,
+      gasFees: String(raw.compute_phase?.gas_fees ?? 0),
+      gasUsed: String(raw.compute_phase?.gas_used ?? 0),
+      gasLimit: String(raw.compute_phase?.gas_used ?? 0),
+      mode: 0,
+      exitCode: raw.compute_phase?.exit_code ?? (raw.success ? 0 : 1),
+      vmStepsNumber: raw.compute_phase?.vm_steps ?? 0
+    },
+    action: {
+      isSuccess: raw.action_phase?.success ?? raw.success ?? true,
+      isValid: true,
+      hasNoFunds: false,
+      statusChange: "unchanged",
+      totalForwardingFees: String(raw.action_phase?.fwd_fees ?? 0),
+      totalActionFees: String(raw.action_phase?.total_fees ?? 0),
+      resultCode: raw.action_phase?.result_code ?? 0,
+      totalActionsNumber: raw.action_phase?.total_actions ?? 0,
+      specActionsNumber: 0,
+      skippedActionsNumber: raw.action_phase?.skipped_actions ?? 0,
+      messagesCreatedNumber: raw.out_msgs?.length ?? 0,
+      totalMessagesSize: {
+        cells: "0",
+        bits: "0"
+      }
+    }
+  };
+}
+function mapTonApiTransaction(raw) {
+  const blockRef = parseBlockRef(raw.block);
+  return {
+    account: asAddressFriendly(raw.account.address),
+    hash: toHex(raw.hash),
+    logicalTime: String(raw.lt),
+    now: Number(raw.utime ?? 0),
+    mcBlockSeqno: blockRef.seqno,
+    traceExternalHash: toHex(raw.hash),
+    previousTransactionHash: raw.prev_trans_hash || void 0,
+    previousTransactionLogicalTime: raw.prev_trans_lt !== void 0 && raw.prev_trans_lt !== null ? String(raw.prev_trans_lt) : void 0,
+    origStatus: toAccountStatus(raw.orig_status),
+    endStatus: toAccountStatus(raw.end_status),
+    totalFees: String(raw.total_fees ?? 0),
+    totalFeesExtraCurrencies: {},
+    blockRef,
+    inMessage: raw.in_msg ? mapTonApiMessage(raw.in_msg) : void 0,
+    outMessages: (raw.out_msgs ?? []).map((message) => mapTonApiMessage(message)),
+    description: mapTonApiDescription(raw),
+    isEmulated: false
+  };
+}
+function mapTraceStatus(status) {
+  if (!status || status === "nonexist") {
+    return "uninit";
+  }
+  if (status === "active" || status === "frozen" || status === "uninit") {
+    return status;
+  }
+  return status;
+}
+function flattenTrace(trace) {
+  const out = [trace.transaction];
+  for (const child of trace.children ?? []) {
+    out.push(...flattenTrace(child));
+  }
+  return out;
+}
+function mapTonApiTraceNode(trace) {
+  return {
+    tx_hash: trace.transaction.hash,
+    in_msg_hash: trace.transaction.in_msg?.hash ?? null,
+    children: (trace.children ?? []).map((child) => mapTonApiTraceNode(child))
+  };
+}
+function mapTonApiTraceMessage(raw) {
+  const extraCurrencies = {};
+  for (const currency of raw.value_extra ?? []) {
+    extraCurrencies[String(currency.id)] = String(currency.amount ?? 0);
+  }
+  return {
+    hash: raw.hash ?? "",
+    source: raw.source?.address ?? null,
+    destination: raw.destination?.address ?? "",
+    value: raw.value !== void 0 && raw.value !== null ? String(raw.value) : null,
+    value_extra_currencies: extraCurrencies,
+    fwd_fee: raw.fwd_fee !== void 0 && raw.fwd_fee !== null ? String(raw.fwd_fee) : null,
+    ihr_fee: raw.ihr_fee !== void 0 && raw.ihr_fee !== null ? String(raw.ihr_fee) : null,
+    created_lt: raw.created_lt !== void 0 && raw.created_lt !== null ? String(raw.created_lt) : null,
+    created_at: raw.created_at !== void 0 && raw.created_at !== null ? String(raw.created_at) : null,
+    opcode: raw.op_code ?? null,
+    ihr_disabled: raw.ihr_disabled ?? null,
+    bounce: raw.bounce ?? null,
+    bounced: raw.bounced ?? null,
+    import_fee: raw.import_fee !== void 0 && raw.import_fee !== null ? String(raw.import_fee) : null,
+    message_content: {
+      hash: "",
+      body: "",
+      decoded: raw.decoded_body ?? null
+    },
+    init_state: null,
+    hash_norm: void 0
+  };
+}
+function mapTonApiTraceTransaction(raw) {
+  const blockRef = parseBlockRef(raw.block);
+  const inMsg = raw.in_msg ? mapTonApiTraceMessage(raw.in_msg) : null;
+  const outMsgs = (raw.out_msgs ?? []).map((message) => mapTonApiTraceMessage(message));
+  return {
+    account: raw.account.address,
+    hash: raw.hash,
+    lt: String(raw.lt ?? 0),
+    now: Number(raw.utime ?? 0),
+    mc_block_seqno: blockRef.seqno,
+    trace_external_hash: raw.hash,
+    prev_trans_hash: raw.prev_trans_hash ?? null,
+    prev_trans_lt: raw.prev_trans_lt !== void 0 && raw.prev_trans_lt !== null ? String(raw.prev_trans_lt) : null,
+    orig_status: mapTraceStatus(raw.orig_status),
+    end_status: mapTraceStatus(raw.end_status),
+    total_fees: String(raw.total_fees ?? 0),
+    total_fees_extra_currencies: {},
+    description: {
+      type: raw.transaction_type ?? "ord",
+      aborted: raw.aborted ?? !(raw.success ?? true),
+      destroyed: raw.destroyed ?? false,
+      credit_first: false,
+      is_tock: false,
+      installed: false,
+      storage_ph: {
+        storage_fees_collected: String(raw.storage_phase?.storage_fees_collected ?? 0),
+        status_change: raw.storage_phase?.status_change ?? "unchanged"
+      },
+      credit_ph: raw.credit_phase?.credit !== void 0 && raw.credit_phase?.credit !== null ? { credit: String(raw.credit_phase.credit) } : void 0,
+      compute_ph: {
+        skipped: raw.compute_phase?.skipped ?? false,
+        success: raw.compute_phase?.success ?? raw.success ?? true,
+        msg_state_used: false,
+        account_activated: false,
+        gas_fees: String(raw.compute_phase?.gas_fees ?? 0),
+        gas_used: String(raw.compute_phase?.gas_used ?? 0),
+        gas_limit: String(raw.compute_phase?.gas_used ?? 0),
+        mode: 0,
+        exit_code: raw.compute_phase?.exit_code ?? (raw.success ? 0 : 1),
+        vm_steps: raw.compute_phase?.vm_steps ?? 0,
+        vm_init_state_hash: "",
+        vm_final_state_hash: ""
+      },
+      action: {
+        success: raw.action_phase?.success ?? raw.success ?? true,
+        valid: true,
+        no_funds: false,
+        status_change: "unchanged",
+        total_fwd_fees: String(raw.action_phase?.fwd_fees ?? 0),
+        total_action_fees: String(raw.action_phase?.total_fees ?? 0),
+        result_code: raw.action_phase?.result_code ?? 0,
+        tot_actions: raw.action_phase?.total_actions ?? 0,
+        spec_actions: 0,
+        skipped_actions: raw.action_phase?.skipped_actions ?? 0,
+        msgs_created: raw.out_msgs?.length ?? 0,
+        action_list_hash: "",
+        tot_msg_size: {
+          cells: "0",
+          bits: "0"
+        }
+      }
+    },
+    block_ref: {
+      workchain: blockRef.workchain,
+      shard: blockRef.shard,
+      seqno: blockRef.seqno
+    },
+    in_msg: inMsg,
+    out_msgs: outMsgs,
+    account_state_before: {
+      hash: "",
+      balance: String(raw.end_balance ?? 0),
+      extra_currencies: null,
+      account_status: mapTraceStatus(raw.orig_status),
+      frozen_hash: null,
+      data_hash: null,
+      code_hash: null
+    },
+    account_state_after: {
+      hash: "",
+      balance: String(raw.end_balance ?? 0),
+      extra_currencies: null,
+      account_status: mapTraceStatus(raw.end_status),
+      frozen_hash: null,
+      data_hash: null,
+      code_hash: null
+    },
+    emulated: false,
+    trace_id: raw.hash
+  };
+}
+function mapTonApiTrace(trace, mapTraceTransaction) {
+  const traceTransactions = flattenTrace(trace);
+  const transactions = Object.fromEntries(traceTransactions.map((tx) => [tx.hash, mapTraceTransaction(tx)]));
+  const transactionsOrder = [...traceTransactions].sort((a2, b2) => BigInt(a2.lt ?? 0) < BigInt(b2.lt ?? 0) ? -1 : 1).map((tx) => tx.hash);
+  const lts = traceTransactions.map((tx) => BigInt(tx.lt ?? 0));
+  const times = traceTransactions.map((tx) => Number(tx.utime ?? 0));
+  const startLt = lts.length > 0 ? lts.reduce((min, value) => value < min ? value : min, lts[0]) : 0n;
+  const endLt = lts.length > 0 ? lts.reduce((max, value) => value > max ? value : max, lts[0]) : 0n;
+  const startUtime = times.length > 0 ? Math.min(...times) : 0;
+  const endUtime = times.length > 0 ? Math.max(...times) : 0;
+  const traceId = trace.transaction.hash;
+  const rootTx = mapTraceTransaction(trace.transaction);
+  const messagesCount = traceTransactions.reduce((acc, tx) => acc + (tx.in_msg ? 1 : 0) + (tx.out_msgs?.length ?? 0), 0);
+  return {
+    address_book: {},
+    metadata: {},
+    traces: [
+      {
+        actions: [],
+        end_lt: endLt.toString(),
+        end_utime: endUtime,
+        external_hash: rootTx.in_msg?.hash ?? "",
+        is_incomplete: false,
+        mc_seqno_end: String(rootTx.mc_block_seqno ?? 0),
+        mc_seqno_start: String(rootTx.mc_block_seqno ?? 0),
+        start_lt: startLt.toString(),
+        start_utime: startUtime,
+        trace: mapTonApiTraceNode(trace),
+        trace_id: traceId,
+        trace_info: {
+          classification_state: "tonapi",
+          messages: messagesCount,
+          pending_messages: 0,
+          trace_state: "complete",
+          transactions: traceTransactions.length
+        },
+        transactions,
+        transactions_order: transactionsOrder,
+        warning: ""
+      }
+    ]
+  };
+}
+function normalizeTonApiAccountAddress(account) {
+  if (typeof account === "string") {
+    return account;
+  }
+  return account?.address ?? "";
+}
+function mapTonApiEvent(raw) {
+  return {
+    eventId: toHex(raw.event_id),
+    account: toAccount(raw.account, {}),
+    timestamp: Number(raw.timestamp ?? 0),
+    actions: (raw.actions ?? []).map((action) => {
+      const status = action.status === "failed" ? "failure" : "success";
+      const actionType = action.type ?? "Unknown";
+      const payload = actionType ? action[actionType] : void 0;
+      const actionIdSource = action.base_transactions?.[0] ?? raw.event_id;
+      return {
+        type: actionType,
+        id: toHex(actionIdSource),
+        status,
+        simplePreview: {
+          name: action.simple_preview?.name ?? actionType ?? "Action",
+          description: action.simple_preview?.description ?? action.simple_preview?.name ?? "Action",
+          value: action.simple_preview?.value ?? "",
+          accounts: (action.simple_preview?.accounts ?? []).map((account) => toAccount(normalizeTonApiAccountAddress(account), {})),
+          valueImage: action.simple_preview?.value_image
+        },
+        baseTransactions: (action.base_transactions ?? []).map((transactionHash) => toHex(String(transactionHash))),
+        ...payload && typeof payload === "object" ? { [actionType]: payload } : {}
+      };
+    }),
+    isScam: raw.is_scam ?? false,
+    lt: Number(raw.lt ?? 0),
+    inProgress: raw.in_progress ?? false,
+    trace: {
+      tx_hash: "",
+      in_msg_hash: null,
+      children: []
+    },
+    transactions: {}
+  };
+}
+function mapMasterchainInfo(rawResponse) {
+  return {
+    seqno: rawResponse.seqno,
+    shard: rawResponse.shard,
+    workchain: rawResponse.workchain_id,
+    fileHash: asHex(`0x${rawResponse.file_hash}`),
+    rootHash: asHex(`0x${rawResponse.root_hash}`)
+  };
+}
 class ApiClientTonApi extends BaseApiClient {
   constructor(config = {}) {
     let defaultEndpoint;
@@ -36219,7 +35663,7 @@ class ApiClientTonApi extends BaseApiClient {
     return mapJettonMasters(raw);
   }
   async jettonsByOwnerAddress(request) {
-    const raw = await this.getJson(`/v2/accounts/${request.ownerAddress}/jettons?currencies=usd`);
+    const raw = await this.getJson(`/v2/accounts/${this.normalizeAddress(request.ownerAddress)}/jettons?currencies=usd`);
     return mapUserJettons(raw);
   }
   async nftItemsByAddress(request) {
@@ -36227,7 +35671,7 @@ class ApiClientTonApi extends BaseApiClient {
       throw new Error("TonApi requires an address to fetch NFT items.");
     }
     try {
-      const raw = await this.getJson(`/v2/nfts/${request.address}`);
+      const raw = await this.getJson(`/v2/nfts/${this.normalizeAddress(request.address)}`);
       return mapNftItemsResponse([raw]);
     } catch (e) {
       if (e instanceof TonClientError && e.status === 404) {
@@ -36242,7 +35686,7 @@ class ApiClientTonApi extends BaseApiClient {
       query.limit = request.pagination.limit;
     if (request.pagination?.offset)
       query.offset = request.pagination.offset;
-    const raw = await this.getJson(`/v2/accounts/${request.ownerAddress}/nfts`, query);
+    const raw = await this.getJson(`/v2/accounts/${this.normalizeAddress(request.ownerAddress)}/nfts`, query);
     return mapNftItemsResponse(raw.nft_items);
   }
   async sendBoc(boc) {
@@ -36269,20 +35713,85 @@ class ApiClientTonApi extends BaseApiClient {
       stack: (raw.stack || []).map(mapTonApiTvmStackRecord)
     };
   }
-  async getAccountTransactions(_request) {
-    throw new Error("Method not implemented.");
+  async getAccountTransactions(request) {
+    const address = request.address?.[0];
+    if (!address) {
+      return { transactions: [], addressBook: {} };
+    }
+    const limit = Math.max(1, Math.min(request.limit ?? 10, 100));
+    const offset = Math.max(0, request.offset ?? 0);
+    const response = await this.getJson(`/v2/blockchain/accounts/${address}/transactions`, {
+      limit,
+      offset,
+      sort_order: "desc"
+    });
+    const transactions = (response.transactions ?? []).map(mapTonApiTransaction);
+    return {
+      transactions,
+      addressBook: {}
+    };
   }
-  async getTransactionsByHash(_request) {
-    throw new Error("Method not implemented.");
+  async getTransactionsByHash(request) {
+    const isMessageHash = "msgHash" in request;
+    const requestHash = isMessageHash ? request.msgHash : request.bodyHash;
+    const normalizedHash = this.normalizeTonApiId(requestHash);
+    const byTransaction = async () => this.getJson(`/v2/blockchain/transactions/${normalizedHash}`);
+    const byMessage = async () => this.getJson(`/v2/blockchain/messages/${normalizedHash}/transaction`);
+    const primaryRequest = isMessageHash ? byMessage : byTransaction;
+    const fallbackRequest = isMessageHash ? byTransaction : byMessage;
+    let tx;
+    try {
+      tx = await primaryRequest();
+    } catch (error2) {
+      if (!(error2 instanceof TonClientError) || error2.status !== 404) {
+        throw error2;
+      }
+      tx = await fallbackRequest();
+    }
+    return {
+      transactions: [mapTonApiTransaction(tx)],
+      addressBook: {}
+    };
   }
   async getPendingTransactions(_request) {
-    throw new Error("Method not implemented.");
+    return {
+      transactions: [],
+      addressBook: {}
+    };
   }
-  async getTrace(_request) {
-    throw new Error("Method not implemented.");
+  async getTrace(request) {
+    const candidates = request.traceId && request.traceId.length > 0 ? request.traceId : [];
+    if (request.account) {
+      candidates.push(String(request.account));
+    }
+    for (const candidate of candidates) {
+      const traceId = this.normalizeTonApiId(candidate);
+      try {
+        const trace = await this.getJson(`/v2/traces/${traceId}`);
+        return mapTonApiTrace(trace, mapTonApiTraceTransaction);
+      } catch (error2) {
+        if (error2 instanceof TonClientError && error2.status === 404) {
+          continue;
+        }
+        throw error2;
+      }
+    }
+    throw new Error("Failed to fetch trace");
   }
-  async getPendingTrace(_request) {
-    throw new Error("Method not implemented.");
+  async getPendingTrace(request) {
+    for (const messageHash of request.externalMessageHash) {
+      const normalizedHash = this.normalizeTonApiId(messageHash);
+      try {
+        const tx = await this.getJson(`/v2/blockchain/messages/${normalizedHash}/transaction`);
+        return await this.getTrace({ traceId: [tx.hash] });
+      } catch (error2) {
+        if (error2 instanceof TonClientError && error2.status === 404) {
+          continue;
+        }
+        throw error2;
+      }
+    }
+    throw new Error("Failed to fetch pending trace");
   }
   async resolveDnsWallet(domain) {
     try {
@@ -36301,12 +35810,55 @@ class ApiClientTonApi extends BaseApiClient {
       return null;
     }
   }
-  async getEvents(_request) {
-    throw new Error("Method not implemented.");
+  async getEvents(request) {
+    const account = String(request.account);
+    const limit = Math.max(1, Math.min(request.limit ?? 20, 100));
+    const offset = Math.max(0, request.offset ?? 0);
+    const response = await this.getJson(`/v2/accounts/${account}/events`, {
+      limit,
+      offset,
+      sort_order: "desc",
+      i18n: "en"
+    });
+    const pageEvents = response.events ?? [];
+    return {
+      events: pageEvents.map(mapTonApiEvent),
+      offset,
+      limit,
+      hasNext: Number(response.next_from ?? 0) > 0 || pageEvents.length >= limit
+    };
+  }
+  async getMasterchainInfo() {
+    const raw = await this.getJson(`/v2/blockchain/masterchain-head`);
+    return mapMasterchainInfo(raw);
   }
   appendAuthHeaders(headers) {
     if (this.apiKey) {
       headers.set("Authorization", `Bearer ${this.apiKey}`);
+    }
+  }
+  normalizeTonApiId(value) {
+    const normalizedValue = value.trim();
+    if (!normalizedValue) {
+      throw new Error("Invalid TonAPI id: value is required");
+    }
+    if (isHex(normalizedValue)) {
+      return normalizedValue.toLowerCase();
+    }
+    if (/^[0-9a-fA-F]+$/.test(normalizedValue) && normalizedValue.length % 2 === 0) {
+      return `0x${normalizedValue.toLowerCase()}`;
+    }
+    const normalizedBase64 = Base64Normalize(normalizedValue);
+    return Base64ToHex(normalizedBase64).toLowerCase();
+  }
+  normalizeAddress(address) {
+    try {
+      if (address instanceof distExports$1.Address) {
+        return address.toString();
+      }
+      return distExports$1.Address.parse(address).toString();
+    } catch {
+      return address.toString();
     }
   }
 }
@@ -36594,16 +36146,10 @@ class WalletV5R1Adapter {
   }
   async createBodyV5(seqno, walletId, actionsList, options) {
     const Opcodes2 = {
-      auth_signed: 1936287598,
-      auth_signed_internal: 1936289396
+      auth_signed: 1936287598
     };
-    const opcode = options.internal ? Opcodes2.auth_signed_internal : Opcodes2.auth_signed;
-    log$1.debug("createBodyV5 signing with opcode", {
-      internal: options.internal,
-      opcode: `0x${opcode.toString(16)}`
-    });
     const expireAt = options.validUntil ?? Math.floor(Date.now() / 1e3) + 300;
-    const payload = distExports$1.beginCell().storeUint(opcode, 32).storeUint(walletId, 32).storeUint(expireAt, 32).storeUint(seqno, 32).storeSlice(actionsList.beginParse()).endCell();
+    const payload = distExports$1.beginCell().storeUint(Opcodes2.auth_signed, 32).storeUint(walletId, 32).storeUint(expireAt, 32).storeUint(seqno, 32).storeSlice(actionsList.beginParse()).endCell();
     const signingData = payload.hash();
     const signature = options.fakeSignature ? FakeSignature(signingData) : await this.sign(signingData);
     return distExports$1.beginCell().storeSlice(payload.beginParse()).storeBuffer(Buffer.from(HexToUint8Array(signature))).endCell();
@@ -36947,10 +36493,7 @@ class WalletV4R2Adapter {
   getWalletId() {
     return createWalletId(this.getNetwork(), this.getAddress());
   }
-  async getSignedSendTransaction(input, options) {
-    if (options?.internal) {
-      throw new Error("WalletV4R2 does not support internal message signing (gasless). Use WalletV5R1.");
-    }
+  async getSignedSendTransaction(input, _options) {
     if (input.messages.length === 0) {
       throw new Error("Ledger does not support empty messages");
     }
@@ -37147,11 +36690,7 @@ const index = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePropert
   HexToBase64,
   HexToBigInt,
   HexToUint8Array,
-  INTENT_ERROR_CODES,
   Initializer,
-  IntentHandler,
-  IntentParser,
-  IntentResolver,
   JettonError,
   get JettonErrorCode() {
     return JettonErrorCode;
@@ -37252,7 +36791,7 @@ function ensureInternalBrowserResolverMap() {
   }
   return internalBrowserGlobal.__internalBrowserResponseResolvers;
 }
-var __async$c = (__this, __arguments, generator) => {
+var __async$b = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
       try {
@@ -37287,11 +36826,11 @@ class AndroidTONConnectSessionsManager {
     this.bridge = win.WalletKitNative;
   }
   initialize() {
-    return __async$c(this, null, function* () {
+    return __async$b(this, null, function* () {
     });
   }
   createSession(sessionId, dAppInfo, wallet2, isJsBridge) {
-    return __async$c(this, null, function* () {
+    return __async$b(this, null, function* () {
       var _a, _b, _c, _d;
       try {
         const walletId = (_b = (_a = wallet2.getWalletId) == null ? void 0 : _a.call(wallet2)) != null ? _b : "";
@@ -37312,7 +36851,7 @@ class AndroidTONConnectSessionsManager {
     });
   }
   getSession(sessionId) {
-    return __async$c(this, null, function* () {
+    return __async$b(this, null, function* () {
       try {
         const resultJson = this.bridge.sessionGet(sessionId);
         if (!resultJson) {
@@ -37326,7 +36865,7 @@ class AndroidTONConnectSessionsManager {
     });
   }
   getSessions(parameters) {
-    return __async$c(this, null, function* () {
+    return __async$b(this, null, function* () {
       try {
         const filterJson = JSON.stringify(parameters != null ? parameters : {});
         const resultJson = this.bridge.sessionGetFiltered(filterJson);
@@ -37338,7 +36877,7 @@ class AndroidTONConnectSessionsManager {
     });
   }
   removeSession(sessionId) {
-    return __async$c(this, null, function* () {
+    return __async$b(this, null, function* () {
       try {
         this.bridge.sessionRemove(sessionId);
       } catch (err) {
@@ -37348,7 +36887,7 @@ class AndroidTONConnectSessionsManager {
     });
   }
   removeSessions(parameters) {
-    return __async$c(this, null, function* () {
+    return __async$b(this, null, function* () {
       try {
         const filterJson = JSON.stringify(parameters != null ? parameters : {});
         this.bridge.sessionRemoveFiltered(filterJson);
@@ -37359,7 +36898,7 @@ class AndroidTONConnectSessionsManager {
     });
   }
   clearSessions() {
-    return __async$c(this, null, function* () {
+    return __async$b(this, null, function* () {
       try {
         this.bridge.sessionClear();
       } catch (err) {
@@ -37369,7 +36908,7 @@ class AndroidTONConnectSessionsManager {
     });
   }
 }
-var __async$b = (__this, __arguments, generator) => {
+var __async$a = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
       try {
@@ -37424,7 +36963,7 @@ class AndroidAPIClientAdapter {
     }
   }
   sendBoc(boc) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       try {
         const networkJson = JSON.stringify(this.network);
         const result = this.androidBridge.apiSendBoc(networkJson, boc);
@@ -37436,7 +36975,7 @@ class AndroidAPIClientAdapter {
     });
   }
   runGetMethod(address, method, stack, seqno) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       try {
         const networkJson = JSON.stringify(this.network);
         const stackJson = stack ? JSON.stringify(stack) : null;
@@ -37453,27 +36992,27 @@ class AndroidAPIClientAdapter {
   // Methods not implemented - will throw if called
   // These are optional for mobile usage
   nftItemsByAddress(_request) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("nftItemsByAddress is not implemented yet");
     });
   }
   nftItemsByOwner(_request) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("nftItemsByOwner is not implemented yet");
     });
   }
   fetchEmulation(_messageBoc, _ignoreSignature) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("fetchEmulation is not implemented yet");
     });
   }
   getAccountState(_address, _seqno) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("getAccountState is not implemented yet");
     });
   }
   getBalance(address, seqno) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       try {
         const networkJson = JSON.stringify(this.network);
         const seqnoArg = seqno != null ? seqno : -1;
@@ -37486,57 +37025,69 @@ class AndroidAPIClientAdapter {
     });
   }
   getAccountTransactions(_request) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("getAccountTransactions is not implemented yet");
     });
   }
   getTransactionsByHash(_request) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("getTransactionsByHash is not implemented yet");
     });
   }
   getPendingTransactions(_request) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("getPendingTransactions is not implemented yet");
     });
   }
   getTrace(_request) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("getTrace is not implemented yet");
     });
   }
   getPendingTrace(_request) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("getPendingTrace is not implemented yet");
     });
   }
   resolveDnsWallet(_domain) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("resolveDnsWallet is not implemented yet");
     });
   }
   backResolveDnsWallet(_address) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("backResolveDnsWallet is not implemented yet");
     });
   }
   jettonsByAddress(_request) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("jettonsByAddress is not implemented yet");
     });
   }
   jettonsByOwnerAddress(_request) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("jettonsByOwnerAddress is not implemented yet");
     });
   }
   getEvents(_request) {
-    return __async$b(this, null, function* () {
+    return __async$a(this, null, function* () {
       throw new Error("getEvents is not implemented yet");
     });
   }
+  getMasterchainInfo() {
+    return __async$a(this, null, function* () {
+      try {
+        const networkJson = JSON.stringify(this.network);
+        const resultJson = this.androidBridge.apiGetMasterchainInfo(networkJson);
+        return JSON.parse(resultJson);
+      } catch (err) {
+        error("[AndroidAPIClientAdapter] getMasterchainInfo failed:", err);
+        throw err;
+      }
+    });
+  }
 }
-var __async$a = (__this, __arguments, generator) => {
+var __async$9 = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
       try {
@@ -37557,8 +37108,8 @@ var __async$a = (__this, __arguments, generator) => {
   });
 };
 function initTonWalletKit(config, deps) {
-  return __async$a(this, null, function* () {
-    var _a, _b, _c;
+  return __async$9(this, null, function* () {
+    var _a, _b, _c, _d, _e, _f, _g;
     if (walletKit) {
       return { ok: true };
     }
@@ -37566,9 +37117,23 @@ function initTonWalletKit(config, deps) {
     const networksConfig = {};
     if ((config == null ? void 0 : config.networkConfigurations) && Array.isArray(config.networkConfigurations)) {
       for (const netConfig of config.networkConfigurations) {
-        networksConfig[netConfig.network.chainId] = {
-          apiClient: netConfig.apiClientConfiguration
-        };
+        const type = netConfig.apiClientType;
+        let apiClient;
+        if (type === "tonapi") {
+          apiClient = new ApiClientTonApi({
+            endpoint: (_a = netConfig.apiClientConfiguration) == null ? void 0 : _a.url,
+            apiKey: (_b = netConfig.apiClientConfiguration) == null ? void 0 : _b.key,
+            network: netConfig.network
+          });
+        } else if (type === "toncenter") {
+          apiClient = new ApiClientToncenter({
+            endpoint: (_c = netConfig.apiClientConfiguration) == null ? void 0 : _c.url,
+            apiKey: (_d = netConfig.apiClientConfiguration) == null ? void 0 : _d.key
+          });
+        } else {
+          apiClient = netConfig.apiClientConfiguration;
+        }
+        networksConfig[netConfig.network.chainId] = { apiClient };
       }
     }
     if (AndroidAPIClientAdapter.isAvailable()) {
@@ -37603,7 +37168,7 @@ function initTonWalletKit(config, deps) {
     if (config == null ? void 0 : config.bridgeUrl) {
       kitOptions.bridge = {
         bridgeUrl: config.bridgeUrl,
-        jsBridgeTransport: (sessionId, message) => __async$a(null, null, function* () {
+        jsBridgeTransport: (sessionId, message) => __async$9(null, null, function* () {
           var _a2;
           const typedMessage = message;
           let bridgeMessage = typedMessage;
@@ -37660,8 +37225,8 @@ function initTonWalletKit(config, deps) {
       throw new Error("TonWalletKit module not loaded");
     }
     setWalletKit(new TonWalletKit$1(kitOptions));
-    if ((_a = walletKit) == null ? void 0 : _a.ensureInitialized) {
-      yield (_c = (_b = walletKit) == null ? void 0 : _b.ensureInitialized) == null ? void 0 : _c.call(_b);
+    if ((_e = walletKit) == null ? void 0 : _e.ensureInitialized) {
+      yield (_g = (_f = walletKit) == null ? void 0 : _f.ensureInitialized) == null ? void 0 : _g.call(_f);
     }
     deps.emit("ready", {});
     deps.postToNative({ kind: "ready" });
@@ -37669,7 +37234,7 @@ function initTonWalletKit(config, deps) {
     return { ok: true };
   });
 }
-var __async$9 = (__this, __arguments, generator) => {
+var __async$8 = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
       try {
@@ -37690,7 +37255,7 @@ var __async$9 = (__this, __arguments, generator) => {
   });
 };
 function ensureReady() {
-  return __async$9(this, null, function* () {
+  return __async$8(this, null, function* () {
     var _a, _b;
     if (!walletKit) {
       throw new Error("WalletKit not initialized");
@@ -37707,7 +37272,7 @@ function getWalletOrThrow(kit2, walletId) {
   return wallet2;
 }
 function kit(method, ...args) {
-  return __async$9(this, null, function* () {
+  return __async$8(this, null, function* () {
     const instance = yield ensureReady();
     const fn = instance[method];
     if (typeof fn !== "function") {
@@ -37717,7 +37282,7 @@ function kit(method, ...args) {
   });
 }
 function wallet(walletId, method, ...args) {
-  return __async$9(this, null, function* () {
+  return __async$8(this, null, function* () {
     const instance = yield ensureReady();
     const w = getWalletOrThrow(instance, walletId);
     const fn = w[method];
@@ -37728,18 +37293,18 @@ function wallet(walletId, method, ...args) {
   });
 }
 function getKit() {
-  return __async$9(this, null, function* () {
+  return __async$8(this, null, function* () {
     return ensureReady();
   });
 }
 function getWallet(walletId) {
-  return __async$9(this, null, function* () {
+  return __async$8(this, null, function* () {
     const instance = yield ensureReady();
     return getWalletOrThrow(instance, walletId);
   });
 }
 function walletCall(method, args) {
-  return __async$9(this, null, function* () {
+  return __async$8(this, null, function* () {
     const instance = yield ensureReady();
     const w = getWalletOrThrow(instance, args.walletId);
     const fn = w[method];
@@ -37750,7 +37315,7 @@ function walletCall(method, args) {
   });
 }
 function clientCall(method, args) {
-  return __async$9(this, null, function* () {
+  return __async$8(this, null, function* () {
     const instance = yield ensureReady();
     const w = getWalletOrThrow(instance, args.walletId);
     const apiClient = w.getClient();
@@ -37862,7 +37427,7 @@ function postToNative(payload) {
   }
   warn("[walletkitBridge] postToNative: no native handler", payload);
 }
-var __async$8 = (__this, __arguments, generator) => {
+var __async$7 = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
       try {
@@ -37894,7 +37459,7 @@ function setBridgeApi(api2) {
   apiRef = api2;
 }
 function invokeApiMethod(api2, method, params, context) {
-  return __async$8(this, null, function* () {
+  return __async$7(this, null, function* () {
     const fn = api2[method];
     if (typeof fn !== "function") {
       throw new Error(`Unknown method ${String(method)}`);
@@ -37908,7 +37473,7 @@ function invokeApiMethod(api2, method, params, context) {
   });
 }
 function handleCall(id, method, params) {
-  return __async$8(this, null, function* () {
+  return __async$7(this, null, function* () {
     if (!apiRef) {
       throw new Error("Bridge API not registered");
     }
@@ -37942,10 +37507,9 @@ const eventListeners = {
   onTransactionListener: null,
   onSignDataListener: null,
   onDisconnectListener: null,
-  onErrorListener: null,
-  onIntentListener: null
+  onErrorListener: null
 };
-var __async$7 = (__this, __arguments, generator) => {
+var __async$6 = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
       try {
@@ -37974,7 +37538,7 @@ class AndroidStorageAdapter {
     this.androidBridge = androidWindow.WalletKitNative;
   }
   get(key) {
-    return __async$7(this, null, function* () {
+    return __async$6(this, null, function* () {
       try {
         const value = this.androidBridge.storageGet(key);
         if (!value) {
@@ -37988,7 +37552,7 @@ class AndroidStorageAdapter {
     });
   }
   set(key, value) {
-    return __async$7(this, null, function* () {
+    return __async$6(this, null, function* () {
       try {
         const serialized = JSON.stringify(value);
         this.androidBridge.storageSet(key, serialized);
@@ -37998,7 +37562,7 @@ class AndroidStorageAdapter {
     });
   }
   remove(key) {
-    return __async$7(this, null, function* () {
+    return __async$6(this, null, function* () {
       try {
         this.androidBridge.storageRemove(key);
       } catch (err) {
@@ -38007,7 +37571,7 @@ class AndroidStorageAdapter {
     });
   }
   clear() {
-    return __async$7(this, null, function* () {
+    return __async$6(this, null, function* () {
       try {
         this.androidBridge.storageClear();
       } catch (err) {
@@ -38016,7 +37580,7 @@ class AndroidStorageAdapter {
     });
   }
 }
-var __async$6 = (__this, __arguments, generator) => {
+var __async$5 = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
       try {
@@ -38037,7 +37601,7 @@ var __async$6 = (__this, __arguments, generator) => {
   });
 };
 function init(config) {
-  return __async$6(this, null, function* () {
+  return __async$5(this, null, function* () {
     yield ensureWalletKitLoaded();
     return yield initTonWalletKit(config, {
       emit,
@@ -38047,7 +37611,7 @@ function init(config) {
   });
 }
 function setEventsListeners(args) {
-  return __async$6(this, null, function* () {
+  return __async$5(this, null, function* () {
     var _a;
     const kit2 = yield getKit();
     const callback = (_a = args == null ? void 0 : args.callback) != null ? _a : ((type, event) => {
@@ -38088,18 +37652,11 @@ function setEventsListeners(args) {
       callback("requestError", event);
     };
     kit2.onRequestError(eventListeners.onErrorListener);
-    if (eventListeners.onIntentListener) {
-      kit2.removeIntentRequestCallback(eventListeners.onIntentListener);
-    }
-    eventListeners.onIntentListener = (event) => {
-      callback("intentRequest", event);
-    };
-    kit2.onIntentRequest(eventListeners.onIntentListener);
     return { ok: true };
   });
 }
 function removeEventListeners() {
-  return __async$6(this, null, function* () {
+  return __async$5(this, null, function* () {
     const kit2 = yield getKit();
     if (eventListeners.onConnectListener) {
       kit2.removeConnectRequestCallback();
@@ -38121,14 +37678,10 @@ function removeEventListeners() {
       kit2.removeErrorCallback();
       eventListeners.onErrorListener = null;
     }
-    if (eventListeners.onIntentListener) {
-      kit2.removeIntentRequestCallback(eventListeners.onIntentListener);
-      eventListeners.onIntentListener = null;
-    }
     return { ok: true };
   });
 }
-var __async$5 = (__this, __arguments, generator) => {
+var __async$4 = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
       try {
@@ -38149,7 +37702,7 @@ var __async$5 = (__this, __arguments, generator) => {
   });
 };
 function mnemonicToKeyPair(args) {
-  return __async$5(this, null, function* () {
+  return __async$4(this, null, function* () {
     var _a;
     if (!MnemonicToKeyPair$1) {
       throw new Error("MnemonicToKeyPair module not loaded");
@@ -38158,7 +37711,7 @@ function mnemonicToKeyPair(args) {
   });
 }
 function sign(args) {
-  return __async$5(this, null, function* () {
+  return __async$4(this, null, function* () {
     if (!DefaultSignature$1) {
       throw new Error("DefaultSignature module not loaded");
     }
@@ -38166,7 +37719,7 @@ function sign(args) {
   });
 }
 function createTonMnemonic() {
-  return __async$5(this, null, function* () {
+  return __async$4(this, null, function* () {
     if (!CreateTonMnemonic$1) {
       throw new Error("CreateTonMnemonic module not loaded");
     }
@@ -38189,7 +37742,7 @@ function get(id) {
 function release(id) {
   return store.delete(id);
 }
-var __async$4 = (__this, __arguments, generator) => {
+var __async$3 = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
       try {
@@ -38232,14 +37785,14 @@ class ProxyWalletAdapter {
     return bridgeRequestSync("getWalletId", { adapterId: this.adapterId });
   }
   getStateInit() {
-    return __async$4(this, null, function* () {
+    return __async$3(this, null, function* () {
       const result = yield bridgeRequest("adapterGetStateInit", { adapterId: this.adapterId });
       if (!result) throw new Error("adapterGetStateInit: no result from native");
       return result;
     });
   }
   getSignedSendTransaction(input, options) {
-    return __async$4(this, null, function* () {
+    return __async$3(this, null, function* () {
       var _a;
       const result = yield bridgeRequest("adapterSignTransaction", {
         adapterId: this.adapterId,
@@ -38251,7 +37804,7 @@ class ProxyWalletAdapter {
     });
   }
   getSignedSignData(input, options) {
-    return __async$4(this, null, function* () {
+    return __async$3(this, null, function* () {
       var _a;
       const result = yield bridgeRequest("adapterSignData", {
         adapterId: this.adapterId,
@@ -38263,7 +37816,7 @@ class ProxyWalletAdapter {
     });
   }
   getSignedTonProof(input, options) {
-    return __async$4(this, null, function* () {
+    return __async$3(this, null, function* () {
       var _a;
       const result = yield bridgeRequest("adapterSignTonProof", {
         adapterId: this.adapterId,
@@ -38285,7 +37838,7 @@ class ProxyWalletAdapter {
   }
 }
 function getWallets() {
-  return __async$4(this, null, function* () {
+  return __async$3(this, null, function* () {
     const wallets = yield kit("getWallets");
     return wallets.map((w) => {
       var _a;
@@ -38294,7 +37847,7 @@ function getWallets() {
   });
 }
 function getWalletById(args) {
-  return __async$4(this, null, function* () {
+  return __async$3(this, null, function* () {
     var _a;
     const w = yield kit("getWallet", args.walletId);
     if (!w) return null;
@@ -38302,43 +37855,43 @@ function getWalletById(args) {
   });
 }
 function getWalletAddress(args) {
-  return __async$4(this, null, function* () {
+  return __async$3(this, null, function* () {
     return wallet(args.walletId, "getAddress");
   });
 }
 function removeWallet(args) {
-  return __async$4(this, null, function* () {
+  return __async$3(this, null, function* () {
     return kit("removeWallet", args.walletId);
   });
 }
 function getBalance(args) {
-  return __async$4(this, null, function* () {
+  return __async$3(this, null, function* () {
     return wallet(args.walletId, "getBalance");
   });
 }
 function createSignerFromMnemonic(args) {
-  return __async$4(this, null, function* () {
+  return __async$3(this, null, function* () {
     var _a;
     if (!Signer$1) throw new Error("Signer module not loaded");
-    const signer = yield Signer$1.fromMnemonic(args.mnemonic, { type: (_a = args.mnemonicType) != null ? _a : "ton" });
+    const signer = yield Signer$1.fromMnemonic(args.mnemonic, { type: (_a = args.mnemonicType) != null ? _a : "ton" }, args.domain);
     const signerId = retain("signer", signer);
     return { signerId, publicKey: signer.publicKey };
   });
 }
 function createSignerFromPrivateKey(args) {
-  return __async$4(this, null, function* () {
+  return __async$3(this, null, function* () {
     if (!Signer$1) throw new Error("Signer module not loaded");
-    const signer = yield Signer$1.fromPrivateKey(args.secretKey);
+    const signer = yield Signer$1.fromPrivateKey(args.secretKey, args.domain);
     const signerId = retain("signer", signer);
     return { signerId, publicKey: signer.publicKey };
   });
 }
 function createSignerFromCustom(args) {
-  return __async$4(this, null, function* () {
+  return __async$3(this, null, function* () {
     const { signerId, publicKey } = args;
     const proxySigner = {
       publicKey,
-      sign: (bytes) => __async$4(null, null, function* () {
+      sign: (bytes) => __async$3(null, null, function* () {
         const result = yield bridgeRequest("signWithCustomSigner", {
           signerId,
           data: Array.from(bytes)
@@ -38352,7 +37905,7 @@ function createSignerFromCustom(args) {
   });
 }
 function createV5R1WalletAdapter(args) {
-  return __async$4(this, null, function* () {
+  return __async$3(this, null, function* () {
     var _a;
     const instance = yield getKit();
     const signer = get(args.signerId);
@@ -38370,7 +37923,7 @@ function createV5R1WalletAdapter(args) {
   });
 }
 function createV4R2WalletAdapter(args) {
-  return __async$4(this, null, function* () {
+  return __async$3(this, null, function* () {
     var _a;
     const instance = yield getKit();
     const signer = get(args.signerId);
@@ -38388,7 +37941,7 @@ function createV4R2WalletAdapter(args) {
   });
 }
 function addWallet(args) {
-  return __async$4(this, null, function* () {
+  return __async$3(this, null, function* () {
     var _a, _b;
     const instance = yield getKit();
     const existingAdapter = get(args.adapterId);
@@ -38407,7 +37960,7 @@ function releaseRef(args) {
   release(args.id);
   return { ok: true };
 }
-var __async$3 = (__this, __arguments, generator) => {
+var __async$2 = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
       try {
@@ -38433,60 +37986,10 @@ const getTransactionPreview = (args) => walletCall("getTransactionPreview", args
 const sendTransaction = (args) => walletCall("sendTransaction", args);
 const getRecentTransactions = (args) => clientCall("getAccountTransactions", args);
 function handleNewTransaction(args) {
-  return __async$3(this, null, function* () {
+  return __async$2(this, null, function* () {
     const k2 = yield getKit();
     const w = yield getWallet(args[0]);
     return k2.handleNewTransaction(w, args[1]);
-  });
-}
-var __async$2 = (__this, __arguments, generator) => {
-  return new Promise((resolve, reject) => {
-    var fulfilled = (value) => {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var rejected = (value) => {
-      try {
-        step(generator.throw(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var step = (x2) => x2.done ? resolve(x2.value) : Promise.resolve(x2.value).then(fulfilled, rejected);
-    step((generator = generator.apply(__this, __arguments)).next());
-  });
-};
-function approveConnectRequest(args) {
-  return __async$2(this, null, function* () {
-    return kit("approveConnectRequest", ...args);
-  });
-}
-function rejectConnectRequest(args) {
-  return __async$2(this, null, function* () {
-    return kit("rejectConnectRequest", ...args);
-  });
-}
-function approveTransactionRequest(args) {
-  return __async$2(this, null, function* () {
-    return kit("approveTransactionRequest", ...args);
-  });
-}
-function rejectTransactionRequest(args) {
-  return __async$2(this, null, function* () {
-    return kit("rejectTransactionRequest", ...args);
-  });
-}
-function approveSignDataRequest(args) {
-  return __async$2(this, null, function* () {
-    return kit("approveSignDataRequest", ...args);
-  });
-}
-function rejectSignDataRequest(args) {
-  return __async$2(this, null, function* () {
-    return kit("rejectSignDataRequest", ...args);
   });
 }
 var __async$1 = (__this, __arguments, generator) => {
@@ -38509,23 +38012,78 @@ var __async$1 = (__this, __arguments, generator) => {
     step((generator = generator.apply(__this, __arguments)).next());
   });
 };
-function handleTonConnectUrl(args) {
+function approveConnectRequest(args) {
   return __async$1(this, null, function* () {
+    return kit("approveConnectRequest", ...args);
+  });
+}
+function rejectConnectRequest(args) {
+  return __async$1(this, null, function* () {
+    return kit("rejectConnectRequest", ...args);
+  });
+}
+function approveTransactionRequest(args) {
+  return __async$1(this, null, function* () {
+    return kit("approveTransactionRequest", ...args);
+  });
+}
+function rejectTransactionRequest(args) {
+  return __async$1(this, null, function* () {
+    return kit("rejectTransactionRequest", ...args);
+  });
+}
+function approveSignDataRequest(args) {
+  return __async$1(this, null, function* () {
+    return kit("approveSignDataRequest", ...args);
+  });
+}
+function rejectSignDataRequest(args) {
+  return __async$1(this, null, function* () {
+    return kit("rejectSignDataRequest", ...args);
+  });
+}
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x2) => x2.done ? resolve(x2.value) : Promise.resolve(x2.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
+function handleTonConnectUrl(args) {
+  return __async(this, null, function* () {
     return kit("handleTonConnectUrl", args);
   });
 }
+function connectionEventFromUrl(args) {
+  return __async(this, null, function* () {
+    return kit("connectionEventFromUrl", args);
+  });
+}
 function listSessions() {
-  return __async$1(this, null, function* () {
+  return __async(this, null, function* () {
     return kit("listSessions");
   });
 }
 function disconnectSession(args) {
-  return __async$1(this, null, function* () {
+  return __async(this, null, function* () {
     return kit("disconnect", args);
   });
 }
 function processInternalBrowserRequest(args) {
-  return __async$1(this, null, function* () {
+  return __async(this, null, function* () {
     const messageInfo = args[0];
     const messageId = messageInfo == null ? void 0 : messageInfo.messageId;
     if (!messageId) {
@@ -38585,66 +38143,6 @@ function emitBrowserBridgeRequest(args) {
   emit("browserBridgeRequest", args);
   return { success: true };
 }
-var __async = (__this, __arguments, generator) => {
-  return new Promise((resolve, reject) => {
-    var fulfilled = (value) => {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var rejected = (value) => {
-      try {
-        step(generator.throw(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var step = (x2) => x2.done ? resolve(x2.value) : Promise.resolve(x2.value).then(fulfilled, rejected);
-    step((generator = generator.apply(__this, __arguments)).next());
-  });
-};
-function isIntentUrl(args) {
-  return __async(this, null, function* () {
-    return kit("isIntentUrl", ...args);
-  });
-}
-function handleIntentUrl(args) {
-  return __async(this, null, function* () {
-    return kit("handleIntentUrl", ...args);
-  });
-}
-function approveTransactionIntent(args) {
-  return __async(this, null, function* () {
-    return kit("approveTransactionIntent", ...args);
-  });
-}
-function approveSignDataIntent(args) {
-  return __async(this, null, function* () {
-    return kit("approveSignDataIntent", ...args);
-  });
-}
-function approveActionIntent(args) {
-  return __async(this, null, function* () {
-    return kit("approveActionIntent", ...args);
-  });
-}
-function approveBatchedIntent(args) {
-  return __async(this, null, function* () {
-    return kit("approveBatchedIntent", ...args);
-  });
-}
-function rejectIntent(args) {
-  return __async(this, null, function* () {
-    return kit("rejectIntent", ...args);
-  });
-}
-function intentItemsToTransactionRequest(args) {
-  return __async(this, null, function* () {
-    return kit("intentItemsToTransactionRequest", ...args);
-  });
-}
 const api = {
   // Initialization
   init,
@@ -38684,6 +38182,7 @@ const api = {
   rejectSignDataRequest,
   // TonConnect & sessions
   handleTonConnectUrl,
+  connectionEventFromUrl,
   listSessions,
   disconnectSession,
   processInternalBrowserRequest,
@@ -38701,16 +38200,7 @@ const api = {
   emitBrowserPageStarted,
   emitBrowserPageFinished,
   emitBrowserError,
-  emitBrowserBridgeRequest,
-  // Intents
-  isIntentUrl,
-  handleIntentUrl,
-  approveTransactionIntent,
-  approveSignDataIntent,
-  approveActionIntent,
-  approveBatchedIntent,
-  rejectIntent,
-  intentItemsToTransactionRequest
+  emitBrowserBridgeRequest
 };
 setBridgeApi(api);
 registerNativeCallHandler();
