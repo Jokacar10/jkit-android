@@ -37,13 +37,13 @@ import io.ton.walletkit.api.generated.TONSwapToken
 import io.ton.walletkit.swap.ITONSwapManager
 import io.ton.walletkit.swap.TONDeDustSwapProvider
 import io.ton.walletkit.swap.TONOmnistonSwapProvider
+import io.ton.walletkit.swap.buildSwapTransaction
 import io.ton.walletkit.swap.getQuote
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonElement
 
 class SwapViewModel(
     private val wallet: ITONWallet,
@@ -72,6 +72,7 @@ class SwapViewModel(
         val isSwapping: Boolean = false,
         val error: String? = null,
         val slippageBps: Int = 100,
+        val registeredProviders: List<String> = emptyList(),
     ) {
         val fromSymbol: String get() = fromToken.symbol ?: "???"
         val toSymbol: String get() = toToken.symbol ?: "???"
@@ -195,19 +196,29 @@ class SwapViewModel(
     }
 
     fun executeSwap() {
-        val quote = _state.value.currentQuote ?: return
-        if (_state.value.isSwapping) return
+        val current = _state.value
+        val quote = current.currentQuote ?: return
+        if (current.isSwapping) return
 
         _state.update { it.copy(isSwapping = true, error = null) }
 
         viewModelScope.launch {
             runCatching {
                 val manager = getSwapResources().manager
-                val params = TONSwapParams<JsonElement>(
-                    quote = quote,
-                    userAddress = wallet.address,
-                )
-                val transactionRequest = manager.buildSwapTransaction(params)
+                val transactionRequest = when (current.selectedProvider) {
+                    SwapProvider.OMNISTON -> manager.buildSwapTransaction(
+                        TONSwapParams<TONOmnistonProviderOptions>(
+                            quote = quote,
+                            userAddress = wallet.address,
+                        ),
+                    )
+                    SwapProvider.DEDUST -> manager.buildSwapTransaction(
+                        TONSwapParams<TONDeDustProviderOptions>(
+                            quote = quote,
+                            userAddress = wallet.address,
+                        ),
+                    )
+                }
                 wallet.send(transactionRequest)
             }.onSuccess {
                 _state.update {
@@ -235,6 +246,14 @@ class SwapViewModel(
 
         val deDust = kit.deDustSwapProvider()
         manager.registerProvider(deDust)
+
+        // Set Omniston as the default provider for getQuote calls without explicit provider
+        manager.setDefaultProvider(omniston)
+
+        // Verify both providers are registered and update UI with their IDs
+        Log.d(TAG, "hasOmniston=${manager.hasProvider(omniston)}, hasDeDust=${manager.hasProvider(deDust)}")
+        val providerIds = manager.registeredProviders()
+        _state.update { it.copy(registeredProviders = providerIds) }
 
         return SwapResources(manager, omniston, deDust).also { swapResources = it }
     }

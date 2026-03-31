@@ -42346,6 +42346,23 @@ function registerSwapProvider(args) {
     (yield getSwap()).registerProvider(get(args.providerId));
   });
 }
+function setDefaultSwapProvider(args) {
+  return __async(this, null, function* () {
+    (yield getSwap()).setDefaultProvider(args.providerId);
+  });
+}
+function getRegisteredSwapProviders() {
+  return __async(this, null, function* () {
+    const providerIds = (yield getSwap()).getRegisteredProviders();
+    return { providerIds };
+  });
+}
+function hasSwapProvider(args) {
+  return __async(this, null, function* () {
+    const result = (yield getSwap()).hasProvider(args.providerId);
+    return { result };
+  });
+}
 function getSwapQuote(args) {
   return __async(this, null, function* () {
     return (yield getSwap()).getQuote(args.params, args.providerId);
@@ -42418,6 +42435,9 @@ const api = {
   createOmnistonSwapProvider,
   createDeDustSwapProvider,
   registerSwapProvider,
+  setDefaultSwapProvider,
+  getRegisteredSwapProviders,
+  hasSwapProvider,
   getSwapQuote,
   buildSwapTransaction
 };
