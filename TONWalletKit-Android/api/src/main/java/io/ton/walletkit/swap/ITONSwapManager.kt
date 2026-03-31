@@ -31,7 +31,7 @@ import kotlinx.serialization.serializer
 
 /** Manages swap providers and executes swap operations. Obtain via [io.ton.walletkit.ITONWalletKit.swap]. */
 interface ITONSwapManager {
-    /** Register a provider before calling [getQuote]. */
+    /** Register a provider. Must be called before [getQuote] or [buildSwapTransaction]. */
     suspend fun registerProvider(provider: TONSwapProvider<*>)
 
     /** Set the default provider used by [getQuote] when no provider is specified. */

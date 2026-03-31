@@ -466,6 +466,15 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): String =
         swapOperations.buildSwapTransaction(params)
 
+    override suspend fun setDefaultSwapProvider(providerId: String) =
+        swapOperations.setDefaultSwapProvider(providerId)
+
+    override suspend fun getRegisteredSwapProviders(): List<String> =
+        swapOperations.getRegisteredSwapProviders()
+
+    override suspend fun hasSwapProvider(providerId: String): Boolean =
+        swapOperations.hasSwapProvider(providerId)
+
     override suspend fun callBridgeMethod(method: String, params: JSONObject?): JSONObject {
         return call(method, params)
     }
