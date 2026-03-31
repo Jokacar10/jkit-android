@@ -422,5 +422,5 @@ internal class TONWalletKit private constructor(
         return TONSwapProvider(providerId)
     }
 
-    override fun swap(): ITONSwapManager = swapManager
+    override suspend fun swap(): ITONSwapManager = swapManager
 }

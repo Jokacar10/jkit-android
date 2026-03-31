@@ -451,6 +451,15 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun registerSwapProvider(providerId: String) =
         swapOperations.registerSwapProvider(providerId)
 
+    override suspend fun setDefaultSwapProvider(providerId: String) =
+        swapOperations.setDefaultSwapProvider(providerId)
+
+    override suspend fun getRegisteredSwapProviders(): List<String> =
+        swapOperations.getRegisteredSwapProviders()
+
+    override suspend fun hasSwapProvider(providerId: String): Boolean =
+        swapOperations.hasSwapProvider(providerId)
+
     override suspend fun getSwapQuote(params: TONSwapQuoteParams<JsonElement>, providerId: String?): TONSwapQuote =
         swapOperations.getSwapQuote(params, providerId)
 

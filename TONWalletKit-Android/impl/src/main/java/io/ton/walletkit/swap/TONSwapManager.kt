@@ -40,6 +40,18 @@ internal class TONSwapManager(
         engine.registerSwapProvider(provider.providerId)
     }
 
+    override suspend fun setDefaultProvider(provider: TONSwapProvider<*>) {
+        engine.setDefaultSwapProvider(provider.providerId)
+    }
+
+    override suspend fun registeredProviders(): List<String> {
+        return engine.getRegisteredSwapProviders()
+    }
+
+    override suspend fun hasProvider(provider: TONSwapProvider<*>): Boolean {
+        return engine.hasSwapProvider(provider.providerId)
+    }
+
     override suspend fun <TQuoteOptions> getQuote(
         params: TONSwapQuoteParams<TQuoteOptions>,
         provider: TONSwapProvider<TQuoteOptions>,
@@ -63,8 +75,27 @@ internal class TONSwapManager(
         return engine.getSwapQuote(params, null)
     }
 
+    override suspend fun <TSwapOptions> buildSwapTransaction(
+        params: TONSwapParams<TSwapOptions>,
+        serializer: KSerializer<TSwapOptions>,
+    ): TONTransactionRequest {
+        val jsonOptions = params.providerOptions?.let { Json.encodeToJsonElement(serializer, it) }
+        val jsonParams = TONSwapParams(
+            quote = params.quote,
+            userAddress = params.userAddress,
+            destinationAddress = params.destinationAddress,
+            slippageBps = params.slippageBps,
+            deadline = params.deadline,
+            providerOptions = jsonOptions,
+        )
+        return decodeTransactionRequest(engine.buildSwapTransaction(jsonParams))
+    }
+
     override suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): TONTransactionRequest {
-        val json = engine.buildSwapTransaction(params)
+        return decodeTransactionRequest(engine.buildSwapTransaction(params))
+    }
+
+    private fun decodeTransactionRequest(json: String): TONTransactionRequest {
         return try {
             Json.decodeFromString(TONTransactionRequest.serializer(), json)
         } catch (e: SerializationException) {

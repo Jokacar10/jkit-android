@@ -34,6 +34,15 @@ interface ITONSwapManager {
     /** Register a provider before calling [getQuote]. */
     suspend fun registerProvider(provider: TONSwapProvider<*>)
 
+    /** Set the default provider used by [getQuote] when no provider is specified. */
+    suspend fun setDefaultProvider(provider: TONSwapProvider<*>)
+
+    /** Returns the IDs of all registered providers. */
+    suspend fun registeredProviders(): List<String>
+
+    /** Returns true if the provider is currently registered. */
+    suspend fun hasProvider(provider: TONSwapProvider<*>): Boolean
+
     /**
      * Get a quote from a specific typed provider.
      * Prefer the inline [getQuote] extension — it infers [serializer] automatically.
@@ -47,7 +56,16 @@ interface ITONSwapManager {
     /** Get a quote using the default registered provider. */
     suspend fun getQuote(params: TONSwapQuoteParams<JsonElement>): TONSwapQuote
 
-    /** Build a swap transaction ready to pass to [io.ton.walletkit.ITONWallet.send]. */
+    /**
+     * Build a swap transaction with typed provider options.
+     * Prefer the inline [buildSwapTransaction] extension — it infers [serializer] automatically.
+     */
+    suspend fun <TSwapOptions> buildSwapTransaction(
+        params: TONSwapParams<TSwapOptions>,
+        serializer: KSerializer<TSwapOptions>,
+    ): TONTransactionRequest
+
+    /** Build a swap transaction using untyped (JsonElement) provider options. */
     suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): TONTransactionRequest
 }
 
@@ -56,3 +74,8 @@ suspend inline fun <reified TQuoteOptions> ITONSwapManager.getQuote(
     params: TONSwapQuoteParams<TQuoteOptions>,
     provider: TONSwapProvider<TQuoteOptions>,
 ): TONSwapQuote = getQuote(params, provider, serializer())
+
+/** Build a swap transaction, inferring the serializer via reified [TSwapOptions]. */
+suspend inline fun <reified TSwapOptions> ITONSwapManager.buildSwapTransaction(
+    params: TONSwapParams<TSwapOptions>,
+): TONTransactionRequest = buildSwapTransaction(params, serializer())

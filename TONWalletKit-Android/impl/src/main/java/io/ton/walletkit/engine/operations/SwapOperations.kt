@@ -30,7 +30,9 @@ import io.ton.walletkit.engine.operations.requests.BuildSwapTransactionRequest
 import io.ton.walletkit.engine.operations.requests.CreateDeDustSwapProviderRequest
 import io.ton.walletkit.engine.operations.requests.CreateOmnistonSwapProviderRequest
 import io.ton.walletkit.engine.operations.requests.GetSwapQuoteRequest
+import io.ton.walletkit.engine.operations.requests.HasSwapProviderRequest
 import io.ton.walletkit.engine.operations.requests.RegisterSwapProviderRequest
+import io.ton.walletkit.engine.operations.requests.SetDefaultSwapProviderRequest
 import io.ton.walletkit.exceptions.JSValueConversionException
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.ResponseConstants
@@ -71,6 +73,26 @@ internal class SwapOperations(
         ensureInitialized()
         val request = RegisterSwapProviderRequest(providerId = providerId)
         rpcClient.call(BridgeMethodConstants.METHOD_REGISTER_SWAP_PROVIDER, json.toJSONObject(request))
+    }
+
+    suspend fun setDefaultSwapProvider(providerId: String) {
+        ensureInitialized()
+        val request = SetDefaultSwapProviderRequest(providerId = providerId)
+        rpcClient.call(BridgeMethodConstants.METHOD_SET_DEFAULT_SWAP_PROVIDER, json.toJSONObject(request))
+    }
+
+    suspend fun getRegisteredSwapProviders(): List<String> {
+        ensureInitialized()
+        val result = rpcClient.call(BridgeMethodConstants.METHOD_GET_REGISTERED_SWAP_PROVIDERS, null)
+        val array = result.getJSONArray("providerIds")
+        return List(array.length()) { array.getString(it) }
+    }
+
+    suspend fun hasSwapProvider(providerId: String): Boolean {
+        ensureInitialized()
+        val request = HasSwapProviderRequest(providerId = providerId)
+        val result = rpcClient.call(BridgeMethodConstants.METHOD_HAS_SWAP_PROVIDER, json.toJSONObject(request))
+        return result.getBoolean("result")
     }
 
     suspend fun getSwapQuote(params: TONSwapQuoteParams<JsonElement>, providerId: String?): TONSwapQuote {
