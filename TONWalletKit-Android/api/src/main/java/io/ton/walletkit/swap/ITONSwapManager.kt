@@ -34,13 +34,13 @@ interface ITONSwapManager {
     /** Register a provider. Must be called before [getQuote] or [buildSwapTransaction]. */
     suspend fun registerProvider(provider: TONSwapProvider<*>)
 
-    /** Set the default provider used when no provider is explicitly passed to [getQuote]. */
+    /** Set the default provider used by [getQuote] when no provider is specified. */
     suspend fun setDefaultProvider(provider: TONSwapProvider<*>)
 
-    /** Returns IDs of all currently registered providers. */
+    /** Returns the IDs of all registered providers. */
     suspend fun registeredProviders(): List<String>
 
-    /** Returns true if [provider] is currently registered. */
+    /** Returns true if the provider is currently registered. */
     suspend fun hasProvider(provider: TONSwapProvider<*>): Boolean
 
     /** Returns [provider] if it is currently registered, null otherwise. */
@@ -60,7 +60,7 @@ interface ITONSwapManager {
     suspend fun getQuote(params: TONSwapQuoteParams<JsonElement>): TONSwapQuote
 
     /**
-     * Build a swap transaction ready to pass to [io.ton.walletkit.ITONWallet.send].
+     * Build a swap transaction with typed provider options.
      * Prefer the inline [buildSwapTransaction] extension — it infers [serializer] automatically.
      */
     suspend fun <TSwapOptions> buildSwapTransaction(
@@ -68,7 +68,7 @@ interface ITONSwapManager {
         serializer: KSerializer<TSwapOptions>,
     ): TONTransactionRequest
 
-    /** Build a swap transaction using a raw [JsonElement] params. */
+    /** Build a swap transaction using untyped (JsonElement) provider options. */
     suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): TONTransactionRequest
 }
 

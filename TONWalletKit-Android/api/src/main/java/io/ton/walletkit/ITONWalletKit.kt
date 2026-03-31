@@ -180,7 +180,7 @@ interface ITONWalletKit {
     /**
      * Get the swap manager for registering providers and executing swaps.
      */
-    fun swap(): ITONSwapManager
+    suspend fun swap(): ITONSwapManager
 }
 
 interface WebViewTonConnectInjector {

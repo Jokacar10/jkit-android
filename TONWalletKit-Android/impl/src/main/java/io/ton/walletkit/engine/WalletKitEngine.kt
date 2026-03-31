@@ -474,6 +474,12 @@ internal interface WalletKitEngine : RequestHandler {
 
     suspend fun registerSwapProvider(providerId: String)
 
+    suspend fun setDefaultSwapProvider(providerId: String)
+
+    suspend fun getRegisteredSwapProviders(): List<String>
+
+    suspend fun hasSwapProvider(providerId: String): Boolean
+
     suspend fun getSwapQuote(params: TONSwapQuoteParams<JsonElement>, providerId: String?): TONSwapQuote
 
     suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): String

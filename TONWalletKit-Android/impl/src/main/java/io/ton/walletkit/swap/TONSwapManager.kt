@@ -92,19 +92,14 @@ internal class TONSwapManager(
             deadline = params.deadline,
             providerOptions = jsonOptions,
         )
-        val json = engine.buildSwapTransaction(jsonParams)
-        return try {
-            Json.decodeFromString(TONTransactionRequest.serializer(), json)
-        } catch (e: SerializationException) {
-            throw JSValueConversionException.DecodingError(
-                message = "Failed to decode TONTransactionRequest: ${e.message}",
-                cause = e,
-            )
-        }
+        return decodeTransactionRequest(engine.buildSwapTransaction(jsonParams))
     }
 
     override suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): TONTransactionRequest {
-        val json = engine.buildSwapTransaction(params)
+        return decodeTransactionRequest(engine.buildSwapTransaction(params))
+    }
+
+    private fun decodeTransactionRequest(json: String): TONTransactionRequest {
         return try {
             Json.decodeFromString(TONTransactionRequest.serializer(), json)
         } catch (e: SerializationException) {

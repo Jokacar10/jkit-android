@@ -243,6 +243,15 @@ internal object BridgeMethodConstants {
     /** Register a previously created swap provider with the swap manager. */
     const val METHOD_REGISTER_SWAP_PROVIDER = "registerSwapProvider"
 
+    /** Set the default swap provider. */
+    const val METHOD_SET_DEFAULT_SWAP_PROVIDER = "setDefaultSwapProvider"
+
+    /** Get all registered swap provider IDs. */
+    const val METHOD_GET_REGISTERED_SWAP_PROVIDERS = "getRegisteredSwapProviders"
+
+    /** Check if a swap provider is registered. */
+    const val METHOD_HAS_SWAP_PROVIDER = "hasSwapProvider"
+
     /** Get a swap quote from a registered provider. */
     const val METHOD_GET_SWAP_QUOTE = "getSwapQuote"
 
