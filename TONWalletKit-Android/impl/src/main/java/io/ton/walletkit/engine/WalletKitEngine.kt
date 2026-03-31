@@ -484,12 +484,6 @@ internal interface WalletKitEngine : RequestHandler {
 
     suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): String
 
-    suspend fun setDefaultSwapProvider(providerId: String)
-
-    suspend fun getRegisteredSwapProviders(): List<String>
-
-    suspend fun hasSwapProvider(providerId: String): Boolean
-
     /**
      * Call a bridge method directly.
      *

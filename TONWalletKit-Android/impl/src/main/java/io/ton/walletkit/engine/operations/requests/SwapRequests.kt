@@ -45,16 +45,6 @@ internal data class RegisterSwapProviderRequest(
 )
 
 @Serializable
-internal data class SetDefaultSwapProviderRequest(
-    val providerId: String,
-)
-
-@Serializable
-internal data class HasSwapProviderRequest(
-    val providerId: String,
-)
-
-@Serializable
 internal data class GetSwapQuoteRequest(
     val params: kotlinx.serialization.json.JsonElement,
     val providerId: String? = null,
