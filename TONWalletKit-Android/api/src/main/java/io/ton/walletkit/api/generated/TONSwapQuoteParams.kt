@@ -28,6 +28,7 @@
 
 package io.ton.walletkit.api.generated
 
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
