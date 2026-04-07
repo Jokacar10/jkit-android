@@ -24,6 +24,7 @@ package io.ton.walletkit
 import android.content.Context
 import io.ton.walletkit.api.MAINNET
 import io.ton.walletkit.api.generated.TONNetwork
+import io.ton.walletkit.api.generated.TONTonStakersProviderConfig
 import io.ton.walletkit.config.TONWalletKitConfiguration
 import io.ton.walletkit.internal.TONWalletKitFactory
 import io.ton.walletkit.listener.TONBridgeEventsHandler
@@ -155,6 +156,37 @@ interface ITONWalletKit {
      * Create WebView TON Connect injector.
      */
     fun createWebViewInjector(webView: android.webkit.WebView, walletId: String? = null): WebViewTonConnectInjector
+
+    // ── Staking ──
+
+    /**
+     * Access the staking manager for registering providers and performing staking operations.
+     *
+     * Mirrors the iOS `TONWalletKit.staking()` method.
+     *
+     * Example:
+     * ```kotlin
+     * val provider = kit.tonStakersStakingProvider()
+     * kit.staking().register(provider)
+     * kit.staking().setDefaultProvider(provider.providerId)
+     * val quote = kit.staking().getQuote(TONStakingQuoteParams(direction = TONStakingQuoteDirection.stake, amount = "1000000000"))
+     * ```
+     */
+    fun staking(): ITONStakingManager
+
+    /**
+     * Create a TonStakers staking provider.
+     *
+     * Call [ITONStakingManager.register] with the returned provider to make it available for quotes.
+     *
+     * Mirrors the iOS `TONWalletKit.stakingProvider(config:)` method.
+     *
+     * @param config Optional per-chain configuration (contract address, TonAPI key)
+     * @return A provider that can be registered with [staking]
+     */
+    suspend fun tonStakersStakingProvider(
+        config: TONTonStakersProviderConfig? = null,
+    ): ITONTonStakersStakingProvider
 }
 
 interface WebViewTonConnectInjector {

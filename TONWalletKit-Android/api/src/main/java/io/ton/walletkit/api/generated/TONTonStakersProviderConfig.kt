@@ -19,43 +19,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-@file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport",
-)
-
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
 /**
+ * Configuration for creating a TonStakers staking provider.
  *
+ * Mirrors the iOS `TONTonStakersProviderConfig` for cross-platform consistency.
+ * Fields correspond to TON chain IDs: mainnet = "-239", testnet = "-3".
  *
- * @param quote
- * @param userAddress
- * @param destinationAddress
- * @param slippageBps Slippage tolerance in basis points (1 bp = 0.01%)
- * @param deadline Transaction deadline in unix timestamp
- * @param providerOptions Provider-specific options
+ * @param mainnet Mainnet-specific configuration (optional)
+ * @param testnet Testnet-specific configuration (optional)
  */
-@Serializable
-data class TONSwapParams<TProviderOptions>(
-    @SerialName("quote")
-    val quote: TONSwapQuote,
-    @SerialName("userAddress")
-    val userAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
-    @SerialName("destinationAddress")
-    val destinationAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
-    @SerialName("slippageBps")
-    val slippageBps: kotlin.Int? = null,
-    @SerialName("deadline")
-    val deadline: kotlin.Int? = null,
-    @SerialName("providerOptions")
-    val providerOptions: TProviderOptions? = null,
+data class TONTonStakersProviderConfig(
+    val mainnet: TONTonStakersChainConfig? = null,
+    val testnet: TONTonStakersChainConfig? = null,
 ) {
+    /**
+     * Converts to a chain-ID-keyed map expected by the JavaScript bridge.
+     */
+    fun toChainConfigMap(): Map<String, TONTonStakersChainConfig> {
+        return buildMap {
+            mainnet?.let { put("-239", it) }
+            testnet?.let { put("-3", it) }
+        }
+    }
+
     companion object
 }
