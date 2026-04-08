@@ -34,16 +34,26 @@ import kotlinx.serialization.Serializable
 /**
  * Staking balance information for a user
  *
- * @param stakedBalance
- * @param instantUnstakeAvailable
+ * @param rawStakedBalance
+ * @param stakedBalance Amount currently staked
+ * @param rawInstantUnstakeAvailable
+ * @param instantUnstakeAvailable Amount available for instant unstake
  * @param providerId Identifier of the staking provider
  */
 @Serializable
 data class TONStakingBalance(
 
+    @SerialName(value = "rawStakedBalance")
+    val rawStakedBalance: kotlin.String,
+
+    /* Amount currently staked */
     @SerialName(value = "stakedBalance")
     val stakedBalance: kotlin.String,
 
+    @SerialName(value = "rawInstantUnstakeAvailable")
+    val rawInstantUnstakeAvailable: kotlin.String,
+
+    /* Amount available for instant unstake */
     @SerialName(value = "instantUnstakeAvailable")
     val instantUnstakeAvailable: kotlin.String,
 

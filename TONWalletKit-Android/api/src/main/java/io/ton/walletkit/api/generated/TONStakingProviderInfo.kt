@@ -34,9 +34,10 @@ import kotlinx.serialization.Serializable
 /**
  * Staking information for a provider
  *
- * @param apy Annual Percentage Yield in basis points (100 = 1%)
+ * @param apy Annual Percentage Yield as a percentage (e.g. 5.42 = 5.42%)
  * @param providerId Identifier of the staking provider
- * @param instantUnstakeAvailable
+ * @param rawInstantUnstakeAvailable
+ * @param instantUnstakeAvailable Amount available for instant unstake
  */
 @Serializable
 data class TONStakingProviderInfo(
@@ -49,6 +50,10 @@ data class TONStakingProviderInfo(
     @SerialName(value = "providerId")
     val providerId: kotlin.String,
 
+    @SerialName(value = "rawInstantUnstakeAvailable")
+    val rawInstantUnstakeAvailable: kotlin.String? = null,
+
+    /* Amount available for instant unstake */
     @SerialName(value = "instantUnstakeAvailable")
     val instantUnstakeAvailable: kotlin.String? = null,
 
