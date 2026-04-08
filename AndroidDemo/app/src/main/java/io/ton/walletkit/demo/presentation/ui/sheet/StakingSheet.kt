@@ -348,12 +348,6 @@ private fun QuoteCard(
             quote.unstakeMode?.let { mode ->
                 LabeledValue("Unstake mode", mode.toDisplayLabel())
             }
-            quote.estimatedUnstakeDelayHours?.let { hours ->
-                LabeledValue("Estimated delay", "$hours h")
-            }
-            quote.instantUnstakeAvailable?.let { value ->
-                LabeledValue("Instant unstake liquidity", formatTokenDisplay(value))
-            }
         }
     }
 }
