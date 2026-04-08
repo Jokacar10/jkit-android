@@ -36,7 +36,7 @@ import kotlinx.serialization.Serializable
  *
  *
  * @param direction
- * @param amount
+ * @param amount Amount of tokens to stake or unstake
  * @param userAddress
  * @param network
  * @param unstakeMode

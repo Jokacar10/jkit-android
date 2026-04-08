@@ -36,14 +36,14 @@ import kotlinx.serialization.Serializable
  * Staking quote response with pricing information
  *
  * @param direction
- * @param amountIn
- * @param amountOut
+ * @param rawAmountIn
+ * @param rawAmountOut
+ * @param amountIn Formatted amount of tokens being provided
+ * @param amountOut Formatted estimated amount of tokens to be received
  * @param network
  * @param providerId Identifier of the staking provider
- * @param apy Annual Percentage Yield in basis points (100 = 1%)
+ * @param apy Annual Percentage Yield as a percentage (e.g. 5.42 = 5.42%)
  * @param unstakeMode
- * @param estimatedUnstakeDelayHours Estimated delay in hours for unstaking
- * @param instantUnstakeAvailable
  * @param metadata Provider-specific metadata for the quote
  */
 @Serializable
@@ -52,9 +52,17 @@ data class TONStakingQuote(
     @Contextual @SerialName(value = "direction")
     val direction: TONStakingQuoteDirection,
 
+    @SerialName(value = "rawAmountIn")
+    val rawAmountIn: kotlin.String,
+
+    @SerialName(value = "rawAmountOut")
+    val rawAmountOut: kotlin.String,
+
+    /* Formatted amount of tokens being provided */
     @SerialName(value = "amountIn")
     val amountIn: kotlin.String,
 
+    /* Formatted estimated amount of tokens to be received */
     @SerialName(value = "amountOut")
     val amountOut: kotlin.String,
 
@@ -71,13 +79,6 @@ data class TONStakingQuote(
 
     @Contextual @SerialName(value = "unstakeMode")
     val unstakeMode: TONUnstakeMode? = null,
-
-    /* Estimated delay in hours for unstaking */
-    @SerialName(value = "estimatedUnstakeDelayHours")
-    val estimatedUnstakeDelayHours: kotlin.Int? = null,
-
-    @SerialName(value = "instantUnstakeAvailable")
-    val instantUnstakeAvailable: kotlin.String? = null,
 
     /* Provider-specific metadata for the quote */
     @Contextual @SerialName(value = "metadata")
