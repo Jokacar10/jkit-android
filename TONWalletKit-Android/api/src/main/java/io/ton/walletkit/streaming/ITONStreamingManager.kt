@@ -30,7 +30,7 @@ import io.ton.walletkit.api.generated.TONTransactionsUpdate
 import kotlinx.coroutines.flow.Flow
 
 interface ITONStreamingManager {
-    fun hasProvider(network: TONNetwork): Boolean
+    suspend fun hasProvider(network: TONNetwork): Boolean
 
     suspend fun register(provider: ITONStreamingProvider)
 

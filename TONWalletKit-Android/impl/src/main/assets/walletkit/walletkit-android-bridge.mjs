@@ -30827,24 +30827,7 @@ function DefaultSignature(data, privateKey) {
   }
   return Uint8ArrayToHex(distExports.sign(Buffer.from(Uint8Array.from(data)), Buffer.from(fullKey)));
 }
-function DefaultDomainSignature(data, privateKey, domain) {
-  let fullKey = privateKey;
-  if (fullKey.length === 32) {
-    const keyPair = distExports.keyPairFromSeed(Buffer.from(fullKey));
-    fullKey = keyPair.secretKey;
-  }
-  return Uint8ArrayToHex(distExports$1.domainSign({
-    data: Buffer.from(Uint8Array.from(data)),
-    secretKey: Buffer.from(fullKey),
-    domain
-  }));
-}
-function createWalletSigner(privateKey, domain) {
-  if (domain) {
-    return async (data) => {
-      return DefaultDomainSignature(Uint8Array.from(data), privateKey, domain);
-    };
-  }
+function createWalletSigner(privateKey) {
   return async (data) => {
     return DefaultSignature(Uint8Array.from(data), privateKey);
   };
@@ -30860,9 +30843,9 @@ class Signer {
    * @param options - Optional configuration for mnemonic type
    * @returns Signer function with publicKey property
    */
-  static async fromMnemonic(mnemonic2, options, domain) {
+  static async fromMnemonic(mnemonic2, options) {
     const keyPair = await MnemonicToKeyPair(mnemonic2, options?.type ?? "ton");
-    const signer = createWalletSigner(keyPair.secretKey, domain);
+    const signer = createWalletSigner(keyPair.secretKey);
     return {
       sign: signer,
       publicKey: Uint8ArrayToHex(keyPair.publicKey)
@@ -30873,10 +30856,10 @@ class Signer {
    * @param privateKey - Private key as hex string or Uint8Array
    * @returns Signer function with publicKey property
    */
-  static async fromPrivateKey(privateKey, domain) {
+  static async fromPrivateKey(privateKey) {
     const privateKeyBytes = typeof privateKey === "string" ? Uint8Array.from(Buffer.from(privateKey.replace("0x", ""), "hex")) : privateKey;
     const keyPair = distExports.keyPairFromSeed(Buffer.from(privateKeyBytes));
-    const signer = createWalletSigner(keyPair.secretKey, domain);
+    const signer = createWalletSigner(keyPair.secretKey);
     return {
       sign: signer,
       publicKey: Uint8ArrayToHex(keyPair.publicKey)
@@ -35362,6 +35345,7 @@ class WalletV5R1Adapter {
   // private keyPair: { publicKey: Uint8Array; secretKey: Uint8Array };
   signer;
   config;
+  domain;
   walletContract;
   client;
   publicKey;
@@ -35378,13 +35362,15 @@ class WalletV5R1Adapter {
       tonClient: options.client,
       network: options.network,
       walletId: options.walletId,
-      workchain: options.workchain
+      workchain: options.workchain,
+      domain: options.domain
     });
   }
   constructor(config) {
     this.config = config;
     this.client = config.tonClient;
     this.signer = config.signer;
+    this.domain = config.domain;
     this.publicKey = this.config.publicKey;
     this.walletContract = WalletV5.createFromConfig({
       publicKey: HexToBigInt(this.publicKey),
@@ -35543,7 +35529,8 @@ class WalletV5R1Adapter {
     };
     const expireAt = options.validUntil ?? Math.floor(Date.now() / 1e3) + 300;
     const payload = distExports$1.beginCell().storeUint(Opcodes2.auth_signed, 32).storeUint(walletId, 32).storeUint(expireAt, 32).storeUint(seqno, 32).storeSlice(actionsList.beginParse()).endCell();
-    const signingData = payload.hash();
+    const domainPrefix = this.domain ? distExports$1.signatureDomainPrefix(this.domain) : null;
+    const signingData = domainPrefix ? Buffer.concat([domainPrefix, payload.hash()]) : payload.hash();
     const signature = options.fakeSignature ? FakeSignature(signingData) : await this.sign(signingData);
     return distExports$1.beginCell().storeSlice(payload.beginParse()).storeBuffer(Buffer.from(HexToUint8Array(signature))).endCell();
   }
@@ -35830,6 +35817,7 @@ const log$2 = globalLogger.createChild("WalletV4R2Adapter");
 class WalletV4R2Adapter {
   signer;
   config;
+  domain;
   walletContract;
   client;
   publicKey;
@@ -35846,13 +35834,15 @@ class WalletV4R2Adapter {
       tonClient: options.client,
       network: options.network,
       walletId: typeof options.walletId === "bigint" ? Number(options.walletId) : options.walletId,
-      workchain: options.workchain
+      workchain: options.workchain,
+      domain: options.domain
     });
   }
   constructor(config) {
     this.config = config;
     this.client = config.tonClient;
     this.signer = config.signer;
+    this.domain = config.domain;
     this.publicKey = this.config.publicKey;
     const walletConfig = {
       publicKey: HexToBigInt(this.publicKey),
@@ -35925,7 +35915,9 @@ class WalletV4R2Adapter {
         messages,
         timeout
       });
-      const signature = await this.sign(Uint8Array.from(data.hash()));
+      const domainPrefix = this.domain ? distExports$1.signatureDomainPrefix(this.domain) : null;
+      const signingData = domainPrefix ? Buffer.concat([domainPrefix, data.hash()]) : data.hash();
+      const signature = await this.sign(Uint8Array.from(signingData));
       const signedCell = distExports$1.beginCell().storeBuffer(Buffer.from(HexToUint8Array(signature))).storeSlice(data.asSlice()).endCell();
       const ext = distExports$1.external({
         to: this.walletContract.address,
@@ -36728,7 +36720,6 @@ const index = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.definePropert
   DEFAULT_JETTON_GAS_FEE,
   DEFAULT_NFT_GAS_FEE,
   DEFAULT_REQUEST_TIMEOUT,
-  DefaultDomainSignature,
   DefaultSignature,
   DisconnectHandler,
   ERROR_CODES,
@@ -38228,30 +38219,18 @@ var __async = (__this, __arguments, generator) => {
     step((generator = generator.apply(__this, __arguments)).next());
   });
 };
-const subscriptions = /* @__PURE__ */ new Map();
-let nextSubId = 1;
-function nextSubscriptionId() {
-  return `streaming_sub_${nextSubId++}`;
-}
-function toNetwork(network) {
-  return typeof network === "string" ? { chainId: network } : network;
-}
 function createTonCenterStreamingProvider(args) {
   return __async(this, null, function* () {
     const instance = yield getKit();
-    const ctx = instance.createFactoryContext();
-    const provider = new TonCenterStreamingProvider(ctx, args.config);
-    const providerId = retain("streamingProvider", provider);
-    return { providerId };
+    const provider = new TonCenterStreamingProvider(instance.createFactoryContext(), args.config);
+    return { providerId: retain("streamingProvider", provider) };
   });
 }
 function createTonApiStreamingProvider(args) {
   return __async(this, null, function* () {
     const instance = yield getKit();
-    const ctx = instance.createFactoryContext();
-    const provider = new TonApiStreamingProvider(ctx, args.config);
-    const providerId = retain("streamingProvider", provider);
-    return { providerId };
+    const provider = new TonApiStreamingProvider(instance.createFactoryContext(), args.config);
+    return { providerId: retain("streamingProvider", provider) };
   });
 }
 function registerStreamingProvider(args) {
@@ -38265,31 +38244,31 @@ function registerStreamingProvider(args) {
 function streamingHasProvider(args) {
   return __async(this, null, function* () {
     const instance = yield getKit();
-    return { hasProvider: instance.streaming.hasProvider(toNetwork(args.network)) };
+    return { hasProvider: instance.streaming.hasProvider(args.network) };
   });
 }
 function streamingWatch(args) {
   return __async(this, null, function* () {
     const instance = yield getKit();
-    const subscriptionId = nextSubscriptionId();
+    let subscriptionId;
     const unwatch = instance.streaming.watch(
-      toNetwork(args.network),
+      args.network,
       args.address,
       args.types,
       (_type, update) => {
         emit("streamingUpdate", { subscriptionId, update });
       }
     );
-    subscriptions.set(subscriptionId, unwatch);
+    subscriptionId = retain("streamingSub", unwatch);
     return { subscriptionId };
   });
 }
 function streamingUnwatch(args) {
   return __async(this, null, function* () {
-    const unwatch = subscriptions.get(args.subscriptionId);
+    const unwatch = get(args.subscriptionId);
     if (unwatch) {
       unwatch();
-      subscriptions.delete(args.subscriptionId);
+      release(args.subscriptionId);
     }
   });
 }
@@ -38308,11 +38287,11 @@ function streamingDisconnect() {
 function streamingWatchConnectionChange(args) {
   return __async(this, null, function* () {
     const instance = yield getKit();
-    const subscriptionId = nextSubscriptionId();
-    const unwatch = instance.streaming.onConnectionChange(toNetwork(args.network), (connected) => {
+    let subscriptionId;
+    const unwatch = instance.streaming.onConnectionChange(args.network, (connected) => {
       emit("streamingConnectionChange", { subscriptionId, connected });
     });
-    subscriptions.set(subscriptionId, unwatch);
+    subscriptionId = retain("streamingSub", unwatch);
     return { subscriptionId };
   });
 }
@@ -38385,22 +38364,6 @@ const api = {
   streamingDisconnect,
   streamingWatchConnectionChange
 };
-api["streaming.createTonCenterStreamingProvider"] = createTonCenterStreamingProvider;
-api["streaming.createTonApiStreamingProvider"] = createTonApiStreamingProvider;
-api["streaming.registerStreamingProvider"] = registerStreamingProvider;
-api["streaming.registerProvider"] = registerStreamingProvider;
-api["streaming.streamingHasProvider"] = streamingHasProvider;
-api["streaming.hasProvider"] = streamingHasProvider;
-api["streaming.streamingWatch"] = streamingWatch;
-api["streaming.watch"] = streamingWatch;
-api["streaming.streamingUnwatch"] = streamingUnwatch;
-api["streaming.unwatch"] = streamingUnwatch;
-api["streaming.streamingConnect"] = streamingConnect;
-api["streaming.connect"] = streamingConnect;
-api["streaming.streamingDisconnect"] = streamingDisconnect;
-api["streaming.disconnect"] = streamingDisconnect;
-api["streaming.streamingWatchConnectionChange"] = streamingWatchConnectionChange;
-api["streaming.watchConnectionChange"] = streamingWatchConnectionChange;
 setBridgeApi(api);
 registerNativeCallHandler();
 registerNativeResponseHandler();
