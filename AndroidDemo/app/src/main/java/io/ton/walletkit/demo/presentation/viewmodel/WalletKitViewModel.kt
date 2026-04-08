@@ -52,6 +52,7 @@ import io.ton.walletkit.demo.presentation.model.TransactionRequestUi
 import io.ton.walletkit.demo.presentation.model.WalletSummary
 import io.ton.walletkit.demo.presentation.state.SheetState
 import io.ton.walletkit.demo.presentation.state.WalletUiState
+import io.ton.walletkit.demo.presentation.util.TonFormatter
 import io.ton.walletkit.demo.presentation.util.TransactionDetailMapper
 import io.ton.walletkit.event.TONWalletKitEvent
 import io.ton.walletkit.model.WalletSigner
@@ -63,7 +64,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -93,8 +94,8 @@ class WalletKitViewModel @Inject constructor(
     )
     val state: StateFlow<WalletUiState> = _state.asStateFlow()
 
-    private var balanceJob: Job? = null
     private var streamingBalanceJob: Job? = null
+    private var streamingTransactionsJob: Job? = null
     private var streamingConnectionJob: Job? = null
     private var currentStreamingWalletAddress: String? = null
     private var currentStreamingNetwork: TONNetwork? = null
@@ -253,7 +254,6 @@ class WalletKitViewModel @Inject constructor(
         }
 
         syncStreamingObservers(_state.value.activeWalletAddress)
-        startBalancePolling()
     }
 
     /**
@@ -472,16 +472,6 @@ class WalletKitViewModel @Inject constructor(
             uiCoordinator.setSheet(previousSheet, savePrevious = false)
         } else {
             dismissSheet()
-        }
-    }
-
-    private fun startBalancePolling() {
-        balanceJob?.cancel()
-        balanceJob = viewModelScope.launch {
-            while (true) {
-                delay(BALANCE_REFRESH_MS)
-                refreshWallets()
-            }
         }
     }
 
@@ -1393,30 +1383,30 @@ class WalletKitViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        balanceJob?.cancel()
         streamingBalanceJob?.cancel()
+        streamingTransactionsJob?.cancel()
         streamingConnectionJob?.cancel()
-        // SDK cleanup is handled globally, no per-ViewModel cleanup needed
         super.onCleared()
     }
 
     private fun syncStreamingObservers(address: String?) {
         val network = resolveStreamingNetwork(address)
-        val balanceActive = streamingBalanceJob?.isActive == true
-        val connectionActive = streamingConnectionJob?.isActive == true
 
         if (
             address == currentStreamingWalletAddress &&
             network == currentStreamingNetwork &&
-            balanceActive &&
-            connectionActive
+            streamingBalanceJob?.isActive == true &&
+            streamingTransactionsJob?.isActive == true &&
+            streamingConnectionJob?.isActive == true
         ) {
             return
         }
 
         streamingBalanceJob?.cancel()
+        streamingTransactionsJob?.cancel()
         streamingConnectionJob?.cancel()
         streamingBalanceJob = null
+        streamingTransactionsJob = null
         streamingConnectionJob = null
         currentStreamingWalletAddress = address
         currentStreamingNetwork = network
@@ -1444,13 +1434,40 @@ class WalletKitViewModel @Inject constructor(
         streamingBalanceJob = viewModelScope.launch {
             try {
                 val kit = getKit()
-                kit.streaming().balance(network, address).collect { balance ->
-                    Log.d(LOG_TAG, "STREAMING: Balance updated: ${balance.balance}")
+                kit.streaming().balance(network, address).collect { update ->
+                    Log.d(LOG_TAG, "STREAMING: balance updated rawBalance=${update.rawBalance}")
+                    _state.update { state ->
+                        state.copy(
+                            wallets = state.wallets.map { wallet ->
+                                if (wallet.address == address) {
+                                    wallet.copy(
+                                        balanceNano = update.rawBalance,
+                                        balance = TonFormatter.formatTon(update.rawBalance),
+                                        lastUpdated = System.currentTimeMillis(),
+                                    )
+                                } else wallet
+                            },
+                        )
+                    }
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "STREAMING BALANCE ERROR - ${e.message}", e)
+            }
+        }
+
+        streamingTransactionsJob = viewModelScope.launch {
+            try {
+                val kit = getKit()
+                kit.streaming().transactions(network, address).collect { update ->
+                    Log.d(LOG_TAG, "STREAMING: transactions updated count=${update.transactions.size}")
+                    refreshTransactions(address)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "STREAMING TRANSACTIONS ERROR - ${e.message}", e)
             }
         }
     }
@@ -1661,7 +1678,7 @@ class WalletKitViewModel @Inject constructor(
     }
 
     companion object {
-        private const val BALANCE_REFRESH_MS = 20_000L
+
         private const val HIDE_MESSAGE_MS = 10_000L
         private const val MAX_EVENT_LOG = 12
         private const val DEFAULT_WALLET_VERSION = WalletVersions.V5R1
