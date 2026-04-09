@@ -38220,6 +38220,40 @@ var __async = (__this, __arguments, generator) => {
   });
 };
 const kotlinSubCallbacks = /* @__PURE__ */ new Map();
+const kotlinProviderSubs = /* @__PURE__ */ new Map();
+function trackKotlinSub(providerId, subId) {
+  let subs = kotlinProviderSubs.get(providerId);
+  if (!subs) {
+    subs = /* @__PURE__ */ new Set();
+    kotlinProviderSubs.set(providerId, subs);
+  }
+  subs.add(subId);
+}
+function forgetKotlinSub(providerId, subId) {
+  const subs = kotlinProviderSubs.get(providerId);
+  if (!subs) return;
+  subs.delete(subId);
+  if (subs.size === 0) {
+    kotlinProviderSubs.delete(providerId);
+  }
+}
+function cleanupReplacedKotlinProvider(instance, nextProviderId, network) {
+  var _a;
+  const manager = instance.streaming;
+  const networkId = String(network.chainId);
+  const previousProvider = manager.providers.get(networkId);
+  if (!(previousProvider instanceof ProxyStreamingProvider)) {
+    return;
+  }
+  (_a = manager.providerConnectionUnsubs.get(networkId)) == null ? void 0 : _a();
+  manager.providerConnectionUnsubs.delete(networkId);
+  manager.providers.delete(networkId);
+  previousProvider.dispose();
+  if (previousProvider.providerId !== nextProviderId) {
+    void bridgeRequest("kotlinProviderRelease", { providerId: previousProvider.providerId });
+  }
+  release(previousProvider.providerId);
+}
 class ProxyStreamingProvider {
   constructor(providerId, network) {
     this.providerId = providerId;
@@ -38229,9 +38263,11 @@ class ProxyStreamingProvider {
   watch(type, address, onChange) {
     const subId = v7();
     kotlinSubCallbacks.set(subId, onChange);
+    trackKotlinSub(this.providerId, subId);
     void bridgeRequest("kotlinProviderWatch", { providerId: this.providerId, subId, type, address });
     return () => {
       kotlinSubCallbacks.delete(subId);
+      forgetKotlinSub(this.providerId, subId);
       void bridgeRequest("kotlinProviderUnwatch", { subId });
     };
   }
@@ -38252,6 +38288,15 @@ class ProxyStreamingProvider {
   }
   disconnect() {
     void bridgeRequest("kotlinProviderDisconnect", { providerId: this.providerId });
+  }
+  dispose() {
+    const subs = kotlinProviderSubs.get(this.providerId);
+    if (!subs) return;
+    for (const subId of subs) {
+      kotlinSubCallbacks.delete(subId);
+      void bridgeRequest("kotlinProviderUnwatch", { subId });
+    }
+    kotlinProviderSubs.delete(this.providerId);
   }
 }
 function createTonCenterStreamingProvider(args) {
@@ -38366,6 +38411,7 @@ function streamingWatchJettons(args) {
 function registerKotlinStreamingProvider(args) {
   return __async(this, null, function* () {
     const instance = yield getKit();
+    cleanupReplacedKotlinProvider(instance, args.providerId, args.network);
     const provider = new ProxyStreamingProvider(args.providerId, args.network);
     retainWithId(args.providerId, provider);
     instance.streaming.registerProvider(() => provider);

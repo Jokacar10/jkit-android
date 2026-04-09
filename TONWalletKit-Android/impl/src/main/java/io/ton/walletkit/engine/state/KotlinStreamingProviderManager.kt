@@ -46,15 +46,40 @@ internal class KotlinStreamingProviderManager(
     private val rpcClient: BridgeRpcClient,
     private val json: Json,
 ) {
+    private data class SubscriptionEntry(
+        val providerId: String,
+        val job: Job,
+    )
+
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val providers = ConcurrentHashMap<String, ITONStreamingProvider>()
-    private val subscriptionJobs = ConcurrentHashMap<String, Job>()
+    private val subscriptionJobs = ConcurrentHashMap<String, SubscriptionEntry>()
 
     fun register(providerId: String, provider: ITONStreamingProvider) {
+        unregister(providerId)
         providers[providerId] = provider
     }
 
     fun getProvider(providerId: String): ITONStreamingProvider? = providers[providerId]
+
+    fun unregister(providerId: String) {
+        providers.remove(providerId)?.let { provider ->
+            scope.launch {
+                try {
+                    provider.disconnect()
+                } catch (e: Exception) {
+                    Logger.w(TAG, "Failed to disconnect provider during unregister: id=$providerId", e)
+                }
+            }
+        }
+        val subIdsToRemove = subscriptionJobs
+            .filterValues { it.providerId == providerId }
+            .keys
+            .toList()
+        subIdsToRemove.forEach { subId ->
+            subscriptionJobs.remove(subId)?.job?.cancel()
+        }
+    }
 
     fun watch(providerId: String, subId: String, type: String, address: String?) {
         val provider = providers[providerId] ?: run {
@@ -74,11 +99,17 @@ internal class KotlinStreamingProviderManager(
                 Logger.w(TAG, "kotlinProviderWatch collection ended: subId=$subId", e)
             }
         }
-        subscriptionJobs[subId] = job
+        subscriptionJobs.put(subId, SubscriptionEntry(providerId, job))?.job?.cancel()
     }
 
     fun unwatch(subId: String) {
-        subscriptionJobs.remove(subId)?.cancel()
+        subscriptionJobs.remove(subId)?.job?.cancel()
+    }
+
+    fun clear() {
+        providers.keys.toList().forEach(::unregister)
+        subscriptionJobs.values.forEach { it.job.cancel() }
+        subscriptionJobs.clear()
     }
 
     private suspend inline fun <reified T> dispatch(subId: String, value: T) {

@@ -482,6 +482,7 @@ internal class WebViewWalletKitEngine private constructor(
                 Logger.w(TAG, "Failed to remove event listeners during destroy", e)
             }
 
+            kotlinStreamingProviderManager.clear()
             webViewManager.destroy()
         }
     }

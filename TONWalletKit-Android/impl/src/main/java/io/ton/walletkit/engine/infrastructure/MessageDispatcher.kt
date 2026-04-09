@@ -229,30 +229,38 @@ internal class MessageDispatcher(
                 val type = params.getString("type")
                 val address = params.optString("address").takeUnless { it.isBlank() }
                 kotlinStreamingProviderManager.watch(providerId, subId, type, address)
-                "{}"
+                emptyJsonObject()
             }
 
             REQUEST_METHOD_KOTLIN_PROVIDER_UNWATCH -> {
                 val subId = params.getString("subId")
                 kotlinStreamingProviderManager.unwatch(subId)
-                "{}"
+                emptyJsonObject()
             }
 
             REQUEST_METHOD_KOTLIN_PROVIDER_CONNECT -> {
                 val providerId = params.getString("providerId")
                 kotlinStreamingProviderManager.getProvider(providerId)?.connect()
-                "{}"
+                emptyJsonObject()
             }
 
             REQUEST_METHOD_KOTLIN_PROVIDER_DISCONNECT -> {
                 val providerId = params.getString("providerId")
                 kotlinStreamingProviderManager.getProvider(providerId)?.disconnect()
-                "{}"
+                emptyJsonObject()
+            }
+
+            REQUEST_METHOD_KOTLIN_PROVIDER_RELEASE -> {
+                val providerId = params.getString("providerId")
+                kotlinStreamingProviderManager.unregister(providerId)
+                emptyJsonObject()
             }
 
             else -> throw IllegalArgumentException("Unknown reverse-RPC method: $method")
         }
     }
+
+    private fun emptyJsonObject(): String = JSONObject().toString()
 
     /**
      * Delivers a reverse-RPC response back to the JS side via
@@ -460,6 +468,7 @@ internal class MessageDispatcher(
         private const val REQUEST_METHOD_KOTLIN_PROVIDER_UNWATCH = "kotlinProviderUnwatch"
         private const val REQUEST_METHOD_KOTLIN_PROVIDER_CONNECT = "kotlinProviderConnect"
         private const val REQUEST_METHOD_KOTLIN_PROVIDER_DISCONNECT = "kotlinProviderDisconnect"
+        private const val REQUEST_METHOD_KOTLIN_PROVIDER_RELEASE = "kotlinProviderRelease"
     }
 }
 
