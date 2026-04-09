@@ -35540,9 +35540,8 @@ class WalletV5R1Adapter {
   }
   async getSignedTonProof(input) {
     const message = await CreateTonProofMessageBytes(input);
-    const domainPrefix = this.domain ? distExports$1.signatureDomainPrefix(this.domain) : null;
-    const signingData = domainPrefix ? Buffer.concat([domainPrefix, Buffer.from(message)]) : message;
-    return this.sign(signingData);
+    const signature = await this.sign(message);
+    return signature;
   }
   getSupportedFeatures() {
     return [
@@ -35987,9 +35986,8 @@ class WalletV4R2Adapter {
   }
   async getSignedTonProof(input) {
     const message = await CreateTonProofMessageBytes(input);
-    const domainPrefix = this.domain ? distExports$1.signatureDomainPrefix(this.domain) : null;
-    const signingData = domainPrefix ? Buffer.concat([domainPrefix, Buffer.from(message)]) : message;
-    return this.sign(signingData);
+    const signature = await this.sign(message);
+    return signature;
   }
   getSupportedFeatures() {
     return [
@@ -37931,7 +37929,7 @@ function createSignerFromMnemonic(args) {
   return __async$3(this, null, function* () {
     var _a;
     if (!Signer$1) throw new Error("Signer module not loaded");
-    const signer = yield Signer$1.fromMnemonic(args.mnemonic, { type: (_a = args.mnemonicType) != null ? _a : "ton" });
+    const signer = yield Signer$1.fromMnemonic(args.mnemonic, { type: (_a = args.mnemonicType) != null ? _a : "ton" }, args.domain);
     const signerId = retain("signer", signer);
     return { signerId, publicKey: signer.publicKey };
   });
@@ -37939,7 +37937,7 @@ function createSignerFromMnemonic(args) {
 function createSignerFromPrivateKey(args) {
   return __async$3(this, null, function* () {
     if (!Signer$1) throw new Error("Signer module not loaded");
-    const signer = yield Signer$1.fromPrivateKey(args.secretKey);
+    const signer = yield Signer$1.fromPrivateKey(args.secretKey, args.domain);
     const signerId = retain("signer", signer);
     return { signerId, publicKey: signer.publicKey };
   });
@@ -37974,8 +37972,7 @@ function createV5R1WalletAdapter(args) {
       client: instance.getApiClient(network),
       network,
       workchain: (_a = args.workchain) != null ? _a : 0,
-      walletId: args.walletId,
-      domain: args.domain
+      walletId: args.walletId
     });
     const adapterId = retain("adapter", adapter);
     return { adapterId, address: adapter.getAddress() };
@@ -37993,8 +37990,7 @@ function createV4R2WalletAdapter(args) {
       client: instance.getApiClient(network),
       network,
       workchain: (_a = args.workchain) != null ? _a : 0,
-      walletId: args.walletId,
-      domain: args.domain
+      walletId: args.walletId
     });
     const adapterId = retain("adapter", adapter);
     return { adapterId, address: adapter.getAddress() };
