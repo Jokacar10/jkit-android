@@ -288,7 +288,7 @@ class StakingViewModel(
         val manager = kit.staking()
         val provider = kit.tonStakersStakingProvider(DemoApiConfig.tonStakersProviderConfig())
         manager.register(provider)
-        manager.setDefaultProvider(provider.providerId)
+        manager.setDefaultProvider(provider.identifier)
 
         runCatching {
             val modes = manager.getSupportedUnstakeModes()
