@@ -35,6 +35,7 @@ import io.ton.walletkit.api.MAINNET
 import io.ton.walletkit.api.TESTNET
 import io.ton.walletkit.api.WalletVersions
 import io.ton.walletkit.api.generated.TONNetwork
+import io.ton.walletkit.api.generated.TONStreamingUpdateStatus
 import io.ton.walletkit.demo.R
 import io.ton.walletkit.demo.core.RequestErrorTracker
 import io.ton.walletkit.demo.data.storage.DemoAppStorage
@@ -1428,7 +1429,20 @@ class WalletKitViewModel @Inject constructor(
             try {
                 val kit = getKit()
                 kit.streaming().balance(network, address).collect { update ->
-                    Log.d(LOG_TAG, "STREAMING: balance updated rawBalance=${update.rawBalance}")
+                    if (update.status != TONStreamingUpdateStatus.confirmed &&
+                        update.status != TONStreamingUpdateStatus.finalized
+                    ) {
+                        Log.d(
+                            LOG_TAG,
+                            "STREAMING: ignoring balance update status=${update.status} rawBalance=${update.rawBalance}",
+                        )
+                        return@collect
+                    }
+
+                    Log.d(
+                        LOG_TAG,
+                        "STREAMING: applying balance update status=${update.status} rawBalance=${update.rawBalance}",
+                    )
                     _state.update { state ->
                         state.copy(
                             wallets = state.wallets.map { wallet ->
