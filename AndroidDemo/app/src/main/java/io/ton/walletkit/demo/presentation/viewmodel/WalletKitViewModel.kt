@@ -65,6 +65,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -94,6 +95,7 @@ class WalletKitViewModel @Inject constructor(
     )
     val state: StateFlow<WalletUiState> = _state.asStateFlow()
 
+    private var balanceRefreshJob: Job? = null
     private var streamingBalanceJob: Job? = null
     private var streamingTransactionsJob: Job? = null
     private var streamingConnectionJob: Job? = null
@@ -254,6 +256,7 @@ class WalletKitViewModel @Inject constructor(
         }
 
         syncStreamingObservers(_state.value.activeWalletAddress)
+        startBalancePolling()
     }
 
     /**
@@ -1377,10 +1380,24 @@ class WalletKitViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        balanceRefreshJob?.cancel()
         streamingBalanceJob?.cancel()
         streamingTransactionsJob?.cancel()
         streamingConnectionJob?.cancel()
         super.onCleared()
+    }
+
+    private fun startBalancePolling() {
+        if (balanceRefreshJob?.isActive == true) {
+            return
+        }
+
+        balanceRefreshJob = viewModelScope.launch {
+            while (true) {
+                delay(BALANCE_REFRESH_MS)
+                refreshWallets()
+            }
+        }
     }
 
     private fun syncStreamingObservers(address: String?) {
@@ -1687,7 +1704,7 @@ class WalletKitViewModel @Inject constructor(
     }
 
     companion object {
-
+        private const val BALANCE_REFRESH_MS = 20_000L
         private const val HIDE_MESSAGE_MS = 10_000L
         private const val MAX_EVENT_LOG = 12
         private const val DEFAULT_WALLET_VERSION = WalletVersions.V5R1
