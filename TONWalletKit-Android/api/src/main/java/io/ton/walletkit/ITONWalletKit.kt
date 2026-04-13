@@ -175,7 +175,7 @@ interface ITONWalletKit {
      *
      * Call [swap().registerProvider] with the returned handle before calling [swap().getQuote].
      */
-    suspend fun deDustSwapProvider(config: TONDeDustSwapProviderConfig? = null): TONDeDustSwapProvider
+    suspend fun dedustSwapProvider(config: TONDeDustSwapProviderConfig? = null): TONDeDustSwapProvider
 
     /**
      * Get the swap manager for registering providers and executing swaps.

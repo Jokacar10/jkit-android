@@ -416,7 +416,7 @@ internal class TONWalletKit private constructor(
         return TONSwapProvider(providerId)
     }
 
-    override suspend fun deDustSwapProvider(config: TONDeDustSwapProviderConfig?): TONDeDustSwapProvider {
+    override suspend fun dedustSwapProvider(config: TONDeDustSwapProviderConfig?): TONDeDustSwapProvider {
         checkNotDestroyed()
         val providerId = engine.createDeDustSwapProvider(config)
         return TONSwapProvider(providerId)
