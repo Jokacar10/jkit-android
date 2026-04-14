@@ -99,6 +99,7 @@ class WalletKitViewModel @Inject constructor(
     private var streamingBalanceJob: Job? = null
     private var streamingTransactionsJob: Job? = null
     private var streamingConnectionJob: Job? = null
+    private var streamingJettonsJob: Job? = null
     private var currentStreamingWalletAddress: String? = null
     private var currentStreamingNetwork: TONNetwork? = null
     private var walletKit: io.ton.walletkit.ITONWalletKit? = null
@@ -1388,6 +1389,7 @@ class WalletKitViewModel @Inject constructor(
         streamingBalanceJob?.cancel()
         streamingTransactionsJob?.cancel()
         streamingConnectionJob?.cancel()
+        streamingJettonsJob?.cancel()
         super.onCleared()
     }
 
@@ -1412,7 +1414,8 @@ class WalletKitViewModel @Inject constructor(
             network == currentStreamingNetwork &&
             streamingBalanceJob?.isActive == true &&
             streamingTransactionsJob?.isActive == true &&
-            streamingConnectionJob?.isActive == true
+            streamingConnectionJob?.isActive == true &&
+            streamingJettonsJob?.isActive == true
         ) {
             return
         }
@@ -1420,14 +1423,17 @@ class WalletKitViewModel @Inject constructor(
         streamingBalanceJob?.cancel()
         streamingTransactionsJob?.cancel()
         streamingConnectionJob?.cancel()
+        streamingJettonsJob?.cancel()
         streamingBalanceJob = null
         streamingTransactionsJob = null
         streamingConnectionJob = null
+        streamingJettonsJob = null
         currentStreamingWalletAddress = address
         currentStreamingNetwork = network
 
         if (address == null || network == null) {
             Log.d(LOG_TAG, "STREAMING: observers stopped - no active wallet")
+            _state.update { it.copy(isStreamingConnected = null) }
             return
         }
 
@@ -1438,11 +1444,13 @@ class WalletKitViewModel @Inject constructor(
                 val kit = getKit()
                 kit.streaming().connectionChange(network).collect { connected ->
                     Log.d(LOG_TAG, "STREAMING: connection changed. connected=$connected network=${network.chainId}")
+                    _state.update { it.copy(isStreamingConnected = connected) }
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "STREAMING CONNECTION ERROR - ${e.message}", e)
+                _state.update { it.copy(isStreamingConnected = false) }
             }
         }
 
@@ -1498,6 +1506,25 @@ class WalletKitViewModel @Inject constructor(
                 throw e
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "STREAMING TRANSACTIONS ERROR - ${e.message}", e)
+            }
+        }
+
+        streamingJettonsJob = viewModelScope.launch {
+            try {
+                val kit = getKit()
+                kit.streaming().jettons(network, address).collect { update ->
+                    if (update.status != TONStreamingUpdateStatus.confirmed &&
+                        update.status != TONStreamingUpdateStatus.finalized
+                    ) {
+                        return@collect
+                    }
+                    Log.d(LOG_TAG, "STREAMING: jetton update master=${update.masterAddress} balance=${update.rawBalance}")
+                    refreshJettons()
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "STREAMING JETTONS ERROR - ${e.message}", e)
             }
         }
     }

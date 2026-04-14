@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 fun String.escapeForBuildConfig(): String = replace("\\", "\\\\").replace("\"", "\\\"")
 
@@ -43,8 +44,13 @@ android {
         val allureToken =
             findProperty("allureToken") as String?
                 ?: System.getenv("ALLURE_API_TOKEN")
+        val localProps =
+            Properties().also { props ->
+                val f = rootProject.file("local.properties")
+                if (f.exists()) f.inputStream().use { stream -> props.load(stream) }
+            }
         val tonCenterApiKey =
-            findProperty("tonCenterApiKey") as String?
+            localProps.getProperty("tonCenterApiKey")
                 ?: System.getenv("TONCENTER_API_KEY")
                 ?: ""
 
