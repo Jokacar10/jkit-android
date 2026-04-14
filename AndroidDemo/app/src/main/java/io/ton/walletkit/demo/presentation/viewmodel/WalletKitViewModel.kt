@@ -1518,8 +1518,28 @@ class WalletKitViewModel @Inject constructor(
                     ) {
                         return@collect
                     }
-                    Log.d(LOG_TAG, "STREAMING: jetton update master=${update.masterAddress} balance=${update.rawBalance}")
-                    refreshJettons()
+                    val walletAddr = update.walletAddress.value
+                    Log.d(LOG_TAG, "STREAMING: jetton update wallet=$walletAddr balance=${update.rawBalance}")
+                    _state.update { state ->
+                        val matched = state.jettons.any { it.address == walletAddr }
+                        if (!matched) return@update state
+                        state.copy(
+                            jettons = state.jettons.map { jetton ->
+                                if (jetton.address == walletAddr) {
+                                    jetton.copy(
+                                        balance = update.rawBalance,
+                                        formattedBalance = JettonSummary.formatBalance(
+                                            update.rawBalance,
+                                            update.decimals,
+                                            jetton.symbol,
+                                        ),
+                                    )
+                                } else {
+                                    jetton
+                                }
+                            },
+                        )
+                    }
                 }
             } catch (e: CancellationException) {
                 throw e
