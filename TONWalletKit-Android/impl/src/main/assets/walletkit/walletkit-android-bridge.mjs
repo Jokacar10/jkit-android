@@ -38114,6 +38114,25 @@ function rejectSignDataRequest(args) {
     return kit("rejectSignDataRequest", ...args);
   });
 }
+var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropSymbols$1 = Object.getOwnPropertySymbols;
+var __hasOwnProp$1 = Object.prototype.hasOwnProperty;
+var __propIsEnum$1 = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a4, b2) => {
+  for (var prop in b2 || (b2 = {}))
+    if (__hasOwnProp$1.call(b2, prop))
+      __defNormalProp(a4, prop, b2[prop]);
+  if (__getOwnPropSymbols$1)
+    for (var prop of __getOwnPropSymbols$1(b2)) {
+      if (__propIsEnum$1.call(b2, prop))
+        __defNormalProp(a4, prop, b2[prop]);
+    }
+  return a4;
+};
+var __spreadProps = (a4, b2) => __defProps(a4, __getOwnPropDescs(b2));
 var __async$3 = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -38161,6 +38180,7 @@ function processInternalBrowserRequest(args) {
     if (!messageId) {
       throw new Error("processInternalBrowserRequest: messageId is required in messageInfo");
     }
+    const normalizedArgs = normalizeRequestParamIds(args);
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         const resolverMap2 = ensureInternalBrowserResolverMap();
@@ -38183,13 +38203,29 @@ function processInternalBrowserRequest(args) {
           reject(error2 instanceof Error ? error2 : new Error(String(error2)));
         }
       });
-      kit("processInjectedBridgeRequest", ...args).catch((err) => {
+      kit("processInjectedBridgeRequest", ...normalizedArgs).catch((err) => {
         clearTimeout(timeoutId);
         resolverMap.delete(messageId);
         reject(err);
       });
     });
   });
+}
+function normalizeRequestParamIds(args) {
+  const request = args[1];
+  if (!request || typeof request !== "object") return args;
+  const req = request;
+  if (!Array.isArray(req.params)) return args;
+  const normalizedParams = req.params.map((p2) => {
+    if (p2 && typeof p2 === "object") {
+      const item = p2;
+      if (item.id != null && typeof item.id !== "string") {
+        return __spreadProps(__spreadValues({}, item), { id: String(item.id) });
+      }
+    }
+    return p2;
+  });
+  return [args[0], __spreadProps(__spreadValues({}, req), { params: normalizedParams })];
 }
 const getNfts = (args) => walletCall("getNfts", args);
 const getNft = (args) => walletCall("getNft", args);
