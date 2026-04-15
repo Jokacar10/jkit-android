@@ -35,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material3.Card
@@ -273,15 +274,6 @@ fun WalletScreen(
                     ) {
                         Icon(Icons.Default.Language, contentDescription = "Open Plain Browser")
                     }
-                    IconButton(onClick = actions::onRefresh) {
-                        Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.action_refresh))
-                    }
-                    IconButton(onClick = actions::onUrlPromptClick) {
-                        Icon(Icons.Outlined.Link, contentDescription = stringResource(R.string.action_handle_url))
-                    }
-                    IconButton(onClick = actions::onAddWalletClick) {
-                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.action_add_wallet))
-                    }
                 },
             )
         },
@@ -327,6 +319,7 @@ fun WalletScreen(
                 totalWallets = state.wallets.size,
                 onWalletSelected = actions::onWalletDetails,
                 onSendFromWallet = actions::onSendFromWallet,
+                onRefresh = actions::onRefresh,
             )
 
             // Show NFTs for the active wallet (if ViewModel is available)
