@@ -46,6 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.ton.walletkit.api.generated.TONMasterchainInfo
 import io.ton.walletkit.api.generated.TONNetwork
+import io.ton.walletkit.api.isTetra
+import io.ton.walletkit.demo.core.TonAPIClient
 import io.ton.walletkit.demo.core.ToncenterAPIClient
 import kotlinx.coroutines.launch
 
@@ -57,9 +59,9 @@ fun MasterchainInfoSection(
     network: TONNetwork,
     modifier: Modifier = Modifier,
 ) {
-    var info by remember { mutableStateOf<TONMasterchainInfo?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var info by remember(network) { mutableStateOf<TONMasterchainInfo?>(null) }
+    var isLoading by remember(network) { mutableStateOf(false) }
+    var error by remember(network) { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -84,7 +86,7 @@ fun MasterchainInfoSection(
                                 isLoading = true
                                 error = null
                                 try {
-                                    val client = ToncenterAPIClient(network)
+                                    val client = if (network.isTetra) TonAPIClient.tetra() else ToncenterAPIClient(network)
                                     info = client.getMasterchainInfo()
                                 } catch (e: Exception) {
                                     error = e.message ?: "Unknown error"
