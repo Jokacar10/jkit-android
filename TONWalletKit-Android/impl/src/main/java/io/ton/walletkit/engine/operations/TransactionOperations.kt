@@ -25,7 +25,6 @@ import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
 import io.ton.walletkit.api.generated.TONTransferRequest
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import io.ton.walletkit.engine.infrastructure.toJSONObject
-import org.json.JSONObject
 import io.ton.walletkit.engine.operations.requests.CreateTransferMultiTonRequest
 import io.ton.walletkit.engine.operations.requests.CreateTransferTonRequest
 import io.ton.walletkit.engine.operations.requests.GetTransactionPreviewRequest
@@ -36,6 +35,7 @@ import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.ResponseConstants
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import org.json.JSONObject
 
 /**
  * Groups TON transaction related bridge operations including creation, preview,
