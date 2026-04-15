@@ -116,6 +116,12 @@ fun WalletScreen(
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val onRefreshAll: () -> Unit = {
+        actions.onRefresh()
+        actions.onRefreshJettons()
+        nftsViewModel?.refresh()
+    }
+
     // State for NFT details bottom sheet
     var selectedNFT by remember { mutableStateOf<TONNFT?>(null) }
     val nftDetailsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -300,7 +306,7 @@ fun WalletScreen(
             QuickActionsCard(
                 onHandleUrl = actions::onUrlPromptClick,
                 onAddWallet = actions::onAddWalletClick,
-                onRefresh = actions::onRefresh,
+                onRefresh = onRefreshAll,
             )
 
             // Wallet Switcher (only show if multiple wallets exist)
@@ -401,8 +407,9 @@ fun WalletScreen(
                     nftDetails = nftDetails,
                     onClose = { selectedNFT = null },
                     onTransferSuccess = {
-                        // Refresh NFT list after successful transfer
-                        nftsViewModel?.refresh()
+                        val nftAddress = selectedNFT?.address?.value
+                        nftAddress?.let { addr -> nftsViewModel?.removeNft(addr) }
+                        nftsViewModel?.refreshWithDelay()
                     },
                 )
             }
