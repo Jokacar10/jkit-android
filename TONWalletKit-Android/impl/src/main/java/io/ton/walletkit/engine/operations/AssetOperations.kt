@@ -30,7 +30,6 @@ import io.ton.walletkit.api.generated.TONNFTsResponse
 import io.ton.walletkit.api.generated.TONPagination
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import io.ton.walletkit.engine.infrastructure.toJSONObject
-import org.json.JSONObject
 import io.ton.walletkit.engine.operations.requests.CreateTransferJettonRequest
 import io.ton.walletkit.engine.operations.requests.CreateTransferNftRawRequest
 import io.ton.walletkit.engine.operations.requests.CreateTransferNftRequest
@@ -43,6 +42,7 @@ import io.ton.walletkit.exceptions.JSValueConversionException
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import org.json.JSONObject
 
 /**
  * Contains NFT and Jetton related bridge calls such as listing assets and building
