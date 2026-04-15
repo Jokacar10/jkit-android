@@ -33,11 +33,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Link
+import androidx.compose.ui.res.painterResource
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -266,7 +266,7 @@ fun WalletScreen(
                 },
                 actions = {
                     IconButton(onClick = { actions.onOpenBrowser(DEFAULT_DAPP_URL) }) {
-                        Icon(Icons.Default.AccountBalanceWallet, contentDescription = "Open Injected Browser")
+                        Icon(painterResource(R.drawable.ic_ton), contentDescription = "Open TonConnect Browser")
                     }
                     IconButton(
                         onClick = { actions.onOpenBrowser(DEFAULT_DAPP_URL, injectTonConnect = false) },
