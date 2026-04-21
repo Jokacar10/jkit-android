@@ -333,8 +333,8 @@ class TonAPIClient(
     }
 
     companion object {
-        fun mainnet(apiKey: String = BuildConfig.TONAPI_API_KEY) = TonAPIClient(TONNetwork.MAINNET, apiKey)
-        fun testnet(apiKey: String = BuildConfig.TONAPI_API_KEY) = TonAPIClient(TONNetwork.TESTNET, apiKey)
+        fun mainnet(apiKey: String = BuildConfig.MAINNET_API_KEY) = TonAPIClient(TONNetwork.MAINNET, apiKey)
+        fun testnet(apiKey: String = BuildConfig.TESTNET_API_KEY) = TonAPIClient(TONNetwork.TESTNET, apiKey)
         fun tetra(apiKey: String = BuildConfig.TETRA_API_KEY) = TonAPIClient(TONNetwork.TETRA, apiKey)
     }
 }

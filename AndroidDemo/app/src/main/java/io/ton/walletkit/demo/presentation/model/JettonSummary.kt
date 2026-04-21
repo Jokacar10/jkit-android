@@ -49,18 +49,17 @@ data class JettonSummary(
         get() = imageUrl ?: imageData
 
     companion object {
-        fun formatBalance(rawBalance: String, decimals: Int?, symbol: String): String =
-            try {
-                val d = decimals ?: 9
-                val divisor = BigDecimal.TEN.pow(d)
-                val formatted = BigDecimal(rawBalance)
-                    .divide(divisor, d, RoundingMode.DOWN)
-                    .stripTrailingZeros()
-                    .toPlainString()
-                "$formatted $symbol"
-            } catch (e: Exception) {
-                "$rawBalance $symbol (raw)"
-            }
+        fun formatBalance(rawBalance: String, decimals: Int?, symbol: String): String = try {
+            val d = decimals ?: 9
+            val divisor = BigDecimal.TEN.pow(d)
+            val formatted = BigDecimal(rawBalance)
+                .divide(divisor, d, RoundingMode.DOWN)
+                .stripTrailingZeros()
+                .toPlainString()
+            "$formatted $symbol"
+        } catch (e: Exception) {
+            "$rawBalance $symbol (raw)"
+        }
 
         fun from(jetton: TONJetton): JettonSummary {
             val info = jetton.info

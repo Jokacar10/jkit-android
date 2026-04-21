@@ -53,9 +53,13 @@ android {
             localProps.getProperty("tonCenterApiKey")
                 ?: System.getenv("TONCENTER_API_KEY")
                 ?: ""
-        val tonApiKey =
-            localProps.getProperty("tonApiKey")
-                ?: System.getenv("TONAPI_API_KEY")
+        val tonApiMainnetKey =
+            localProps.getProperty("tonApiMainnetKey")
+                ?: System.getenv("MAINNET_API_KEY")
+                ?: ""
+        val tonApiTestnetKey =
+            localProps.getProperty("tonApiTestnetKey")
+                ?: System.getenv("TESTNET_API_KEY")
                 ?: ""
         val tetraApiKey =
             localProps.getProperty("tetraApiKey")
@@ -70,7 +74,8 @@ android {
             testInstrumentationRunnerArguments["allureToken"] = it
         }
         buildConfigField("String", "TONCENTER_API_KEY", "\"${tonCenterApiKey.escapeForBuildConfig()}\"")
-        buildConfigField("String", "TONAPI_API_KEY", "\"${tonApiKey.escapeForBuildConfig()}\"")
+        buildConfigField("String", "MAINNET_API_KEY", "\"${tonApiMainnetKey.escapeForBuildConfig()}\"")
+        buildConfigField("String", "TESTNET_API_KEY", "\"${tonApiTestnetKey.escapeForBuildConfig()}\"")
         buildConfigField("String", "TETRA_API_KEY", "\"${tetraApiKey.escapeForBuildConfig()}\"")
     }
 
