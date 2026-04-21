@@ -28,35 +28,29 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  *
  *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param router
+ * @param fromRouterWallet
+ * @param toRouterWallet
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONDeDustRouteStepStonfiExtraDetails(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @SerialName(value = "router")
+    val router: kotlin.String,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    @SerialName(value = "from_router_wallet")
+    val fromRouterWallet: kotlin.String,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    @SerialName(value = "to_router_wallet")
+    val toRouterWallet: kotlin.String,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
 ) {
+
     companion object
 }

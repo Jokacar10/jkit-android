@@ -28,35 +28,47 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Direction of the staking quote
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * Values: stake,unstake
  */
 @Serializable
-data class TONBalanceUpdate(
+enum class TONStakingQuoteDirection(val value: kotlin.String) {
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @SerialName(value = "stake")
+    stake("stake"),
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    @SerialName(value = "unstake")
+    unstake("unstake"),
+    ;
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    /**
+     * Override [toString()] to avoid using the enum variable name as the value, and instead use
+     * the actual value defined in the API spec file.
+     *
+     * This solves a problem when the variable name and its value are different, and ensures that
+     * the client sends the correct enum values to the server always.
+     */
+    override fun toString(): kotlin.String = value
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
-) {
-    companion object
+    companion object {
+        /**
+         * Converts the provided [data] to a [String] on success, null otherwise.
+         */
+        fun encode(data: kotlin.Any?): kotlin.String? = if (data is TONStakingQuoteDirection) "$data" else null
+
+        /**
+         * Returns a valid [TONStakingQuoteDirection] for [data], null otherwise.
+         */
+        fun decode(data: kotlin.Any?): TONStakingQuoteDirection? = data?.let {
+            val normalizedData = "$it".lowercase()
+            values().firstOrNull { value ->
+                it == value || normalizedData == "$value".lowercase()
+            }
+        }
+    }
 }

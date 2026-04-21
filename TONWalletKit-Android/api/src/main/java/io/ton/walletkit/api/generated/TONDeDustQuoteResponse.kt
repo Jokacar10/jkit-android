@@ -28,35 +28,49 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Quote response from DeDust Router API
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param inAmount
+ * @param outAmount
+ * @param swapData
+ * @param swapIsPossible
+ * @param priceImpact
+ * @param improvement
+ * @param inMinterPrice
+ * @param outMinterPrice
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONDeDustQuoteResponse(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @SerialName(value = "in_amount")
+    val inAmount: kotlin.String,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    @SerialName(value = "out_amount")
+    val outAmount: kotlin.String,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    @SerialName(value = "swap_data")
+    val swapData: TONDeDustSwapData,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
+    @SerialName(value = "swap_is_possible")
+    val swapIsPossible: kotlin.Boolean,
+
+    @SerialName(value = "price_impact")
+    val priceImpact: kotlin.Int? = null,
+
+    @SerialName(value = "improvement")
+    val improvement: kotlin.String? = null,
+
+    @SerialName(value = "in_minter_price")
+    val inMinterPrice: kotlin.String? = null,
+
+    @SerialName(value = "out_minter_price")
+    val outMinterPrice: kotlin.String? = null,
+
 ) {
+
     companion object
 }

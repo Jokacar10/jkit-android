@@ -46,6 +46,7 @@ import io.ton.walletkit.config.TONWalletKitConfiguration
 import io.ton.walletkit.demo.BuildConfig
 import io.ton.walletkit.demo.data.storage.DemoAppStorage
 import io.ton.walletkit.demo.data.storage.SecureDemoAppStorage
+import io.ton.walletkit.demo.domain.model.WalletInterfaceType
 import io.ton.walletkit.event.TONWalletKitEvent
 import io.ton.walletkit.listener.TONBridgeEventsHandler
 import io.ton.walletkit.storage.TONWalletKitStorageType
@@ -84,6 +85,9 @@ class WalletKitDemoApp :
         .logger(DebugLogger())
         .build()
 
+    /**
+     * Demo app storage for wallets, metadata, and user preferences.
+     */
     val storage: DemoAppStorage by lazy {
         SecureDemoAppStorage(this)
     }
@@ -118,21 +122,43 @@ class WalletKitDemoApp :
 
     private suspend fun loadAndAddStoredWallets(kit: ITONWalletKit) {
         try {
+<<<<<<< HEAD
             val storage = getSharedPreferences("wallet_storage", MODE_PRIVATE)
             val walletDataJson = storage.getString("wallets", "[]") ?: "[]"
 
             if (walletDataJson == "[]") {
+=======
+            val storedWallets = storage.loadAllWallets()
+            if (storedWallets.isEmpty()) {
+>>>>>>> main
                 Log.d(TAG, "No stored wallets to load")
                 return
             }
 
-            val walletDataList = kotlinx.serialization.json.Json.decodeFromString<List<WalletDataRecord>>(walletDataJson)
+            val existingAddresses = kit.getWallets().mapNotNull { it.address?.value }.toMutableSet()
+            Log.d(TAG, "Loading ${storedWallets.size} stored wallets into SDK")
 
-            Log.d(TAG, "Loading ${walletDataList.size} stored wallets into SDK")
+            for ((address, walletRecord) in storedWallets) {
+                if (!existingAddresses.add(address)) {
+                    continue
+                }
 
+<<<<<<< HEAD
             for (walletRecord in walletDataList) {
                 try {
                     val mnemonicWords = walletRecord.mnemonic.split(" ").filter { it.isNotBlank() }
+=======
+                try {
+                    if (walletRecord.interfaceType != WalletInterfaceType.MNEMONIC.value) {
+                        Log.d(TAG, "Skipping auto-restore for $address: interfaceType=${walletRecord.interfaceType}")
+                        continue
+                    }
+
+                    if (walletRecord.mnemonic.isEmpty()) {
+                        Log.w(TAG, "Skipping auto-restore for $address: mnemonic is empty")
+                        continue
+                    }
+>>>>>>> main
 
                     val network = when (walletRecord.network) {
                         ChainIds.MAINNET -> TONNetwork.MAINNET
@@ -141,11 +167,8 @@ class WalletKitDemoApp :
                         else -> TONNetwork.MAINNET
                     }
 
-                    // Tetra (L2) wallets require an L2 signature domain
-                    val domain = if (network.isTetra) TONSignatureDomain.L2(value = 662387) else null
-
-                    // Use 3-step wallet creation pattern
-                    val signer = kit.createSignerFromMnemonic(mnemonicWords)
+                    val domain = if (network.isTetra) TONSignatureDomain.L2(globalId = 662387) else null
+                    val signer = kit.createSignerFromMnemonic(walletRecord.mnemonic)
                     val adapter = when (walletRecord.version) {
                         WalletVersions.V4R2 -> kit.createV4R2Adapter(signer, network, domain = domain)
                         WalletVersions.V5R1 -> kit.createV5R1Adapter(signer, network, domain = domain)
@@ -155,25 +178,15 @@ class WalletKitDemoApp :
                         }
                     }
                     kit.addWallet(adapter)
-                    Log.d(TAG, "Added wallet to SDK: ${walletRecord.address}")
+                    Log.d(TAG, "Added wallet to SDK: $address")
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed to add wallet ${walletRecord.address} to SDK", e)
+                    Log.e(TAG, "Failed to add wallet $address to SDK", e)
                 }
             }
-
-            Log.d(TAG, "Finished loading wallets into SDK")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load stored wallets", e)
         }
     }
-
-    @kotlinx.serialization.Serializable
-    private data class WalletDataRecord(
-        val mnemonic: String,
-        val address: String,
-        val network: String,
-        val version: String,
-    )
 
     private companion object {
         private const val TAG = "WalletKitDemoApp"
@@ -227,7 +240,7 @@ object TONWalletKitHelper {
             }
 
             val customSessionManager = if (useCustomSessionManager) {
-                TestSessionManager().also { sessionManager = it }
+                TestSessionManager(application).also { sessionManager = it }
             } else {
                 null
             }

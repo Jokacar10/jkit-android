@@ -28,35 +28,40 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Staking balance information for a user
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param rawStakedBalance
+ * @param stakedBalance Amount currently staked
+ * @param rawInstantUnstakeAvailable
+ * @param instantUnstakeAvailable Amount available for instant unstake
+ * @param providerId Identifier of the staking provider
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONStakingBalance(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @SerialName(value = "rawStakedBalance")
+    val rawStakedBalance: kotlin.String,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    /* Amount currently staked */
+    @SerialName(value = "stakedBalance")
+    val stakedBalance: kotlin.String,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    @SerialName(value = "rawInstantUnstakeAvailable")
+    val rawInstantUnstakeAvailable: kotlin.String,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
+    /* Amount available for instant unstake */
+    @SerialName(value = "instantUnstakeAvailable")
+    val instantUnstakeAvailable: kotlin.String,
+
+    /* Identifier of the staking provider */
+    @SerialName(value = "providerId")
+    val providerId: kotlin.String,
+
 ) {
+
     companion object
 }

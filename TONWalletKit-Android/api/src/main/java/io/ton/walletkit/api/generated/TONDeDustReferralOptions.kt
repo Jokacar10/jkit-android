@@ -28,35 +28,27 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Options for configuring the referral in DeDust swap operations
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param referralAddress The address of the referrer
+ * @param referralFeeBps Referral fee in basis points (max 100 = 1%)
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONDeDustReferralOptions(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    /* The address of the referrer */
+    @SerialName(value = "referralAddress")
+    val referralAddress: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    /* Referral fee in basis points (max 100 = 1%) */
+    @SerialName(value = "referralFeeBps")
+    val referralFeeBps: kotlin.Int? = null,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
-
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
 ) {
+
     companion object
 }

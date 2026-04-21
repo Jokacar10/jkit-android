@@ -19,9 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit.demo.domain.model
-
-data class PendingWalletRecord(
-    val metadata: WalletMetadata,
-    val mnemonic: List<String>?,
+@file:Suppress(
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport",
 )
+
+package io.ton.walletkit.api.generated
+
+import io.ton.walletkit.model.TONUserFriendlyAddress
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+/**
+ *
+ *
+ * @param contractAddress
+ * @param tonApiToken
+ */
+@Serializable
+data class TONTonStakersChainConfig(
+
+    @Contextual @SerialName(value = "contractAddress")
+    val contractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+
+    @SerialName(value = "tonApiToken")
+    val tonApiToken: kotlin.String? = null,
+
+) {
+
+    companion object
+}

@@ -35,28 +35,27 @@ import kotlinx.serialization.Serializable
 /**
  *
  *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param direction
+ * @param amount Amount of tokens to stake or unstake
+ * @param userAddress
+ * @param network
+ * @param unstakeMode
+ * @param providerOptions Provider-specific options
  */
 @Serializable
-data class TONBalanceUpdate(
-
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
-
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
-
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
-
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
+data class TONStakingQuoteParams<TProviderOptions>(
+    @SerialName("direction")
+    val direction: TONStakingQuoteDirection,
+    @SerialName("amount")
+    val amount: kotlin.String,
+    @SerialName("userAddress")
+    val userAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    @SerialName("network")
+    val network: TONNetwork? = null,
+    @SerialName("unstakeMode")
+    val unstakeMode: TONUnstakeMode? = null,
+    @SerialName("providerOptions")
+    val providerOptions: TProviderOptions? = null,
 ) {
     companion object
 }

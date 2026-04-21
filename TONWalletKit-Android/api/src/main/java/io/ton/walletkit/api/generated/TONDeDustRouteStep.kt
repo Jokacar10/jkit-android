@@ -28,35 +28,53 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Route step from DeDust Router API
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param poolAddress
+ * @param isStable
+ * @param inMinter
+ * @param outMinter
+ * @param inAmount
+ * @param outAmount
+ * @param networkFee
+ * @param protocolSlug
+ * @param stonfiExtraDetails
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONDeDustRouteStep(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @SerialName(value = "pool_address")
+    val poolAddress: kotlin.String,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    @SerialName(value = "is_stable")
+    val isStable: kotlin.Boolean,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    @SerialName(value = "in_minter")
+    val inMinter: kotlin.String,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
+    @SerialName(value = "out_minter")
+    val outMinter: kotlin.String,
+
+    @SerialName(value = "in_amount")
+    val inAmount: kotlin.String,
+
+    @SerialName(value = "out_amount")
+    val outAmount: kotlin.String,
+
+    @SerialName(value = "network_fee")
+    val networkFee: kotlin.String,
+
+    @SerialName(value = "protocol_slug")
+    val protocolSlug: kotlin.String,
+
+    @SerialName(value = "stonfi_extra_details")
+    val stonfiExtraDetails: TONDeDustRouteStepStonfiExtraDetails? = null,
+
 ) {
+
     companion object
 }

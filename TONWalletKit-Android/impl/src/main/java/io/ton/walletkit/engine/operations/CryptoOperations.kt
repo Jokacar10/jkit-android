@@ -126,9 +126,12 @@ internal class CryptoOperations(
         )
         val result = rpcClient.call(BridgeMethodConstants.METHOD_SIGN, json.toJSONObject(request))
 
+        // BridgeRpcClient wraps primitive JS results into { value: ... }.
+        // Older code also supported { signature: ... }, so accept both.
         val signatureHex = when {
-            result.has(ResponseConstants.KEY_SIGNATURE) -> result.optString(ResponseConstants.KEY_SIGNATURE)
+            result is String -> result
             result.has(ResponseConstants.KEY_VALUE) -> result.optString(ResponseConstants.KEY_VALUE)
+            result.has(ResponseConstants.KEY_SIGNATURE) -> result.optString(ResponseConstants.KEY_SIGNATURE)
             else -> result.toString()
         }.takeIf { it.isNotEmpty() && it != "null" }
             ?: throw WalletKitBridgeException(ERROR_SIGNATURE_MISSING_SIGN_RESULT)

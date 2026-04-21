@@ -28,35 +28,26 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Metadata stored in SwapQuote for DeDust provider
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param quoteResponse Raw quote response from API
+ * @param slippageBps Slippage used for the quote in basis points
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONDeDustQuoteMetadata(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @SerialName("quoteResponse")
+    private val quoteResponse: kotlinx.serialization.json.JsonElement,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    /* Slippage used for the quote in basis points */
+    @SerialName(value = "slippageBps")
+    val slippageBps: kotlin.Int,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
-
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
 ) {
+
     companion object
 }

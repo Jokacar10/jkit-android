@@ -28,35 +28,23 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  *
  *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param settlementMethods Settlement methods to use for the swap
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONOmnistonSwapOptions(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    /* Settlement methods to use for the swap */
+    @SerialName(value = "settlementMethods")
+    val settlementMethods: kotlin.collections.List<@Contextual TONSettlementMethod>? = null,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
-
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
-
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
 ) {
+
     companion object
 }

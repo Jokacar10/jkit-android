@@ -28,35 +28,38 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Provider-specific options for Omniston swap operations
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param referrerAddress The address of the referrer
+ * @param referrerFeeBps Referrer fee in basis points (1 bp = 0.01%)
+ * @param flexibleReferrerFee Whether a flexible referrer fee is allowed
+ * @param settlementMethods Settlement methods to use for the swap
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONOmnistonProviderOptions(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    /* The address of the referrer */
+    @SerialName(value = "referrerAddress")
+    val referrerAddress: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    /* Referrer fee in basis points (1 bp = 0.01%) */
+    @SerialName(value = "referrerFeeBps")
+    val referrerFeeBps: kotlin.Int? = null,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    /* Whether a flexible referrer fee is allowed */
+    @SerialName(value = "flexibleReferrerFee")
+    val flexibleReferrerFee: kotlin.Boolean? = null,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
+    /* Settlement methods to use for the swap */
+    @SerialName(value = "settlementMethods")
+    val settlementMethods: kotlin.collections.List<@Contextual TONSettlementMethod>? = null,
+
 ) {
+
     companion object
 }

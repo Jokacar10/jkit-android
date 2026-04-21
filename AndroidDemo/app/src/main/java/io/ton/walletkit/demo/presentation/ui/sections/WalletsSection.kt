@@ -48,6 +48,7 @@ fun WalletsSection(
     onWalletSelected: (String) -> Unit,
     onSendFromWallet: (String) -> Unit = {},
     isStreamingConnected: Boolean? = null,
+    onRefresh: () -> Unit = {},
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(WALLETS_SECTION_SPACING)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -74,6 +75,7 @@ fun WalletsSection(
                 onDetails = { onWalletSelected(activeWallet.address) },
                 onSend = { onSendFromWallet(activeWallet.address) },
                 isStreamingConnected = isStreamingConnected,
+                onRefresh = onRefresh,
             )
             if (totalWallets > 1) {
                 Text(
