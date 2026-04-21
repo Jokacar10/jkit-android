@@ -28,39 +28,24 @@
 
 package io.ton.walletkit.api.generated
 
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Token type for swap
  *
- * @param address
- * @param decimals
- * @param name
- * @param symbol
- * @param image
- * @param chainId
+ *
+ * @param type
+ * @param status
  */
 @Serializable
-data class TONSwapToken(
+data class TONStreamingBaseUpdate(
 
-    @SerialName(value = "address")
-    val address: kotlin.String,
+    @Contextual @SerialName(value = "type")
+    val type: TONStreamingWatchType,
 
-    @SerialName(value = "decimals")
-    val decimals: kotlin.Double,
-
-    @SerialName(value = "name")
-    val name: kotlin.String? = null,
-
-    @SerialName(value = "symbol")
-    val symbol: kotlin.String? = null,
-
-    @SerialName(value = "image")
-    val image: kotlin.String? = null,
-
-    @SerialName(value = "chainId")
-    val chainId: kotlin.String? = null,
+    @Contextual @SerialName(value = "status")
+    val status: TONStreamingUpdateStatus,
 
 ) {
 

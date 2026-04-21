@@ -32,35 +32,25 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Token type for swap
+ * Configuration options for the TonCenter streaming provider.
  *
- * @param address
- * @param decimals
- * @param name
- * @param symbol
- * @param image
- * @param chainId
+ * @param network
+ * @param endpoint Optional custom WebSocket endpoint URL for the TonCenter v2 streaming API. If omitted, it defaults to the official mainnet or testnet URL based on the network context.
+ * @param apiKey Optional API key for authenticating requests to TonCenter. Highly recommended to avoid rate limiting on the streaming endpoint.
  */
 @Serializable
-data class TONSwapToken(
+data class TONTonCenterStreamingProviderConfig(
 
-    @SerialName(value = "address")
-    val address: kotlin.String,
+    @SerialName(value = "network")
+    val network: TONNetwork,
 
-    @SerialName(value = "decimals")
-    val decimals: kotlin.Double,
+    /* Optional custom WebSocket endpoint URL for the TonCenter v2 streaming API. If omitted, it defaults to the official mainnet or testnet URL based on the network context. */
+    @SerialName(value = "endpoint")
+    val endpoint: kotlin.String? = null,
 
-    @SerialName(value = "name")
-    val name: kotlin.String? = null,
-
-    @SerialName(value = "symbol")
-    val symbol: kotlin.String? = null,
-
-    @SerialName(value = "image")
-    val image: kotlin.String? = null,
-
-    @SerialName(value = "chainId")
-    val chainId: kotlin.String? = null,
+    /* Optional API key for authenticating requests to TonCenter. Highly recommended to avoid rate limiting on the streaming endpoint. */
+    @SerialName(value = "apiKey")
+    val apiKey: kotlin.String? = null,
 
 ) {
 

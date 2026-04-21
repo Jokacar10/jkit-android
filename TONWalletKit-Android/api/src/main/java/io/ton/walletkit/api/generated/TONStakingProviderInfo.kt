@@ -32,35 +32,30 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Token type for swap
+ * Staking information for a provider
  *
- * @param address
- * @param decimals
- * @param name
- * @param symbol
- * @param image
- * @param chainId
+ * @param apy Annual Percentage Yield in basis points (100 = 1%)
+ * @param providerId Identifier of the staking provider
+ * @param rawInstantUnstakeAvailable
+ * @param instantUnstakeAvailable Amount available for instant unstake
  */
 @Serializable
-data class TONSwapToken(
+data class TONStakingProviderInfo(
 
-    @SerialName(value = "address")
-    val address: kotlin.String,
+    /* Annual Percentage Yield in basis points (100 = 1%) */
+    @SerialName(value = "apy")
+    val apy: kotlin.Double,
 
-    @SerialName(value = "decimals")
-    val decimals: kotlin.Double,
+    /* Identifier of the staking provider */
+    @SerialName(value = "providerId")
+    val providerId: kotlin.String,
 
-    @SerialName(value = "name")
-    val name: kotlin.String? = null,
+    @SerialName(value = "rawInstantUnstakeAvailable")
+    val rawInstantUnstakeAvailable: kotlin.String? = null,
 
-    @SerialName(value = "symbol")
-    val symbol: kotlin.String? = null,
-
-    @SerialName(value = "image")
-    val image: kotlin.String? = null,
-
-    @SerialName(value = "chainId")
-    val chainId: kotlin.String? = null,
+    /* Amount available for instant unstake */
+    @SerialName(value = "instantUnstakeAvailable")
+    val instantUnstakeAvailable: kotlin.String? = null,
 
 ) {
 

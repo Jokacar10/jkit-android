@@ -28,24 +28,49 @@
 
 package io.ton.walletkit.api.generated
 
+import io.ton.walletkit.model.TONUserFriendlyAddress
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  *
  *
- * @param slippageBps
- * @param routes
+ * @param status
+ * @param masterAddress
+ * @param walletAddress
+ * @param ownerAddress
+ * @param rawBalance
+ * @param decimals Decimals mapped from metadata if available
+ * @param balance Human readable formatted balance if decimals are known
  */
 @Serializable
-data class TONDeDustSwapRequestSwapData(
+data class TONJettonUpdate(
 
-    @SerialName(value = "slippage_bps")
-    val slippageBps: kotlin.Int,
+    @Contextual @SerialName(value = "status")
+    val status: TONStreamingUpdateStatus,
 
-    @SerialName(value = "routes")
-    val routes: kotlin.collections.List<TONDeDustRouteStep>,
+    @Contextual @SerialName(value = "masterAddress")
+    val masterAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
+    @Contextual @SerialName(value = "walletAddress")
+    val walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+
+    @Contextual @SerialName(value = "ownerAddress")
+    val ownerAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+
+    @SerialName(value = "rawBalance")
+    val rawBalance: kotlin.String,
+
+    /* Decimals mapped from metadata if available */
+    @SerialName(value = "decimals")
+    val decimals: kotlin.Double? = null,
+
+    /* Human readable formatted balance if decimals are known */
+    @SerialName(value = "balance")
+    val balance: kotlin.String? = null,
+    @SerialName("type")
+    val type: kotlin.String = "jettons",
 ) {
 
     companion object

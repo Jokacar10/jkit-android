@@ -32,24 +32,21 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Defines the types of blockchain events that can be subscribed to via a streaming provider.
  *
- *
- * Values: SETTLEMENT_METHOD_SWAP,SETTLEMENT_METHOD_ESCROW,SETTLEMENT_METHOD_HTLC,UNRECOGNIZED
+ * Values: balance,transactions,jettons
  */
 @Serializable
-enum class TONSettlementMethodValue(val value: kotlin.String) {
+enum class TONStreamingWatchType(val value: kotlin.String) {
 
-    @SerialName(value = "SETTLEMENT_METHOD_SWAP")
-    SETTLEMENT_METHOD_SWAP("SETTLEMENT_METHOD_SWAP"),
+    @SerialName(value = "balance")
+    balance("balance"),
 
-    @SerialName(value = "SETTLEMENT_METHOD_ESCROW")
-    SETTLEMENT_METHOD_ESCROW("SETTLEMENT_METHOD_ESCROW"),
+    @SerialName(value = "transactions")
+    transactions("transactions"),
 
-    @SerialName(value = "SETTLEMENT_METHOD_HTLC")
-    SETTLEMENT_METHOD_HTLC("SETTLEMENT_METHOD_HTLC"),
-
-    @SerialName(value = "UNRECOGNIZED")
-    UNRECOGNIZED("UNRECOGNIZED"),
+    @SerialName(value = "jettons")
+    jettons("jettons"),
     ;
 
     /**
@@ -65,12 +62,12 @@ enum class TONSettlementMethodValue(val value: kotlin.String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is TONSettlementMethodValue) "$data" else null
+        fun encode(data: kotlin.Any?): kotlin.String? = if (data is TONStreamingWatchType) "$data" else null
 
         /**
-         * Returns a valid [TONSettlementMethodValue] for [data], null otherwise.
+         * Returns a valid [TONStreamingWatchType] for [data], null otherwise.
          */
-        fun decode(data: kotlin.Any?): TONSettlementMethodValue? = data?.let {
+        fun decode(data: kotlin.Any?): TONStreamingWatchType? = data?.let {
             val normalizedData = "$it".lowercase()
             values().firstOrNull { value ->
                 it == value || normalizedData == "$value".lowercase()

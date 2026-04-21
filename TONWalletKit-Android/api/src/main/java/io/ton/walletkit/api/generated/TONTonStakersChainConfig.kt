@@ -28,31 +28,25 @@
 
 package io.ton.walletkit.api.generated
 
+import io.ton.walletkit.model.TONUserFriendlyAddress
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Swap transaction from DeDust Router API
  *
- * @param address
- * @param amount
- * @param payload
- * @param stateInit
+ *
+ * @param contractAddress
+ * @param tonApiToken
  */
 @Serializable
-data class TONDeDustSwapTransaction(
+data class TONTonStakersChainConfig(
 
-    @SerialName(value = "address")
-    val address: kotlin.String,
+    @Contextual @SerialName(value = "contractAddress")
+    val contractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
-    @SerialName(value = "amount")
-    val amount: kotlin.String,
-
-    @SerialName(value = "payload")
-    val payload: kotlin.String,
-
-    @SerialName(value = "state_init")
-    val stateInit: kotlin.String? = null,
+    @SerialName(value = "tonApiToken")
+    val tonApiToken: kotlin.String? = null,
 
 ) {
 

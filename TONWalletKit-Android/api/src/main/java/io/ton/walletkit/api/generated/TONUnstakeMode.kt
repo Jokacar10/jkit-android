@@ -32,21 +32,46 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Swap response from DeDust Router API
  *
- * @param queryId
- * @param transactions
+ *
+ * Values: instant,whenAvailable,roundEnd
  */
 @Serializable
-data class TONDeDustSwapResponse(
+enum class TONUnstakeMode(val value: kotlin.String) {
 
-    @SerialName(value = "query_id")
-    val queryId: kotlin.Int,
+    @SerialName(value = "INSTANT")
+    instant("INSTANT"),
 
-    @SerialName(value = "transactions")
-    val transactions: kotlin.collections.List<TONDeDustSwapTransaction>,
+    @SerialName(value = "WHEN_AVAILABLE")
+    whenAvailable("WHEN_AVAILABLE"),
 
-) {
+    @SerialName(value = "ROUND_END")
+    roundEnd("ROUND_END"),
+    ;
 
-    companion object
+    /**
+     * Override [toString()] to avoid using the enum variable name as the value, and instead use
+     * the actual value defined in the API spec file.
+     *
+     * This solves a problem when the variable name and its value are different, and ensures that
+     * the client sends the correct enum values to the server always.
+     */
+    override fun toString(): kotlin.String = value
+
+    companion object {
+        /**
+         * Converts the provided [data] to a [String] on success, null otherwise.
+         */
+        fun encode(data: kotlin.Any?): kotlin.String? = if (data is TONUnstakeMode) "$data" else null
+
+        /**
+         * Returns a valid [TONUnstakeMode] for [data], null otherwise.
+         */
+        fun decode(data: kotlin.Any?): TONUnstakeMode? = data?.let {
+            val normalizedData = "$it".lowercase()
+            values().firstOrNull { value ->
+                it == value || normalizedData == "$value".lowercase()
+            }
+        }
+    }
 }

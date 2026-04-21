@@ -28,41 +28,34 @@
 
 package io.ton.walletkit.api.generated
 
+import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Token type for swap
  *
- * @param address
- * @param decimals
- * @param name
- * @param symbol
- * @param image
- * @param chainId
+ *
+ * @param direction
+ * @param amount Amount of tokens to stake or unstake
+ * @param userAddress
+ * @param network
+ * @param unstakeMode
+ * @param providerOptions Provider-specific options
  */
 @Serializable
-data class TONSwapToken(
-
-    @SerialName(value = "address")
-    val address: kotlin.String,
-
-    @SerialName(value = "decimals")
-    val decimals: kotlin.Double,
-
-    @SerialName(value = "name")
-    val name: kotlin.String? = null,
-
-    @SerialName(value = "symbol")
-    val symbol: kotlin.String? = null,
-
-    @SerialName(value = "image")
-    val image: kotlin.String? = null,
-
-    @SerialName(value = "chainId")
-    val chainId: kotlin.String? = null,
-
+data class TONStakingQuoteParams<TProviderOptions>(
+    @SerialName("direction")
+    val direction: TONStakingQuoteDirection,
+    @SerialName("amount")
+    val amount: kotlin.String,
+    @SerialName("userAddress")
+    val userAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    @SerialName("network")
+    val network: TONNetwork? = null,
+    @SerialName("unstakeMode")
+    val unstakeMode: TONUnstakeMode? = null,
+    @SerialName("providerOptions")
+    val providerOptions: TProviderOptions? = null,
 ) {
-
     companion object
 }

@@ -32,35 +32,25 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Token type for swap
+ * Configuration options for the TonAPI streaming provider (v2 WebSocket protocol).
  *
- * @param address
- * @param decimals
- * @param name
- * @param symbol
- * @param image
- * @param chainId
+ * @param network
+ * @param endpoint Full WebSocket URL for the streaming API. When set, it is used as-is (after http→wss normalization). When omitted, the default TonAPI host for the network is used with `/api/streaming/v2/ws`.
+ * @param apiKey Optional bearer token for TonAPI (`token` query parameter on the WebSocket URL).
  */
 @Serializable
-data class TONSwapToken(
+data class TONTonApiStreamingProviderConfig(
 
-    @SerialName(value = "address")
-    val address: kotlin.String,
+    @SerialName(value = "network")
+    val network: TONNetwork,
 
-    @SerialName(value = "decimals")
-    val decimals: kotlin.Double,
+    /* Full WebSocket URL for the streaming API. When set, it is used as-is (after http→wss normalization). When omitted, the default TonAPI host for the network is used with `/api/streaming/v2/ws`. */
+    @SerialName(value = "endpoint")
+    val endpoint: kotlin.String? = null,
 
-    @SerialName(value = "name")
-    val name: kotlin.String? = null,
-
-    @SerialName(value = "symbol")
-    val symbol: kotlin.String? = null,
-
-    @SerialName(value = "image")
-    val image: kotlin.String? = null,
-
-    @SerialName(value = "chainId")
-    val chainId: kotlin.String? = null,
+    /* Optional bearer token for TonAPI (`token` query parameter on the WebSocket URL). */
+    @SerialName(value = "apiKey")
+    val apiKey: kotlin.String? = null,
 
 ) {
 

@@ -28,40 +28,36 @@
 
 package io.ton.walletkit.api.generated
 
+import io.ton.walletkit.model.TONUserFriendlyAddress
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Swap request to DeDust Router API
  *
- * @param senderAddress
- * @param swapData
- * @param referralAddress
- * @param referralFee
- * @param jettonWalletStateInit
- * @param customPayload
+ *
+ * @param status
+ * @param address
+ * @param rawBalance
+ * @param balance The formatted balance
  */
 @Serializable
-data class TONDeDustSwapRequest(
+data class TONBalanceUpdate(
 
-    @SerialName(value = "sender_address")
-    val senderAddress: kotlin.String,
+    @Contextual @SerialName(value = "status")
+    val status: TONStreamingUpdateStatus,
 
-    @SerialName(value = "swap_data")
-    val swapData: TONDeDustSwapRequestSwapData,
+    @Contextual @SerialName(value = "address")
+    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
-    @SerialName(value = "referral_address")
-    val referralAddress: kotlin.String? = null,
+    @SerialName(value = "rawBalance")
+    val rawBalance: kotlin.String,
 
-    @SerialName(value = "referral_fee")
-    val referralFee: kotlin.Int? = null,
-
-    @SerialName(value = "jetton_wallet_state_init")
-    val jettonWalletStateInit: kotlin.String? = null,
-
-    @SerialName(value = "custom_payload")
-    val customPayload: kotlin.String? = null,
-
+    /* The formatted balance */
+    @SerialName(value = "balance")
+    val balance: kotlin.String,
+    @SerialName("type")
+    val type: kotlin.String = "balance",
 ) {
 
     companion object

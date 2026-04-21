@@ -28,20 +28,46 @@
 
 package io.ton.walletkit.api.generated
 
+import io.ton.walletkit.model.TONUserFriendlyAddress
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  *
  *
- * @param globalId
+ * @param status
+ * @param address
+ * @param transactions The array of transactions
+ * @param traceHash
+ * @param addressBook Map of raw addresses to their metadata entries.
+ * @param metadata Metadata about addresses, including indexing and associated token info.
  */
 @Serializable
-data class TONSignatureDomainL2(
+data class TONTransactionsUpdate(
 
-    @SerialName(value = "globalId")
-    val globalId: kotlin.Int,
+    @Contextual @SerialName(value = "status")
+    val status: TONStreamingUpdateStatus,
 
+    @Contextual @SerialName(value = "address")
+    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+
+    /* The array of transactions */
+    @SerialName(value = "transactions")
+    val transactions: kotlin.collections.List<TONTransaction>,
+
+    @Contextual @SerialName(value = "traceHash")
+    val traceHash: io.ton.walletkit.model.TONHex,
+
+    /* Map of raw addresses to their metadata entries. */
+    @Contextual @SerialName(value = "addressBook")
+    val addressBook: kotlin.collections.Map<kotlin.String, TONAddressBookEntry>? = null,
+
+    /* Metadata about addresses, including indexing and associated token info. */
+    @Contextual @SerialName(value = "metadata")
+    val metadata: kotlin.collections.Map<kotlin.String, TONTransactionAddressMetadataEntry>? = null,
+    @SerialName("type")
+    val type: kotlin.String = "transactions",
 ) {
 
     companion object

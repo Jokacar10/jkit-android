@@ -32,35 +32,23 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Token type for swap
  *
- * @param address
- * @param decimals
- * @param name
- * @param symbol
- * @param image
- * @param chainId
+ *
+ * @param streamingBalanceUpdate
+ * @param streamingTransactions
+ * @param streamingJettonsUpdate
  */
 @Serializable
-data class TONSwapToken(
+data class TONStreamingEvents(
 
-    @SerialName(value = "address")
-    val address: kotlin.String,
+    @SerialName(value = "streaming:balance-update")
+    val streamingBalanceUpdate: TONBalanceUpdate,
 
-    @SerialName(value = "decimals")
-    val decimals: kotlin.Double,
+    @SerialName(value = "streaming:transactions")
+    val streamingTransactions: TONTransactionsUpdate,
 
-    @SerialName(value = "name")
-    val name: kotlin.String? = null,
-
-    @SerialName(value = "symbol")
-    val symbol: kotlin.String? = null,
-
-    @SerialName(value = "image")
-    val image: kotlin.String? = null,
-
-    @SerialName(value = "chainId")
-    val chainId: kotlin.String? = null,
+    @SerialName(value = "streaming:jettons-update")
+    val streamingJettonsUpdate: TONJettonUpdate,
 
 ) {
 
