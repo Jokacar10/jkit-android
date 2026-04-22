@@ -19,23 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit.swap
+package io.ton.walletkit.demo.presentation.model
 
-import io.ton.walletkit.api.generated.TONDeDustProviderOptions
-import io.ton.walletkit.api.generated.TONOmnistonProviderOptions
+data class BrowserTab(val id: String, val url: String)
 
-/**
- * Handle for a registered swap provider. The type parameter [TQuoteOptions] carries
- * the provider-specific options type used in [ITONSwapManager.getQuote].
- *
- * Created via [io.ton.walletkit.ITONWalletKit.omnistonSwapProvider] or
- * [io.ton.walletkit.ITONWalletKit.dedustSwapProvider].
- * Register with [ITONSwapManager.registerProvider] before calling [ITONSwapManager.getQuote].
- */
-data class TONSwapProvider<TQuoteOptions>(val providerId: String)
-
-/** Typed handle for the Omniston (STON.fi) swap provider. */
-typealias TONOmnistonSwapProvider = TONSwapProvider<TONOmnistonProviderOptions>
-
-/** Typed handle for the DeDust swap provider. */
-typealias TONDeDustSwapProvider = TONSwapProvider<TONDeDustProviderOptions>
+data class BrowserPageState(
+    val currentUrl: String = "",
+    val title: String = "",
+    val isLoading: Boolean = false,
+)
