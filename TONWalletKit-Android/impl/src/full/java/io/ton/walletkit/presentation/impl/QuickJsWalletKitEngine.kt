@@ -30,12 +30,14 @@ import io.ton.walletkit.api.MAINNET
 import io.ton.walletkit.api.TESTNET
 import io.ton.walletkit.api.generated.TONConnectionApprovalResponse
 import io.ton.walletkit.api.generated.TONConnectionRequestEvent
+import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONDisconnectionEvent
 import io.ton.walletkit.api.generated.TONDisconnectionEventPreview
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
 import io.ton.walletkit.api.generated.TONNFTRawTransferRequest
 import io.ton.walletkit.api.generated.TONNFTTransferRequest
 import io.ton.walletkit.api.generated.TONNetwork
+import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
@@ -59,8 +61,6 @@ import io.ton.walletkit.request.TONWalletConnectionRequest
 import io.ton.walletkit.request.TONWalletSignDataRequest
 import io.ton.walletkit.request.TONWalletTransactionRequest
 import io.ton.walletkit.session.TONConnectSession
-import io.ton.walletkit.swap.TONDeDustSwapProviderConfig
-import io.ton.walletkit.swap.TONOmnistonSwapProviderConfig
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope

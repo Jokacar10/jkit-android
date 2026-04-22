@@ -23,7 +23,9 @@ package io.ton.walletkit
 
 import android.content.Context
 import io.ton.walletkit.api.MAINNET
+import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONNetwork
+import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSignatureDomain
 import io.ton.walletkit.config.TONWalletKitConfiguration
 import io.ton.walletkit.internal.TONWalletKitFactory
@@ -35,9 +37,7 @@ import io.ton.walletkit.model.WalletSignerInfo
 import io.ton.walletkit.request.TONWalletConnectionRequest
 import io.ton.walletkit.swap.ITONSwapManager
 import io.ton.walletkit.swap.TONDeDustSwapProvider
-import io.ton.walletkit.swap.TONDeDustSwapProviderConfig
 import io.ton.walletkit.swap.TONOmnistonSwapProvider
-import io.ton.walletkit.swap.TONOmnistonSwapProviderConfig
 
 /**
  * TON Wallet Kit SDK for managing wallets and TON Connect.

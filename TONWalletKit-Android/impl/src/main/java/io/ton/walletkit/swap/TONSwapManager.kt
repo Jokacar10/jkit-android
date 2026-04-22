@@ -36,7 +36,7 @@ internal class TONSwapManager(
 ) : ITONSwapManager {
 
     override suspend fun registerProvider(provider: TONSwapProvider<*, *>) {
-        engine.registerSwapProvider(provider.providerId)
+        engine.registerSwapProvider(provider.identifier.name)
     }
 
     override suspend fun setDefaultProvider(identifier: TONSwapProviderIdentifier<*, *>) {
@@ -51,8 +51,11 @@ internal class TONSwapManager(
         return engine.hasSwapProvider(identifier.name)
     }
 
-    override suspend fun getQuote(params: TONSwapQuoteParams<JsonElement>, providerId: String): TONSwapQuote {
-        return engine.getSwapQuote(params, providerId)
+    override suspend fun getQuote(
+        params: TONSwapQuoteParams<JsonElement>,
+        identifier: TONSwapProviderIdentifier<*, *>,
+    ): TONSwapQuote {
+        return engine.getSwapQuote(params, identifier.name)
     }
 
     override suspend fun getQuote(params: TONSwapQuoteParams<JsonElement>): TONSwapQuote {
