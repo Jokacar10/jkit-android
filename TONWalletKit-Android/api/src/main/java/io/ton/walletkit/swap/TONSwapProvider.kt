@@ -23,19 +23,80 @@ package io.ton.walletkit.swap
 
 import io.ton.walletkit.api.generated.TONDeDustProviderOptions
 import io.ton.walletkit.api.generated.TONOmnistonProviderOptions
+import io.ton.walletkit.api.generated.TONSwapParams
+import io.ton.walletkit.api.generated.TONSwapQuote
+import io.ton.walletkit.api.generated.TONSwapQuoteParams
+import io.ton.walletkit.api.generated.TONTransactionRequest
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.serializer
 
 /**
- * Handle for a registered swap provider. The type parameter [TQuoteOptions] carries
- * the provider-specific options type used in [ITONSwapManager.getQuote].
+ * A registered swap provider that can be used to obtain quotes and build swap transactions.
+ * [TQuoteOptions] carries the provider-specific options for [quote];
+ * [TSwapOptions] carries the provider-specific options for [buildSwapTransaction].
  *
  * Created via [io.ton.walletkit.ITONWalletKit.omnistonSwapProvider] or
  * [io.ton.walletkit.ITONWalletKit.dedustSwapProvider].
- * Register with [ITONSwapManager.registerProvider] before calling [ITONSwapManager.getQuote].
+ * Register with [ITONSwapManager.registerProvider] before calling [quote] or [buildSwapTransaction].
  */
-data class TONSwapProvider<TQuoteOptions>(val providerId: String)
+class TONSwapProvider<TQuoteOptions, TSwapOptions> @PublishedApi internal constructor(
+    val identifier: TONSwapProviderIdentifier<TQuoteOptions, TSwapOptions>,
+    private val manager: ITONSwapManager,
+    @PublishedApi internal val quoteSerializer: KSerializer<TQuoteOptions>,
+    @PublishedApi internal val swapSerializer: KSerializer<TSwapOptions>,
+) {
+    val providerId: String get() = identifier.name
 
-/** Typed handle for the Omniston (STON.fi) swap provider. */
-typealias TONOmnistonSwapProvider = TONSwapProvider<TONOmnistonProviderOptions>
+    /** Get a quote from this provider. */
+    suspend fun quote(params: TONSwapQuoteParams<TQuoteOptions>): TONSwapQuote {
+        val jsonOptions = params.providerOptions?.let { Json.encodeToJsonElement(quoteSerializer, it) }
+        return manager.getQuote(
+            TONSwapQuoteParams(
+                amount = params.amount,
+                from = params.from,
+                to = params.to,
+                network = params.network,
+                slippageBps = params.slippageBps,
+                maxOutgoingMessages = params.maxOutgoingMessages,
+                providerOptions = jsonOptions,
+                isReverseSwap = params.isReverseSwap,
+            ),
+            providerId,
+        )
+    }
+
+    /** Build a swap transaction using this provider. */
+    suspend fun buildSwapTransaction(params: TONSwapParams<TSwapOptions>): TONTransactionRequest {
+        val jsonOptions = params.providerOptions?.let { Json.encodeToJsonElement(swapSerializer, it) }
+        return manager.buildSwapTransaction(
+            TONSwapParams(
+                quote = params.quote,
+                userAddress = params.userAddress,
+                destinationAddress = params.destinationAddress,
+                slippageBps = params.slippageBps,
+                deadline = params.deadline,
+                providerOptions = jsonOptions,
+            ),
+        )
+    }
+}
+
+/** Creates a typed [TONSwapProvider], capturing serializers via reified type parameters. */
+@Suppress("ktlint:standard:function-naming")
+inline fun <reified TQuoteOptions, reified TSwapOptions> TONSwapProvider(
+    identifier: TONSwapProviderIdentifier<TQuoteOptions, TSwapOptions>,
+    manager: ITONSwapManager,
+): TONSwapProvider<TQuoteOptions, TSwapOptions> = TONSwapProvider(
+    identifier = identifier,
+    manager = manager,
+    quoteSerializer = serializer(),
+    swapSerializer = serializer(),
+)
+
+/** Typed handle for the Omniston (STON.fi) swap provider. SwapOptions is [JsonElement] (untyped), matching iOS `AnyCodable`. */
+typealias TONOmnistonSwapProvider = TONSwapProvider<TONOmnistonProviderOptions, JsonElement>
 
 /** Typed handle for the DeDust swap provider. */
-typealias TONDeDustSwapProvider = TONSwapProvider<TONDeDustProviderOptions>
+typealias TONDeDustSwapProvider = TONSwapProvider<TONDeDustProviderOptions, TONDeDustProviderOptions>
