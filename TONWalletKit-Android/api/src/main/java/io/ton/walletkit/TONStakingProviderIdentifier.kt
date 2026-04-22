@@ -22,15 +22,10 @@
 package io.ton.walletkit
 
 /**
- * Typed provider identifier used by public SDK APIs instead of raw strings.
+ * Identifies a staking provider and carries its option types as generic parameters.
+ * Analogous to iOS's `TONStakingProviderIdentifier` protocol.
+ *
+ * [TQuoteOptions] is the provider-specific type for quote params.
+ * [TStakeOptions] is the provider-specific type for stake transaction params.
  */
-interface TONProviderIdentifier {
-    val name: String
-}
-
-/**
- * Type-erased provider identifier.
- */
-data class AnyTONProviderIdentifier(
-    override val name: String,
-) : TONProviderIdentifier
+interface TONStakingProviderIdentifier<TQuoteOptions, TStakeOptions> : TONProviderIdentifier
