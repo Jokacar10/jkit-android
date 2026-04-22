@@ -19,49 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit.engine.operations.requests
+package io.ton.walletkit.swap
 
-import io.ton.walletkit.api.generated.TONTransferRequest
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
 /**
- * Internal bridge request models for transaction operations.
- * These DTOs represent the exact JSON structure sent to the JavaScript bridge.
+ * Identifies a swap provider and carries its option types as generic parameters.
+ * Analogous to iOS's `TONSwapProviderIdentifier` protocol.
  *
- * @suppress Internal bridge communication only.
+ * [TQuoteOptions] is the provider-specific type for [ITONSwapManager.getQuote] options.
+ * [TSwapOptions] is the provider-specific type for [ITONSwapManager.buildSwapTransaction] options.
  */
+interface TONSwapProviderIdentifier<TQuoteOptions, TSwapOptions> {
+    val name: String
+}
 
-@Serializable
-internal data class CreateTransferTonRequest(
-    val walletId: String,
-    val recipientAddress: String,
-    val transferAmount: String,
-    val comment: String? = null,
-    val body: String? = null,
-    val stateInit: String? = null,
-)
-
-@Serializable
-internal data class CreateTransferMultiTonRequest(
-    val walletId: String,
-    val messages: List<TONTransferRequest>,
-)
-
-@Serializable
-internal data class HandleNewTransactionRequest(
-    val walletId: String,
-    val transactionContent: JsonElement,
-)
-
-@Serializable
-internal data class SendTransactionRequest(
-    val walletId: String,
-    val transactionContent: JsonElement,
-)
-
-@Serializable
-internal data class GetTransactionPreviewRequest(
-    val walletId: String,
-    val transactionContent: JsonElement,
-)
+/**
+ * Type-erased swap provider identifier returned by [ITONSwapManager.registeredProviders].
+ * Analogous to iOS's `AnyTONProviderIdentifier`.
+ */
+data class AnyTONSwapProviderIdentifier(override val name: String) :
+    TONSwapProviderIdentifier<JsonElement, JsonElement>
