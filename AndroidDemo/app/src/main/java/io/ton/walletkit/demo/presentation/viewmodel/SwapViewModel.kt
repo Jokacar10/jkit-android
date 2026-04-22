@@ -35,8 +35,6 @@ import io.ton.walletkit.api.generated.TONSwapToken
 import io.ton.walletkit.swap.ITONSwapManager
 import io.ton.walletkit.swap.TONDeDustSwapProvider
 import io.ton.walletkit.swap.TONOmnistonSwapProvider
-import io.ton.walletkit.swap.buildSwapTransaction
-import io.ton.walletkit.swap.getQuote
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,10 +53,10 @@ class SwapViewModel(
     }
 
     data class UiState(
-        val fromToken: TONSwapToken = TONSwapToken(address = "ton", decimals = 9, name = "TON", symbol = "TON"),
+        val fromToken: TONSwapToken = TONSwapToken(address = "ton", decimals = 9.0, name = "TON", symbol = "TON"),
         val toToken: TONSwapToken = TONSwapToken(
             address = "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs",
-            decimals = 6,
+            decimals = 6.0,
             name = "USDT",
             symbol = "USDT",
         ),
