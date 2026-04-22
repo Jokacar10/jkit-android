@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.generated.TONConnectionApprovalResponse
 import io.ton.walletkit.api.generated.TONConnectionRequestEvent
+import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONJettonsResponse
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
 import io.ton.walletkit.api.generated.TONNFT
@@ -33,6 +34,7 @@ import io.ton.walletkit.api.generated.TONNFTRawTransferRequest
 import io.ton.walletkit.api.generated.TONNFTTransferRequest
 import io.ton.walletkit.api.generated.TONNFTsResponse
 import io.ton.walletkit.api.generated.TONNetwork
+import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
@@ -75,8 +77,6 @@ import io.ton.walletkit.storage.CustomBridgeStorageAdapter
 import io.ton.walletkit.storage.MemoryBridgeStorageAdapter
 import io.ton.walletkit.storage.SecureBridgeStorageAdapter
 import io.ton.walletkit.storage.TONWalletKitStorageType
-import io.ton.walletkit.swap.TONDeDustSwapProviderConfig
-import io.ton.walletkit.swap.TONOmnistonSwapProviderConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex

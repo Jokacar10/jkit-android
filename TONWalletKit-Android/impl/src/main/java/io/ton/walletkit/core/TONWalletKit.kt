@@ -26,6 +26,8 @@ import android.webkit.WebView
 import io.ton.walletkit.ITONWallet
 import io.ton.walletkit.ITONWalletKit
 import io.ton.walletkit.WebViewTonConnectInjector
+import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
+import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSignatureDomain
 import io.ton.walletkit.browser.TonConnectInjector
 import io.ton.walletkit.config.TONWalletKitConfiguration
@@ -35,10 +37,8 @@ import io.ton.walletkit.model.KeyPair
 import io.ton.walletkit.model.TONWalletAdapter
 import io.ton.walletkit.swap.ITONSwapManager
 import io.ton.walletkit.swap.TONDeDustSwapProvider
-import io.ton.walletkit.swap.TONDeDustSwapProviderConfig
 import io.ton.walletkit.swap.TONDeDustSwapProviderIdentifier
 import io.ton.walletkit.swap.TONOmnistonSwapProvider
-import io.ton.walletkit.swap.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.swap.TONOmnistonSwapProviderIdentifier
 import io.ton.walletkit.swap.TONSwapManager
 import io.ton.walletkit.swap.TONSwapProvider

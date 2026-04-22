@@ -25,14 +25,16 @@ import io.ton.walletkit.api.generated.TONSwapParams
 import io.ton.walletkit.api.generated.TONSwapQuote
 import io.ton.walletkit.api.generated.TONSwapQuoteParams
 import io.ton.walletkit.api.generated.TONTransactionRequest
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.serializer
 
 /** Manages swap providers and executes swap operations. Obtain via [io.ton.walletkit.ITONWalletKit.swap]. */
 interface ITONSwapManager {
     /** Register a provider. Must be called before [getQuote] or [buildSwapTransaction]. */
     suspend fun registerProvider(provider: TONSwapProvider<*, *>)
 
-    /** Set the default provider used by [getQuote] when no provider is specified. */
+    /** Set the default provider used by [getQuote] when no identifier is specified. */
     suspend fun setDefaultProvider(identifier: TONSwapProviderIdentifier<*, *>)
 
     /** Returns typed identifiers for all registered providers. */
@@ -41,15 +43,24 @@ interface ITONSwapManager {
     /** Returns true if a provider with the given [identifier] is currently registered. */
     suspend fun hasProvider(identifier: TONSwapProviderIdentifier<*, *>): Boolean
 
-    /** Get a quote from the specific [providerId]. */
-    suspend fun getQuote(params: TONSwapQuoteParams<JsonElement>, providerId: String): TONSwapQuote
+    /**
+     * Get a quote from the provider with [identifier]. Mirrors iOS
+     * `quote<Identifier: TONSwapProviderIdentifier>(params:, identifier:)`.
+     *
+     * Prefer the typed extension `getQuote<TQuoteOptions, TSwapOptions>(params, identifier)`,
+     * which serializes typed `providerOptions` automatically.
+     */
+    suspend fun getQuote(
+        params: TONSwapQuoteParams<JsonElement>,
+        identifier: TONSwapProviderIdentifier<*, *>,
+    ): TONSwapQuote
 
-    /** Get a quote from the default registered provider. */
+    /** Get a quote from the default registered provider. Mirrors iOS `quote(params: TONSwapQuoteParams<AnyCodable>)`. */
     suspend fun getQuote(params: TONSwapQuoteParams<JsonElement>): TONSwapQuote
 
     /**
-     * Build a swap transaction. The provider is resolved from [TONSwapParams.quote].
-     * Prefer calling [TONSwapProvider.buildSwapTransaction] directly for typed provider options.
+     * Build a swap transaction. The provider is resolved from [TONSwapParams.quote.providerId].
+     * Prefer the typed extension `buildSwapTransaction<TSwapOptions>(params)` for typed options.
      */
     suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): TONTransactionRequest
 }
@@ -68,8 +79,31 @@ suspend inline fun <reified TQuoteOptions, reified TSwapOptions> ITONSwapManager
     return if (hasProvider(identifier)) handle else null
 }
 
-/** Get a quote via a typed provider. Delegates to [TONSwapProvider.quote]. */
-suspend fun <TQuoteOptions, TSwapOptions> ITONSwapManager.getQuote(
+/**
+ * Get a quote from the provider with [identifier], serializing typed `providerOptions` automatically.
+ * Mirrors iOS `quote<Identifier: TONSwapProviderIdentifier>(params: TONSwapQuoteParams<Identifier.QuoteOptions>, identifier: Identifier)`.
+ */
+suspend inline fun <reified TQuoteOptions, reified TSwapOptions> ITONSwapManager.getQuote(
     params: TONSwapQuoteParams<TQuoteOptions>,
-    provider: TONSwapProvider<TQuoteOptions, TSwapOptions>,
-): TONSwapQuote = provider.quote(params)
+    identifier: TONSwapProviderIdentifier<TQuoteOptions, TSwapOptions>,
+): TONSwapQuote = TONSwapProvider(identifier, this).quote(params)
+
+/**
+ * Build a swap transaction with typed swap options, serializing `providerOptions` automatically.
+ * Mirrors iOS `swapTransaction<QuoteOptions: Codable>(params: TONSwapParams<QuoteOptions>)`.
+ */
+suspend inline fun <reified TSwapOptions> ITONSwapManager.buildSwapTransaction(
+    params: TONSwapParams<TSwapOptions>,
+): TONTransactionRequest {
+    val jsonOptions = params.providerOptions?.let { Json.encodeToJsonElement(serializer<TSwapOptions>(), it) }
+    return buildSwapTransaction(
+        TONSwapParams(
+            quote = params.quote,
+            userAddress = params.userAddress,
+            destinationAddress = params.destinationAddress,
+            slippageBps = params.slippageBps,
+            deadline = params.deadline,
+            providerOptions = jsonOptions,
+        ),
+    )
+}

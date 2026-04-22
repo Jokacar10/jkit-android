@@ -47,8 +47,6 @@ class TONSwapProvider<TQuoteOptions, TSwapOptions> @PublishedApi internal constr
     @PublishedApi internal val quoteSerializer: KSerializer<TQuoteOptions>,
     @PublishedApi internal val swapSerializer: KSerializer<TSwapOptions>,
 ) {
-    val providerId: String get() = identifier.name
-
     /** Get a quote from this provider. */
     suspend fun quote(params: TONSwapQuoteParams<TQuoteOptions>): TONSwapQuote {
         val jsonOptions = params.providerOptions?.let { Json.encodeToJsonElement(quoteSerializer, it) }
@@ -63,7 +61,7 @@ class TONSwapProvider<TQuoteOptions, TSwapOptions> @PublishedApi internal constr
                 providerOptions = jsonOptions,
                 isReverseSwap = params.isReverseSwap,
             ),
-            providerId,
+            identifier,
         )
     }
 

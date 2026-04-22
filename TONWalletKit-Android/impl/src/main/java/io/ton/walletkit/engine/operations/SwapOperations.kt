@@ -21,6 +21,8 @@
  */
 package io.ton.walletkit.engine.operations
 
+import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
+import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSwapParams
 import io.ton.walletkit.api.generated.TONSwapQuote
 import io.ton.walletkit.api.generated.TONSwapQuoteParams
@@ -36,8 +38,6 @@ import io.ton.walletkit.engine.operations.requests.SetDefaultSwapProviderRequest
 import io.ton.walletkit.exceptions.JSValueConversionException
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.ResponseConstants
-import io.ton.walletkit.swap.TONDeDustSwapProviderConfig
-import io.ton.walletkit.swap.TONOmnistonSwapProviderConfig
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
