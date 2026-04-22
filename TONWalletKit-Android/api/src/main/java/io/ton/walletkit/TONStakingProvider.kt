@@ -21,10 +21,15 @@
  */
 package io.ton.walletkit
 
+import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONStakeParams
+import io.ton.walletkit.api.generated.TONStakingBalance
+import io.ton.walletkit.api.generated.TONStakingProviderInfo
 import io.ton.walletkit.api.generated.TONStakingQuote
 import io.ton.walletkit.api.generated.TONStakingQuoteParams
 import io.ton.walletkit.api.generated.TONTransactionRequest
+import io.ton.walletkit.api.generated.TONUnstakeMode
+import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.json.JsonElement
 
 /**
@@ -46,6 +51,21 @@ class TONStakingProvider<TQuoteOptions, TStakeOptions>(
     /** Build a stake or unstake transaction using this provider. Delegates to [ITONStakingManager.buildStakeTransaction] with this provider's [identifier]. */
     suspend fun buildStakeTransaction(params: TONStakeParams<TStakeOptions>): TONTransactionRequest =
         manager.buildStakeTransaction(params, identifier)
+
+    /** Get the user's staked balance for this provider. Mirrors iOS `TONStakingProvider.stakedBalance(userAddress:network:)`. */
+    suspend fun getStakedBalance(
+        userAddress: TONUserFriendlyAddress,
+        network: TONNetwork? = null,
+    ): TONStakingBalance = manager.getStakedBalance(userAddress, network, identifier)
+
+    /** Get this provider's general info (APY, instant-unstake liquidity). Mirrors iOS `TONStakingProvider.stakingProviderInfo(network:)`. */
+    suspend fun getStakingProviderInfo(
+        network: TONNetwork? = null,
+    ): TONStakingProviderInfo = manager.getStakingProviderInfo(network, identifier)
+
+    /** Get the unstake modes supported by this provider. Mirrors iOS `TONStakingProvider.supportedUnstakeModes()`. */
+    suspend fun getSupportedUnstakeModes(): List<TONUnstakeMode> =
+        manager.getSupportedUnstakeModes(identifier)
 }
 
 /** Typed handle for the TonStakers staking provider. Both option types are [JsonElement] (untyped), matching iOS `AnyCodable`. */
