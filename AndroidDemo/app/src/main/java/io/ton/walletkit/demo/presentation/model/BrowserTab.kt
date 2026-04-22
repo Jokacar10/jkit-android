@@ -19,18 +19,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit
+package io.ton.walletkit.demo.presentation.model
 
-/**
- * Typed provider identifier used by public SDK APIs instead of raw strings.
- */
-interface TONProviderIdentifier {
-    val name: String
-}
+data class BrowserTab(val id: String, val url: String)
 
-/**
- * Type-erased provider identifier.
- */
-data class AnyTONProviderIdentifier(
-    override val name: String,
-) : TONProviderIdentifier
+data class BrowserPageState(
+    val currentUrl: String = "",
+    val title: String = "",
+    val isLoading: Boolean = false,
+)

@@ -21,16 +21,16 @@
  */
 package io.ton.walletkit
 
-/**
- * Typed provider identifier used by public SDK APIs instead of raw strings.
- */
-interface TONProviderIdentifier {
-    val name: String
-}
+import kotlinx.serialization.json.JsonElement
 
 /**
- * Type-erased provider identifier.
+ * Identifier for the TonStakers staking provider.
+ * Both [TQuoteOptions] and [TStakeOptions] are [JsonElement] (untyped), matching iOS's `AnyCodable`.
  */
-data class AnyTONProviderIdentifier(
-    override val name: String,
-) : TONProviderIdentifier
+data class TONTonStakersStakingProviderIdentifier(
+    override val name: String = DEFAULT_NAME,
+) : TONStakingProviderIdentifier<JsonElement, JsonElement> {
+    companion object {
+        const val DEFAULT_NAME = "tonstakers"
+    }
+}
