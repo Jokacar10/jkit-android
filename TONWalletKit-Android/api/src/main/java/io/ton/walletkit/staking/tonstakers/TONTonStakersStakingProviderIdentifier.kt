@@ -19,20 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit
+package io.ton.walletkit.staking.tonstakers
 
-import kotlinx.serialization.KSerializer
+import io.ton.walletkit.staking.TONStakingProviderIdentifier
+import kotlinx.serialization.json.JsonElement
 
 /**
- * Identifies a staking provider and carries its option types as generic parameters.
- * Analogous to iOS's `TONStakingProviderIdentifier` protocol, whose
- * `associatedtype QuoteOptions: Codable` / `associatedtype StakeOptions: Codable` are mirrored
- * here by explicit [quoteOptionsSerializer] and [stakeOptionsSerializer].
- *
- * [TQuoteOptions] is the provider-specific type for quote params.
- * [TStakeOptions] is the provider-specific type for stake transaction params.
+ * Identifier for the TonStakers staking provider.
+ * Both [TQuoteOptions] and [TStakeOptions] are [JsonElement] (untyped), matching iOS's `AnyCodable`.
  */
-interface TONStakingProviderIdentifier<TQuoteOptions, TStakeOptions> : TONProviderIdentifier {
-    val quoteOptionsSerializer: KSerializer<TQuoteOptions>
-    val stakeOptionsSerializer: KSerializer<TStakeOptions>
+data class TONTonStakersStakingProviderIdentifier(
+    override val name: String = DEFAULT_NAME,
+) : TONStakingProviderIdentifier<JsonElement, JsonElement> {
+    companion object {
+        const val DEFAULT_NAME = "tonstakers"
+    }
 }

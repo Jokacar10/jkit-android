@@ -19,8 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit
+package io.ton.walletkit.staking
 
+import io.ton.walletkit.TONProviderType
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONStakeParams
 import io.ton.walletkit.api.generated.TONStakingBalance
@@ -34,7 +35,7 @@ import io.ton.walletkit.model.TONUserFriendlyAddress
 /**
  * Contract every staking provider must satisfy. Mirrors iOS's `TONStakingProviderProtocol`.
  *
- * The built-in [TONStakingProvider] implements this interface. Custom providers implement it directly.
+ * The SDK's built-in TonStakers provider implements this interface. Custom providers implement it directly.
  *
  * [TQuoteOptions] is the provider-specific options type for [getQuote];
  * [TStakeOptions] is the provider-specific options type for [buildStakeTransaction].

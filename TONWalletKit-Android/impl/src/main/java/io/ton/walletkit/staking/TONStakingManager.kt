@@ -19,13 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit.core
+package io.ton.walletkit.staking
 
 import io.ton.walletkit.AnyTONProviderIdentifier
-import io.ton.walletkit.ITONStakingManager
-import io.ton.walletkit.ITONStakingProvider
-import io.ton.walletkit.TONStakingProvider
-import io.ton.walletkit.TONStakingProviderIdentifier
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONStakeParams
 import io.ton.walletkit.api.generated.TONStakingBalance
@@ -52,7 +48,7 @@ internal class TONStakingManager(
     private val json = Json { ignoreUnknownKeys = true }
 
     override suspend fun register(provider: ITONStakingProvider<*, *>) {
-        if (provider is TONStakingProvider<*, *>) {
+        if (provider is BuiltInStakingProvider<*, *>) {
             // Built-in JS-backed provider: the JS side already has the instance; just register its name.
             engine.registerStakingProvider(provider.identifier.name)
         } else {
@@ -65,7 +61,7 @@ internal class TONStakingManager(
             // `getSupportedUnstakeModes()` contract without a round-trip.
             val modes = typedProvider.getSupportedUnstakeModes()
             val modesJson = json.encodeToString(
-                ListSerializer(io.ton.walletkit.api.generated.TONUnstakeMode.serializer()),
+                ListSerializer(TONUnstakeMode.serializer()),
                 modes,
             )
             engine.registerKotlinStakingProvider(provider.identifier.name, modesJson)
@@ -82,11 +78,26 @@ internal class TONStakingManager(
     override suspend fun hasProvider(identifier: TONStakingProviderIdentifier<*, *>): Boolean =
         engine.hasStakingProvider(identifier.name)
 
+    override suspend fun <TQuoteOptions, TStakeOptions> provider(
+        identifier: TONStakingProviderIdentifier<TQuoteOptions, TStakeOptions>,
+    ): ITONStakingProvider<TQuoteOptions, TStakeOptions>? {
+        if (!hasProvider(identifier)) return null
+        // Custom Kotlin provider: return the user's actual registered instance.
+        engine.kotlinStakingProviderManager.getProvider(identifier.name)?.let { custom ->
+            @Suppress("UNCHECKED_CAST")
+            return custom as ITONStakingProvider<TQuoteOptions, TStakeOptions>
+        }
+        // Built-in JS-backed provider: wrap in a fresh handle that talks to the engine.
+        return BuiltInStakingProvider(identifier, engine)
+    }
+
     override suspend fun <TQuoteOptions, TStakeOptions> getQuote(
         params: TONStakingQuoteParams<TQuoteOptions>,
         identifier: TONStakingProviderIdentifier<TQuoteOptions, TStakeOptions>,
     ): TONStakingQuote {
-        val jsonOptions = params.providerOptions?.let { Json.encodeToJsonElement(identifier.quoteOptionsSerializer, it) }
+        val jsonOptions = params.providerOptions?.let {
+            Json.encodeToJsonElement(StakingSerializers.quoteSerializer(identifier), it)
+        }
         val jsonParams = TONStakingQuoteParams(
             direction = params.direction,
             amount = params.amount,
@@ -105,7 +116,9 @@ internal class TONStakingManager(
         params: TONStakeParams<TStakeOptions>,
         identifier: TONStakingProviderIdentifier<TQuoteOptions, TStakeOptions>,
     ): TONTransactionRequest {
-        val jsonOptions = params.providerOptions?.let { Json.encodeToJsonElement(identifier.stakeOptionsSerializer, it) }
+        val jsonOptions = params.providerOptions?.let {
+            Json.encodeToJsonElement(StakingSerializers.stakeSerializer(identifier), it)
+        }
         val jsonParams = TONStakeParams(
             quote = params.quote,
             userAddress = params.userAddress,

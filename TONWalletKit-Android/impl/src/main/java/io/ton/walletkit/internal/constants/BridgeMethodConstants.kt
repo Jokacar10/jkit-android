@@ -284,7 +284,7 @@ internal object BridgeMethodConstants {
 
     /**
      * Method name for telling JS to create a ProxyStakingProvider that forwards calls
-     * back to a Kotlin-implemented [io.ton.walletkit.ITONStakingProvider] via reverse-RPC.
+     * back to a Kotlin-implemented [io.ton.walletkit.staking.ITONStakingProvider] via reverse-RPC.
      */
     const val METHOD_REGISTER_KOTLIN_STAKING_PROVIDER = "registerKotlinStakingProvider"
 }
