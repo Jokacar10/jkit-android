@@ -68,4 +68,8 @@ dependencies {
     // Test dependencies
     testImplementation(libs.junit)
     testImplementation(libs.kotlinxCoroutinesTest)
+    // kotlin-reflect is used by GeneratedModelsTest to introspect the shape of
+    // models generated from the walletkit fixture (primary constructor params,
+    // sealed subclasses, etc.). Test-only — kept out of the published API.
+    testImplementation(libs.kotlinReflect)
 }
