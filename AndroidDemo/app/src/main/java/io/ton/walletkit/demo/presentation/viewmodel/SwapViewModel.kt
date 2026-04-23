@@ -33,8 +33,8 @@ import io.ton.walletkit.api.generated.TONSwapQuote
 import io.ton.walletkit.api.generated.TONSwapQuoteParams
 import io.ton.walletkit.api.generated.TONSwapToken
 import io.ton.walletkit.swap.ITONSwapManager
-import io.ton.walletkit.swap.TONDeDustSwapProvider
-import io.ton.walletkit.swap.TONOmnistonSwapProvider
+import io.ton.walletkit.swap.dedust.TONDeDustSwapProvider
+import io.ton.walletkit.swap.omniston.TONOmnistonSwapProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
