@@ -30,9 +30,8 @@ import io.ton.walletkit.api.generated.TONStakingQuoteParams
 import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.api.generated.TONUnstakeMode
 import io.ton.walletkit.engine.WalletKitEngine
-import io.ton.walletkit.exceptions.JSValueConversionException
+import io.ton.walletkit.engine.infrastructure.decodeTransactionRequest
 import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
 /**
@@ -87,13 +86,4 @@ internal class BuiltInStakingProvider<TQuoteOptions, TStakeOptions>(
 
     override suspend fun getSupportedUnstakeModes(): List<TONUnstakeMode> =
         engine.getSupportedUnstakeModes(identifier.name)
-
-    private fun decodeTransactionRequest(json: String): TONTransactionRequest = try {
-        Json.decodeFromString(TONTransactionRequest.serializer(), json)
-    } catch (e: SerializationException) {
-        throw JSValueConversionException.DecodingError(
-            message = "Failed to decode TONTransactionRequest: ${e.message}",
-            cause = e,
-        )
-    }
 }

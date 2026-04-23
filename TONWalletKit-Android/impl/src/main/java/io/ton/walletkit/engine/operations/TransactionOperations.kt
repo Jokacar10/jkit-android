@@ -110,9 +110,9 @@ internal class TransactionOperations(
         )
         val result = rpcClient.call(BridgeMethodConstants.METHOD_SEND_TRANSACTION, json.toJSONObject(request))
         return when {
-            result.has(ResponseConstants.KEY_SIGNED_BOC) -> result.getString(ResponseConstants.KEY_SIGNED_BOC)
             result.has(ResponseConstants.KEY_BOC) -> result.getString(ResponseConstants.KEY_BOC)
-            else -> throw org.json.JSONException("No value for signedBoc or boc")
+            result.has(ResponseConstants.KEY_SIGNED_BOC) -> result.getString(ResponseConstants.KEY_SIGNED_BOC)
+            else -> throw org.json.JSONException("No value for boc or signedBoc")
         }
     }
 

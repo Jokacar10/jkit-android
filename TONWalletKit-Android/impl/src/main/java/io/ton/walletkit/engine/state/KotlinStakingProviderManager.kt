@@ -28,50 +28,28 @@ import io.ton.walletkit.api.generated.TONStakingProviderInfo
 import io.ton.walletkit.api.generated.TONStakingQuote
 import io.ton.walletkit.api.generated.TONStakingQuoteParams
 import io.ton.walletkit.api.generated.TONTransactionRequest
-import io.ton.walletkit.internal.util.Logger
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import io.ton.walletkit.staking.ITONStakingProvider
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Manages Kotlin-implemented [ITONStakingProvider] instances.
+ * Reverse-RPC registry for Kotlin-implemented [ITONStakingProvider] instances. When a developer
+ * registers a custom Kotlin staking provider, JS creates a `ProxyStakingProvider` that routes
+ * calls here (mirroring the Kotlin swap / wallet-adapter / streaming proxy pattern).
  *
- * When a developer registers a custom Kotlin staking provider, JS creates a `ProxyStakingProvider`
- * that calls back here via the reverse-RPC mechanism (same pattern as Kotlin wallet adapters /
- * Kotlin streaming providers). Each call targets the Kotlin provider by `providerId` and returns
- * a JSON response to the JS side.
- *
- * Custom providers are expected to implement `ITONStakingProvider<JsonElement, JsonElement>` since
- * the JS side transports provider options as JSON. Users can still decode the JsonElement to their
- * own types inside their provider implementation if desired.
+ * Custom providers must implement `ITONStakingProvider<JsonElement, JsonElement>` because the
+ * JS side transports provider options as JSON. Users can decode the [JsonElement] to concrete
+ * types inside their implementation.
  *
  * @suppress Internal engine component.
  */
 internal class KotlinStakingProviderManager(
     private val json: Json,
-) {
-    private val providers = ConcurrentHashMap<String, ITONStakingProvider<JsonElement, JsonElement>>()
+) : KotlinProviderRegistry<ITONStakingProvider<JsonElement, JsonElement>>() {
 
-    fun register(providerId: String, provider: ITONStakingProvider<JsonElement, JsonElement>) {
-        providers[providerId] = provider
-    }
+    override val tag: String = "KotlinStakingProviderManager"
 
-    fun unregister(providerId: String) {
-        providers.remove(providerId)
-    }
-
-    fun getProvider(providerId: String): ITONStakingProvider<JsonElement, JsonElement>? = providers[providerId]
-
-    fun clear() {
-        providers.clear()
-    }
-
-    /**
-     * Invoked from the reverse-RPC dispatcher when JS requests a quote for a custom Kotlin provider.
-     * Returns the serialized [TONStakingQuote] as a JSON string.
-     */
     suspend fun getQuote(providerId: String, paramsJson: String): String {
         val provider = require(providerId)
         val params = json.decodeFromString(
@@ -105,15 +83,5 @@ internal class KotlinStakingProviderManager(
         val network = networkChainId?.let { TONNetwork(chainId = it) }
         val info = provider.getStakingProviderInfo(network)
         return json.encodeToString(TONStakingProviderInfo.serializer(), info)
-    }
-
-    private fun require(providerId: String): ITONStakingProvider<JsonElement, JsonElement> =
-        providers[providerId] ?: run {
-            Logger.w(TAG, "No Kotlin staking provider registered for id=$providerId")
-            throw IllegalStateException("No Kotlin staking provider registered for id=$providerId")
-        }
-
-    private companion object {
-        private const val TAG = "KotlinStakingProviderManager"
     }
 }

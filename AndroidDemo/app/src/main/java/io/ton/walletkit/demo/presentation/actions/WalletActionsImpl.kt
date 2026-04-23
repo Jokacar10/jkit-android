@@ -128,4 +128,6 @@ class WalletActionsImpl @Inject constructor(
     override fun onLoadMoreJettons() = viewModel.loadMoreJettons()
 
     override fun onRefreshJettons() = viewModel.refreshJettons()
+
+    override fun onSwapClick() = viewModel.openSwapSheet()
 }

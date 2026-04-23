@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.generated.TONConnectionApprovalResponse
 import io.ton.walletkit.api.generated.TONConnectionRequestEvent
+import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONJettonsResponse
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
 import io.ton.walletkit.api.generated.TONNFT
@@ -33,6 +34,7 @@ import io.ton.walletkit.api.generated.TONNFTRawTransferRequest
 import io.ton.walletkit.api.generated.TONNFTTransferRequest
 import io.ton.walletkit.api.generated.TONNFTsResponse
 import io.ton.walletkit.api.generated.TONNetwork
+import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
@@ -43,6 +45,9 @@ import io.ton.walletkit.api.generated.TONStakingBalance
 import io.ton.walletkit.api.generated.TONStakingProviderInfo
 import io.ton.walletkit.api.generated.TONStakingQuote
 import io.ton.walletkit.api.generated.TONStakingQuoteParams
+import io.ton.walletkit.api.generated.TONSwapParams
+import io.ton.walletkit.api.generated.TONSwapQuote
+import io.ton.walletkit.api.generated.TONSwapQuoteParams
 import io.ton.walletkit.api.generated.TONTonStakersChainConfig
 import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
 import io.ton.walletkit.api.generated.TONTransferRequest
@@ -59,6 +64,7 @@ import io.ton.walletkit.engine.model.WalletAccount
 import io.ton.walletkit.engine.operations.AssetOperations
 import io.ton.walletkit.engine.operations.CryptoOperations
 import io.ton.walletkit.engine.operations.StakingOperations
+import io.ton.walletkit.engine.operations.SwapOperations
 import io.ton.walletkit.engine.operations.TonConnectOperations
 import io.ton.walletkit.engine.operations.TransactionOperations
 import io.ton.walletkit.engine.operations.WalletOperations
@@ -85,6 +91,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -128,6 +135,8 @@ internal class WebViewWalletKitEngine private constructor(
     private val signerManager = io.ton.walletkit.engine.state.SignerManager()
     private val eventRouter = EventRouter()
     private val storageManager = StorageManager(storageAdapter) { persistentStorageEnabled }
+    override val kotlinSwapProviderManager =
+        io.ton.walletkit.engine.state.KotlinSwapProviderManager(json)
     override val kotlinStakingProviderManager =
         io.ton.walletkit.engine.state.KotlinStakingProviderManager(json)
 
@@ -141,6 +150,7 @@ internal class WebViewWalletKitEngine private constructor(
     private val transactionOperations: TransactionOperations
     private val tonConnectOperations: TonConnectOperations
     private val assetOperations: AssetOperations
+    private val swapOperations: SwapOperations
     private val stakingOperations: StakingOperations
 
     init {
@@ -168,6 +178,7 @@ internal class WebViewWalletKitEngine private constructor(
                 webViewManager = webViewManager,
                 adapterManager = adapterManager,
                 signerManager = signerManager,
+                kotlinSwapProviderManager = kotlinSwapProviderManager,
                 kotlinStakingProviderManager = kotlinStakingProviderManager,
                 json = json,
                 onInitialized = ::refreshDerivedState,
@@ -206,6 +217,12 @@ internal class WebViewWalletKitEngine private constructor(
             )
         assetOperations =
             AssetOperations(
+                ensureInitialized = ensureInitialized,
+                rpcClient = rpcClient,
+                json = json,
+            )
+        swapOperations =
+            SwapOperations(
                 ensureInitialized = ensureInitialized,
                 rpcClient = rpcClient,
                 json = json,
@@ -450,6 +467,37 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun getJettonWalletAddress(walletId: String, jettonAddress: String): String =
         assetOperations.getJettonWalletAddress(walletId, jettonAddress)
 
+    override suspend fun createOmnistonSwapProvider(config: TONOmnistonSwapProviderConfig?): String =
+        swapOperations.createOmnistonSwapProvider(config)
+
+    override suspend fun createDeDustSwapProvider(config: TONDeDustSwapProviderConfig?): String =
+        swapOperations.createDeDustSwapProvider(config)
+
+    override suspend fun registerSwapProvider(providerId: String) =
+        swapOperations.registerSwapProvider(providerId)
+
+    override suspend fun setDefaultSwapProvider(providerId: String) =
+        swapOperations.setDefaultSwapProvider(providerId)
+
+    override suspend fun getRegisteredSwapProviders(): List<String> =
+        swapOperations.getRegisteredSwapProviders()
+
+    override suspend fun hasSwapProvider(providerId: String): Boolean =
+        swapOperations.hasSwapProvider(providerId)
+
+    override suspend fun registerKotlinSwapProvider(providerId: String) {
+        callBridgeMethod(
+            io.ton.walletkit.internal.constants.BridgeMethodConstants.METHOD_REGISTER_KOTLIN_SWAP_PROVIDER,
+            JSONObject().apply { put("providerId", providerId) },
+        )
+    }
+
+    override suspend fun getSwapQuote(params: TONSwapQuoteParams<JsonElement>, providerId: String?): TONSwapQuote =
+        swapOperations.getSwapQuote(params, providerId)
+
+    override suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): String =
+        swapOperations.buildSwapTransaction(params)
+
     override suspend fun createTonStakersStakingProvider(chainConfig: Map<String, TONTonStakersChainConfig>?): String =
         stakingOperations.createTonStakersStakingProvider(chainConfig)
 
@@ -476,12 +524,12 @@ internal class WebViewWalletKitEngine private constructor(
     }
 
     override suspend fun getStakingQuote(
-        params: TONStakingQuoteParams<kotlinx.serialization.json.JsonElement>,
+        params: TONStakingQuoteParams<JsonElement>,
         providerId: String?,
     ): TONStakingQuote = stakingOperations.getStakingQuote(params, providerId)
 
     override suspend fun buildStakeTransaction(
-        params: TONStakeParams<kotlinx.serialization.json.JsonElement>,
+        params: TONStakeParams<JsonElement>,
         providerId: String?,
     ): String = stakingOperations.buildStakeTransaction(params, providerId)
 
@@ -548,6 +596,7 @@ internal class WebViewWalletKitEngine private constructor(
                 Logger.w(TAG, "Failed to remove event listeners during destroy", e)
             }
 
+            kotlinSwapProviderManager.clear()
             kotlinStakingProviderManager.clear()
             webViewManager.destroy()
         }

@@ -23,6 +23,7 @@ package io.ton.walletkit.engine
 
 import io.ton.walletkit.api.generated.TONConnectionApprovalResponse
 import io.ton.walletkit.api.generated.TONConnectionRequestEvent
+import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONJettonsResponse
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
 import io.ton.walletkit.api.generated.TONNFT
@@ -30,6 +31,7 @@ import io.ton.walletkit.api.generated.TONNFTRawTransferRequest
 import io.ton.walletkit.api.generated.TONNFTTransferRequest
 import io.ton.walletkit.api.generated.TONNFTsResponse
 import io.ton.walletkit.api.generated.TONNetwork
+import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
@@ -40,6 +42,9 @@ import io.ton.walletkit.api.generated.TONStakingBalance
 import io.ton.walletkit.api.generated.TONStakingProviderInfo
 import io.ton.walletkit.api.generated.TONStakingQuote
 import io.ton.walletkit.api.generated.TONStakingQuoteParams
+import io.ton.walletkit.api.generated.TONSwapParams
+import io.ton.walletkit.api.generated.TONSwapQuote
+import io.ton.walletkit.api.generated.TONSwapQuoteParams
 import io.ton.walletkit.api.generated.TONTonStakersChainConfig
 import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
 import io.ton.walletkit.api.generated.TONTransferRequest
@@ -53,6 +58,7 @@ import io.ton.walletkit.model.TONWalletAdapter
 import io.ton.walletkit.model.WalletSigner
 import io.ton.walletkit.model.WalletSignerInfo
 import io.ton.walletkit.request.RequestHandler
+import kotlinx.serialization.json.JsonElement
 
 /**
  * Abstraction over a runtime that can execute the WalletKit JavaScript bundle and expose
@@ -471,6 +477,37 @@ internal interface WalletKitEngine : RequestHandler {
      */
     suspend fun getJettonWalletAddress(walletId: String, jettonAddress: String): String
 
+    // ── Swap ──
+
+    suspend fun createOmnistonSwapProvider(config: TONOmnistonSwapProviderConfig?): String
+
+    suspend fun createDeDustSwapProvider(config: TONDeDustSwapProviderConfig?): String
+
+    suspend fun registerSwapProvider(providerId: String)
+
+    suspend fun setDefaultSwapProvider(providerId: String)
+
+    suspend fun getRegisteredSwapProviders(): List<String>
+
+    suspend fun hasSwapProvider(providerId: String): Boolean
+
+    /**
+     * Registry for Kotlin-implemented [io.ton.walletkit.swap.ITONSwapProvider] instances. Reverse-RPC
+     * calls from JS's `ProxySwapProvider` are routed here by [io.ton.walletkit.engine.infrastructure.MessageDispatcher].
+     */
+    val kotlinSwapProviderManager: io.ton.walletkit.engine.state.KotlinSwapProviderManager
+
+    /**
+     * Tell the JS side to create a `ProxySwapProvider` bound to [providerId] and register it
+     * with the JS swap manager. Called after [kotlinSwapProviderManager] has the Kotlin instance
+     * so reverse-RPC calls can find it.
+     */
+    suspend fun registerKotlinSwapProvider(providerId: String)
+
+    suspend fun getSwapQuote(params: TONSwapQuoteParams<JsonElement>, providerId: String?): TONSwapQuote
+
+    suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): String
+
     // ── Staking ──
 
     /**
@@ -481,33 +518,16 @@ internal interface WalletKitEngine : RequestHandler {
      */
     suspend fun createTonStakersStakingProvider(chainConfig: Map<String, TONTonStakersChainConfig>?): String
 
-    /**
-     * Register a previously created staking provider with the staking manager.
-     *
-     * @param providerId JS registry reference ID from [createTonStakersStakingProvider]
-     */
+    /** Register a previously created staking provider with the staking manager. */
     suspend fun registerStakingProvider(providerId: String)
 
-    /**
-     * Set the default staking provider used when no providerId is specified.
-     *
-     * @param providerId JS registry reference ID of the provider to set as default
-     */
+    /** Set the default staking provider used when no providerId is specified. */
     suspend fun setDefaultStakingProvider(providerId: String)
 
-    /**
-     * Get the IDs of all registered staking providers.
-     *
-     * @return List of provider ID strings
-     */
+    /** Get the IDs of all registered staking providers. */
     suspend fun getRegisteredStakingProviders(): List<String>
 
-    /**
-     * Check if a staking provider with the given ID is registered.
-     *
-     * @param providerId JS registry reference ID to check
-     * @return true if the provider is registered
-     */
+    /** Check if a staking provider with the given ID is registered. */
     suspend fun hasStakingProvider(providerId: String): Boolean
 
     /**
@@ -526,62 +546,27 @@ internal interface WalletKitEngine : RequestHandler {
      */
     suspend fun registerKotlinStakingProvider(providerId: String, supportedUnstakeModesJson: String)
 
-    /**
-     * Get a stake or unstake quote from the staking manager.
-     *
-     * @param params Quote parameters (direction, amount, optional user address / network / mode)
-     * @param providerId Optional provider ID; uses the default provider when null
-     * @return Staking quote with amounts and metadata
-     */
     suspend fun getStakingQuote(
-        params: TONStakingQuoteParams<kotlinx.serialization.json.JsonElement>,
+        params: TONStakingQuoteParams<JsonElement>,
         providerId: String?,
     ): TONStakingQuote
 
-    /**
-     * Build a stake or unstake transaction from a previously obtained quote.
-     *
-     * @param params Stake parameters (quote, user address, optional provider options)
-     * @param providerId Optional provider ID; uses the default provider when null
-     * @return Transaction content as JSON string (pass to sendTransaction)
-     */
     suspend fun buildStakeTransaction(
-        params: TONStakeParams<kotlinx.serialization.json.JsonElement>,
+        params: TONStakeParams<JsonElement>,
         providerId: String?,
     ): String
 
-    /**
-     * Get the user's staked balance for a provider.
-     *
-     * @param userAddress User's wallet address (user-friendly format)
-     * @param network TON network; uses the current network when null
-     * @param providerId Optional provider ID; uses the default provider when null
-     * @return Staking balance with staked amount and instant-unstake liquidity
-     */
     suspend fun getStakedBalance(
         userAddress: String,
         network: TONNetwork?,
         providerId: String?,
     ): TONStakingBalance
 
-    /**
-     * Get general information about a staking provider (APY, liquidity).
-     *
-     * @param network TON network; uses the current network when null
-     * @param providerId Optional provider ID; uses the default provider when null
-     * @return Provider info including APY and available instant-unstake liquidity
-     */
     suspend fun getStakingProviderInfo(
         network: TONNetwork?,
         providerId: String?,
     ): TONStakingProviderInfo
 
-    /**
-     * Get the unstake modes supported by a staking provider.
-     *
-     * @param providerId Optional provider ID; uses the default provider when null
-     * @return List of supported unstake modes
-     */
     suspend fun getSupportedUnstakeModes(providerId: String?): List<TONUnstakeMode>
 
     /**
