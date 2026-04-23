@@ -19,13 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit
+package io.ton.walletkit.staking
+
+import io.ton.walletkit.TONProviderIdentifier
 
 /**
- * Discriminator for the domain a provider belongs to. Mirrors iOS's `TONProviderType` enum.
- * Used to tell swap and staking providers apart at runtime.
+ * Identifies a staking provider and carries its option types as generic parameters.
+ * Analogous to iOS's `TONStakingProviderIdentifier` protocol.
+ *
+ * [TQuoteOptions] is the provider-specific type for quote params.
+ * [TStakeOptions] is the provider-specific type for stake transaction params.
  */
-enum class TONProviderType {
-    Swap,
-    Staking,
-}
+interface TONStakingProviderIdentifier<TQuoteOptions, TStakeOptions> : TONProviderIdentifier

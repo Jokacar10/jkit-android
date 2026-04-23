@@ -37,11 +37,18 @@ import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
 import io.ton.walletkit.api.generated.TONSignDataRequestEvent
 import io.ton.walletkit.api.generated.TONSignatureDomain
+import io.ton.walletkit.api.generated.TONStakeParams
+import io.ton.walletkit.api.generated.TONStakingBalance
+import io.ton.walletkit.api.generated.TONStakingProviderInfo
+import io.ton.walletkit.api.generated.TONStakingQuote
+import io.ton.walletkit.api.generated.TONStakingQuoteParams
 import io.ton.walletkit.api.generated.TONSwapParams
 import io.ton.walletkit.api.generated.TONSwapQuote
 import io.ton.walletkit.api.generated.TONSwapQuoteParams
+import io.ton.walletkit.api.generated.TONTonStakersChainConfig
 import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
 import io.ton.walletkit.api.generated.TONTransferRequest
+import io.ton.walletkit.api.generated.TONUnstakeMode
 import io.ton.walletkit.config.TONWalletKitConfiguration
 import io.ton.walletkit.core.WalletKitEngineKind
 import io.ton.walletkit.engine.model.WalletAccount
@@ -500,6 +507,67 @@ internal interface WalletKitEngine : RequestHandler {
     suspend fun getSwapQuote(params: TONSwapQuoteParams<JsonElement>, providerId: String?): TONSwapQuote
 
     suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): String
+
+    // ── Staking ──
+
+    /**
+     * Create a TonStakers staking provider in the JS bridge.
+     *
+     * @param chainConfig Chain-ID keyed config, e.g. { "-239" to TONTonStakersChainConfig(...) }
+     * @return JS registry reference ID for the created provider
+     */
+    suspend fun createTonStakersStakingProvider(chainConfig: Map<String, TONTonStakersChainConfig>?): String
+
+    /** Register a previously created staking provider with the staking manager. */
+    suspend fun registerStakingProvider(providerId: String)
+
+    /** Set the default staking provider used when no providerId is specified. */
+    suspend fun setDefaultStakingProvider(providerId: String)
+
+    /** Get the IDs of all registered staking providers. */
+    suspend fun getRegisteredStakingProviders(): List<String>
+
+    /** Check if a staking provider with the given ID is registered. */
+    suspend fun hasStakingProvider(providerId: String): Boolean
+
+    /**
+     * Registry for Kotlin-implemented [io.ton.walletkit.staking.ITONStakingProvider] instances. Reverse-RPC
+     * calls from JS's `ProxyStakingProvider` are routed here by [io.ton.walletkit.engine.infrastructure.MessageDispatcher].
+     */
+    val kotlinStakingProviderManager: io.ton.walletkit.engine.state.KotlinStakingProviderManager
+
+    /**
+     * Tell the JS side to create a `ProxyStakingProvider` bound to [providerId] and register it
+     * with the JS staking manager. Called after [kotlinStakingProviderManager] has the Kotlin
+     * instance so reverse-RPC calls can find it.
+     *
+     * @param supportedUnstakeModesJson JSON array of supported unstake modes, fetched eagerly so the
+     *   JS proxy can satisfy the synchronous `getSupportedUnstakeModes()` contract without a round-trip.
+     */
+    suspend fun registerKotlinStakingProvider(providerId: String, supportedUnstakeModesJson: String)
+
+    suspend fun getStakingQuote(
+        params: TONStakingQuoteParams<JsonElement>,
+        providerId: String?,
+    ): TONStakingQuote
+
+    suspend fun buildStakeTransaction(
+        params: TONStakeParams<JsonElement>,
+        providerId: String?,
+    ): String
+
+    suspend fun getStakedBalance(
+        userAddress: String,
+        network: TONNetwork?,
+        providerId: String?,
+    ): TONStakingBalance
+
+    suspend fun getStakingProviderInfo(
+        network: TONNetwork?,
+        providerId: String?,
+    ): TONStakingProviderInfo
+
+    suspend fun getSupportedUnstakeModes(providerId: String?): List<TONUnstakeMode>
 
     /**
      * Call a bridge method directly.

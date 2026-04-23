@@ -19,13 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit
+package io.ton.walletkit.staking.tonstakers
 
-/**
- * Discriminator for the domain a provider belongs to. Mirrors iOS's `TONProviderType` enum.
- * Used to tell swap and staking providers apart at runtime.
- */
-enum class TONProviderType {
-    Swap,
-    Staking,
-}
+import io.ton.walletkit.staking.ITONStakingProvider
+import kotlinx.serialization.json.JsonElement
+
+/** Typed handle for the TonStakers staking provider. Both option types are [JsonElement] (untyped), matching iOS `AnyCodable`. */
+typealias TONTonStakersStakingProvider = ITONStakingProvider<JsonElement, JsonElement>

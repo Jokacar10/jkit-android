@@ -263,4 +263,42 @@ internal object BridgeMethodConstants {
      * Kotlin-implemented [io.ton.walletkit.swap.ITONSwapProvider] via reverse-RPC.
      */
     const val METHOD_REGISTER_KOTLIN_SWAP_PROVIDER = "registerKotlinSwapProvider"
+
+    // Staking methods
+
+    /** Create a TonStakers staking provider instance. */
+    const val METHOD_CREATE_TON_STAKERS_STAKING_PROVIDER = "createTonStakersStakingProvider"
+
+    /** Register a previously created staking provider with the staking manager. */
+    const val METHOD_REGISTER_STAKING_PROVIDER = "registerStakingProvider"
+
+    /** Set the default staking provider. */
+    const val METHOD_SET_DEFAULT_STAKING_PROVIDER = "setDefaultStakingProvider"
+
+    /** Get a staking quote (stake or unstake) from a registered provider. */
+    const val METHOD_GET_STAKING_QUOTE = "getStakingQuote"
+
+    /** Build a stake or unstake transaction. */
+    const val METHOD_BUILD_STAKE_TRANSACTION = "buildStakeTransaction"
+
+    /** Get the user's staked balance. */
+    const val METHOD_GET_STAKED_BALANCE = "getStakedBalance"
+
+    /** Get staking provider information (APY, liquidity). */
+    const val METHOD_GET_STAKING_PROVIDER_INFO = "getStakingProviderInfo"
+
+    /** Get supported unstake modes for a staking provider. */
+    const val METHOD_GET_SUPPORTED_UNSTAKE_MODES = "getSupportedUnstakeModes"
+
+    /** Get all registered staking provider IDs. */
+    const val METHOD_GET_REGISTERED_STAKING_PROVIDERS = "getRegisteredStakingProviders"
+
+    /** Check if a staking provider is registered. */
+    const val METHOD_HAS_STAKING_PROVIDER = "hasStakingProvider"
+
+    /**
+     * Method name for telling JS to create a ProxyStakingProvider that forwards calls back
+     * to a Kotlin-implemented [io.ton.walletkit.staking.ITONStakingProvider] via reverse-RPC.
+     */
+    const val METHOD_REGISTER_KOTLIN_STAKING_PROVIDER = "registerKotlinStakingProvider"
 }

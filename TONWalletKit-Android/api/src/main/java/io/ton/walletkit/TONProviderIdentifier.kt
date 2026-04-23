@@ -22,10 +22,15 @@
 package io.ton.walletkit
 
 /**
- * Discriminator for the domain a provider belongs to. Mirrors iOS's `TONProviderType` enum.
- * Used to tell swap and staking providers apart at runtime.
+ * Typed provider identifier used by public SDK APIs instead of raw strings.
  */
-enum class TONProviderType {
-    Swap,
-    Staking,
+interface TONProviderIdentifier {
+    val name: String
 }
+
+/**
+ * Type-erased provider identifier.
+ */
+data class AnyTONProviderIdentifier(
+    override val name: String,
+) : TONProviderIdentifier

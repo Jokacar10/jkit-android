@@ -26,6 +26,7 @@ import android.webkit.WebView
 import io.ton.walletkit.ITONWallet
 import io.ton.walletkit.ITONWalletKit
 import io.ton.walletkit.WebViewTonConnectInjector
+import io.ton.walletkit.api.TONTonStakersProviderConfig
 import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSignatureDomain
@@ -35,6 +36,11 @@ import io.ton.walletkit.engine.WalletKitEngine
 import io.ton.walletkit.listener.TONBridgeEventsHandler
 import io.ton.walletkit.model.KeyPair
 import io.ton.walletkit.model.TONWalletAdapter
+import io.ton.walletkit.staking.BuiltInStakingProvider
+import io.ton.walletkit.staking.ITONStakingManager
+import io.ton.walletkit.staking.TONStakingManager
+import io.ton.walletkit.staking.tonstakers.TONTonStakersStakingProvider
+import io.ton.walletkit.staking.tonstakers.TONTonStakersStakingProviderIdentifier
 import io.ton.walletkit.swap.BuiltInSwapProvider
 import io.ton.walletkit.swap.ITONSwapManager
 import io.ton.walletkit.swap.TONSwapManager
@@ -126,6 +132,9 @@ internal class TONWalletKit private constructor(
 
     @Volatile
     private var isDestroyed = false
+
+    @Suppress("PropertyName")
+    private val _stakingManager: ITONStakingManager by lazy { TONStakingManager(engine) }
 
     /**
      * Add an event handler to receive SDK events.
@@ -432,4 +441,18 @@ internal class TONWalletKit private constructor(
     }
 
     override suspend fun swap(): ITONSwapManager = swapManager
+
+    override fun staking(): ITONStakingManager {
+        checkNotDestroyed()
+        return _stakingManager
+    }
+
+    override suspend fun tonStakersStakingProvider(
+        config: TONTonStakersProviderConfig?,
+    ): TONTonStakersStakingProvider {
+        checkNotDestroyed()
+        val chainConfig = config?.toChainConfigMap()
+        val providerId = engine.createTonStakersStakingProvider(chainConfig?.takeIf { it.isNotEmpty() })
+        return BuiltInStakingProvider(TONTonStakersStakingProviderIdentifier(providerId), engine)
+    }
 }

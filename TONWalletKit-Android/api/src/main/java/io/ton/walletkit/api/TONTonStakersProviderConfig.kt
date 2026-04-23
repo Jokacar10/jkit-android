@@ -19,13 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit
+package io.ton.walletkit.api
+
+import io.ton.walletkit.api.generated.TONTonStakersChainConfig
 
 /**
- * Discriminator for the domain a provider belongs to. Mirrors iOS's `TONProviderType` enum.
- * Used to tell swap and staking providers apart at runtime.
+ * Per-chain configuration for the TonStakers staking provider.
+ *
+ * The underlying JS API uses an index-signature type `{ [chainId: string]: TonStakersChainConfig }`
+ * where chainIds are "-239" (mainnet) and "-3" (testnet). This class provides a named-field
+ * alternative that converts to the required map via [toChainConfigMap].
  */
-enum class TONProviderType {
-    Swap,
-    Staking,
+data class TONTonStakersProviderConfig(
+    val mainnet: TONTonStakersChainConfig? = null,
+    val testnet: TONTonStakersChainConfig? = null,
+) {
+    fun toChainConfigMap(): Map<String, TONTonStakersChainConfig> = buildMap {
+        mainnet?.let { put("-239", it) }
+        testnet?.let { put("-3", it) }
+    }
 }

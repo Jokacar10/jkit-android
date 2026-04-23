@@ -19,13 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit
+package io.ton.walletkit.demo.core
 
-/**
- * Discriminator for the domain a provider belongs to. Mirrors iOS's `TONProviderType` enum.
- * Used to tell swap and staking providers apart at runtime.
- */
-enum class TONProviderType {
-    Swap,
-    Staking,
+import io.ton.walletkit.api.TONTonStakersProviderConfig
+import io.ton.walletkit.api.generated.TONTonStakersChainConfig
+import io.ton.walletkit.demo.BuildConfig
+
+object DemoApiConfig {
+    private fun normalizeApiKey(value: String): String {
+        val normalized = value.trim()
+        if (normalized.isEmpty()) {
+            return ""
+        }
+        if (normalized.startsWith("YOUR_") && normalized.endsWith("_KEY")) {
+            return ""
+        }
+        return normalized
+    }
+
+    val toncenterApiKey: String
+        get() = normalizeApiKey(BuildConfig.TONCENTER_API_KEY)
+
+    val tonApiKey: String
+        get() = normalizeApiKey(BuildConfig.TONAPI_API_KEY)
+
+    fun tonStakersProviderConfig(): TONTonStakersProviderConfig? {
+        val token = tonApiKey.takeIf { it.isNotEmpty() } ?: return null
+        val chainConfig = TONTonStakersChainConfig(tonApiToken = token)
+        return TONTonStakersProviderConfig(
+            mainnet = chainConfig,
+            testnet = chainConfig,
+        )
+    }
 }

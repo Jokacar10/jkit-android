@@ -26,8 +26,7 @@ import io.ton.walletkit.api.generated.TONSwapQuote
 import io.ton.walletkit.api.generated.TONSwapQuoteParams
 import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.engine.WalletKitEngine
-import io.ton.walletkit.exceptions.JSValueConversionException
-import kotlinx.serialization.SerializationException
+import io.ton.walletkit.engine.infrastructure.decodeTransactionRequest
 import kotlinx.serialization.json.Json
 
 /**
@@ -75,14 +74,5 @@ internal class BuiltInSwapProvider<TQuoteOptions, TSwapOptions>(
             providerOptions = jsonOptions,
         )
         return decodeTransactionRequest(engine.buildSwapTransaction(jsonParams))
-    }
-
-    private fun decodeTransactionRequest(json: String): TONTransactionRequest = try {
-        Json.decodeFromString(TONTransactionRequest.serializer(), json)
-    } catch (e: SerializationException) {
-        throw JSValueConversionException.DecodingError(
-            message = "Failed to decode TONTransactionRequest: ${e.message}",
-            cause = e,
-        )
     }
 }

@@ -23,6 +23,7 @@ package io.ton.walletkit
 
 import android.content.Context
 import io.ton.walletkit.api.MAINNET
+import io.ton.walletkit.api.TONTonStakersProviderConfig
 import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
@@ -35,6 +36,8 @@ import io.ton.walletkit.model.TONWalletAdapter
 import io.ton.walletkit.model.WalletSigner
 import io.ton.walletkit.model.WalletSignerInfo
 import io.ton.walletkit.request.TONWalletConnectionRequest
+import io.ton.walletkit.staking.ITONStakingManager
+import io.ton.walletkit.staking.tonstakers.TONTonStakersStakingProvider
 import io.ton.walletkit.swap.ITONSwapManager
 import io.ton.walletkit.swap.dedust.TONDeDustSwapProvider
 import io.ton.walletkit.swap.omniston.TONOmnistonSwapProvider
@@ -190,6 +193,25 @@ interface ITONWalletKit {
      * Get the swap manager for registering providers and executing swaps.
      */
     suspend fun swap(): ITONSwapManager
+
+    // ── Staking ──
+
+    /**
+     * Access the staking manager for registering providers and performing staking operations.
+     */
+    fun staking(): ITONStakingManager
+
+    /**
+     * Create a TonStakers staking provider.
+     *
+     * Call [ITONStakingManager.register] with the returned provider to make it available for quotes.
+     *
+     * @param config Optional per-chain configuration (contract address, TonAPI key)
+     * @return A provider that can be registered with [staking]
+     */
+    suspend fun tonStakersStakingProvider(
+        config: TONTonStakersProviderConfig? = null,
+    ): TONTonStakersStakingProvider
 }
 
 interface WebViewTonConnectInjector {
