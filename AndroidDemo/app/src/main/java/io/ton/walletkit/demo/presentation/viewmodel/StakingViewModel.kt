@@ -27,7 +27,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.ton.walletkit.ITONWallet
 import io.ton.walletkit.ITONWalletKit
-import io.ton.walletkit.staking.ITONStakingManager
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONStakeParams
 import io.ton.walletkit.api.generated.TONStakingBalance
@@ -37,6 +36,7 @@ import io.ton.walletkit.api.generated.TONStakingQuoteDirection
 import io.ton.walletkit.api.generated.TONStakingQuoteParams
 import io.ton.walletkit.api.generated.TONUnstakeMode
 import io.ton.walletkit.demo.core.DemoApiConfig
+import io.ton.walletkit.staking.ITONStakingManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
