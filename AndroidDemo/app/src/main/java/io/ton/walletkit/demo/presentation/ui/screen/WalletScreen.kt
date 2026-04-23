@@ -344,6 +344,7 @@ fun WalletScreen(
                 onWalletSelected = actions::onWalletDetails,
                 onSendFromWallet = actions::onSendFromWallet,
                 onStakeFromWallet = actions::onStakeFromWallet,
+                isStreamingConnected = state.isStreamingConnected,
                 onRefresh = actions::onRefresh,
             )
 

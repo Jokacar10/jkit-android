@@ -43,6 +43,7 @@ import io.ton.walletkit.api.generated.TONSignatureDomain
 import io.ton.walletkit.api.isTetra
 import io.ton.walletkit.config.SignDataType
 import io.ton.walletkit.config.TONWalletKitConfiguration
+import io.ton.walletkit.demo.BuildConfig
 import io.ton.walletkit.demo.data.storage.DemoAppStorage
 import io.ton.walletkit.demo.data.storage.SecureDemoAppStorage
 import io.ton.walletkit.demo.domain.model.WalletInterfaceType
@@ -63,30 +64,25 @@ class WalletKitDemoApp :
     Application(),
     SingletonImageLoader.Factory {
 
-    // Application-level coroutine scope
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    /**
-     * Create Coil ImageLoader with optimized settings for LazyGrid
-     */
     override fun newImageLoader(context: PlatformContext): ImageLoader = ImageLoader.Builder(context)
         .crossfade(true)
         .memoryCache {
             MemoryCache.Builder()
-                .maxSizePercent(context, 0.25) // Use 25% of app memory for image cache
+                .maxSizePercent(context, 0.25)
                 .build()
         }
         .diskCache {
             DiskCache.Builder()
                 .directory(context.cacheDir.resolve("image_cache").toOkioPath())
-                .maxSizeBytes(512L * 1024 * 1024) // 512 MB
+                .maxSizeBytes(512L * 1024 * 1024)
                 .build()
         }
-        // Add components with retry capability
         .components {
             add(OkHttpNetworkFetcherFactory())
         }
-        .logger(DebugLogger()) // Enable logging for debugging
+        .logger(DebugLogger())
         .build()
 
     /**
@@ -96,15 +92,9 @@ class WalletKitDemoApp :
         SecureDemoAppStorage(this)
     }
 
-    /**
-     * Shared flow for SDK events to be consumed by ViewModel.
-     */
     private val _sdkEvents = MutableSharedFlow<TONWalletKitEvent>(extraBufferCapacity = 10)
     val sdkEvents = _sdkEvents.asSharedFlow()
 
-    /**
-     * State flow for SDK initialization status.
-     */
     private val _sdkInitialized = MutableSharedFlow<Boolean>(replay = 1)
     val sdkInitialized = _sdkInitialized.asSharedFlow()
 
@@ -117,7 +107,6 @@ class WalletKitDemoApp :
                 val kit = TONWalletKitHelper.mainnet(this@WalletKitDemoApp)
                 loadAndAddStoredWallets(kit)
 
-                // Add event handler (this triggers setEventsListeners() and event replay)
                 kit.addEventsHandler(object : TONBridgeEventsHandler {
                     override fun handle(event: TONWalletKitEvent) {
                         _sdkEvents.tryEmit(event)
@@ -191,50 +180,23 @@ class WalletKitDemoApp :
     }
 }
 
-/**
- * Helper to get cached ITONWalletKit instance.
- */
 object TONWalletKitHelper {
     private var mainnetInstance: ITONWalletKit? = null
     private val mutex = kotlinx.coroutines.sync.Mutex()
 
-    /**
-     * Flag to disable network send for testing.
-     * When true, transactions will be simulated but not actually sent to the network.
-     * Set this BEFORE initializing the SDK.
-     */
     @Volatile
     var disableNetworkSend: Boolean = false
 
-    /**
-     * Flag to use custom session manager for testing.
-     * When true, uses TestSessionManager instead of SDK's built-in session storage.
-     * Set this BEFORE initializing the SDK.
-     */
     @Volatile
-    var useCustomSessionManager: Boolean = true // Enable by default for testing
+    var useCustomSessionManager: Boolean = true
 
-    /**
-     * Flag to use custom API client for testing.
-     * When true, uses TestAPIClient instead of SDK's built-in API client.
-     * Set this BEFORE initializing the SDK.
-     */
     @Volatile
     var useCustomApiClient: Boolean = false
 
-    /**
-     * The custom session manager instance (if enabled).
-     * Exposed so tests can inspect session state.
-     */
     var sessionManager: TestSessionManager? = null
         private set
 
-    /**
-     * Check if we're running under instrumentation tests and if disableNetworkSend is requested.
-     * Uses reflection to avoid compile-time dependency on test libraries.
-     */
     private fun checkInstrumentationDisableNetworkSend(): Boolean = try {
-        // Use reflection to access InstrumentationRegistry without compile-time dependency
         val registryClass = Class.forName("androidx.test.platform.app.InstrumentationRegistry")
         val getArgumentsMethod = registryClass.getMethod("getArguments")
         val arguments = getArgumentsMethod.invoke(null) as? android.os.Bundle
@@ -245,22 +207,17 @@ object TONWalletKitHelper {
         }
         result
     } catch (e: Exception) {
-        // Not running under instrumentation or class not found, ignore
         false
     }
 
     suspend fun mainnet(application: Application): ITONWalletKit {
-        // Fast path: already initialized
         mainnetInstance?.let { return it }
 
-        // Slow path: need to initialize (with mutex to prevent double-init)
         return mutex.withLock {
-            // Double-check after acquiring lock
             mainnetInstance?.let {
                 return@withLock it
             }
 
-            // Check both the flag and instrumentation arguments
             val shouldDisableNetwork = disableNetworkSend || checkInstrumentationDisableNetworkSend()
 
             val devOptions = if (shouldDisableNetwork) {
@@ -269,7 +226,6 @@ object TONWalletKitHelper {
                 null
             }
 
-            // Create custom session manager if enabled
             val customSessionManager = if (useCustomSessionManager) {
                 TestSessionManager(application).also { sessionManager = it }
             } else {
@@ -283,7 +239,6 @@ object TONWalletKitHelper {
             val toncenterApiKey = DemoApiConfig.toncenterApiKey
             val tonApiKey = DemoApiConfig.tonApiKey
             val networkConfigurations = if (useCustomApiClient) {
-                // Demonstrate using different API providers per network
                 setOf(
                     TONWalletKitConfiguration.NetworkConfiguration(
                         network = TONNetwork.MAINNET,
@@ -350,14 +305,30 @@ object TONWalletKitHelper {
             )
 
             val kit = ITONWalletKit.initialize(application, config)
+            val tonCenterApiKey = BuildConfig.TONCENTER_API_KEY.takeIf { it.isNotBlank() }
+            if (tonCenterApiKey != null) {
+                listOf(TONNetwork.MAINNET, TONNetwork.TESTNET, TONNetwork.TETRA).forEach { network ->
+                    try {
+                        val streamingProvider = kit.createStreamingProvider(
+                            io.ton.walletkit.api.generated.TONTonCenterStreamingProviderConfig(
+                                network = network,
+                                apiKey = tonCenterApiKey,
+                            ),
+                        )
+                        kit.streaming().register(streamingProvider)
+                    } catch (e: Exception) {
+                        Log.e("WalletKitDemoApp", "Streaming init ERROR network=${network.chainId} - ${e.message}", e)
+                    }
+                }
+            } else {
+                Log.w("WalletKitDemoApp", "TONCENTER_API_KEY is not set; TonCenter streaming provider disabled")
+            }
+
             mainnetInstance = kit
             kit
         }
     }
 
-    /**
-     * Clear the cached instance (for testing or logout scenarios).
-     */
     suspend fun clearMainnet() {
         mutex.withLock {
             mainnetInstance?.destroy()
@@ -375,4 +346,5 @@ object TONWalletKitHelper {
     private const val DEFAULT_MANIFEST_ABOUT_URL = "https://wallet.ton.org"
     private const val DEFAULT_MANIFEST_UNIVERSAL_LINK = "https://wallet.ton.org/tc"
     private const val DEFAULT_BRIDGE_URL = "https://bridge.tonapi.io/bridge"
+    private const val TAG = "TONWalletKitHelper"
 }

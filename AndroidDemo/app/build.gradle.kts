@@ -67,12 +67,26 @@ android {
         val toncenterApiKey =
             findProperty("walletkitToncenterApiKey") as String?
                 ?: readLocalProperty(rootDir, "walletkitToncenterApiKey")
+                ?: readLocalProperty(rootDir, "tonCenterApiKey")
                 ?: System.getenv("WALLETKIT_TONCENTER_API_KEY")
+                ?: System.getenv("TONCENTER_API_KEY")
                 ?: ""
         val tonApiKey =
             findProperty("walletkitTonApiKey") as String?
                 ?: readLocalProperty(rootDir, "walletkitTonApiKey")
                 ?: System.getenv("WALLETKIT_TONAPI_API_KEY")
+                ?: ""
+        val tonApiMainnetKey =
+            readLocalProperty(rootDir, "tonApiMainnetKey")
+                ?: System.getenv("MAINNET_API_KEY")
+                ?: ""
+        val tonApiTestnetKey =
+            readLocalProperty(rootDir, "tonApiTestnetKey")
+                ?: System.getenv("TESTNET_API_KEY")
+                ?: ""
+        val tetraApiKey =
+            readLocalProperty(rootDir, "tetraApiKey")
+                ?: System.getenv("TETRA_API_KEY")
                 ?: ""
 
         testMnemonic?.let {
@@ -85,6 +99,9 @@ android {
 
         buildConfigField("String", "TONCENTER_API_KEY", escapedBuildConfigString(toncenterApiKey))
         buildConfigField("String", "TONAPI_API_KEY", escapedBuildConfigString(tonApiKey))
+        buildConfigField("String", "MAINNET_API_KEY", escapedBuildConfigString(tonApiMainnetKey))
+        buildConfigField("String", "TESTNET_API_KEY", escapedBuildConfigString(tonApiTestnetKey))
+        buildConfigField("String", "TETRA_API_KEY", escapedBuildConfigString(tetraApiKey))
     }
 
     buildTypes {
@@ -99,6 +116,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
+        buildConfig = true
         compose = true
         buildConfig = true
     }

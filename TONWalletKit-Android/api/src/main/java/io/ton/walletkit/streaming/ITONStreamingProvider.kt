@@ -19,14 +19,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit
+package io.ton.walletkit.streaming
 
-/**
- * Discriminator for the domain a provider belongs to. Mirrors iOS's `TONProviderType` enum.
- * Used to tell swap, staking, and streaming providers apart at runtime.
- */
-enum class TONProviderType {
-    Swap,
-    Staking,
-    Streaming,
+import io.ton.walletkit.TONProviderType
+import io.ton.walletkit.api.generated.TONBalanceUpdate
+import io.ton.walletkit.api.generated.TONJettonUpdate
+import io.ton.walletkit.api.generated.TONNetwork
+import io.ton.walletkit.api.generated.TONTransactionsUpdate
+import kotlinx.coroutines.flow.Flow
+
+interface ITONStreamingProvider {
+    val id: String
+    val type: TONProviderType get() = TONProviderType.Streaming
+    val network: TONNetwork
+
+    suspend fun connect()
+
+    suspend fun disconnect()
+
+    fun connectionChange(): Flow<Boolean>
+
+    fun balance(address: String): Flow<TONBalanceUpdate>
+
+    fun transactions(address: String): Flow<TONTransactionsUpdate>
+
+    fun jettons(address: String): Flow<TONJettonUpdate>
 }

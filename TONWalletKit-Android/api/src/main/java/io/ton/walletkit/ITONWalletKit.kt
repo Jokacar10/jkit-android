@@ -212,6 +212,21 @@ interface ITONWalletKit {
     suspend fun tonStakersStakingProvider(
         config: TONTonStakersProviderConfig? = null,
     ): TONTonStakersStakingProvider
+
+    // ── Streaming ──
+
+    /**
+     * Get the streaming manager.
+     */
+    fun streaming(): io.ton.walletkit.streaming.ITONStreamingManager
+
+    suspend fun createStreamingProvider(
+        config: io.ton.walletkit.api.generated.TONTonCenterStreamingProviderConfig,
+    ): io.ton.walletkit.streaming.ITONStreamingProvider
+
+    suspend fun createStreamingProvider(
+        config: io.ton.walletkit.api.generated.TONTonApiStreamingProviderConfig,
+    ): io.ton.walletkit.streaming.ITONStreamingProvider
 }
 
 interface WebViewTonConnectInjector {

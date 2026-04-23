@@ -71,6 +71,7 @@ import io.ton.walletkit.engine.operations.WalletOperations
 import io.ton.walletkit.engine.parsing.EventParser
 import io.ton.walletkit.engine.state.AdapterManager
 import io.ton.walletkit.engine.state.EventRouter
+import io.ton.walletkit.engine.state.KotlinStreamingProviderManager
 import io.ton.walletkit.internal.constants.LogConstants
 import io.ton.walletkit.internal.constants.NetworkConstants
 import io.ton.walletkit.internal.constants.WebViewConstants
@@ -113,6 +114,7 @@ internal class WebViewWalletKitEngine private constructor(
     private val assetPath: String = WebViewConstants.DEFAULT_ASSET_PATH,
 ) : WalletKitEngine {
     override val kind: WalletKitEngineKind = WalletKitEngineKind.WEBVIEW
+    override val streamingEvents get() = messageDispatcher.streamingEvents
 
     private val appContext = context.applicationContext
 
@@ -133,6 +135,7 @@ internal class WebViewWalletKitEngine private constructor(
 
     private val adapterManager = AdapterManager()
     private val signerManager = io.ton.walletkit.engine.state.SignerManager()
+    override val kotlinStreamingProviderManager: KotlinStreamingProviderManager
     private val eventRouter = EventRouter()
     private val storageManager = StorageManager(storageAdapter) { persistentStorageEnabled }
     override val kotlinSwapProviderManager =
@@ -167,6 +170,7 @@ internal class WebViewWalletKitEngine private constructor(
                 onBridgeError = ::handleBridgeError,
             )
         rpcClient = BridgeRpcClient(webViewManager)
+        kotlinStreamingProviderManager = KotlinStreamingProviderManager(rpcClient, json)
         initManager = InitializationManager(appContext, rpcClient)
         eventParser = EventParser(json, this)
         messageDispatcher =
@@ -180,6 +184,7 @@ internal class WebViewWalletKitEngine private constructor(
                 signerManager = signerManager,
                 kotlinSwapProviderManager = kotlinSwapProviderManager,
                 kotlinStakingProviderManager = kotlinStakingProviderManager,
+                kotlinStreamingProviderManager = kotlinStreamingProviderManager,
                 json = json,
                 onInitialized = ::refreshDerivedState,
                 onNetworkChanged = ::handleNetworkChanged,
@@ -598,6 +603,7 @@ internal class WebViewWalletKitEngine private constructor(
 
             kotlinSwapProviderManager.clear()
             kotlinStakingProviderManager.clear()
+            kotlinStreamingProviderManager.clear()
             webViewManager.destroy()
         }
     }
