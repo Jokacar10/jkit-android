@@ -21,7 +21,6 @@
  */
 package io.ton.walletkit.engine.state
 
-import io.ton.walletkit.ITONStakingProvider
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONStakeParams
 import io.ton.walletkit.api.generated.TONStakingBalance
@@ -31,6 +30,7 @@ import io.ton.walletkit.api.generated.TONStakingQuoteParams
 import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.internal.util.Logger
 import io.ton.walletkit.model.TONUserFriendlyAddress
+import io.ton.walletkit.staking.ITONStakingProvider
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import java.util.concurrent.ConcurrentHashMap

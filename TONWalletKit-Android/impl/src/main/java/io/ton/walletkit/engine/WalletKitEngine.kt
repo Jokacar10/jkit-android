@@ -511,7 +511,7 @@ internal interface WalletKitEngine : RequestHandler {
     suspend fun hasStakingProvider(providerId: String): Boolean
 
     /**
-     * Registry for Kotlin-implemented [io.ton.walletkit.ITONStakingProvider] instances. Reverse-RPC
+     * Registry for Kotlin-implemented [io.ton.walletkit.staking.ITONStakingProvider] instances. Reverse-RPC
      * calls from JS's `ProxyStakingProvider` are routed here by [io.ton.walletkit.engine.infrastructure.MessageDispatcher].
      */
     val kotlinStakingProviderManager: io.ton.walletkit.engine.state.KotlinStakingProviderManager

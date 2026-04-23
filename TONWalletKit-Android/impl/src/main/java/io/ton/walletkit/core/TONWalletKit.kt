@@ -23,12 +23,8 @@ package io.ton.walletkit.core
 
 import android.content.Context
 import android.webkit.WebView
-import io.ton.walletkit.ITONStakingManager
 import io.ton.walletkit.ITONWallet
 import io.ton.walletkit.ITONWalletKit
-import io.ton.walletkit.TONStakingProvider
-import io.ton.walletkit.TONTonStakersStakingProvider
-import io.ton.walletkit.TONTonStakersStakingProviderIdentifier
 import io.ton.walletkit.WebViewTonConnectInjector
 import io.ton.walletkit.api.TONTonStakersProviderConfig
 import io.ton.walletkit.api.generated.TONSignatureDomain
@@ -38,6 +34,11 @@ import io.ton.walletkit.engine.WalletKitEngine
 import io.ton.walletkit.listener.TONBridgeEventsHandler
 import io.ton.walletkit.model.KeyPair
 import io.ton.walletkit.model.TONWalletAdapter
+import io.ton.walletkit.staking.BuiltInStakingProvider
+import io.ton.walletkit.staking.ITONStakingManager
+import io.ton.walletkit.staking.TONStakingManager
+import io.ton.walletkit.staking.tonstakers.TONTonStakersStakingProvider
+import io.ton.walletkit.staking.tonstakers.TONTonStakersStakingProviderIdentifier
 
 /**
  * Main entry point for TON Wallet Kit SDK.
@@ -427,6 +428,6 @@ internal class TONWalletKit private constructor(
         checkNotDestroyed()
         val chainConfig = config?.toChainConfigMap()
         val providerId = engine.createTonStakersStakingProvider(chainConfig?.takeIf { it.isNotEmpty() })
-        return TONStakingProvider(TONTonStakersStakingProviderIdentifier(providerId), _stakingManager)
+        return BuiltInStakingProvider(TONTonStakersStakingProviderIdentifier(providerId), engine)
     }
 }

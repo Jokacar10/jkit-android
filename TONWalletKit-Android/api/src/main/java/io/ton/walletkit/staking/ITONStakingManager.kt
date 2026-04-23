@@ -19,8 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit
+package io.ton.walletkit.staking
 
+import io.ton.walletkit.AnyTONProviderIdentifier
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONStakeParams
 import io.ton.walletkit.api.generated.TONStakingBalance
@@ -38,7 +39,11 @@ import kotlinx.serialization.json.JsonElement
  */
 interface ITONStakingManager {
 
-    /** Register a staking provider. Accepts any [ITONStakingProvider] implementation — the built-in [TONStakingProvider] and any user-defined conformers. Mirrors iOS `register<Provider: TONStakingProviderProtocol>(provider:)`. */
+    /**
+     * Register a staking provider. Accepts any [ITONStakingProvider] implementation — the SDK's
+     * built-in TonStakers provider returned from `ITONWalletKit.tonStakersStakingProvider`, and
+     * any user-defined conformer. Mirrors iOS `register<Provider: TONStakingProviderProtocol>(provider:)`.
+     */
     suspend fun register(provider: ITONStakingProvider<*, *>)
 
     /** Set the default provider used when no identifier is passed to query methods. */
@@ -51,19 +56,18 @@ interface ITONStakingManager {
     suspend fun hasProvider(identifier: TONStakingProviderIdentifier<*, *>): Boolean
 
     /**
-     * Returns a typed [TONStakingProvider] for [identifier] if it is currently registered, null otherwise.
+     * Returns a typed [ITONStakingProvider] for [identifier] if it is currently registered, null otherwise.
      * Mirrors iOS `provider<Identifier: TONStakingProviderIdentifier>(with: Identifier) -> TONStakingProvider<Identifier>?`.
      */
     suspend fun <TQuoteOptions, TStakeOptions> provider(
         identifier: TONStakingProviderIdentifier<TQuoteOptions, TStakeOptions>,
-    ): TONStakingProvider<TQuoteOptions, TStakeOptions>? =
-        if (hasProvider(identifier)) TONStakingProvider(identifier, this) else null
+    ): ITONStakingProvider<TQuoteOptions, TStakeOptions>?
 
     /**
      * Get a stake or unstake quote from the provider with [identifier]. Mirrors iOS
      * `quote<Identifier: TONStakingProviderIdentifier>(params:, identifier:)`.
      *
-     * Typed `providerOptions` are serialized via [TONStakingProviderIdentifier.quoteOptionsSerializer].
+     * Typed `providerOptions` are serialized internally by the SDK before reaching the JS bridge.
      */
     suspend fun <TQuoteOptions, TStakeOptions> getQuote(
         params: TONStakingQuoteParams<TQuoteOptions>,
@@ -77,7 +81,7 @@ interface ITONStakingManager {
      * Build a stake or unstake transaction with the provider [identifier]. Mirrors iOS
      * `stakeTransaction<Identifier>(params:, identifier:)`.
      *
-     * Typed `providerOptions` are serialized via [TONStakingProviderIdentifier.stakeOptionsSerializer].
+     * Typed `providerOptions` are serialized internally by the SDK before reaching the JS bridge.
      */
     suspend fun <TQuoteOptions, TStakeOptions> buildStakeTransaction(
         params: TONStakeParams<TStakeOptions>,
