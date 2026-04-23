@@ -81,7 +81,6 @@ internal class TONStakingManager(
     override suspend fun <TQuoteOptions, TStakeOptions> provider(
         identifier: TONStakingProviderIdentifier<TQuoteOptions, TStakeOptions>,
     ): ITONStakingProvider<TQuoteOptions, TStakeOptions>? {
-        if (!hasProvider(identifier)) return null
         // Custom Kotlin provider: return the user's actual registered instance.
         engine.kotlinStakingProviderManager.getProvider(identifier.name)?.let { custom ->
             @Suppress("UNCHECKED_CAST")
