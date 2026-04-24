@@ -228,7 +228,7 @@ internal class TONWalletKit private constructor(
         secretKey: ByteArray,
     ): io.ton.walletkit.model.WalletSignerInfo {
         checkNotDestroyed()
-        val hex = io.ton.walletkit.WalletKitUtils.byteArrayToHexNoPrefix(secretKey)
+        val hex = io.ton.walletkit.internal.util.WalletKitUtils.byteArrayToHexNoPrefix(secretKey)
         return engine.createSignerFromSecretKey(hex)
     }
 
