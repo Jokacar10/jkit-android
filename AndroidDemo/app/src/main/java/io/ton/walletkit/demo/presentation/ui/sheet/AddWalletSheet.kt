@@ -37,7 +37,6 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -73,6 +72,7 @@ import io.ton.walletkit.api.WalletVersions
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.demo.R
 import io.ton.walletkit.demo.domain.model.WalletInterfaceType
+import io.ton.walletkit.demo.presentation.ui.icons.ContentPaste
 import io.ton.walletkit.demo.presentation.util.TestTags
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
