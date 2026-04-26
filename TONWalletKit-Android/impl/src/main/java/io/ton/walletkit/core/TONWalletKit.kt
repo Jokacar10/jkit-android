@@ -25,11 +25,16 @@ import android.content.Context
 import android.webkit.WebView
 import io.ton.walletkit.ITONWallet
 import io.ton.walletkit.ITONWalletKit
+import io.ton.walletkit.WalletKitUtils
 import io.ton.walletkit.WebViewTonConnectInjector
 import io.ton.walletkit.api.TONTonStakersProviderConfig
+import io.ton.walletkit.api.WalletVersions
 import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
+import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSignatureDomain
+import io.ton.walletkit.api.generated.TONTonApiStreamingProviderConfig
+import io.ton.walletkit.api.generated.TONTonCenterStreamingProviderConfig
 import io.ton.walletkit.browser.TonConnectInjector
 import io.ton.walletkit.config.TONWalletKitConfiguration
 import io.ton.walletkit.core.streaming.TONStreamingManager
@@ -40,11 +45,16 @@ import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.listener.TONBridgeEventsHandler
 import io.ton.walletkit.model.KeyPair
 import io.ton.walletkit.model.TONWalletAdapter
+import io.ton.walletkit.model.WalletSigner
+import io.ton.walletkit.model.WalletSignerInfo
+import io.ton.walletkit.request.TONWalletConnectionRequest
 import io.ton.walletkit.staking.BuiltInStakingProvider
 import io.ton.walletkit.staking.ITONStakingManager
 import io.ton.walletkit.staking.TONStakingManager
 import io.ton.walletkit.staking.tonstakers.TONTonStakersStakingProvider
 import io.ton.walletkit.staking.tonstakers.TONTonStakersStakingProviderIdentifier
+import io.ton.walletkit.streaming.ITONStreamingManager
+import io.ton.walletkit.streaming.ITONStreamingProvider
 import io.ton.walletkit.swap.BuiltInSwapProvider
 import io.ton.walletkit.swap.ITONSwapManager
 import io.ton.walletkit.swap.TONSwapManager
@@ -172,8 +182,8 @@ internal class TONWalletKit private constructor(
     }
 
     override suspend fun createStreamingProvider(
-        config: io.ton.walletkit.api.generated.TONTonCenterStreamingProviderConfig,
-    ): io.ton.walletkit.streaming.ITONStreamingProvider {
+        config: TONTonCenterStreamingProviderConfig,
+    ): ITONStreamingProvider {
         checkNotDestroyed()
         val args = JSONObject().apply { put("config", json.toJSONObject(config)) }
         val result = engine.callBridgeMethod(BridgeMethodConstants.METHOD_CREATE_TON_CENTER_STREAMING_PROVIDER, args)
@@ -181,15 +191,15 @@ internal class TONWalletKit private constructor(
     }
 
     override suspend fun createStreamingProvider(
-        config: io.ton.walletkit.api.generated.TONTonApiStreamingProviderConfig,
-    ): io.ton.walletkit.streaming.ITONStreamingProvider {
+        config: TONTonApiStreamingProviderConfig,
+    ): ITONStreamingProvider {
         checkNotDestroyed()
         val args = JSONObject().apply { put("config", json.toJSONObject(config)) }
         val result = engine.callBridgeMethod(BridgeMethodConstants.METHOD_CREATE_TON_API_STREAMING_PROVIDER, args)
         return TONStreamingProviderImpl(engine = engine, network = config.network, id = result.getString("providerId"))
     }
 
-    override fun streaming(): io.ton.walletkit.streaming.ITONStreamingManager {
+    override fun streaming(): ITONStreamingManager {
         checkNotDestroyed()
         return streamingManager
     }
@@ -219,20 +229,20 @@ internal class TONWalletKit private constructor(
     override suspend fun createSignerFromMnemonic(
         mnemonic: List<String>,
         mnemonicType: String,
-    ): io.ton.walletkit.model.WalletSignerInfo {
+    ): WalletSignerInfo {
         checkNotDestroyed()
         return engine.createSignerFromMnemonic(mnemonic, mnemonicType)
     }
 
     override suspend fun createSignerFromSecretKey(
         secretKey: ByteArray,
-    ): io.ton.walletkit.model.WalletSignerInfo {
+    ): WalletSignerInfo {
         checkNotDestroyed()
-        val hex = io.ton.walletkit.WalletKitUtils.byteArrayToHexNoPrefix(secretKey)
+        val hex = WalletKitUtils.byteArrayToHexNoPrefix(secretKey)
         return engine.createSignerFromSecretKey(hex)
     }
 
-    override suspend fun createSignerFromCustom(signer: io.ton.walletkit.model.WalletSigner): io.ton.walletkit.model.WalletSignerInfo {
+    override suspend fun createSignerFromCustom(signer: WalletSigner): WalletSignerInfo {
         checkNotDestroyed()
         return engine.createSignerFromCustom(signer)
     }
@@ -240,17 +250,17 @@ internal class TONWalletKit private constructor(
     // ── Adapter factory ──
 
     override suspend fun createV5R1Adapter(
-        signer: io.ton.walletkit.model.WalletSignerInfo,
-        network: io.ton.walletkit.api.generated.TONNetwork,
+        signer: WalletSignerInfo,
+        network: TONNetwork,
         workchain: Int,
         walletId: Long,
         domain: TONSignatureDomain?,
-    ): io.ton.walletkit.model.TONWalletAdapter {
+    ): TONWalletAdapter {
         checkNotDestroyed()
         return engine.createAdapter(
             signerId = signer.signerId,
             publicKey = signer.publicKey,
-            version = io.ton.walletkit.api.WalletVersions.V5R1,
+            version = WalletVersions.V5R1,
             network = network,
             workchain = workchain,
             walletId = walletId,
@@ -259,17 +269,17 @@ internal class TONWalletKit private constructor(
     }
 
     override suspend fun createV4R2Adapter(
-        signer: io.ton.walletkit.model.WalletSignerInfo,
-        network: io.ton.walletkit.api.generated.TONNetwork,
+        signer: WalletSignerInfo,
+        network: TONNetwork,
         workchain: Int,
         walletId: Long,
         domain: TONSignatureDomain?,
-    ): io.ton.walletkit.model.TONWalletAdapter {
+    ): TONWalletAdapter {
         checkNotDestroyed()
         return engine.createAdapter(
             signerId = signer.signerId,
             publicKey = signer.publicKey,
-            version = io.ton.walletkit.api.WalletVersions.V4R2,
+            version = WalletVersions.V4R2,
             network = network,
             workchain = workchain,
             walletId = walletId,
@@ -436,7 +446,7 @@ internal class TONWalletKit private constructor(
         engine.handleTonConnectUrl(url)
     }
 
-    override suspend fun connectionEventFromUrl(url: String): io.ton.walletkit.request.TONWalletConnectionRequest {
+    override suspend fun connectionEventFromUrl(url: String): TONWalletConnectionRequest {
         checkNotDestroyed()
         return engine.connectionEventFromUrl(url)
     }

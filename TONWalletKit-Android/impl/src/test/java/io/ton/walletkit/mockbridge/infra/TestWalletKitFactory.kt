@@ -35,6 +35,7 @@ import io.ton.walletkit.engine.WalletKitEngine
 import io.ton.walletkit.event.TONWalletKitEvent
 import io.ton.walletkit.listener.TONBridgeEventsHandler
 import org.json.JSONObject
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * Test-specific factory for creating TONWalletKit instances with mocked engine.
@@ -107,7 +108,7 @@ internal object TestWalletKitFactory {
         every { mockEngine.getConfiguration() } returns null
 
         // Track handlers for event dispatch (thread-safe for concurrent registration)
-        val handlers = java.util.concurrent.CopyOnWriteArrayList<TONBridgeEventsHandler>()
+        val handlers = CopyOnWriteArrayList<TONBridgeEventsHandler>()
         coEvery { mockEngine.addEventsHandler(any()) } answers {
             handlers.add(firstArg())
         }

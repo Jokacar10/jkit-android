@@ -33,15 +33,19 @@ import io.ton.walletkit.api.generated.TONConnectionRequestEvent
 import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONDisconnectionEvent
 import io.ton.walletkit.api.generated.TONDisconnectionEventPreview
+import io.ton.walletkit.api.generated.TONJettonsResponse
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
+import io.ton.walletkit.api.generated.TONNFT
 import io.ton.walletkit.api.generated.TONNFTRawTransferRequest
 import io.ton.walletkit.api.generated.TONNFTTransferRequest
+import io.ton.walletkit.api.generated.TONNFTsResponse
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
 import io.ton.walletkit.api.generated.TONSignDataRequestEvent
+import io.ton.walletkit.api.generated.TONSignatureDomain
 import io.ton.walletkit.api.generated.TONStakeParams
 import io.ton.walletkit.api.generated.TONStakingBalance
 import io.ton.walletkit.api.generated.TONStakingProviderInfo
@@ -51,6 +55,7 @@ import io.ton.walletkit.api.generated.TONSwapParams
 import io.ton.walletkit.api.generated.TONSwapQuote
 import io.ton.walletkit.api.generated.TONSwapQuoteParams
 import io.ton.walletkit.api.generated.TONTonStakersChainConfig
+import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
 import io.ton.walletkit.api.generated.TONTransferRequest
 import io.ton.walletkit.api.generated.TONUnstakeMode
 import io.ton.walletkit.config.TONWalletKitConfiguration
@@ -62,7 +67,11 @@ import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.NetworkConstants
 import io.ton.walletkit.listener.TONBridgeEventsHandler
 import io.ton.walletkit.model.KeyPair
+import io.ton.walletkit.model.TONHex
 import io.ton.walletkit.model.TONUserFriendlyAddress
+import io.ton.walletkit.model.TONWalletAdapter
+import io.ton.walletkit.model.WalletSigner
+import io.ton.walletkit.model.WalletSignerInfo
 import io.ton.walletkit.presentation.impl.quickjs.QuickJs
 import io.ton.walletkit.request.TONWalletConnectionRequest
 import io.ton.walletkit.request.TONWalletSignDataRequest
@@ -337,31 +346,31 @@ internal class QuickJsWalletKitEngine(
         TODO("Not yet implemented")
     }
 
-    override suspend fun addWallet(adapter: io.ton.walletkit.model.TONWalletAdapter): WalletAccount {
+    override suspend fun addWallet(adapter: TONWalletAdapter): WalletAccount {
         throw UnsupportedOperationException("QuickJS engine does not support addWallet. Use WebView engine.")
     }
 
-    override suspend fun createSignerFromMnemonic(mnemonic: List<String>, mnemonicType: String): io.ton.walletkit.model.WalletSignerInfo {
+    override suspend fun createSignerFromMnemonic(mnemonic: List<String>, mnemonicType: String): WalletSignerInfo {
         throw UnsupportedOperationException("QuickJS engine does not support createSignerFromMnemonic. Use WebView engine.")
     }
 
-    override suspend fun createSignerFromSecretKey(secretKeyHex: String): io.ton.walletkit.model.WalletSignerInfo {
+    override suspend fun createSignerFromSecretKey(secretKeyHex: String): WalletSignerInfo {
         throw UnsupportedOperationException("QuickJS engine does not support createSignerFromSecretKey. Use WebView engine.")
     }
 
-    override suspend fun createSignerFromCustom(signer: io.ton.walletkit.model.WalletSigner): io.ton.walletkit.model.WalletSignerInfo {
+    override suspend fun createSignerFromCustom(signer: WalletSigner): WalletSignerInfo {
         throw UnsupportedOperationException("QuickJS engine does not support createSignerFromCustom. Use WebView engine.")
     }
 
     override suspend fun createAdapter(
         signerId: String,
-        publicKey: io.ton.walletkit.model.TONHex,
+        publicKey: TONHex,
         version: String,
-        network: io.ton.walletkit.api.generated.TONNetwork?,
+        network: TONNetwork?,
         workchain: Int,
         walletId: Long,
-        domain: io.ton.walletkit.api.generated.TONSignatureDomain?,
-    ): io.ton.walletkit.model.TONWalletAdapter {
+        domain: TONSignatureDomain?,
+    ): TONWalletAdapter {
         throw UnsupportedOperationException("QuickJS engine does not support createAdapter. Use WebView engine.")
     }
 
@@ -723,7 +732,7 @@ internal class QuickJsWalletKitEngine(
         throw UnsupportedOperationException("QuickJS engine does not support staking. Use WebView engine.")
     }
 
-    override suspend fun getNfts(walletAddress: String, limit: Int, offset: Int): io.ton.walletkit.api.generated.TONNFTsResponse {
+    override suspend fun getNfts(walletAddress: String, limit: Int, offset: Int): TONNFTsResponse {
         ensureWalletKitInitialized()
         val params = JSONObject().apply {
             put("address", walletAddress)
@@ -734,7 +743,7 @@ internal class QuickJsWalletKitEngine(
         return json.decodeFromString(result.toString())
     }
 
-    override suspend fun getNft(nftAddress: String): io.ton.walletkit.api.generated.TONNFT? {
+    override suspend fun getNft(nftAddress: String): TONNFT? {
         ensureWalletKitInitialized()
         val params = JSONObject().apply {
             put("address", nftAddress)
@@ -762,7 +771,7 @@ internal class QuickJsWalletKitEngine(
     }
 
     // Jetton methods
-    override suspend fun getJettons(walletAddress: String, limit: Int, offset: Int): io.ton.walletkit.api.generated.TONJettonsResponse {
+    override suspend fun getJettons(walletAddress: String, limit: Int, offset: Int): TONJettonsResponse {
         ensureWalletKitInitialized()
         val params = JSONObject().apply {
             put("address", walletAddress)
@@ -790,7 +799,7 @@ internal class QuickJsWalletKitEngine(
     override suspend fun getTransactionPreview(
         walletAddress: String,
         transactionContent: String,
-    ): io.ton.walletkit.api.generated.TONTransactionEmulatedPreview {
+    ): TONTransactionEmulatedPreview {
         ensureWalletKitInitialized()
         val paramsJson = JSONObject().apply {
             put("walletId", walletAddress)

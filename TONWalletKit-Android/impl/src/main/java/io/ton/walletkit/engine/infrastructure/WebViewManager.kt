@@ -575,7 +575,7 @@ internal class WebViewManager(
 
         private fun parseSessionFilter(filterJson: String): SessionFilter? {
             return try {
-                val jsonObj = org.json.JSONObject(filterJson)
+                val jsonObj = JSONObject(filterJson)
                 if (jsonObj.length() == 0) {
                     null
                 } else {

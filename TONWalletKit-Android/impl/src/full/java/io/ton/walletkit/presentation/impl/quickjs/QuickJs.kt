@@ -107,7 +107,7 @@ internal class QuickJs private constructor(private var nativePointer: Long) : Cl
         else -> false
     }
 
-    private fun isSupportedReturnType(type: Class<*>): Boolean = type == java.lang.Void.TYPE || type == java.lang.Void::class.java || isSupportedType(type)
+    private fun isSupportedReturnType(type: Class<*>): Boolean = type == Void.TYPE || type == Void::class.java || isSupportedType(type)
 
     private external fun nativeEvaluate(pointer: Long, script: String, filename: String): Any?
 
