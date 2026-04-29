@@ -19,6 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+@file:Suppress("ktlint:standard:backing-property-naming")
+
 package io.ton.walletkit.demo.presentation.ui.icons
 
 import androidx.compose.material.icons.Icons
