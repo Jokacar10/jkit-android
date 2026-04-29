@@ -112,7 +112,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -144,7 +145,10 @@ dependencies {
     implementation(platform(libs.androidxComposeBom))
     implementation(libs.androidxComposeUi)
     implementation(libs.androidxComposeMaterial3)
-    implementation(libs.androidxComposeMaterialIconsExtended)
+    // material-icons-core (~50 icons) replaces material-icons-extended (~11,000 icons,
+    // ~40 MB of DEX). The 15 icons the demo uses that aren't in `core` are defined locally
+    // in io.ton.walletkit.demo.presentation.ui.icons.DemoIcons.
+    implementation(libs.androidxComposeMaterialIconsCore)
     implementation(libs.androidxComposeUiToolingPreview)
     debugImplementation(libs.androidxComposeUiTooling)
     implementation(libs.androidxLifecycleRuntimeKtx)
@@ -166,7 +170,7 @@ dependencies {
     //     `org.ton:walletkit` coord with the live `:impl` project, so SDK edits flow into
     //     the demo on rebuild. No AAR copy needed.
     //   • Standalone — open AndroidDemo/ alone. The flag is absent, so we fall back to the
-    //     pre-built AAR produced by `./gradlew buildAndCopyWebviewToDemo` in
+    //     pre-built AAR produced by `./gradlew buildAndCopyToDemo` in
     //     TONWalletKit-Android/. Force this path even in composite mode with
     //     `-Pwalletkit.useAarFile=true`.
     val forceAar = findProperty("walletkit.useAarFile") == "true"
