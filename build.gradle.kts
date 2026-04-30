@@ -5,14 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-// Aggregate tasks across the two included builds so you can drive everything from the root
-// (e.g. from Android Studio's "root" project context).
-
 tasks.register("assembleAll") {
     group = "build"
-    description = "Assemble the SDK (webview debug AAR) and the demo app debug APK."
+    description = "Build+copy the SDK AAR and assemble the demo APK."
     dependsOn(
-        gradle.includedBuild("TONWalletKit-Android").task(":impl:bundleWebviewDebugAar"),
+        gradle.includedBuild("TONWalletKit-Android").task(":buildAndCopyToDemo"),
         gradle.includedBuild("AndroidDemo").task(":app:assembleDebug"),
     )
 }
@@ -28,10 +25,10 @@ tasks.register("cleanAll") {
 
 tasks.register("testAll") {
     group = "verification"
-    description = "Run SDK webview-variant unit tests + demo unit tests."
+    description = "Run SDK unit tests + demo unit tests."
     dependsOn(
         gradle.includedBuild("TONWalletKit-Android").task(":api:testDebugUnitTest"),
-        gradle.includedBuild("TONWalletKit-Android").task(":impl:testWebviewDebugUnitTest"),
+        gradle.includedBuild("TONWalletKit-Android").task(":impl:testDebugUnitTest"),
         gradle.includedBuild("AndroidDemo").task(":app:testDebugUnitTest"),
     )
 }
