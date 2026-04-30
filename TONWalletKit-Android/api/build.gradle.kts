@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
@@ -37,6 +39,21 @@ kotlin {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
     }
+}
+
+// Forward `walletkit.path` from local.properties (or the WALLETKIT_PATH env var) to the test
+// JVM so GeneratedModelsSnapshotTest can find the kit monorepo. Unset → the test self-skips.
+tasks.withType<Test>().configureEach {
+    val localPropsFile = rootProject.file("local.properties")
+    val fromLocal: String? = if (localPropsFile.exists()) {
+        val props = Properties()
+        localPropsFile.inputStream().use { props.load(it) }
+        props.getProperty("walletkit.path")
+    } else {
+        null
+    }
+    val resolved: String? = fromLocal?.takeIf { it.isNotBlank() } ?: System.getenv("WALLETKIT_PATH")
+    if (!resolved.isNullOrBlank()) environment("WALLETKIT_PATH", resolved)
 }
 
 // Generate sources JAR with KDocs for better IDE experience
