@@ -58,7 +58,6 @@ import io.ton.walletkit.demo.presentation.state.WalletUiState
 import io.ton.walletkit.demo.presentation.util.TonFormatter
 import io.ton.walletkit.demo.presentation.util.TransactionDetailMapper
 import io.ton.walletkit.demo.presentation.util.hexToByteArray
-import io.ton.walletkit.demo.presentation.util.stripHexPrefix
 import io.ton.walletkit.demo.presentation.util.toHex
 import io.ton.walletkit.event.TONWalletKitEvent
 import io.ton.walletkit.model.TONHex
@@ -610,8 +609,8 @@ class WalletKitViewModel @Inject constructor(
                 // Accept 32-byte seed (64 hex chars) or tweetnacl's 64-byte extended key
                 // (128 hex chars = seed || pubkey). mnemonicToKeyPair returns the latter;
                 // the JS bridge needs only the seed, so we slice to the first 32 bytes below.
-                val trimmed = secretKeyHex.trim().stripHexPrefix()
-                if (!trimmed.matches(Regex("^[0-9a-fA-F]{64}([0-9a-fA-F]{64})?$"))) {
+                val trimmed = secretKeyHex.trim()
+                if (!trimmed.matches(Regex("^(?:0x|0X)?[0-9a-fA-F]{64}([0-9a-fA-F]{64})?$"))) {
                     _state.update { it.copy(error = uiString(R.string.wallet_error_invalid_secret_key)) }
                     return
                 }

@@ -24,19 +24,6 @@ package io.ton.walletkit.model
 import kotlinx.serialization.Serializable
 import org.ton.block.AddrStd
 
-private val HEX_CHARS = "0123456789abcdef".toCharArray()
-
-private fun ByteArray.toHexNoPrefix(): String {
-    if (isEmpty()) return ""
-    val out = CharArray(size * 2)
-    for (i in indices) {
-        val v = this[i].toInt() and 0xFF
-        out[i * 2] = HEX_CHARS[v ushr 4]
-        out[i * 2 + 1] = HEX_CHARS[v and 0x0F]
-    }
-    return String(out)
-}
-
 /**
  * Represents a TON blockchain address in raw format.
  *
@@ -60,7 +47,7 @@ data class TONRawAddress(
      * Raw address string representation: "workchain:hash"
      */
     val string: String
-        get() = "${workchain.toInt()}:${hash.toHexNoPrefix()}"
+        get() = "${workchain.toInt()}:${TONHex.fromData(hash, withPrefix = false).value}"
 
     /**
      * Creates a TONRawAddress from a string representation.
