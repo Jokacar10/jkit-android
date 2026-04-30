@@ -38,6 +38,10 @@ if ! command -v openapi-generator &> /dev/null; then
     echo "Error: openapi-generator is not installed. Install via Homebrew or npm."
     exit 1
 fi
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is not installed. Install via Homebrew (\`brew install jq\`) or apt (\`apt-get install jq\`)."
+    exit 1
+fi
 
 FIXTURE_PATH="$WALLETKIT_PATH/src/api/scripts/__fixtures__/model-patterns.fixture.ts"
 JSON_SCHEMA_SCRIPT="$WALLETKIT_PATH/src/api/scripts/generate-json-schema.js"
@@ -63,6 +67,15 @@ mkdir -p "$OUTPUT_DIR"
 TEMP_SCHEMA="$OUTPUT_DIR/fixture-schema.json"
 OPENAPI_SPEC="$OUTPUT_DIR/fixture-openapi.json"
 
+# Derive a config without `modelNamePrefix` / `modelNameMappings` for the fixture run.
+# The real api config sets `"modelNamePrefix": "TON"` (correct for the published SDK), and
+# the test fixture runs in a non-prefixed test package — relying on
+# `--additional-properties=modelNamePrefix=` to override the config has proved version-
+# fragile (some openapi-generator builds ignore an empty additional-property override).
+# Removing the keys at the source eliminates the precedence question entirely.
+TEST_CONFIG_FILE="$OUTPUT_DIR/generate-test-models-config.json"
+jq 'del(.modelNamePrefix) | del(.modelNameMappings)' "$CONFIG_FILE" > "$TEST_CONFIG_FILE"
+
 echo "📝 Step 1: JSON Schema from fixture..."
 node "$JSON_SCHEMA_SCRIPT" "$FIXTURE_PATH" "$TEMP_SCHEMA"
 
@@ -74,11 +87,10 @@ openapi-generator generate \
     -i "$OPENAPI_SPEC" \
     -g kotlin \
     -o "$OUTPUT_DIR" \
-    -c "$CONFIG_FILE" \
+    -c "$TEST_CONFIG_FILE" \
     -t "$TEMPLATES_DIR" \
     --package-name "io.ton.walletkit.api.generatedtest" \
     --model-package "io.ton.walletkit.api.generatedtest" \
-    --additional-properties=modelNamePrefix= \
     --type-mappings number=kotlin.Int \
     --skip-validate-spec \
     --global-property models,modelDocs=false,modelTests=false,apis=false,apiDocs=false,apiTests=false,supportingFiles=false
