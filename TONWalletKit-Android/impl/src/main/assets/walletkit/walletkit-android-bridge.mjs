@@ -37907,12 +37907,92 @@ function bigIntReplacer(_key, value) {
 	return value;
 }
 //#endregion
+//#region src/transport/port.ts
+/**
+* Copyright (c) TonTech.
+*
+* This source code is licensed under the MIT license found in the
+* LICENSE file in the root directory of this source tree.
+*
+*/
+/**
+* WebMessagePort transport between Kotlin (Android WebViewCompat) and the JS bundle.
+*
+* Replaces the previous combination of `window.WalletKitNative.postMessage(json)` (JS→Kotlin)
+* and `window.__walletkitCall / __walletkitResponse` script-injection (Kotlin→JS) with a
+* single symmetrical port. The port is handed off by Kotlin via
+* `WebViewCompat.postWebMessage(view, WebMessageCompat("__walletkit_bridge_init", [jsPort]))`
+* once `WebViewClient.onPageFinished` fires; we capture it from `window.onmessage`.
+*/
+var HANDSHAKE_TAG = "__walletkit_bridge_init";
+var port = null;
+var inboundCallback = null;
+var pendingOutbound = [];
+function flushPending(p) {
+	while (pendingOutbound.length > 0) {
+		const next = pendingOutbound.shift();
+		p.postMessage(next);
+	}
+}
+/**
+* Send a JSON envelope to Kotlin. Buffers if the port hasn't been handed off yet.
+*/
+function sendToNative(json) {
+	if (port) {
+		port.postMessage(json);
+		return;
+	}
+	pendingOutbound.push(json);
+}
+/**
+* Register the inbound callback. Invoked with the raw JSON string from each
+* `port.onmessage` event so the caller can dispatch to existing JSON-shape handlers.
+*/
+function setInboundCallback(callback) {
+	inboundCallback = callback;
+}
+/**
+* Install the `window.message` listener that picks up the port handoff from Kotlin.
+* Must be called before `WebViewClient.onPageFinished` fires on the native side —
+* imported from `bridge.ts` at top-level so it runs synchronously during bundle parse.
+*/
+function installPortHandshake() {
+	window.addEventListener("message", (event) => {
+		if (event.data !== HANDSHAKE_TAG) {
+			warn("[walletkitBridge] Ignoring window message — not the handshake tag", event.data);
+			return;
+		}
+		const incoming = event.ports?.[0];
+		if (!incoming) {
+			error("[walletkitBridge] Handshake message had no port");
+			return;
+		}
+		if (port) {
+			warn("[walletkitBridge] Bridge port already initialised — ignoring duplicate handshake");
+			return;
+		}
+		incoming.onmessage = (e) => {
+			const data = typeof e.data === "string" ? e.data : JSON.stringify(e.data);
+			const cb = inboundCallback;
+			if (!cb) {
+				warn("[walletkitBridge] Inbound port message arrived before callback was installed");
+				return;
+			}
+			cb(data);
+		};
+		incoming.start();
+		port = incoming;
+		flushPending(port);
+	});
+}
+//#endregion
 //#region src/transport/nativeBridge.ts
 init_dist();
 var pendingRequests = /* @__PURE__ */ new Map();
 /**
 * Synchronous bridge call via @JavascriptInterface (WalletKitNative.adapterCallSync).
-* Used for sync WalletAdapter getters that cannot be async.
+* Used for sync WalletAdapter getters that cannot be async. Stays on the legacy
+* channel — sync WebView calls cannot use the async WebMessagePort.
 */
 function bridgeRequestSync(method, params) {
 	const native = window.WalletKitNative;
@@ -37920,7 +38000,7 @@ function bridgeRequestSync(method, params) {
 	return native.adapterCallSync(method, JSON.stringify(params));
 }
 /**
-* Send a request to Kotlin via postMessage and wait for a response.
+* Send a request to Kotlin via the WebMessagePort and wait for a response.
 */
 function bridgeRequest(method, params) {
 	const id = v7();
@@ -37937,54 +38017,37 @@ function bridgeRequest(method, params) {
 		});
 	});
 }
-function registerNativeResponseHandler() {
-	window.__walletkitResponse = (id, resultJson, errorJson) => {
-		const entry = pendingRequests.get(id);
-		if (!entry) {
-			warn("[walletkitBridge] __walletkitResponse: no pending request for id", id);
-			return;
-		}
-		pendingRequests.delete(id);
-		if (errorJson) {
-			try {
-				const err = JSON.parse(errorJson);
-				entry.reject(new Error(err.message ?? "Native request failed"));
-			} catch {
-				entry.reject(new Error(errorJson));
-			}
-			return;
-		}
-		if (resultJson) try {
+/**
+* Resolve a pending JS-side request with a result coming back from Kotlin.
+*/
+function handleNativeResponse(id, resultJson, errorJson) {
+	const entry = pendingRequests.get(id);
+	if (!entry) {
+		warn("[walletkitBridge] handleNativeResponse: no pending request for id", id);
+		return;
+	}
+	pendingRequests.delete(id);
+	if (errorJson) {
+		const err = errorJson;
+		entry.reject(new Error(err.message ?? "Native request failed"));
+		return;
+	}
+	if (resultJson === null || resultJson === void 0) {
+		entry.resolve(void 0);
+		return;
+	}
+	if (typeof resultJson === "string") {
+		try {
 			entry.resolve(JSON.parse(resultJson));
 		} catch {
 			entry.resolve(resultJson);
 		}
-		else entry.resolve(void 0);
-	};
-	info("[walletkitBridge] __walletkitResponse handler registered");
+		return;
+	}
+	entry.resolve(resultJson);
 }
 /**
-* Resolves WalletKit's native bridge implementation exposed on the global scope.
-*/
-function resolveNativeBridge(scope) {
-	const candidate = scope.WalletKitNative;
-	if (candidate && typeof candidate.postMessage === "function") return candidate.postMessage.bind(candidate);
-	const windowCandidate = (typeof scope.window === "object" && scope.window ? scope.window : void 0)?.WalletKitNative;
-	if (windowCandidate && typeof windowCandidate.postMessage === "function") return windowCandidate.postMessage.bind(windowCandidate);
-	return null;
-}
-/**
-* Resolves the Android bridge exposed by the host WebView.
-*/
-function resolveAndroidBridge(scope) {
-	const candidate = scope.AndroidBridge;
-	if (candidate && typeof candidate.postMessage === "function") return candidate.postMessage.bind(candidate);
-	const windowCandidate = (typeof scope.window === "object" && scope.window ? scope.window : void 0)?.AndroidBridge;
-	if (windowCandidate && typeof windowCandidate.postMessage === "function") return windowCandidate.postMessage.bind(windowCandidate);
-	return null;
-}
-/**
-* Sends a payload to the native bridge, falling back to debug logging when unavailable.
+* Sends a payload to the native bridge via the WebMessagePort transport.
 */
 function postToNative(payload) {
 	if (payload === null || typeof payload !== "object" && typeof payload !== "function") {
@@ -37995,19 +38058,7 @@ function postToNative(payload) {
 		});
 		throw new Error("Invalid payload - must be an object");
 	}
-	const json = JSON.stringify(payload, bigIntReplacer);
-	const nativePostMessage = resolveNativeBridge(window);
-	if (nativePostMessage) {
-		nativePostMessage(json);
-		return;
-	}
-	const androidPostMessage = resolveAndroidBridge(window);
-	if (androidPostMessage) {
-		androidPostMessage(json);
-		return;
-	}
-	if (payload.kind === "event") throw new Error("Native bridge not available - cannot deliver event");
-	warn("[walletkitBridge] postToNative: no native handler", payload);
+	sendToNative(JSON.stringify(payload, bigIntReplacer));
 }
 //#endregion
 //#region src/transport/messaging.ts
@@ -38050,17 +38101,12 @@ async function handleCall(id, method, params) {
 		respond(id, void 0, { message });
 	}
 }
-function registerNativeCallHandler() {
-	window.__walletkitCall = (id, method, paramsJson) => {
-		let params = void 0;
-		if (paramsJson && paramsJson !== "null") try {
-			params = JSON.parse(paramsJson);
-		} catch {
-			respond(id, void 0, { message: "Invalid params JSON" });
-			return;
-		}
-		handleCall(id, method, params);
-	};
+/**
+* Handle an inbound `{kind:'call'}` envelope dispatched from Kotlin via the port.
+* Replaces the legacy `window.__walletkitCall` global.
+*/
+function handleNativeCall(id, method, params) {
+	handleCall(id, method, params);
 }
 //#endregion
 //#region src/api/eventListeners.ts
@@ -43269,7 +43315,7 @@ var log = globalLogger.createChild("DeDustSwapProvider");
 /**
 * Default API URL for DeDust Router
 */
-var DEFAULT_API_URL = "https://mainnet.api.dedust.io";
+var DEFAULT_API_URL = "https://mainnet.api.dedust.io/v4/router";
 /**
 * Default protocols to use for routing
 */
@@ -43312,7 +43358,7 @@ var DeDustSwapProvider = class extends SwapProvider {
 	constructor(config) {
 		super();
 		this.providerId = config?.providerId ?? "dedust";
-		this.apiUrl = config?.apiUrl ?? DEFAULT_API_URL;
+		this.apiUrl = (config?.apiUrl ?? DEFAULT_API_URL).replace(/\/+$/, "");
 		this.defaultSlippageBps = config?.defaultSlippageBps ?? 100;
 		this.referralAddress = config?.referralAddress;
 		this.referralFeeBps = config?.referralFeeBps;
@@ -43352,7 +43398,7 @@ var DeDustSwapProvider = class extends SwapProvider {
 				min_pool_usd_tvl: this.minPoolUsdTvl,
 				exclude_volatile_pools: params.providerOptions?.excludeVolatilePools
 			};
-			const response = await fetch(`${this.apiUrl}/v4/router/quote`, {
+			const response = await fetch(`${this.apiUrl}/quote`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -43420,7 +43466,7 @@ var DeDustSwapProvider = class extends SwapProvider {
 				referral_address: referralAddress ? import_dist$1.Address.parse(referralAddress).toRawString() : void 0,
 				referral_fee: referralFeeBps
 			};
-			const response = await fetch(`${this.apiUrl}/v4/router/swap`, {
+			const response = await fetch(`${this.apiUrl}/swap`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -43624,8 +43670,25 @@ var api = {
 //#endregion
 //#region src/bridge.ts
 setBridgeApi(api);
-registerNativeCallHandler();
-registerNativeResponseHandler();
+installPortHandshake();
+setInboundCallback((json) => {
+	let envelope;
+	try {
+		envelope = JSON.parse(json);
+	} catch (err) {
+		error("[walletkitBridge] Failed to parse inbound port message", err, json);
+		return;
+	}
+	switch (envelope.kind) {
+		case "call":
+			handleNativeCall(envelope.id, envelope.method, envelope.params);
+			break;
+		case "response":
+			handleNativeResponse(envelope.id, envelope.result, envelope.error);
+			break;
+		default: warn("[walletkitBridge] Unknown inbound envelope kind", envelope);
+	}
+});
 window.walletkitBridge = api;
 //#endregion
 
