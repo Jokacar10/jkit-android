@@ -21,13 +21,10 @@
  */
 package io.ton.walletkit.engine.infrastructure
 
-import android.util.Base64
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.LogConstants
-import io.ton.walletkit.internal.constants.MiscConstants
 import io.ton.walletkit.internal.constants.ResponseConstants
-import io.ton.walletkit.internal.constants.WebViewConstants
 import io.ton.walletkit.internal.util.Logger
 import kotlinx.coroutines.CompletableDeferred
 import org.json.JSONArray
@@ -71,49 +68,20 @@ internal class BridgeRpcClient(
         val deferred = CompletableDeferred<BridgeResponse>()
         pending[callId] = deferred
 
-        // Convert params to string - supports JSONObject, JSONArray, String, or null
-        // For strings, use JSONObject.quote to produce valid JSON (e.g. "hello" -> '"hello"')
-        val payload: String? = when (params) {
-            null -> null
-            is JSONObject -> params.toString()
-            is JSONArray -> params.toString()
-            is String -> JSONObject.quote(params)
-            else -> params.toString()
-        }
-        val idLiteral = JSONObject.quote(callId)
-        val methodLiteral = JSONObject.quote(method)
-        val script =
-            if (payload == null) {
-                buildString {
-                    append(WebViewConstants.JS_FUNCTION_WALLETKIT_CALL)
-                    append(JS_OPEN_PAREN)
-                    append(idLiteral)
-                    append(JS_PARAMETER_SEPARATOR)
-                    append(methodLiteral)
-                    append(JS_PARAMETER_SEPARATOR)
-                    append(WebViewConstants.JS_NULL)
-                    append(JS_CLOSE_PAREN)
-                }
-            } else {
-                val payloadBase64 = Base64.encodeToString(payload.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
-                val payloadLiteral = JSONObject.quote(payloadBase64)
-                buildString {
-                    append(WebViewConstants.JS_FUNCTION_WALLETKIT_CALL)
-                    append(JS_OPEN_PAREN)
-                    append(idLiteral)
-                    append(JS_PARAMETER_SEPARATOR)
-                    append(methodLiteral)
-                    append(JS_PARAMETER_SEPARATOR)
-                    append(MiscConstants.SPACE_DELIMITER)
-                    append(WebViewConstants.JS_FUNCTION_ATOB)
-                    append(JS_OPEN_PAREN)
-                    append(payloadLiteral)
-                    append(JS_CLOSE_PAREN)
-                    append(JS_CLOSE_PAREN)
-                }
+        val envelope = JSONObject().apply {
+            put(ResponseConstants.KEY_KIND, ResponseConstants.VALUE_KIND_CALL)
+            put(ResponseConstants.KEY_ID, callId)
+            put(ResponseConstants.KEY_METHOD, method)
+            when (params) {
+                null -> {}
+                is JSONObject -> put(ResponseConstants.KEY_PARAMS, params)
+                is JSONArray -> put(ResponseConstants.KEY_PARAMS, params)
+                is String -> put(ResponseConstants.KEY_PARAMS, params)
+                else -> put(ResponseConstants.KEY_PARAMS, params.toString())
             }
+        }
 
-        webViewManager.executeJavaScript(script)
+        webViewManager.transport.send(envelope.toString())
 
         val response = deferred.await()
         return response.result
@@ -172,9 +140,6 @@ internal class BridgeRpcClient(
 
     private companion object {
         private const val TAG = LogConstants.TAG_WEBVIEW_ENGINE
-        private const val JS_OPEN_PAREN = "("
-        private const val JS_CLOSE_PAREN = ")"
-        private const val JS_PARAMETER_SEPARATOR = ","
         private const val ERROR_CALL_FAILED = "call["
         private const val ERROR_FAILED_SUFFIX = "] failed: "
     }
