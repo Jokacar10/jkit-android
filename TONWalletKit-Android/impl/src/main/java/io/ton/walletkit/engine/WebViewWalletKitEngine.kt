@@ -22,7 +22,6 @@
 package io.ton.walletkit.engine
 
 import android.content.Context
-import android.view.ViewGroup
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.generated.TONConnectionApprovalResponse
 import io.ton.walletkit.api.generated.TONConnectionRequestEvent
@@ -130,7 +129,6 @@ import io.ton.walletkit.engine.state.KotlinSwapProviderManager
 import io.ton.walletkit.engine.state.SignerManager
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.LogConstants
-import io.ton.walletkit.internal.constants.NetworkConstants
 import io.ton.walletkit.internal.constants.WebViewConstants
 import io.ton.walletkit.internal.util.Logger
 import io.ton.walletkit.internal.util.WalletKitUtils
@@ -160,13 +158,10 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Refactored WebView-backed WalletKit engine that orchestrates specialised components
- * for WebView lifecycle, RPC communication, event handling, and parsing.
+ * WebView-backed WalletKit engine. Orchestrates the WebView, JS bridge transport,
+ * RPC dispatch, and event routing for a single network instance.
  *
- * The public behaviour and logging semantics remain identical to the legacy monolithic
- * implementation to guarantee backward compatibility.
- *
- * @suppress Internal implementation class. Created by [io.ton.walletkit.core.TONWalletKit.initialize].
+ * @suppress Internal implementation. Created by [io.ton.walletkit.core.TONWalletKit.initialize].
  */
 internal class WebViewWalletKitEngine private constructor(
     context: Context,
@@ -188,12 +183,6 @@ internal class WebViewWalletKitEngine private constructor(
     @Volatile private var persistentStorageEnabled: Boolean = true
 
     @Volatile private var isDestroyed: Boolean = false
-
-    @Volatile private var currentNetwork: String = NetworkConstants.DEFAULT_NETWORK
-
-    @Volatile private var apiBaseUrl: String = NetworkConstants.DEFAULT_TESTNET_API_URL
-
-    @Volatile private var tonApiKey: String? = null
 
     private val adapterManager = AdapterManager()
     private val signerManager = SignerManager()
@@ -247,8 +236,6 @@ internal class WebViewWalletKitEngine private constructor(
                 kotlinStreamingProviderManager = kotlinStreamingProviderManager,
                 json = json,
                 onInitialized = ::refreshDerivedState,
-                onNetworkChanged = ::handleNetworkChanged,
-                onApiBaseUrlChanged = ::handleApiBaseUrlChanged,
             )
 
         if (eventsHandler != null) {
@@ -265,21 +252,6 @@ internal class WebViewWalletKitEngine private constructor(
 
     private fun refreshDerivedState() {
         persistentStorageEnabled = initManager.isPersistentStorageEnabled()
-        currentNetwork = initManager.currentNetwork()
-        apiBaseUrl = initManager.apiBaseUrl()
-        tonApiKey = initManager.tonApiKey()
-    }
-
-    private fun handleNetworkChanged(network: String?) {
-        if (!network.isNullOrBlank()) {
-            currentNetwork = network
-        }
-    }
-
-    private fun handleApiBaseUrlChanged(url: String?) {
-        if (!url.isNullOrBlank()) {
-            apiBaseUrl = url
-        }
     }
 
     private fun handleBridgeMessage(payload: JSONObject) {
@@ -300,20 +272,6 @@ internal class WebViewWalletKitEngine private constructor(
         }
         return rpcClient.call(method, params)
     }
-
-    /**
-     * Attach the underlying WebView to a parent view so it can be inspected/debugged if needed.
-     * @suppress Internal debugging method. Not part of public API.
-     */
-    internal fun attachTo(parent: ViewGroup) {
-        webViewManager.attachTo(parent)
-    }
-
-    /**
-     * Get the underlying WebView instance.
-     * @suppress Internal debugging method. Not part of public API.
-     */
-    internal fun asView() = webViewManager.asView()
 
     override suspend fun init(configuration: TONWalletKitConfiguration) {
         initManager.initialize(configuration)
@@ -651,11 +609,6 @@ internal class WebViewWalletKitEngine private constructor(
         }
     }
 
-    private fun failBridgeFutures(exception: WalletKitBridgeException) {
-        webViewManager.transport.fail(exception)
-        rpcClient.failAll(exception)
-    }
-
     companion object {
         init {
             registerDomainTypeBridgeDecoders()
@@ -728,35 +681,6 @@ internal class WebViewWalletKitEngine private constructor(
             }
         }
 
-        /**
-         * Create engine for testing with custom asset path.
-         *
-         * This allows tests to load mock JavaScript files instead of the production bridge.
-         * Only use this in test code!
-         *
-         * @param context Android context
-         * @param assetPath Path to the HTML file to load (e.g., "mock-bridge/normal-flow.html")
-         * @param eventsHandler Optional events handler to track SDK events
-         * @param storageType Storage type to use (defaults to Memory for tests)
-         * @return New WebViewWalletKitEngine instance configured for testing
-         */
-        @JvmStatic
-        internal fun createForTesting(
-            context: Context,
-            assetPath: String,
-            eventsHandler: TONBridgeEventsHandler? = null,
-            storageType: TONWalletKitStorageType = TONWalletKitStorageType.Memory,
-            sessionManager: TONConnectSessionManager? = null,
-            apiClients: List<TONAPIClient> = emptyList(),
-        ): WebViewWalletKitEngine {
-            Logger.d(TAG, "Creating test WebView engine with asset path: $assetPath")
-            val storageAdapter = createStorageAdapter(context, storageType)
-            return WebViewWalletKitEngine(context, eventsHandler, storageAdapter, sessionManager, apiClients, assetPath)
-        }
-
-        /**
-         * Create storage adapter based on storage type.
-         */
         private fun createStorageAdapter(
             context: Context,
             storageType: TONWalletKitStorageType,

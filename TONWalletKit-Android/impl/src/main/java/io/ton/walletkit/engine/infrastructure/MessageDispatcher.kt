@@ -96,8 +96,6 @@ internal class MessageDispatcher(
     private val kotlinStreamingProviderManager: KotlinStreamingProviderManager,
     private val json: Json,
     private val onInitialized: () -> Unit,
-    private val onNetworkChanged: (String?) -> Unit,
-    private val onApiBaseUrlChanged: (String?) -> Unit,
 ) {
     private val mainHandler: Handler = webViewManager.getMainHandler()
     private val eventListenersSetupMutex = Mutex()
@@ -310,12 +308,8 @@ internal class MessageDispatcher(
     }
 
     private fun handleReady(payload: JSONObject) {
-        val network = payload.optNullableString(ResponseConstants.KEY_NETWORK)
-        initManager.updateNetwork(network)
-        onNetworkChanged(network)
-        val apiBaseUrl = payload.optNullableString(ResponseConstants.KEY_TON_API_URL)
-        initManager.updateApiBaseUrl(apiBaseUrl)
-        onApiBaseUrlChanged(apiBaseUrl)
+        initManager.updateNetwork(payload.optNullableString(ResponseConstants.KEY_NETWORK))
+        initManager.updateApiBaseUrl(payload.optNullableString(ResponseConstants.KEY_TON_API_URL))
 
         val wasAlreadyReady = rpcClient.isReady()
 
