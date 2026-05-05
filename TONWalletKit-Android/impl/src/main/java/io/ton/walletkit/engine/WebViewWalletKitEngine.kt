@@ -189,10 +189,8 @@ internal class WebViewWalletKitEngine private constructor(
     override val kotlinStreamingProviderManager: KotlinStreamingProviderManager
     private val eventRouter = EventRouter()
     private val storageManager = StorageManager(storageAdapter) { persistentStorageEnabled }
-    override val kotlinSwapProviderManager =
-        KotlinSwapProviderManager(json)
-    override val kotlinStakingProviderManager =
-        KotlinStakingProviderManager(json)
+    override val kotlinSwapProviderManager = KotlinSwapProviderManager()
+    override val kotlinStakingProviderManager = KotlinStakingProviderManager()
 
     private val webViewManager: WebViewManager
     private val rpcClient: BridgeRpcClient

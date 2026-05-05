@@ -64,7 +64,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, data)
 
         assertNotNull("Should parse disconnect event", event)
         assertTrue("Should be Disconnect event", event is TONWalletKitEvent.Disconnect)
@@ -78,7 +78,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, data)
 
         assertNotNull("Should parse disconnect event", event)
         assertTrue("Should be Disconnect event", event is TONWalletKitEvent.Disconnect)
@@ -90,7 +90,7 @@ class EventParserTest {
         val data = JSONObject() // No sessionId or id
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, data)
 
         assertNull("Should return null when no session ID", event)
     }
@@ -103,7 +103,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, data)
 
         assertNotNull("Should parse disconnect event", event)
         assertEquals("primary-session", (event as TONWalletKitEvent.Disconnect).event.sessionId)
@@ -118,7 +118,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_PAGE_STARTED, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_PAGE_STARTED, data)
 
         // Browser events are internal and not exposed to public API
         assertNull("Browser events should return null", event)
@@ -129,7 +129,7 @@ class EventParserTest {
         val data = JSONObject()
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_PAGE_STARTED, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_PAGE_STARTED, data)
 
         // Browser events are internal
         assertNull("Browser events should return null", event)
@@ -142,7 +142,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_PAGE_FINISHED, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_PAGE_FINISHED, data)
 
         // Browser events are internal
         assertNull("Browser events should return null", event)
@@ -155,7 +155,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_ERROR, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_ERROR, data)
 
         // Browser events are internal
         assertNull("Browser events should return null", event)
@@ -166,7 +166,7 @@ class EventParserTest {
         val data = JSONObject()
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_ERROR, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_ERROR, data)
 
         // Browser events are internal
         assertNull("Browser events should return null", event)
@@ -181,7 +181,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_BRIDGE_REQUEST, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_BRIDGE_REQUEST, data)
 
         // Browser events are internal and not exposed to public API
         assertNull("Browser events should return null", event)
@@ -194,7 +194,7 @@ class EventParserTest {
         val data = JSONObject()
         val raw = JSONObject()
 
-        val event = parser.parseEvent("someUnknownEventType", data, raw)
+        val event = parser.parseEvent("someUnknownEventType", data)
 
         assertNull("Unknown event type should return null", event)
     }
@@ -204,7 +204,7 @@ class EventParserTest {
         val data = JSONObject()
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_STATE_CHANGED, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_STATE_CHANGED, data)
 
         assertNull("stateChanged should return null (ignored)", event)
     }
@@ -214,7 +214,7 @@ class EventParserTest {
         val data = JSONObject()
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_WALLET_STATE_CHANGED, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_WALLET_STATE_CHANGED, data)
 
         assertNull("walletStateChanged should return null (ignored)", event)
     }
@@ -224,7 +224,7 @@ class EventParserTest {
         val data = JSONObject()
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_SESSIONS_CHANGED, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_SESSIONS_CHANGED, data)
 
         assertNull("sessionsChanged should return null (ignored)", event)
     }
@@ -255,7 +255,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_CONNECT_REQUEST, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_CONNECT_REQUEST, data)
 
         assertNotNull("Should parse connect request event", event)
         assertTrue("Should be ConnectRequest event", event is TONWalletKitEvent.ConnectRequest)
@@ -284,7 +284,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_CONNECT_REQUEST, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_CONNECT_REQUEST, data)
 
         assertNotNull("Should parse connect request", event)
         // The manifest URL normalization is applied internally
@@ -314,7 +314,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_CONNECT_REQUEST, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_CONNECT_REQUEST, data)
 
         assertNotNull("Should parse connect request with empty permissions", event)
         assertTrue("Should be ConnectRequest event", event is TONWalletKitEvent.ConnectRequest)
@@ -336,7 +336,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_CONNECT_REQUEST, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_CONNECT_REQUEST, data)
 
         assertNotNull("Should parse connect request without preview", event)
         assertTrue("Should be ConnectRequest event", event is TONWalletKitEvent.ConnectRequest)
@@ -370,7 +370,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_TRANSACTION_REQUEST, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_TRANSACTION_REQUEST, data)
 
         assertNotNull("Should parse transaction request event", event)
         assertTrue("Should be SendTransactionRequest event", event is TONWalletKitEvent.SendTransactionRequest)
@@ -421,7 +421,7 @@ class EventParserTest {
         }
         val raw = JSONObject()
 
-        val event = parser.parseEvent(EventTypeConstants.EVENT_SIGN_DATA_REQUEST, data, raw)
+        val event = parser.parseEvent(EventTypeConstants.EVENT_SIGN_DATA_REQUEST, data)
 
         assertNotNull("Should parse sign data request event", event)
         assertTrue("Should be SignDataRequest event", event is TONWalletKitEvent.SignDataRequest)

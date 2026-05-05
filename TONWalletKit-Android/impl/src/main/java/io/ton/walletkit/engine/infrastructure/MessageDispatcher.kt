@@ -26,6 +26,10 @@ import android.webkit.WebView
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.generated.TONPreparedSignData
 import io.ton.walletkit.api.generated.TONProofMessage
+import io.ton.walletkit.api.generated.TONStakeParams
+import io.ton.walletkit.api.generated.TONStakingQuoteParams
+import io.ton.walletkit.api.generated.TONSwapParams
+import io.ton.walletkit.api.generated.TONSwapQuoteParams
 import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.bridge.dispatch.AdapterByIdRequest
 import io.ton.walletkit.bridge.dispatch.AdapterSignDataRequest
@@ -144,12 +148,12 @@ internal class MessageDispatcher(
             adapter.signedTonProof(request, req.fakeSignature ?: false).value
         }
 
-        registerTyped<KotlinProviderQuoteRequest>(REQUEST_METHOD_KOTLIN_SWAP_PROVIDER_QUOTE) { req ->
-            kotlinSwapProviderManager.quote(req.providerId, req.params)
+        registerTypedJson<KotlinProviderQuoteRequest, _>(REQUEST_METHOD_KOTLIN_SWAP_PROVIDER_QUOTE) { req ->
+            kotlinSwapProviderManager.quote(req.providerId, decodeParams<TONSwapQuoteParams<JsonElement>>(req.params))
         }
 
-        registerTyped<KotlinProviderBuildRequest>(REQUEST_METHOD_KOTLIN_SWAP_PROVIDER_BUILD_SWAP_TRANSACTION) { req ->
-            kotlinSwapProviderManager.buildSwapTransaction(req.providerId, req.params)
+        registerTypedJson<KotlinProviderBuildRequest, _>(REQUEST_METHOD_KOTLIN_SWAP_PROVIDER_BUILD_SWAP_TRANSACTION) { req ->
+            kotlinSwapProviderManager.buildSwapTransaction(req.providerId, decodeParams<TONSwapParams<JsonElement>>(req.params))
         }
 
         registerTyped<KotlinProviderIdRequest>(REQUEST_METHOD_KOTLIN_SWAP_PROVIDER_RELEASE) { req ->
@@ -157,19 +161,19 @@ internal class MessageDispatcher(
             EMPTY_JSON_OBJECT
         }
 
-        registerTyped<KotlinProviderQuoteRequest>(REQUEST_METHOD_KOTLIN_STAKING_PROVIDER_GET_QUOTE) { req ->
-            kotlinStakingProviderManager.getQuote(req.providerId, req.params)
+        registerTypedJson<KotlinProviderQuoteRequest, _>(REQUEST_METHOD_KOTLIN_STAKING_PROVIDER_GET_QUOTE) { req ->
+            kotlinStakingProviderManager.getQuote(req.providerId, decodeParams<TONStakingQuoteParams<JsonElement>>(req.params))
         }
 
-        registerTyped<KotlinProviderBuildRequest>(REQUEST_METHOD_KOTLIN_STAKING_PROVIDER_BUILD_STAKE_TRANSACTION) { req ->
-            kotlinStakingProviderManager.buildStakeTransaction(req.providerId, req.params)
+        registerTypedJson<KotlinProviderBuildRequest, _>(REQUEST_METHOD_KOTLIN_STAKING_PROVIDER_BUILD_STAKE_TRANSACTION) { req ->
+            kotlinStakingProviderManager.buildStakeTransaction(req.providerId, decodeParams<TONStakeParams<JsonElement>>(req.params))
         }
 
-        registerTyped<KotlinStakingGetStakedBalanceRequest>(REQUEST_METHOD_KOTLIN_STAKING_PROVIDER_GET_STAKED_BALANCE) { req ->
+        registerTypedJson<KotlinStakingGetStakedBalanceRequest, _>(REQUEST_METHOD_KOTLIN_STAKING_PROVIDER_GET_STAKED_BALANCE) { req ->
             kotlinStakingProviderManager.getStakedBalance(req.providerId, req.userAddress, req.networkChainId)
         }
 
-        registerTyped<KotlinStakingGetProviderInfoRequest>(REQUEST_METHOD_KOTLIN_STAKING_PROVIDER_GET_STAKING_PROVIDER_INFO) { req ->
+        registerTypedJson<KotlinStakingGetProviderInfoRequest, _>(REQUEST_METHOD_KOTLIN_STAKING_PROVIDER_GET_STAKING_PROVIDER_INFO) { req ->
             kotlinStakingProviderManager.getStakingProviderInfo(req.providerId, req.networkChainId)
         }
 
@@ -291,6 +295,9 @@ internal class MessageDispatcher(
         return requestRegistry.dispatch(method, element)
     }
 
+    /** JS pre-stringifies generic provider params; decode them before handing off to the manager. */
+    private inline fun <reified T> decodeParams(paramsJson: String): T = json.decodeFromString(paramsJson)
+
     private fun respondToJs(id: String, result: String?, errorMessage: String?) {
         val envelope = JSONObject().apply {
             put(ResponseConstants.KEY_KIND, ResponseConstants.VALUE_KIND_RESPONSE)
@@ -361,7 +368,7 @@ internal class MessageDispatcher(
         }
 
         val typedEvent = try {
-            eventParser.parseEvent(type, data, event)
+            eventParser.parseEvent(type, data)
         } catch (e: Exception) {
             Logger.e(TAG, "Exception thrown while parsing event type=$type", e)
             null

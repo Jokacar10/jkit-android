@@ -40,6 +40,22 @@ internal class BridgeRequestRegistry(private val json: Json) {
         register(method) { raw -> handler(json.decodeFromJsonElement(serializer, raw)) }
     }
 
+    /**
+     * Typed-in, typed-out variant. The handler returns a strongly-typed [Res] which is encoded
+     * to JSON for the wire — callers don't have to think about serialization.
+     */
+    inline fun <reified Req, reified Res> registerTypedJson(
+        method: String,
+        crossinline handler: suspend (Req) -> Res,
+    ) {
+        val reqSerializer = json.serializersModule.serializer<Req>()
+        val resSerializer = json.serializersModule.serializer<Res>()
+        register(method) { raw ->
+            val req = json.decodeFromJsonElement(reqSerializer, raw)
+            json.encodeToString(resSerializer, handler(req))
+        }
+    }
+
     suspend fun dispatch(method: String, params: JsonElement): String {
         val handler = handlers[method]
             ?: throw IllegalArgumentException("Unknown reverse-RPC method: $method")
