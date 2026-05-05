@@ -24,6 +24,7 @@ package io.ton.walletkit.engine.infrastructure
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.bridge.BridgeCodec
 import io.ton.walletkit.bridge.decodeFromBridge
+import io.ton.walletkit.bridge.decodeFromBridgeOrNull
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.LogConstants
 import io.ton.walletkit.internal.constants.ResponseConstants
@@ -43,6 +44,11 @@ internal class BridgeRpcClient(
     private val ready = CompletableDeferred<Unit>()
 
     suspend fun call(method: String, params: Any? = null): JSONObject = wrap(callRaw(method, params))
+
+    /** Fire-and-forget for side-effect bridge methods that return no useful data. */
+    suspend fun send(method: String, params: Any? = null) {
+        callRaw(method, params)
+    }
 
     suspend fun callRaw(method: String, params: Any? = null): Any? {
         webViewManager.webViewInitialized.await()
@@ -127,3 +133,9 @@ internal suspend inline fun <reified T : Any> BridgeRpcClient.callTyped(
     params: Any? = null,
     json: Json,
 ): T = json.decodeFromBridge(callRaw(method, params))
+
+internal suspend inline fun <reified T : Any> BridgeRpcClient.callTypedOrNull(
+    method: String,
+    params: Any? = null,
+    json: Json,
+): T? = json.decodeFromBridgeOrNull(callRaw(method, params))

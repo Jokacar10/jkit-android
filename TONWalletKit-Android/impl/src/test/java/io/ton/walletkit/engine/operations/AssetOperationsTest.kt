@@ -189,48 +189,24 @@ class AssetOperationsTest : OperationsTestBase() {
 
     @Test
     fun getJettonBalance_extractsBalanceString() = runBlocking {
-        givenBridgeReturns(
-            jsonOf(
-                "balance" to "5000000000",
-            ),
-        )
+        // JS bridge returns the balance as a raw string
+        givenBridgeReturnsRaw("5000000000")
 
         val result = assetOperations.getJettonBalance(TEST_ADDRESS, TEST_JETTON_ADDRESS)
 
         assertEquals("5000000000", result)
     }
 
-    @Test
-    fun getJettonBalance_returnsZeroIfMissing() = runBlocking {
-        givenBridgeReturns(JSONObject())
-
-        val result = assetOperations.getJettonBalance(TEST_ADDRESS, TEST_JETTON_ADDRESS)
-
-        assertEquals("0", result)
-    }
-
     // --- getJettonWalletAddress tests ---
 
     @Test
     fun getJettonWalletAddress_extractsAddress() = runBlocking {
-        givenBridgeReturns(
-            jsonOf(
-                "jettonWalletAddress" to TEST_JETTON_ADDRESS,
-            ),
-        )
+        // JS bridge returns the address as a raw string
+        givenBridgeReturnsRaw(TEST_JETTON_ADDRESS)
 
         val result = assetOperations.getJettonWalletAddress(TEST_ADDRESS, TEST_JETTON_ADDRESS)
 
         assertEquals(TEST_JETTON_ADDRESS, result)
-    }
-
-    @Test
-    fun getJettonWalletAddress_returnsEmptyIfMissing() = runBlocking {
-        givenBridgeReturns(JSONObject())
-
-        val result = assetOperations.getJettonWalletAddress(TEST_ADDRESS, TEST_JETTON_ADDRESS)
-
-        assertEquals("", result)
     }
 
     // --- createTransferNftTransaction tests ---

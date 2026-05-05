@@ -21,6 +21,7 @@
  */
 package io.ton.walletkit.engine.operations
 
+import io.mockk.coEvery
 import io.ton.walletkit.WalletKitBridgeException
 import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
@@ -56,17 +57,12 @@ class CryptoOperationsTest : OperationsTestBase() {
     // --- createTonMnemonic tests ---
 
     @Test
-    fun createTonMnemonic_parsesItemsArray() = runBlocking {
-        givenBridgeReturns(
-            JSONObject().apply {
-                put(
-                    "items",
-                    JSONArray().apply {
-                        put("word1")
-                        put("word2")
-                        put("word3")
-                    },
-                )
+    fun createTonMnemonic_parsesArray() = runBlocking {
+        givenBridgeReturnsRaw(
+            JSONArray().apply {
+                put("word1")
+                put("word2")
+                put("word3")
             },
         )
 
@@ -79,8 +75,8 @@ class CryptoOperationsTest : OperationsTestBase() {
     }
 
     @Test
-    fun createTonMnemonic_returnsEmptyListIfNoItems() = runBlocking {
-        givenBridgeReturns(JSONObject()) // No items key
+    fun createTonMnemonic_returnsEmptyListIfEmpty() = runBlocking {
+        givenBridgeReturnsRaw(JSONArray())
 
         val result = cryptoOperations.createTonMnemonic(12)
 
@@ -90,15 +86,8 @@ class CryptoOperationsTest : OperationsTestBase() {
     @Test
     fun createTonMnemonic_handles24Words() = runBlocking {
         val words = (1..24).map { "word$it" }
-        givenBridgeReturns(
-            JSONObject().apply {
-                put(
-                    "items",
-                    JSONArray().apply {
-                        words.forEach { put(it) }
-                    },
-                )
-            },
+        givenBridgeReturnsRaw(
+            JSONArray().apply { words.forEach { put(it) } },
         )
 
         val result = cryptoOperations.createTonMnemonic(24)
@@ -203,12 +192,8 @@ class CryptoOperationsTest : OperationsTestBase() {
 
     @Test
     fun sign_parsesHexSignature() = runBlocking {
-        // Signature as hex string
-        givenBridgeReturns(
-            jsonOf(
-                "signature" to "abcd1234ef567890",
-            ),
-        )
+        // JS bridge returns the hex signature directly as a String
+        coEvery { rpcClient.callRaw(any(), any()) } returns "abcd1234ef567890"
 
         val result = cryptoOperations.sign(
             data = byteArrayOf(1, 2, 3),
@@ -222,32 +207,8 @@ class CryptoOperationsTest : OperationsTestBase() {
     }
 
     @Test
-    fun sign_parsesHexSignatureFromValueField() = runBlocking {
-        givenBridgeReturns(
-            jsonOf(
-                "value" to "0xdeadbeef",
-            ),
-        )
-
-        val result = cryptoOperations.sign(
-            data = byteArrayOf(1, 2, 3),
-            secretKey = ByteArray(64) { it.toByte() },
-        )
-
-        assertEquals(4, result.size)
-        assertEquals(0xde.toByte(), result[0])
-        assertEquals(0xad.toByte(), result[1])
-        assertEquals(0xbe.toByte(), result[2])
-        assertEquals(0xef.toByte(), result[3])
-    }
-
-    @Test
     fun sign_handlesHexWithPrefix() = runBlocking {
-        givenBridgeReturns(
-            jsonOf(
-                "signature" to "0xdeadbeef",
-            ),
-        )
+        coEvery { rpcClient.callRaw(any(), any()) } returns "0xdeadbeef"
 
         val result = cryptoOperations.sign(
             data = byteArrayOf(1),
@@ -259,28 +220,10 @@ class CryptoOperationsTest : OperationsTestBase() {
     }
 
     @Test
-    fun sign_throwsIfSignatureMissing() {
-        runBlocking {
-            // When bridge returns result with "signature" key present but null value
-            // The takeIf { it != "null" } check should catch this
-            givenBridgeReturns(jsonOf("signature" to JSONObject.NULL))
-
-            assertThrows(WalletKitBridgeException::class.java) {
-                runBlocking {
-                    cryptoOperations.sign(
-                        data = byteArrayOf(1),
-                        secretKey = ByteArray(64),
-                    )
-                }
-            }
-        }
-    }
-
-    @Test
     fun sign_throwsIfSignatureEmpty() {
         runBlocking {
             // Empty string signature should throw
-            givenBridgeReturns(jsonOf("signature" to ""))
+            coEvery { rpcClient.callRaw(any(), any()) } returns ""
 
             assertThrows(WalletKitBridgeException::class.java) {
                 runBlocking {

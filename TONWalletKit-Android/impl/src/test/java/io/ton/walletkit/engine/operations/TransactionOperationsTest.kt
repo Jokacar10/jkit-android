@@ -24,8 +24,8 @@ package io.ton.walletkit.engine.operations
 import io.ton.walletkit.api.generated.TONTransferRequest
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.SerializationException
 import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
@@ -202,7 +202,7 @@ class TransactionOperationsTest : OperationsTestBase() {
 
     @Test
     fun sendTransaction_throwsIfSignedBocAndBocMissing() {
-        assertThrows(JSONException::class.java) {
+        assertThrows(SerializationException::class.java) {
             runBlocking {
                 givenBridgeReturns(JSONObject())
                 transactionOperations.sendTransaction(TEST_ADDRESS, emptyTx())

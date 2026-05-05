@@ -39,6 +39,7 @@ abstract class OperationsTestBase {
     protected var capturedParams: Any? = null
 
     private var mockResponse: JSONObject = JSONObject()
+    private var mockRawResponse: Any? = JSONObject()
 
     @Before
     open fun setup() {
@@ -48,6 +49,12 @@ abstract class OperationsTestBase {
 
     protected fun givenBridgeReturns(response: JSONObject) {
         mockResponse = response
+        mockRawResponse = response
+        installMocks()
+    }
+
+    protected fun givenBridgeReturnsRaw(response: Any?) {
+        mockRawResponse = response
         installMocks()
     }
 
@@ -65,12 +72,20 @@ abstract class OperationsTestBase {
         coEvery { rpcClient.callRaw(any(), any()) } coAnswers {
             capturedMethod = firstArg()
             capturedParams = secondArg()
-            mockResponse
+            mockRawResponse
         }
         coEvery { rpcClient.callRaw(any()) } coAnswers {
             capturedMethod = firstArg()
             capturedParams = null
-            mockResponse
+            mockRawResponse
+        }
+        coEvery { rpcClient.send(any(), any()) } coAnswers {
+            capturedMethod = firstArg()
+            capturedParams = secondArg()
+        }
+        coEvery { rpcClient.send(any()) } coAnswers {
+            capturedMethod = firstArg()
+            capturedParams = null
         }
     }
 

@@ -286,7 +286,7 @@ internal class InitializationManager(
                 append(appVersion)
             },
         )
-        rpcClient.call(BridgeMethodConstants.METHOD_INIT, payload)
+        rpcClient.send(BridgeMethodConstants.METHOD_INIT, payload)
 
         // Store the configuration for later use (e.g., WebView injection)
         currentConfig = configuration

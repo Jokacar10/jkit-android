@@ -509,7 +509,7 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun getSwapQuote(params: TONSwapQuoteParams<JsonElement>, providerId: String?): TONSwapQuote =
         swapOperations.getSwapQuote(params, providerId)
 
-    override suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): String =
+    override suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): TONTransactionRequest =
         swapOperations.buildSwapTransaction(params)
 
     override suspend fun createTonStakersStakingProvider(chainConfig: Map<String, TONTonStakersChainConfig>?): String =
@@ -545,7 +545,7 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun buildStakeTransaction(
         params: TONStakeParams<JsonElement>,
         providerId: String?,
-    ): String = stakingOperations.buildStakeTransaction(params, providerId)
+    ): TONTransactionRequest = stakingOperations.buildStakeTransaction(params, providerId)
 
     override suspend fun getStakedBalance(
         userAddress: String,

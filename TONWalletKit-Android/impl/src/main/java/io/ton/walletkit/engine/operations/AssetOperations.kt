@@ -31,6 +31,7 @@ import io.ton.walletkit.api.generated.TONPagination
 import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import io.ton.walletkit.engine.infrastructure.callTyped
+import io.ton.walletkit.engine.infrastructure.callTypedOrNull
 import io.ton.walletkit.engine.operations.requests.CreateTransferJettonRequest
 import io.ton.walletkit.engine.operations.requests.CreateTransferNftRawRequest
 import io.ton.walletkit.engine.operations.requests.CreateTransferNftRequest
@@ -70,8 +71,11 @@ internal class AssetOperations(
     suspend fun getNft(nftAddress: String): TONNFT? {
         ensureInitialized()
         val request = GetNftRequest(address = nftAddress)
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_GET_NFT, request)
-        return if (result.has("address")) json.decodeFromString(result.toString()) else null
+        // JS returns either a TONNFT or null. callTypedOrNull handles null;
+        // runCatching guards against partial/malformed objects that can't be decoded.
+        return runCatching {
+            rpcClient.callTypedOrNull<TONNFT>(BridgeMethodConstants.METHOD_GET_NFT, request, json)
+        }.getOrNull()
     }
 
     suspend fun createTransferNftTransaction(
@@ -130,14 +134,12 @@ internal class AssetOperations(
     suspend fun getJettonBalance(walletId: String, jettonAddress: String): String {
         ensureInitialized()
         val request = GetJettonBalanceRequest(walletId = walletId, jettonAddress = jettonAddress)
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_GET_JETTON_BALANCE, request)
-        return result.optString("balance", "0")
+        return rpcClient.callTyped(BridgeMethodConstants.METHOD_GET_JETTON_BALANCE, request, json)
     }
 
     suspend fun getJettonWalletAddress(walletId: String, jettonAddress: String): String {
         ensureInitialized()
         val request = GetJettonWalletAddressRequest(walletId = walletId, jettonAddress = jettonAddress)
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_GET_JETTON_WALLET_ADDRESS, request)
-        return result.optString("jettonWalletAddress", "")
+        return rpcClient.callTyped(BridgeMethodConstants.METHOD_GET_JETTON_WALLET_ADDRESS, request, json)
     }
 }

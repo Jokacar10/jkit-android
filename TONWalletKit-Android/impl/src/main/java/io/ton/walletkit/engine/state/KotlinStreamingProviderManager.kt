@@ -108,7 +108,7 @@ internal class KotlinStreamingProviderManager(
     private suspend inline fun <reified T> dispatch(subId: String, value: T) {
         try {
             val updateJson = json.encodeToString(value)
-            rpcClient.call(
+            rpcClient.send(
                 BridgeMethodConstants.METHOD_KOTLIN_PROVIDER_DISPATCH,
                 mapOf("subId" to subId, "updateJson" to updateJson),
             )

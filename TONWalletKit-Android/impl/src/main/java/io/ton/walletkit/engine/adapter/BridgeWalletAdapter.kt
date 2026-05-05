@@ -89,7 +89,7 @@ internal class BridgeWalletAdapter(
         GlobalScope.launch {
             try {
                 val request = JSONObject().apply { put("id", adapterId) }
-                rpcClient.call(BridgeMethodConstants.METHOD_RELEASE_REF, request)
+                rpcClient.send(BridgeMethodConstants.METHOD_RELEASE_REF, request)
             } catch (_: Exception) {
                 Logger.w(TAG, "Failed to release adapter $adapterId during finalization")
             }

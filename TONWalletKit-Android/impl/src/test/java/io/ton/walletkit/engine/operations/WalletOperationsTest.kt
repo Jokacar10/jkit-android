@@ -23,7 +23,6 @@ package io.ton.walletkit.engine.operations
 
 import io.mockk.coEvery
 import io.mockk.mockk
-import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.WalletVersions
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.engine.state.SignerManager
@@ -44,7 +43,9 @@ import org.robolectric.annotation.Config
  * Tests for WalletOperations response parsing and data transformation.
  *
  * Focus: Response parsing logic, hex prefix stripping, default value handling.
- * Not testing: That ensureInitialized/rpcClient.call are invoked (too trivial).
+ * The mocks model the actual JS bridge contract: getWallets returns a raw array,
+ * getWalletAddress / getBalance return raw strings, addWallet / getWallet return
+ * `{walletId, wallet}` envelopes.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [28])
@@ -54,7 +55,6 @@ class WalletOperationsTest : OperationsTestBase() {
     private lateinit var walletOperations: WalletOperations
     private var currentNetwork = NetworkConstants.DEFAULT_NETWORK
 
-    // Valid TON test addresses for testing
     companion object {
         const val TEST_ADDRESS_1 = "EQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqB2N"
         const val TEST_ADDRESS_2 = "Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF"
@@ -78,7 +78,6 @@ class WalletOperationsTest : OperationsTestBase() {
 
     @Test
     fun createSignerFromMnemonic_extractsSignerFromNestedResponse() = runBlocking {
-        // JS returns { signerId, publicKey }
         givenBridgeReturns(
             jsonOf(
                 "signerId" to "signer-123",
@@ -120,77 +119,42 @@ class WalletOperationsTest : OperationsTestBase() {
         assertEquals("abcd1234", result.publicKey.value)
     }
 
-    @Test
-    fun createSignerFromMnemonic_fallsBackToRootObjectIfNoSignerNested() = runBlocking {
-        // Current format: { signerId, publicKey }
-        givenBridgeReturns(
-            jsonOf(
-                "signerId" to "signer-legacy",
-                "publicKey" to "0xlegacykey",
-            ),
-        )
-
-        val result = walletOperations.createSignerFromMnemonic(listOf("test"))
-
-        assertEquals("signer-legacy", result.signerId)
-        assertEquals("legacykey", result.publicKey.value)
-    }
-
-    @Test
-    fun createSignerFromMnemonic_generatesSignerIdIfTempIdMissing() = runBlocking {
-        givenBridgeReturns(
-            jsonOf(
-                "signerId" to "signer_generated",
-                "publicKey" to "0xkey123",
-            ),
-        )
-
-        val result = walletOperations.createSignerFromMnemonic(listOf("test"))
-
-        assertEquals("signer_generated", result.signerId)
-        assertEquals("key123", result.publicKey.value)
-    }
-
     // --- getWallets tests ---
 
     @Test
     fun getWallets_parsesArrayOfWallets() = runBlocking {
-        // JS now returns array of { walletId, wallet } objects
-        coEvery { rpcClient.call(any(), any()) } coAnswers {
+        // JS returns the wallet array directly, not an envelope.
+        coEvery { rpcClient.callRaw(any(), any()) } coAnswers {
             val method = firstArg<String>()
             capturedMethod = method
             capturedParams = secondArg()
             when (method) {
                 "getWalletAddress" -> {
-                    val walletId = (secondArg<Any?>() as? JSONObject)?.optString("walletId") ?: ""
-                    jsonOf("value" to if (walletId.contains("wallet-1")) TEST_ADDRESS_1 else TEST_ADDRESS_2)
+                    val walletId =
+                        (secondArg<Any?>() as? io.ton.walletkit.engine.operations.requests.WalletIdRequest)?.walletId ?: ""
+                    if (walletId.contains("wallet-1")) TEST_ADDRESS_1 else TEST_ADDRESS_2
                 }
-                else -> JSONObject().apply {
+                else -> JSONArray().apply {
                     put(
-                        "items",
-                        JSONArray().apply {
+                        JSONObject().apply {
+                            put("walletId", "-239:wallet-1")
                             put(
+                                "wallet",
                                 JSONObject().apply {
-                                    put("walletId", "-239:wallet-1")
-                                    put(
-                                        "wallet",
-                                        JSONObject().apply {
-                                            put("publicKey", "0xpub1")
-                                            put("version", WalletVersions.V5R1)
-                                        },
-                                    )
+                                    put("publicKey", "0xpub1")
+                                    put("version", WalletVersions.V5R1)
                                 },
                             )
+                        },
+                    )
+                    put(
+                        JSONObject().apply {
+                            put("walletId", "-3:wallet-2")
                             put(
+                                "wallet",
                                 JSONObject().apply {
-                                    put("walletId", "-3:wallet-2")
-                                    put(
-                                        "wallet",
-                                        JSONObject().apply {
-                                            put("publicKey", "pub2") // no 0x prefix
-                                            put("version", WalletVersions.V4R2)
-                                        },
-                                    )
+                                    put("publicKey", "pub2")
+                                    put("version", WalletVersions.V4R2)
                                 },
                             )
                         },
@@ -202,109 +166,33 @@ class WalletOperationsTest : OperationsTestBase() {
         val result = walletOperations.getWallets()
 
         assertEquals(2, result.size)
-
         assertEquals(TEST_ADDRESS_1, result[0].address.value)
-        assertEquals("pub1", result[0].publicKey) // stripped
+        assertEquals("pub1", result[0].publicKey)
         assertEquals(WalletVersions.V5R1, result[0].version)
-
         assertEquals(TEST_ADDRESS_2, result[1].address.value)
         assertEquals("pub2", result[1].publicKey)
         assertEquals(WalletVersions.V4R2, result[1].version)
     }
 
     @Test
-    fun getWallets_handlesDirectArrayResponse() = runBlocking {
-        // Tests the items wrapper
-        coEvery { rpcClient.call(any(), any()) } coAnswers {
-            val method = firstArg<String>()
-            capturedMethod = method
-            capturedParams = secondArg()
-            when (method) {
-                "getWalletAddress" -> jsonOf("value" to TEST_ADDRESS_1)
-                else -> JSONObject().apply {
-                    put(
-                        "items",
-                        JSONArray().apply {
-                            put(
-                                JSONObject().apply {
-                                    put("walletId", "-239:wallet-1")
-                                    put(
-                                        "wallet",
-                                        JSONObject().apply {
-                                            put("publicKey", "directKey")
-                                        },
-                                    )
-                                },
-                            )
-                        },
-                    )
-                }
-            }
-        }
-
-        val result = walletOperations.getWallets()
-
-        assertEquals(1, result.size)
-        assertEquals(TEST_ADDRESS_1, result[0].address.value)
-    }
-
-    @Test
-    fun getWallets_returnsEmptyListIfNoItems() = runBlocking {
-        givenBridgeReturns(JSONObject()) // No items key
+    fun getWallets_returnsEmptyListIfEmptyArray() = runBlocking {
+        givenBridgeReturnsRaw(JSONArray()) // raw empty array
 
         val result = walletOperations.getWallets()
 
         assertTrue(result.isEmpty())
     }
 
-    @Test
-    fun getWallets_usesAlternateKeyNames() = runBlocking {
-        // Tests that it checks wallet.publicKey
-        coEvery { rpcClient.call(any(), any()) } coAnswers {
-            val method = firstArg<String>()
-            capturedMethod = method
-            capturedParams = secondArg()
-            when (method) {
-                "getWalletAddress" -> jsonOf("value" to TEST_ADDRESS_1)
-                else -> JSONObject().apply {
-                    put(
-                        "items",
-                        JSONArray().apply {
-                            put(
-                                JSONObject().apply {
-                                    put("walletId", "-239:wallet-1")
-                                    put(
-                                        "wallet",
-                                        JSONObject().apply {
-                                            // No publicKey - should be null
-                                        },
-                                    )
-                                },
-                            )
-                        },
-                    )
-                }
-            }
-        }
-
-        val result = walletOperations.getWallets()
-
-        assertEquals(1, result.size)
-        // Should handle missing publicKey gracefully
-        assertNull(result[0].publicKey) // Falls back to null if no publicKey in wallet
-    }
-
     // --- getWallet tests ---
 
     @Test
     fun getWallet_parsesWalletObject() = runBlocking {
-        // JS returns { walletId, wallet }
-        coEvery { rpcClient.call(any(), any()) } coAnswers {
+        coEvery { rpcClient.callRaw(any(), any()) } coAnswers {
             val method = firstArg<String>()
             capturedMethod = method
             capturedParams = secondArg()
             when (method) {
-                "getWalletAddress" -> jsonOf("value" to TEST_ADDRESS_1)
+                "getWalletAddress" -> TEST_ADDRESS_1
                 else -> jsonOf(
                     "walletId" to "-239:$TEST_ADDRESS_1",
                     "wallet" to JSONObject().apply {
@@ -324,8 +212,8 @@ class WalletOperationsTest : OperationsTestBase() {
     }
 
     @Test
-    fun getWallet_returnsNullForEmptyResponse() = runBlocking {
-        givenBridgeReturns(JSONObject()) // Empty object
+    fun getWallet_returnsNullIfBridgeReturnsNull() = runBlocking {
+        givenBridgeReturnsRaw(null)
 
         val result = walletOperations.getWallet("nonexistent")
 
@@ -335,12 +223,12 @@ class WalletOperationsTest : OperationsTestBase() {
     @Test
     fun getWallet_returnsNullIfAddressMissing() = runBlocking {
         // Mock getWalletAddress to return empty string
-        coEvery { rpcClient.call(any(), any()) } coAnswers {
+        coEvery { rpcClient.callRaw(any(), any()) } coAnswers {
             val method = firstArg<String>()
             capturedMethod = method
             capturedParams = secondArg()
             when (method) {
-                "getWalletAddress" -> jsonOf("value" to "") // Empty address
+                "getWalletAddress" -> ""
                 else -> jsonOf(
                     "walletId" to "-239:missing",
                     "wallet" to JSONObject().apply {
@@ -359,70 +247,20 @@ class WalletOperationsTest : OperationsTestBase() {
     // --- getBalance tests ---
 
     @Test
-    fun getBalance_extractsBalanceFromObject() = runBlocking {
-        givenBridgeReturns(
-            jsonOf(
-                "balance" to "1000000000",
-            ),
-        )
+    fun getBalance_returnsRawString() = runBlocking {
+        givenBridgeReturnsRaw("1000000000")
 
         val result = walletOperations.getBalance("EQAddress")
 
         assertEquals("1000000000", result)
     }
 
-    @Test
-    fun getBalance_extractsBalanceFromValueKey() = runBlocking {
-        givenBridgeReturns(
-            jsonOf(
-                "value" to "500000000",
-            ),
-        )
-
-        val result = walletOperations.getBalance("EQAddress")
-
-        assertEquals("500000000", result)
-    }
-
-    @Test
-    fun getBalance_returnsZeroIfMissing() = runBlocking {
-        givenBridgeReturns(JSONObject()) // Empty object - toString() returns "{}"
-
-        val result = walletOperations.getBalance("EQAddress")
-
-        // Empty JSONObject.toString() = "{}" which is not null/empty,
-        // so the current impl returns "{}" - this tests actual behavior
-        assertEquals("{}", result)
-    }
-
     // --- removeWallet tests ---
 
     @Test
-    fun removeWallet_succeedsWithRemovedTrue() = runBlocking {
-        givenBridgeReturns(jsonOf("removed" to true))
-
-        // Should not throw
-        walletOperations.removeWallet("EQAddress")
-    }
-
-    @Test
-    fun removeWallet_succeedsWithOkTrue() = runBlocking {
-        givenBridgeReturns(jsonOf("ok" to true))
-
-        walletOperations.removeWallet("EQAddress")
-    }
-
-    @Test
-    fun removeWallet_succeedsWithEmptyResponse() = runBlocking {
-        // Empty response is treated as success
+    fun removeWallet_completesSuccessfully() = runBlocking {
+        // JS removeWallet returns void; bridge call succeeds without exception
         givenBridgeReturns(JSONObject())
-
-        walletOperations.removeWallet("EQAddress")
-    }
-
-    @Test(expected = WalletKitBridgeException::class)
-    fun removeWallet_throwsIfRemovedFalse() = runBlocking {
-        givenBridgeReturns(jsonOf("removed" to false))
 
         walletOperations.removeWallet("EQAddress")
     }
@@ -431,13 +269,12 @@ class WalletOperationsTest : OperationsTestBase() {
 
     @Test
     fun addWallet_parsesWalletResponse() = runBlocking {
-        // JS returns { walletId, wallet }
-        coEvery { rpcClient.call(any(), any()) } coAnswers {
+        coEvery { rpcClient.callRaw(any(), any()) } coAnswers {
             val method = firstArg<String>()
             capturedMethod = method
             capturedParams = secondArg()
             when (method) {
-                "getWalletAddress" -> jsonOf("value" to TEST_ADDRESS_1)
+                "getWalletAddress" -> TEST_ADDRESS_1
                 else -> jsonOf(
                     "walletId" to "-239:$TEST_ADDRESS_1",
                     "wallet" to JSONObject().apply {
@@ -463,12 +300,12 @@ class WalletOperationsTest : OperationsTestBase() {
 
     @Test
     fun addWallet_usesUnknownVersionIfMissing() = runBlocking {
-        coEvery { rpcClient.call(any(), any()) } coAnswers {
+        coEvery { rpcClient.callRaw(any(), any()) } coAnswers {
             val method = firstArg<String>()
             capturedMethod = method
             capturedParams = secondArg()
             when (method) {
-                "getWalletAddress" -> jsonOf("value" to TEST_ADDRESS_1)
+                "getWalletAddress" -> TEST_ADDRESS_1
                 else -> jsonOf(
                     "walletId" to "-239:$TEST_ADDRESS_1",
                     "wallet" to JSONObject(),

@@ -75,29 +75,24 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun listSessions_parsesSessionArray() = runBlocking {
-        givenBridgeReturns(
-            JSONObject().apply {
+        givenBridgeReturnsRaw(
+            JSONArray().apply {
                 put(
-                    "items",
-                    JSONArray().apply {
+                    JSONObject().apply {
+                        put("sessionId", TEST_SESSION_ID)
+                        put("walletId", "-239:$TEST_ADDRESS")
+                        put("walletAddress", TEST_ADDRESS)
+                        put("createdAt", "2025-01-01T00:00:00Z")
+                        put("lastActivityAt", "2025-01-02T12:00:00Z")
+                        put("privateKey", "test-private-key")
+                        put("publicKey", "test-public-key")
+                        put("domain", "example.com")
                         put(
+                            "dAppInfo",
                             JSONObject().apply {
-                                put("sessionId", TEST_SESSION_ID)
-                                put("walletId", "-239:$TEST_ADDRESS")
-                                put("walletAddress", TEST_ADDRESS)
-                                put("createdAt", "2025-01-01T00:00:00Z")
-                                put("lastActivityAt", "2025-01-02T12:00:00Z")
-                                put("privateKey", "test-private-key")
-                                put("publicKey", "test-public-key")
-                                put("domain", "example.com")
-                                put(
-                                    "dAppInfo",
-                                    JSONObject().apply {
-                                        put("name", "Test dApp")
-                                        put("url", TEST_DAPP_URL)
-                                        put("iconUrl", "https://example.com/icon.png")
-                                    },
-                                )
+                                put("name", "Test dApp")
+                                put("url", TEST_DAPP_URL)
+                                put("iconUrl", "https://example.com/icon.png")
                             },
                         )
                     },
@@ -117,11 +112,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun listSessions_returnsEmptyListIfNoSessions() = runBlocking {
-        givenBridgeReturns(
-            JSONObject().apply {
-                put("items", JSONArray())
-            },
-        )
+        givenBridgeReturnsRaw(JSONArray())
 
         val result = tonConnectOperations.listSessions()
 
@@ -130,28 +121,23 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun listSessions_handlesNullOptionalFields() = runBlocking {
-        givenBridgeReturns(
-            JSONObject().apply {
+        givenBridgeReturnsRaw(
+            JSONArray().apply {
                 put(
-                    "items",
-                    JSONArray().apply {
+                    JSONObject().apply {
+                        put("sessionId", TEST_SESSION_ID)
+                        put("walletId", "-239:$TEST_ADDRESS")
+                        put("walletAddress", TEST_ADDRESS)
+                        put("createdAt", "")
+                        put("lastActivityAt", "")
+                        put("privateKey", "")
+                        put("publicKey", "")
+                        put("domain", "")
                         put(
+                            "dAppInfo",
                             JSONObject().apply {
-                                put("sessionId", TEST_SESSION_ID)
-                                put("walletId", "-239:$TEST_ADDRESS")
-                                put("walletAddress", TEST_ADDRESS)
-                                put("createdAt", "")
-                                put("lastActivityAt", "")
-                                put("privateKey", "")
-                                put("publicKey", "")
-                                put("domain", "")
-                                put(
-                                    "dAppInfo",
-                                    JSONObject().apply {
-                                        put("name", "Minimal dApp")
-                                        // No optional url/iconUrl fields
-                                    },
-                                )
+                                put("name", "Minimal dApp")
+                                // No optional url/iconUrl fields
                             },
                         )
                     },
@@ -169,67 +155,22 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun listSessions_handlesMultipleSessions() = runBlocking {
-        givenBridgeReturns(
-            JSONObject().apply {
-                put(
-                    "items",
-                    JSONArray().apply {
-                        put(
-                            JSONObject().apply {
-                                put("sessionId", "session-1")
-                                put("walletId", "-239:$TEST_ADDRESS")
-                                put("walletAddress", TEST_ADDRESS)
-                                put("createdAt", "")
-                                put("lastActivityAt", "")
-                                put("privateKey", "")
-                                put("publicKey", "")
-                                put("domain", "")
-                                put(
-                                    "dAppInfo",
-                                    JSONObject().apply {
-                                        put("name", "dApp 1")
-                                    },
-                                )
-                            },
-                        )
-                        put(
-                            JSONObject().apply {
-                                put("sessionId", "session-2")
-                                put("walletId", "-239:$TEST_ADDRESS")
-                                put("walletAddress", TEST_ADDRESS)
-                                put("createdAt", "")
-                                put("lastActivityAt", "")
-                                put("privateKey", "")
-                                put("publicKey", "")
-                                put("domain", "")
-                                put(
-                                    "dAppInfo",
-                                    JSONObject().apply {
-                                        put("name", "dApp 2")
-                                    },
-                                )
-                            },
-                        )
-                        put(
-                            JSONObject().apply {
-                                put("sessionId", "session-3")
-                                put("walletId", "-239:$TEST_ADDRESS")
-                                put("walletAddress", TEST_ADDRESS)
-                                put("createdAt", "")
-                                put("lastActivityAt", "")
-                                put("privateKey", "")
-                                put("publicKey", "")
-                                put("domain", "")
-                                put(
-                                    "dAppInfo",
-                                    JSONObject().apply {
-                                        put("name", "dApp 3")
-                                    },
-                                )
-                            },
-                        )
-                    },
-                )
+        fun sessionEntry(sessionId: String, dAppName: String): JSONObject = JSONObject().apply {
+            put("sessionId", sessionId)
+            put("walletId", "-239:$TEST_ADDRESS")
+            put("walletAddress", TEST_ADDRESS)
+            put("createdAt", "")
+            put("lastActivityAt", "")
+            put("privateKey", "")
+            put("publicKey", "")
+            put("domain", "")
+            put("dAppInfo", JSONObject().apply { put("name", dAppName) })
+        }
+        givenBridgeReturnsRaw(
+            JSONArray().apply {
+                put(sessionEntry("session-1", "dApp 1"))
+                put(sessionEntry("session-2", "dApp 2"))
+                put(sessionEntry("session-3", "dApp 3"))
             },
         )
 

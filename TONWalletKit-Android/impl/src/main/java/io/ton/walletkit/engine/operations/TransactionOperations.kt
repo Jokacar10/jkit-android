@@ -31,10 +31,10 @@ import io.ton.walletkit.engine.operations.requests.CreateTransferTonRequest
 import io.ton.walletkit.engine.operations.requests.GetTransactionPreviewRequest
 import io.ton.walletkit.engine.operations.requests.HandleNewTransactionRequest
 import io.ton.walletkit.engine.operations.requests.SendTransactionRequest
+import io.ton.walletkit.engine.operations.responses.SendTransactionResponse
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
-import io.ton.walletkit.internal.constants.ResponseConstants
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import org.json.JSONException
 
 /**
  * Groups TON transaction related bridge operations including creation, preview,
@@ -79,18 +79,17 @@ internal class TransactionOperations(
     suspend fun handleNewTransaction(walletId: String, transactionContent: TONTransactionRequest) {
         ensureInitialized()
         val request = HandleNewTransactionRequest(walletId = walletId, transactionContent = transactionContent)
-        rpcClient.call(BridgeMethodConstants.METHOD_HANDLE_NEW_TRANSACTION, request)
+        rpcClient.send(BridgeMethodConstants.METHOD_HANDLE_NEW_TRANSACTION, request)
     }
 
     suspend fun sendTransaction(walletId: String, transactionContent: TONTransactionRequest): String {
         ensureInitialized()
         val request = SendTransactionRequest(walletId = walletId, transactionContent = transactionContent)
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_SEND_TRANSACTION, request)
-        return when {
-            result.has(ResponseConstants.KEY_BOC) -> result.getString(ResponseConstants.KEY_BOC)
-            result.has(ResponseConstants.KEY_SIGNED_BOC) -> result.getString(ResponseConstants.KEY_SIGNED_BOC)
-            else -> throw JSONException("No value for boc or signedBoc")
-        }
+        val response: SendTransactionResponse =
+            rpcClient.callTyped(BridgeMethodConstants.METHOD_SEND_TRANSACTION, request, json)
+        return response.boc
+            ?: response.signedBoc
+            ?: throw SerializationException("No value for boc or signedBoc")
     }
 
     suspend fun getTransactionPreview(

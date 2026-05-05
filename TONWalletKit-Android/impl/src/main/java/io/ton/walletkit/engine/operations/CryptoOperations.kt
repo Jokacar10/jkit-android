@@ -23,13 +23,13 @@ package io.ton.walletkit.engine.operations
 
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
+import io.ton.walletkit.engine.infrastructure.callTyped
 import io.ton.walletkit.engine.operations.requests.CreateMnemonicRequest
 import io.ton.walletkit.engine.operations.requests.MnemonicToKeyPairRequest
 import io.ton.walletkit.engine.operations.requests.SignRequest
+import io.ton.walletkit.engine.operations.responses.KeyPairResponse
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.LogConstants
-import io.ton.walletkit.internal.constants.ResponseConstants
-import io.ton.walletkit.internal.util.JsonUtils
 import io.ton.walletkit.internal.util.Logger
 import io.ton.walletkit.internal.util.WalletKitUtils
 import io.ton.walletkit.model.KeyPair
@@ -64,16 +64,11 @@ internal class CryptoOperations(
         ensureInitialized()
 
         val request = CreateMnemonicRequest(count = wordCount)
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_CREATE_TON_MNEMONIC, request)
-
-        val items = result.optJSONArray(ResponseConstants.KEY_ITEMS)
-
-        if (items == null) {
+        val items: List<String> = rpcClient.callTyped(BridgeMethodConstants.METHOD_CREATE_TON_MNEMONIC, request, json)
+        if (items.isEmpty()) {
             Logger.w(TAG, "Mnemonic generation returned no items (wordCount=$wordCount)")
-            return emptyList()
         }
-
-        return List(items.length()) { index -> items.optString(index) }
+        return items
     }
 
     /**
@@ -91,18 +86,9 @@ internal class CryptoOperations(
         ensureInitialized()
 
         val request = MnemonicToKeyPairRequest(mnemonic = words, mnemonicType = mnemonicType)
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_MNEMONIC_TO_KEY_PAIR, request)
-
-        // Uint8Array properties may arrive as indexed JSON objects depending on the bridge.
-        val publicKeyJson = result.opt(ResponseConstants.KEY_PUBLIC_KEY)
-            ?: throw WalletKitBridgeException("Missing publicKey in mnemonicToKeyPair response")
-        val secretKeyJson = result.opt(ResponseConstants.KEY_SECRET_KEY)
-            ?: throw WalletKitBridgeException("Missing secretKey in mnemonicToKeyPair response")
-
-        val publicKey = JsonUtils.jsonToByteArray(publicKeyJson, "publicKey")
-        val secretKey = JsonUtils.jsonToByteArray(secretKeyJson, "secretKey")
-
-        return KeyPair(publicKey, secretKey)
+        val response: KeyPairResponse =
+            rpcClient.callTyped(BridgeMethodConstants.METHOD_MNEMONIC_TO_KEY_PAIR, request, json)
+        return KeyPair(response.publicKey, response.secretKey)
     }
 
     /**
@@ -123,19 +109,10 @@ internal class CryptoOperations(
             data = data.map { it.toInt() and 0xFF },
             secretKey = secretKey.map { it.toInt() and 0xFF },
         )
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_SIGN, request)
-
-        // BridgeRpcClient wraps primitive JS results into { value: ... }.
-        // Older code also supported { signature: ... }, so accept both.
-        val signatureHex = when {
-            result is String -> result
-            result.has(ResponseConstants.KEY_VALUE) -> result.optString(ResponseConstants.KEY_VALUE)
-            result.has(ResponseConstants.KEY_SIGNATURE) -> result.optString(ResponseConstants.KEY_SIGNATURE)
-            else -> result.toString()
-        }.takeIf { it.isNotEmpty() && it != "null" }
-            ?: throw WalletKitBridgeException(ERROR_SIGNATURE_MISSING_SIGN_RESULT)
-
-        // Convert hex string to ByteArray
+        val signatureHex: String = rpcClient.callTyped(BridgeMethodConstants.METHOD_SIGN, request, json)
+        if (signatureHex.isEmpty() || signatureHex == "null") {
+            throw WalletKitBridgeException(ERROR_SIGNATURE_MISSING_SIGN_RESULT)
+        }
         return WalletKitUtils.hexToByteArray(signatureHex)
     }
 

@@ -491,7 +491,7 @@ internal interface WalletKitEngine : RequestHandler {
 
     suspend fun getSwapQuote(params: TONSwapQuoteParams<JsonElement>, providerId: String?): TONSwapQuote
 
-    suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): String
+    suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): TONTransactionRequest
 
     // ── Staking ──
 
@@ -539,7 +539,7 @@ internal interface WalletKitEngine : RequestHandler {
     suspend fun buildStakeTransaction(
         params: TONStakeParams<JsonElement>,
         providerId: String?,
-    ): String
+    ): TONTransactionRequest
 
     suspend fun getStakedBalance(
         userAddress: String,

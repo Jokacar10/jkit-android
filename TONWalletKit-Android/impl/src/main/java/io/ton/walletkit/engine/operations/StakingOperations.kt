@@ -28,6 +28,7 @@ import io.ton.walletkit.api.generated.TONStakingProviderInfo
 import io.ton.walletkit.api.generated.TONStakingQuote
 import io.ton.walletkit.api.generated.TONStakingQuoteParams
 import io.ton.walletkit.api.generated.TONTonStakersChainConfig
+import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.api.generated.TONUnstakeMode
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import io.ton.walletkit.engine.infrastructure.callTyped
@@ -40,6 +41,9 @@ import io.ton.walletkit.engine.operations.requests.GetSupportedUnstakeModesReque
 import io.ton.walletkit.engine.operations.requests.HasStakingProviderRequest
 import io.ton.walletkit.engine.operations.requests.RegisterStakingProviderRequest
 import io.ton.walletkit.engine.operations.requests.SetDefaultStakingProviderRequest
+import io.ton.walletkit.engine.operations.responses.HasProviderResponse
+import io.ton.walletkit.engine.operations.responses.ProviderIdResponse
+import io.ton.walletkit.engine.operations.responses.ProviderIdsResponse
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -69,31 +73,33 @@ internal class StakingOperations(
     suspend fun createTonStakersStakingProvider(chainConfig: Map<String, TONTonStakersChainConfig>?): String {
         ensureInitialized()
         val request = CreateTonStakersStakingProviderRequest(config = chainConfig)
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_CREATE_TON_STAKERS_STAKING_PROVIDER, request)
-        return result.getString("providerId")
+        val response: ProviderIdResponse =
+            rpcClient.callTyped(BridgeMethodConstants.METHOD_CREATE_TON_STAKERS_STAKING_PROVIDER, request, json)
+        return response.providerId
     }
 
     suspend fun registerStakingProvider(providerId: String) {
         ensureInitialized()
-        rpcClient.call(BridgeMethodConstants.METHOD_REGISTER_STAKING_PROVIDER, RegisterStakingProviderRequest(providerId))
+        rpcClient.send(BridgeMethodConstants.METHOD_REGISTER_STAKING_PROVIDER, RegisterStakingProviderRequest(providerId))
     }
 
     suspend fun setDefaultStakingProvider(providerId: String) {
         ensureInitialized()
-        rpcClient.call(BridgeMethodConstants.METHOD_SET_DEFAULT_STAKING_PROVIDER, SetDefaultStakingProviderRequest(providerId))
+        rpcClient.send(BridgeMethodConstants.METHOD_SET_DEFAULT_STAKING_PROVIDER, SetDefaultStakingProviderRequest(providerId))
     }
 
     suspend fun getRegisteredStakingProviders(): List<String> {
         ensureInitialized()
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_GET_REGISTERED_STAKING_PROVIDERS, null)
-        val array = result.getJSONArray("providerIds")
-        return List(array.length()) { array.getString(it) }
+        val response: ProviderIdsResponse =
+            rpcClient.callTyped(BridgeMethodConstants.METHOD_GET_REGISTERED_STAKING_PROVIDERS, null, json)
+        return response.providerIds
     }
 
     suspend fun hasStakingProvider(providerId: String): Boolean {
         ensureInitialized()
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_HAS_STAKING_PROVIDER, HasStakingProviderRequest(providerId))
-        return result.getBoolean("result")
+        val response: HasProviderResponse =
+            rpcClient.callTyped(BridgeMethodConstants.METHOD_HAS_STAKING_PROVIDER, HasStakingProviderRequest(providerId), json)
+        return response.result
     }
 
     suspend fun getStakingQuote(params: TONStakingQuoteParams<JsonElement>, providerId: String?): TONStakingQuote {
@@ -110,7 +116,7 @@ internal class StakingOperations(
         return rpcClient.callTyped(BridgeMethodConstants.METHOD_GET_STAKING_QUOTE, request, json)
     }
 
-    suspend fun buildStakeTransaction(params: TONStakeParams<JsonElement>, providerId: String?): String {
+    suspend fun buildStakeTransaction(params: TONStakeParams<JsonElement>, providerId: String?): TONTransactionRequest {
         ensureInitialized()
         val request = BuildStakeTransactionRequest(
             quote = params.quote,
@@ -118,7 +124,7 @@ internal class StakingOperations(
             providerOptions = params.providerOptions,
             providerId = providerId,
         )
-        return rpcClient.call(BridgeMethodConstants.METHOD_BUILD_STAKE_TRANSACTION, request).toString()
+        return rpcClient.callTyped(BridgeMethodConstants.METHOD_BUILD_STAKE_TRANSACTION, request, json)
     }
 
     suspend fun getStakedBalance(userAddress: String, network: TONNetwork?, providerId: String?): TONStakingBalance {

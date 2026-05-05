@@ -243,7 +243,7 @@ internal class MessageDispatcher(
                 initManager.ensureInitialized()
                 onInitialized()
 
-                rpcClient.call(BridgeMethodConstants.METHOD_SET_EVENTS_LISTENERS, JSONObject())
+                rpcClient.send(BridgeMethodConstants.METHOD_SET_EVENTS_LISTENERS, JSONObject())
                 areEventListenersSetUp = true
             } catch (err: Throwable) {
                 Logger.e(TAG, "Failed to set up event listeners", err)
@@ -257,7 +257,7 @@ internal class MessageDispatcher(
             return
         }
         try {
-            rpcClient.call(BridgeMethodConstants.METHOD_REMOVE_EVENT_LISTENERS, JSONObject())
+            rpcClient.send(BridgeMethodConstants.METHOD_REMOVE_EVENT_LISTENERS, JSONObject())
             areEventListenersSetUp = false
             Logger.d(TAG, "Event listeners removed from JS bridge (no handlers remaining)")
         } catch (e: Exception) {
