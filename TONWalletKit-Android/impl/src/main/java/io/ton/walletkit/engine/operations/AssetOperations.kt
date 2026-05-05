@@ -28,6 +28,7 @@ import io.ton.walletkit.api.generated.TONNFTRawTransferRequest
 import io.ton.walletkit.api.generated.TONNFTTransferRequest
 import io.ton.walletkit.api.generated.TONNFTsResponse
 import io.ton.walletkit.api.generated.TONPagination
+import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import io.ton.walletkit.engine.infrastructure.callTyped
 import io.ton.walletkit.engine.operations.requests.CreateTransferJettonRequest
@@ -76,7 +77,7 @@ internal class AssetOperations(
     suspend fun createTransferNftTransaction(
         walletId: String,
         params: TONNFTTransferRequest,
-    ): String {
+    ): TONTransactionRequest {
         ensureInitialized()
         val request = CreateTransferNftRequest(
             walletId = walletId,
@@ -85,13 +86,13 @@ internal class AssetOperations(
             recipientAddress = params.recipientAddress.value,
             comment = params.comment,
         )
-        return rpcClient.call(BridgeMethodConstants.METHOD_CREATE_TRANSFER_NFT_TRANSACTION, request).toString()
+        return rpcClient.callTyped(BridgeMethodConstants.METHOD_CREATE_TRANSFER_NFT_TRANSACTION, request, json)
     }
 
     suspend fun createTransferNftRawTransaction(
         walletId: String,
         params: TONNFTRawTransferRequest,
-    ): String {
+    ): TONTransactionRequest {
         ensureInitialized()
         val request = CreateTransferNftRawRequest(
             walletId = walletId,
@@ -99,7 +100,7 @@ internal class AssetOperations(
             transferAmount = params.transferAmount,
             message = params.message,
         )
-        return rpcClient.call(BridgeMethodConstants.METHOD_CREATE_TRANSFER_NFT_RAW_TRANSACTION, request).toString()
+        return rpcClient.callTyped(BridgeMethodConstants.METHOD_CREATE_TRANSFER_NFT_RAW_TRANSACTION, request, json)
     }
 
     suspend fun getJettons(walletId: String, limit: Int, offset: Int): TONJettonsResponse {
@@ -114,7 +115,7 @@ internal class AssetOperations(
     suspend fun createTransferJettonTransaction(
         walletId: String,
         params: TONJettonsTransferRequest,
-    ): String {
+    ): TONTransactionRequest {
         ensureInitialized()
         val request = CreateTransferJettonRequest(
             walletId = walletId,
@@ -123,7 +124,7 @@ internal class AssetOperations(
             transferAmount = params.transferAmount,
             comment = params.comment,
         )
-        return rpcClient.call(BridgeMethodConstants.METHOD_CREATE_TRANSFER_JETTON_TRANSACTION, request).toString()
+        return rpcClient.callTyped(BridgeMethodConstants.METHOD_CREATE_TRANSFER_JETTON_TRANSACTION, request, json)
     }
 
     suspend fun getJettonBalance(walletId: String, jettonAddress: String): String {

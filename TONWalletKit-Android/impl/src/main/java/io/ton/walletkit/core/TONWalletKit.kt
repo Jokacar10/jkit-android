@@ -34,6 +34,7 @@ import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSignatureDomain
 import io.ton.walletkit.api.generated.TONTonApiStreamingProviderConfig
 import io.ton.walletkit.api.generated.TONTonCenterStreamingProviderConfig
+import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.browser.TonConnectInjector
 import io.ton.walletkit.config.TONWalletKitConfiguration
 import io.ton.walletkit.core.streaming.TONStreamingManager
@@ -405,7 +406,7 @@ internal class TONWalletKit private constructor(
      * @param transactionContent Transaction content as JSON string (from createTransferTonTransaction, etc.)
      * @throws io.ton.walletkit.WalletKitBridgeException if transaction handling fails
      */
-    override suspend fun handleNewTransaction(wallet: ITONWallet, transactionContent: String) {
+    override suspend fun handleNewTransaction(wallet: ITONWallet, transactionContent: TONTransactionRequest) {
         checkNotDestroyed()
         val addr = wallet.address?.value ?: throw IllegalArgumentException("Wallet address is null")
         engine.handleNewTransaction(addr, transactionContent)

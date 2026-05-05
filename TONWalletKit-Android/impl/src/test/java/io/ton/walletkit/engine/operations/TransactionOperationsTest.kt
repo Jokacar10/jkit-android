@@ -50,6 +50,9 @@ class TransactionOperationsTest : OperationsTestBase() {
         const val TEST_TO_ADDRESS = "Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF"
     }
 
+    private fun emptyTx(): io.ton.walletkit.api.generated.TONTransactionRequest =
+        io.ton.walletkit.api.generated.TONTransactionRequest(messages = emptyList())
+
     @Before
     override fun setup() {
         super.setup()
@@ -89,8 +92,8 @@ class TransactionOperationsTest : OperationsTestBase() {
         val result = transactionOperations.createTransferTonTransaction(TEST_ADDRESS, params)
 
         assertNotNull(result)
-        assertTrue(result.contains("messages"))
-        assertTrue(result.contains("fromAddress"))
+        assertEquals(TEST_ADDRESS, result.fromAddress)
+        assertTrue(result.messages.isNotEmpty())
     }
 
     @Test
@@ -146,8 +149,8 @@ class TransactionOperationsTest : OperationsTestBase() {
         )
         val result = transactionOperations.createTransferMultiTonTransaction(TEST_ADDRESS, messages)
 
-        assertTrue(result.contains("messages"))
-        assertTrue(result.contains("fromAddress"))
+        assertEquals(TEST_ADDRESS, result.fromAddress)
+        assertEquals(2, result.messages.size)
     }
 
     // --- sendTransaction tests ---
@@ -162,7 +165,7 @@ class TransactionOperationsTest : OperationsTestBase() {
             ),
         )
 
-        val result = transactionOperations.sendTransaction(TEST_ADDRESS, """{"messages":[]}""")
+        val result = transactionOperations.sendTransaction(TEST_ADDRESS, emptyTx())
 
         assertEquals("te6ccgEBAgEA...", result)
     }
@@ -175,7 +178,7 @@ class TransactionOperationsTest : OperationsTestBase() {
             ),
         )
 
-        val result = transactionOperations.sendTransaction(TEST_ADDRESS, """{"messages":[]}""")
+        val result = transactionOperations.sendTransaction(TEST_ADDRESS, emptyTx())
 
         assertEquals("te6ccgEBAgEA...", result)
         val encoded = encodeCapturedParams() as JSONObject
@@ -192,7 +195,7 @@ class TransactionOperationsTest : OperationsTestBase() {
             ),
         )
 
-        val result = transactionOperations.sendTransaction(TEST_ADDRESS, """{"messages":[{"address":"$TEST_TO_ADDRESS","amount":"1000000000"}]}""")
+        val result = transactionOperations.sendTransaction(TEST_ADDRESS, emptyTx())
 
         assertEquals("te6ccgEBAgEA...wallet", result)
     }
@@ -202,7 +205,7 @@ class TransactionOperationsTest : OperationsTestBase() {
         assertThrows(JSONException::class.java) {
             runBlocking {
                 givenBridgeReturns(JSONObject())
-                transactionOperations.sendTransaction(TEST_ADDRESS, """{"messages":[]}""")
+                transactionOperations.sendTransaction(TEST_ADDRESS, emptyTx())
             }
         }
     }
@@ -217,7 +220,7 @@ class TransactionOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = transactionOperations.getTransactionPreview(TEST_ADDRESS, """{"messages":[]}""")
+        val result = transactionOperations.getTransactionPreview(TEST_ADDRESS, emptyTx())
 
         // Result should be a Success type
         assertNotNull(result)
@@ -233,7 +236,7 @@ class TransactionOperationsTest : OperationsTestBase() {
         givenBridgeReturns(JSONObject()) // Success, no return value needed
 
         // Should not throw
-        transactionOperations.handleNewTransaction(TEST_ADDRESS, """{"boc":"..."}""")
+        transactionOperations.handleNewTransaction(TEST_ADDRESS, emptyTx())
         val encoded = encodeCapturedParams() as JSONObject
         assertTrue(encoded.get("transactionContent") is JSONObject)
     }

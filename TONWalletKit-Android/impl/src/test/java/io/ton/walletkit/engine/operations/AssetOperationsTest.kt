@@ -247,14 +247,14 @@ class AssetOperationsTest : OperationsTestBase() {
         )
         val result = assetOperations.createTransferNftTransaction(TEST_ADDRESS, params)
 
-        assertTrue(result.contains("messages"))
+        assertEquals(1, result.messages.size)
     }
 
     // --- createTransferNftRawTransaction tests ---
 
     @Test
     fun createTransferNftRawTransaction_returnsTransactionString() = runBlocking {
-        val transactionContent = """{"boc":"te6..."}"""
+        val transactionContent = """{"messages":[{"address":"EQ...","amount":"1"}]}"""
         givenBridgeReturns(JSONObject(transactionContent))
 
         val params = TONNFTRawTransferRequest(
@@ -268,14 +268,14 @@ class AssetOperationsTest : OperationsTestBase() {
         )
         val result = assetOperations.createTransferNftRawTransaction(TEST_ADDRESS, params)
 
-        assertTrue(result.contains("boc"))
+        assertEquals(1, result.messages.size)
     }
 
     // --- createTransferJettonTransaction tests ---
 
     @Test
     fun createTransferJettonTransaction_returnsTransactionString() = runBlocking {
-        val transactionContent = """{"messages":[{"address":"EQ..."}]}"""
+        val transactionContent = """{"messages":[{"address":"EQ...","amount":"100"}]}"""
         givenBridgeReturns(JSONObject(transactionContent))
 
         val params = TONJettonsTransferRequest(
@@ -286,6 +286,6 @@ class AssetOperationsTest : OperationsTestBase() {
         )
         val result = assetOperations.createTransferJettonTransaction(TEST_ADDRESS, params)
 
-        assertTrue(result.contains("messages"))
+        assertEquals(1, result.messages.size)
     }
 }

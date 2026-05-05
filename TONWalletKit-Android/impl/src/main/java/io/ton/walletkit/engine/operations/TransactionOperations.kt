@@ -22,6 +22,7 @@
 package io.ton.walletkit.engine.operations
 
 import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
+import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.api.generated.TONTransferRequest
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import io.ton.walletkit.engine.infrastructure.callTyped
@@ -30,12 +31,9 @@ import io.ton.walletkit.engine.operations.requests.CreateTransferTonRequest
 import io.ton.walletkit.engine.operations.requests.GetTransactionPreviewRequest
 import io.ton.walletkit.engine.operations.requests.HandleNewTransactionRequest
 import io.ton.walletkit.engine.operations.requests.SendTransactionRequest
-import io.ton.walletkit.exceptions.JSValueConversionException
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.ResponseConstants
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import org.json.JSONException
 
 /**
@@ -53,22 +51,11 @@ internal class TransactionOperations(
     private val rpcClient: BridgeRpcClient,
     private val json: Json,
 ) {
-    private fun parseTransactionContent(transactionContent: String): JsonElement =
-        try {
-            json.parseToJsonElement(transactionContent)
-        } catch (e: SerializationException) {
-            throw JSValueConversionException.DecodingError(
-                message = "Failed to decode TONTransactionRequest: ${e.message}",
-                cause = e,
-            )
-        }
-
     suspend fun createTransferTonTransaction(
         walletId: String,
         params: TONTransferRequest,
-    ): String {
+    ): TONTransactionRequest {
         ensureInitialized()
-
         val request = CreateTransferTonRequest(
             walletId = walletId,
             recipientAddress = params.recipientAddress.value,
@@ -77,36 +64,27 @@ internal class TransactionOperations(
             body = params.payload?.value,
             stateInit = params.stateInit?.value,
         )
-        return rpcClient.call(BridgeMethodConstants.METHOD_CREATE_TRANSFER_TON_TRANSACTION, request).toString()
+        return rpcClient.callTyped(BridgeMethodConstants.METHOD_CREATE_TRANSFER_TON_TRANSACTION, request, json)
     }
 
     suspend fun createTransferMultiTonTransaction(
         walletId: String,
         messages: List<TONTransferRequest>,
-    ): String {
+    ): TONTransactionRequest {
         ensureInitialized()
-
         val request = CreateTransferMultiTonRequest(walletId = walletId, messages = messages)
-        return rpcClient.call(BridgeMethodConstants.METHOD_CREATE_TRANSFER_MULTI_TON_TRANSACTION, request).toString()
+        return rpcClient.callTyped(BridgeMethodConstants.METHOD_CREATE_TRANSFER_MULTI_TON_TRANSACTION, request, json)
     }
 
-    suspend fun handleNewTransaction(walletId: String, transactionContent: String) {
+    suspend fun handleNewTransaction(walletId: String, transactionContent: TONTransactionRequest) {
         ensureInitialized()
-
-        val request = HandleNewTransactionRequest(
-            walletId = walletId,
-            transactionContent = parseTransactionContent(transactionContent),
-        )
+        val request = HandleNewTransactionRequest(walletId = walletId, transactionContent = transactionContent)
         rpcClient.call(BridgeMethodConstants.METHOD_HANDLE_NEW_TRANSACTION, request)
     }
 
-    suspend fun sendTransaction(walletId: String, transactionContent: String): String {
+    suspend fun sendTransaction(walletId: String, transactionContent: TONTransactionRequest): String {
         ensureInitialized()
-
-        val request = SendTransactionRequest(
-            walletId = walletId,
-            transactionContent = parseTransactionContent(transactionContent),
-        )
+        val request = SendTransactionRequest(walletId = walletId, transactionContent = transactionContent)
         val result = rpcClient.call(BridgeMethodConstants.METHOD_SEND_TRANSACTION, request)
         return when {
             result.has(ResponseConstants.KEY_BOC) -> result.getString(ResponseConstants.KEY_BOC)
@@ -115,13 +93,12 @@ internal class TransactionOperations(
         }
     }
 
-    suspend fun getTransactionPreview(walletId: String, transactionContent: String): TONTransactionEmulatedPreview {
+    suspend fun getTransactionPreview(
+        walletId: String,
+        transactionContent: TONTransactionRequest,
+    ): TONTransactionEmulatedPreview {
         ensureInitialized()
-
-        val request = GetTransactionPreviewRequest(
-            walletId = walletId,
-            transactionContent = parseTransactionContent(transactionContent),
-        )
+        val request = GetTransactionPreviewRequest(walletId = walletId, transactionContent = transactionContent)
         return rpcClient.callTyped(BridgeMethodConstants.METHOD_GET_TRANSACTION_PREVIEW, request, json)
     }
 }

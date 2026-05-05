@@ -50,6 +50,7 @@ import io.ton.walletkit.api.generated.TONSwapQuote
 import io.ton.walletkit.api.generated.TONSwapQuoteParams
 import io.ton.walletkit.api.generated.TONTonStakersChainConfig
 import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
+import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.api.generated.TONTransferRequest
 import io.ton.walletkit.api.generated.TONUnstakeMode
 import io.ton.walletkit.bridge.BridgeCodec
@@ -380,16 +381,16 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun createTransferTonTransaction(
         walletId: String,
         params: TONTransferRequest,
-    ): String = transactionOperations.createTransferTonTransaction(walletId, params)
+    ): TONTransactionRequest = transactionOperations.createTransferTonTransaction(walletId, params)
 
     override suspend fun handleNewTransaction(
         walletId: String,
-        transactionContent: String,
+        transactionContent: TONTransactionRequest,
     ) = transactionOperations.handleNewTransaction(walletId, transactionContent)
 
     override suspend fun sendTransaction(
         walletId: String,
-        transactionContent: String,
+        transactionContent: TONTransactionRequest,
     ): String = transactionOperations.sendTransaction(walletId, transactionContent)
 
     override suspend fun approveConnect(
@@ -445,12 +446,12 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun createTransferNftTransaction(
         walletId: String,
         params: TONNFTTransferRequest,
-    ): String = assetOperations.createTransferNftTransaction(walletId, params)
+    ): TONTransactionRequest = assetOperations.createTransferNftTransaction(walletId, params)
 
     override suspend fun createTransferNftRawTransaction(
         walletId: String,
         params: TONNFTRawTransferRequest,
-    ): String = assetOperations.createTransferNftRawTransaction(walletId, params)
+    ): TONTransactionRequest = assetOperations.createTransferNftRawTransaction(walletId, params)
 
     override suspend fun getJettons(
         walletId: String,
@@ -461,16 +462,16 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun createTransferJettonTransaction(
         walletId: String,
         params: TONJettonsTransferRequest,
-    ): String = assetOperations.createTransferJettonTransaction(walletId, params)
+    ): TONTransactionRequest = assetOperations.createTransferJettonTransaction(walletId, params)
 
     override suspend fun createTransferMultiTonTransaction(
         walletId: String,
         messages: List<TONTransferRequest>,
-    ): String = transactionOperations.createTransferMultiTonTransaction(walletId, messages)
+    ): TONTransactionRequest = transactionOperations.createTransferMultiTonTransaction(walletId, messages)
 
     override suspend fun getTransactionPreview(
         walletId: String,
-        transactionContent: String,
+        transactionContent: TONTransactionRequest,
     ): TONTransactionEmulatedPreview =
         transactionOperations.getTransactionPreview(walletId, transactionContent)
 

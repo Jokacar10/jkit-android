@@ -47,6 +47,7 @@ import io.ton.walletkit.api.generated.TONSwapQuote
 import io.ton.walletkit.api.generated.TONSwapQuoteParams
 import io.ton.walletkit.api.generated.TONTonStakersChainConfig
 import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
+import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.api.generated.TONTransferRequest
 import io.ton.walletkit.api.generated.TONUnstakeMode
 import io.ton.walletkit.config.TONWalletKitConfiguration
@@ -242,37 +243,28 @@ internal interface WalletKitEngine : RequestHandler {
     suspend fun createTransferTonTransaction(
         walletId: String,
         params: TONTransferRequest,
-    ): String
+    ): TONTransactionRequest
 
     /**
      * Handle a new transaction initiated from the wallet app.
      *
-     * This method matches the JS WalletKit API kit.handleNewTransaction() and triggers
-     * a transaction request event that can be approved or rejected via the event handler.
-     *
-     * @param walletId Wallet ID
-     * @param transactionContent Transaction content as JSON (from createTransferTonTransaction, etc.)
+     * @return Transaction hash (signedBoc) after successful broadcast
      * @throws WalletKitBridgeException if transaction handling fails
      */
     suspend fun handleNewTransaction(
         walletId: String,
-        transactionContent: String,
+        transactionContent: TONTransactionRequest,
     )
 
     /**
      * Send a transaction to the blockchain.
      *
-     * This method takes transaction content (as JSON) and sends it to the blockchain,
-     * returning the transaction hash. This matches the iOS wallet.sendTransaction() behavior.
-     *
-     * @param walletId Wallet ID
-     * @param transactionContent Transaction content as JSON (from transferNFT, createTransferJettonTransaction, etc.)
      * @return Transaction hash (signedBoc) after successful broadcast
      * @throws WalletKitBridgeException if sending fails
      */
     suspend fun sendTransaction(
         walletId: String,
-        transactionContent: String,
+        transactionContent: TONTransactionRequest,
     ): String
 
     /**
@@ -400,20 +392,15 @@ internal interface WalletKitEngine : RequestHandler {
     suspend fun createTransferNftTransaction(
         walletId: String,
         params: TONNFTTransferRequest,
-    ): String
+    ): TONTransactionRequest
 
     /**
      * Create an NFT transfer transaction with raw parameters.
-     *
-     * @param walletId Wallet ID
-     * @param params Raw transfer parameters
-     * @return Transaction content as JSON string
-     * @throws WalletKitBridgeException if transaction creation fails
      */
     suspend fun createTransferNftRawTransaction(
         walletId: String,
         params: TONNFTRawTransferRequest,
-    ): String
+    ): TONTransactionRequest
 
     /**
      * Get jetton wallets owned by a wallet with pagination.
@@ -437,32 +424,22 @@ internal interface WalletKitEngine : RequestHandler {
     suspend fun createTransferJettonTransaction(
         walletId: String,
         params: TONJettonsTransferRequest,
-    ): String
+    ): TONTransactionRequest
 
     /**
      * Create a multi-recipient TON transfer transaction.
-     *
-     * @param walletId Wallet ID
-     * @param messages List of transfer parameters for each recipient
-     * @return Transaction content as JSON string
-     * @throws WalletKitBridgeException if transaction creation fails
      */
     suspend fun createTransferMultiTonTransaction(
         walletId: String,
         messages: List<TONTransferRequest>,
-    ): String
+    ): TONTransactionRequest
 
     /**
      * Get a preview of a transaction including estimated fees.
-     *
-     * @param walletId Wallet ID
-     * @param transactionContent Transaction content as JSON string
-     * @return Transaction preview with fee estimation
-     * @throws WalletKitBridgeException if preview generation fails
      */
     suspend fun getTransactionPreview(
         walletId: String,
-        transactionContent: String,
+        transactionContent: TONTransactionRequest,
     ): TONTransactionEmulatedPreview
 
     /**
