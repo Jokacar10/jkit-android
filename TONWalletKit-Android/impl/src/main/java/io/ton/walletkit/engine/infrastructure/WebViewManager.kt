@@ -69,9 +69,6 @@ import org.json.JSONObject
 /**
  * Owns the WebView lifecycle, asset loading, and JavaScript bridge integration.
  *
- * The manager mirrors the legacy inline implementation to ensure behaviour (including logging)
- * remains unchanged while allowing the rest of the engine to interact through a focused API.
- *
  * @suppress Internal component. Use through [WebViewWalletKitEngine].
  */
 internal class WebViewManager(

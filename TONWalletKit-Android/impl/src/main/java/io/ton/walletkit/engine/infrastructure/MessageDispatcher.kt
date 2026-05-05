@@ -43,6 +43,7 @@ import io.ton.walletkit.bridge.dispatch.KotlinProviderUnwatchRequest
 import io.ton.walletkit.bridge.dispatch.KotlinProviderWatchRequest
 import io.ton.walletkit.bridge.dispatch.KotlinStakingGetProviderInfoRequest
 import io.ton.walletkit.bridge.dispatch.KotlinStakingGetStakedBalanceRequest
+import io.ton.walletkit.bridge.dispatch.SignWithCustomSignerRequest
 import io.ton.walletkit.browser.TonConnectInjector
 import io.ton.walletkit.core.streaming.StreamingEvent
 import io.ton.walletkit.engine.parsing.EventParser
@@ -69,10 +70,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import org.json.JSONObject
 import java.util.UUID
 
@@ -110,42 +107,29 @@ internal class MessageDispatcher(
     @Volatile private var areEventListenersSetUp = false
 
     private val requestRegistry: BridgeRequestRegistry = BridgeRequestRegistry(json).apply {
-        // `data` is a JSON array of byte ints; kotlinx default ByteArray serializer is base64.
-        register(REQUEST_METHOD_SIGN_WITH_CUSTOM_SIGNER) { params ->
-            val obj = params.jsonObject
-            val signerId = obj.getValue(ResponseConstants.KEY_SIGNER_ID).jsonPrimitive.content
-            val data = obj.getValue("data").jsonArray
-                .let { arr -> ByteArray(arr.size) { i -> arr[i].jsonPrimitive.int.toByte() } }
-            val signer = signerManager.getSigner(signerId)
-                ?: throw IllegalArgumentException("Custom signer not found: $signerId")
-            signer.sign(data).value
+        registerTypedJson<SignWithCustomSignerRequest, String>(REQUEST_METHOD_SIGN_WITH_CUSTOM_SIGNER) { req ->
+            val signer = signerManager.getSigner(req.signerId)
+                ?: throw IllegalArgumentException("Custom signer not found: ${req.signerId}")
+            signer.sign(req.data).value
         }
 
-        registerTyped<AdapterByIdRequest>(REQUEST_METHOD_ADAPTER_GET_STATE_INIT) { req ->
-            val adapter = adapterManager.getAdapter(req.adapterId)
-                ?: throw IllegalArgumentException("Adapter not found: ${req.adapterId}")
-            adapter.stateInit().value
+        registerTypedJson<AdapterByIdRequest, String>(REQUEST_METHOD_ADAPTER_GET_STATE_INIT) { req ->
+            requireAdapter(req.adapterId).stateInit().value
         }
 
-        registerTyped<AdapterSignTransactionRequest>(REQUEST_METHOD_ADAPTER_SIGN_TRANSACTION) { req ->
-            val adapter = adapterManager.getAdapter(req.adapterId)
-                ?: throw IllegalArgumentException("Adapter not found: ${req.adapterId}")
+        registerTypedJson<AdapterSignTransactionRequest, String>(REQUEST_METHOD_ADAPTER_SIGN_TRANSACTION) { req ->
             val request = json.decodeFromString<TONTransactionRequest>(req.input)
-            adapter.signedSendTransaction(request, req.fakeSignature ?: false).value
+            requireAdapter(req.adapterId).signedSendTransaction(request, req.fakeSignature ?: false).value
         }
 
-        registerTyped<AdapterSignDataRequest>(REQUEST_METHOD_ADAPTER_SIGN_DATA) { req ->
-            val adapter = adapterManager.getAdapter(req.adapterId)
-                ?: throw IllegalArgumentException("Adapter not found: ${req.adapterId}")
+        registerTypedJson<AdapterSignDataRequest, String>(REQUEST_METHOD_ADAPTER_SIGN_DATA) { req ->
             val request = json.decodeFromString<TONPreparedSignData>(req.input)
-            adapter.signedSignData(request, req.fakeSignature ?: false).value
+            requireAdapter(req.adapterId).signedSignData(request, req.fakeSignature ?: false).value
         }
 
-        registerTyped<AdapterSignTonProofRequest>(REQUEST_METHOD_ADAPTER_SIGN_TON_PROOF) { req ->
-            val adapter = adapterManager.getAdapter(req.adapterId)
-                ?: throw IllegalArgumentException("Adapter not found: ${req.adapterId}")
+        registerTypedJson<AdapterSignTonProofRequest, String>(REQUEST_METHOD_ADAPTER_SIGN_TON_PROOF) { req ->
             val request = json.decodeFromString<TONProofMessage>(req.input)
-            adapter.signedTonProof(request, req.fakeSignature ?: false).value
+            requireAdapter(req.adapterId).signedTonProof(request, req.fakeSignature ?: false).value
         }
 
         registerTypedJson<KotlinProviderQuoteRequest, _>(REQUEST_METHOD_KOTLIN_SWAP_PROVIDER_QUOTE) { req ->
@@ -297,6 +281,10 @@ internal class MessageDispatcher(
 
     /** JS pre-stringifies generic provider params; decode them before handing off to the manager. */
     private inline fun <reified T> decodeParams(paramsJson: String): T = json.decodeFromString(paramsJson)
+
+    private fun requireAdapter(adapterId: String) =
+        adapterManager.getAdapter(adapterId)
+            ?: throw IllegalArgumentException("Adapter not found: $adapterId")
 
     private fun respondToJs(id: String, result: String?, errorMessage: String?) {
         val envelope = JSONObject().apply {

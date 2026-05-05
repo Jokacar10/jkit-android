@@ -21,7 +21,14 @@
  */
 package io.ton.walletkit.bridge.dispatch
 
+import io.ton.walletkit.engine.operations.responses.BridgeByteArraySerializer
 import kotlinx.serialization.Serializable
+
+@Serializable
+internal data class SignWithCustomSignerRequest(
+    val signerId: String,
+    @Serializable(with = BridgeByteArraySerializer::class) val data: ByteArray,
+)
 
 @Serializable
 internal data class AdapterByIdRequest(val adapterId: String)

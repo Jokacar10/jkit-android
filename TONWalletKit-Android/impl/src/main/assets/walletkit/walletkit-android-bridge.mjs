@@ -38005,11 +38005,7 @@ function handleNativeResponse(id, resultJson, errorJson) {
 		return;
 	}
 	if (typeof resultJson === "string") {
-		try {
-			entry.resolve(JSON.parse(resultJson));
-		} catch {
-			entry.resolve(resultJson);
-		}
+		entry.resolve(JSON.parse(resultJson));
 		return;
 	}
 	entry.resolve(resultJson);
