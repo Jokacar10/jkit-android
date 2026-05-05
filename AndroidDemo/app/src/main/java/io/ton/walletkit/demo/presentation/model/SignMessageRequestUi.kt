@@ -19,46 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-@file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport",
-)
+package io.ton.walletkit.demo.presentation.model
 
-package io.ton.walletkit.api.generated
-
-import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import io.ton.walletkit.request.TONWalletSignMessageRequest
 
 /**
+ * UI state for a sign-message (sign-only transaction) request.
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * The wallet signs but does not broadcast — the dApp relays the resulting BoC.
  */
-@Serializable
-data class TONBalanceUpdate(
-
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
-
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
-
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
-
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
-) {
-
-    companion object
-}
+data class SignMessageRequestUi(
+    val id: String,
+    val walletAddress: String,
+    val dAppName: String,
+    val validUntil: Long?,
+    val messages: List<TransactionMessageUi>,
+    val preview: String?,
+    val signMessageRequest: TONWalletSignMessageRequest? = null,
+)

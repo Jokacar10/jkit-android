@@ -29,6 +29,7 @@ import io.ton.walletkit.api.generated.TONJettonUpdate
 import io.ton.walletkit.api.generated.TONRequestErrorEvent
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataRequestEvent
+import io.ton.walletkit.api.generated.TONSignMessageRequestEvent
 import io.ton.walletkit.api.generated.TONStreamingUpdate
 import io.ton.walletkit.api.generated.TONTransactionsUpdate
 import io.ton.walletkit.core.streaming.StreamingEvent
@@ -42,6 +43,7 @@ import io.ton.walletkit.internal.constants.ResponseConstants
 import io.ton.walletkit.internal.util.Logger
 import io.ton.walletkit.request.TONWalletConnectionRequest
 import io.ton.walletkit.request.TONWalletSignDataRequest
+import io.ton.walletkit.request.TONWalletSignMessageRequest
 import io.ton.walletkit.request.TONWalletTransactionRequest
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -126,6 +128,29 @@ internal class EventParser(
                     Logger.e(TAG, ERROR_FAILED_PARSE_SIGN_DATA_REQUEST, e)
                     throw JSValueConversionException.Unknown(
                         message = "Failed to parse sign data request: ${e.message}",
+                        cause = e,
+                    )
+                }
+            }
+
+            EventTypeConstants.EVENT_SIGN_MESSAGE_REQUEST -> {
+                try {
+                    val event = json.decodeFromString<TONSignMessageRequestEvent>(data.toString())
+                    val request = TONWalletSignMessageRequest(
+                        event = event,
+                        handler = engine,
+                    )
+                    TONWalletKitEvent.SignMessageRequest(request)
+                } catch (e: SerializationException) {
+                    Logger.e(TAG, ERROR_FAILED_PARSE_SIGN_MESSAGE_REQUEST, e)
+                    throw JSValueConversionException.DecodingError(
+                        message = "Failed to decode TONSignMessageRequestEvent: ${e.message}",
+                        cause = e,
+                    )
+                } catch (e: Exception) {
+                    Logger.e(TAG, ERROR_FAILED_PARSE_SIGN_MESSAGE_REQUEST, e)
+                    throw JSValueConversionException.Unknown(
+                        message = "Failed to parse sign message request: ${e.message}",
                         cause = e,
                     )
                 }
@@ -247,5 +272,6 @@ internal class EventParser(
         private const val ERROR_FAILED_PARSE_CONNECT_REQUEST = "Failed to parse TONConnectionRequestEvent"
         private const val ERROR_FAILED_PARSE_TRANSACTION_REQUEST = "Failed to parse TONSendTransactionRequestEvent"
         private const val ERROR_FAILED_PARSE_SIGN_DATA_REQUEST = "Failed to parse TONSignDataRequestEvent"
+        private const val ERROR_FAILED_PARSE_SIGN_MESSAGE_REQUEST = "Failed to parse TONSignMessageRequestEvent"
     }
 }

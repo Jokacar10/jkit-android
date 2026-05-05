@@ -27,6 +27,8 @@ import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
 import io.ton.walletkit.api.generated.TONSignDataRequestEvent
+import io.ton.walletkit.api.generated.TONSignMessageApprovalResponse
+import io.ton.walletkit.api.generated.TONSignMessageRequestEvent
 
 /**
  * Internal interface for handling request approvals/rejections.
@@ -72,4 +74,17 @@ interface RequestHandler {
     )
 
     suspend fun rejectSignData(event: TONSignDataRequestEvent, reason: String?, errorCode: Int?)
+
+    /**
+     * Approve a sign-message request (sign-only transaction; not broadcast).
+     * @param event The sign-message request event
+     * @param response Optional pre-computed approval response. If provided, the SDK will use this
+     *                 response directly instead of signing the transaction internally.
+     */
+    suspend fun approveSignMessage(
+        event: TONSignMessageRequestEvent,
+        response: TONSignMessageApprovalResponse? = null,
+    )
+
+    suspend fun rejectSignMessage(event: TONSignMessageRequestEvent, reason: String?, errorCode: Int?)
 }

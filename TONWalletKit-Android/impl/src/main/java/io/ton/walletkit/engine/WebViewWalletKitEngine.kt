@@ -39,6 +39,8 @@ import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
 import io.ton.walletkit.api.generated.TONSignDataRequestEvent
+import io.ton.walletkit.api.generated.TONSignMessageApprovalResponse
+import io.ton.walletkit.api.generated.TONSignMessageRequestEvent
 import io.ton.walletkit.api.generated.TONSignatureDomain
 import io.ton.walletkit.api.generated.TONStakeParams
 import io.ton.walletkit.api.generated.TONStakingBalance
@@ -424,6 +426,17 @@ internal class WebViewWalletKitEngine private constructor(
         reason: String?,
         errorCode: Int?,
     ) = tonConnectOperations.rejectSignData(event, reason, errorCode)
+
+    override suspend fun approveSignMessage(
+        event: TONSignMessageRequestEvent,
+        response: TONSignMessageApprovalResponse?,
+    ) = tonConnectOperations.approveSignMessage(event, response)
+
+    override suspend fun rejectSignMessage(
+        event: TONSignMessageRequestEvent,
+        reason: String?,
+        errorCode: Int?,
+    ) = tonConnectOperations.rejectSignMessage(event, reason, errorCode)
 
     override suspend fun listSessions(): List<TONConnectSession> = tonConnectOperations.listSessions()
 

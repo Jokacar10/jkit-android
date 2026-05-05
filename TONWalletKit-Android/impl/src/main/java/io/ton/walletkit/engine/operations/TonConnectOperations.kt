@@ -28,6 +28,8 @@ import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
 import io.ton.walletkit.api.generated.TONSignDataRequestEvent
+import io.ton.walletkit.api.generated.TONSignMessageApprovalResponse
+import io.ton.walletkit.api.generated.TONSignMessageRequestEvent
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import io.ton.walletkit.engine.infrastructure.toJSONObject
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
@@ -238,6 +240,34 @@ internal class TonConnectOperations(
             put(reason ?: JSONObject.NULL)
         }
         rpcClient.call(BridgeMethodConstants.METHOD_REJECT_SIGN_DATA_REQUEST, argsArray)
+    }
+
+    suspend fun approveSignMessage(
+        event: TONSignMessageRequestEvent,
+        response: TONSignMessageApprovalResponse? = null,
+    ) {
+        ensureInitialized()
+
+        event.walletAddress ?: throw WalletKitBridgeException(ERROR_WALLET_ADDRESS_REQUIRED)
+        event.walletId ?: throw WalletKitBridgeException(ERROR_WALLET_ID_REQUIRED)
+
+        // Send array [event, response] - walletkit expects: approveSignMessageRequest(event, response?)
+        val argsArray = JSONArray().apply {
+            put(json.toJSONObject(event))
+            put(if (response != null) json.toJSONObject(response) else JSONObject.NULL)
+        }
+        rpcClient.call(BridgeMethodConstants.METHOD_APPROVE_SIGN_MESSAGE_REQUEST, argsArray)
+    }
+
+    suspend fun rejectSignMessage(event: TONSignMessageRequestEvent, reason: String?, errorCode: Int? = null) {
+        ensureInitialized()
+
+        // Send array [event, reason] - walletkit expects: rejectSignMessageRequest(event, reason?)
+        val argsArray = JSONArray().apply {
+            put(json.toJSONObject(event))
+            put(reason ?: JSONObject.NULL)
+        }
+        rpcClient.call(BridgeMethodConstants.METHOD_REJECT_SIGN_MESSAGE_REQUEST, argsArray)
     }
 
     suspend fun listSessions(): List<TONConnectSession> {

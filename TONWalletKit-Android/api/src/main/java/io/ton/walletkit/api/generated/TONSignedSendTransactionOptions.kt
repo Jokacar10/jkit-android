@@ -28,36 +28,25 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Copyright (c) TonTech.  This source code is licensed under the MIT license found in the LICENSE file in the root directory of this source tree.
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param fakeSignature
+ * @param `internal` Use internal message opcode (0x73696e74) instead of external (0x7369676e) for gasless relaying
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONSignedSendTransactionOptions(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @SerialName(value = "fakeSignature")
+    val fakeSignature: kotlin.Boolean? = null,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    /* Use internal message opcode (0x73696e74) instead of external (0x7369676e) for gasless relaying */
+    @SerialName(value = "internal")
+    val `internal`: kotlin.Boolean? = null,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
-
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
 ) {
 
     companion object

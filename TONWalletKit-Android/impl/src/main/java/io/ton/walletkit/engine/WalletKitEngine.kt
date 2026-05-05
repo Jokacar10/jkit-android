@@ -36,6 +36,8 @@ import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
 import io.ton.walletkit.api.generated.TONSignDataRequestEvent
+import io.ton.walletkit.api.generated.TONSignMessageApprovalResponse
+import io.ton.walletkit.api.generated.TONSignMessageRequestEvent
 import io.ton.walletkit.api.generated.TONSignatureDomain
 import io.ton.walletkit.api.generated.TONStakeParams
 import io.ton.walletkit.api.generated.TONStakingBalance
@@ -350,6 +352,25 @@ internal interface WalletKitEngine : RequestHandler {
      */
     override suspend fun rejectSignData(
         event: TONSignDataRequestEvent,
+        reason: String?,
+        errorCode: Int?,
+    )
+
+    /**
+     * Approve a sign-message (sign-only transaction) request.
+     *
+     * The wallet signs but does not broadcast — the dApp relays the resulting BoC.
+     */
+    override suspend fun approveSignMessage(
+        event: TONSignMessageRequestEvent,
+        response: TONSignMessageApprovalResponse?,
+    )
+
+    /**
+     * Reject a sign-message request.
+     */
+    override suspend fun rejectSignMessage(
+        event: TONSignMessageRequestEvent,
         reason: String?,
         errorCode: Int?,
     )

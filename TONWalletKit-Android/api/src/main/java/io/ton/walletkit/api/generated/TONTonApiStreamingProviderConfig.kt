@@ -53,5 +53,6 @@ data class TONTonApiStreamingProviderConfig(
     val apiKey: kotlin.String? = null,
 
 ) {
+
     companion object
 }
