@@ -36,7 +36,6 @@ import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -51,24 +50,12 @@ import org.robolectric.annotation.Config
 @Config(manifest = Config.NONE, sdk = [28])
 class TonConnectOperationsTest : OperationsTestBase() {
 
-    private lateinit var tonConnectOperations: TonConnectOperations
-
     companion object {
         const val TEST_ADDRESS = "EQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqB2N"
         const val TEST_SESSION_ID = "session-123"
         const val TEST_DAPP_URL = "https://example.com"
         const val TEST_WALLET_ID = "test-wallet-id-123"
         val TEST_NETWORK: TONNetwork = TONNetwork(chainId = ChainIds.TESTNET)
-    }
-
-    @Before
-    override fun setup() {
-        super.setup()
-        tonConnectOperations = TonConnectOperations(
-            ensureInitialized = ensureInitialized,
-            rpcClient = rpcClient,
-            json = json,
-        )
     }
 
     // --- listSessions tests ---
@@ -100,7 +87,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = tonConnectOperations.listSessions()
+        val result = rpcClient.listSessions()
 
         assertEquals(1, result.size)
         assertEquals(TEST_SESSION_ID, result[0].sessionId)
@@ -114,7 +101,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
     fun listSessions_returnsEmptyListIfNoSessions() = runBlocking {
         givenBridgeReturnsRaw(JSONArray())
 
-        val result = tonConnectOperations.listSessions()
+        val result = rpcClient.listSessions()
 
         assertTrue(result.isEmpty())
     }
@@ -145,7 +132,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = tonConnectOperations.listSessions()
+        val result = rpcClient.listSessions()
 
         assertEquals(1, result.size)
         assertEquals(TEST_SESSION_ID, result[0].sessionId)
@@ -174,7 +161,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = tonConnectOperations.listSessions()
+        val result = rpcClient.listSessions()
 
         assertEquals(3, result.size)
         assertEquals("session-1", result[0].sessionId)
@@ -189,7 +176,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
         givenBridgeReturns(JSONObject())
 
         // Should not throw
-        tonConnectOperations.handleTonConnectUrl("tc://connect?...")
+        rpcClient.handleTonConnectUrl("tc://connect?...")
     }
 
     // --- disconnectSession tests ---
@@ -199,7 +186,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
         givenBridgeReturns(JSONObject())
 
         // Should not throw
-        tonConnectOperations.disconnectSession(TEST_SESSION_ID)
+        rpcClient.disconnectSession(TEST_SESSION_ID)
     }
 
     @Test
@@ -207,7 +194,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
         givenBridgeReturns(JSONObject())
 
         // Should not throw - null means disconnect all
-        tonConnectOperations.disconnectSession(null)
+        rpcClient.disconnectSession(null)
     }
 
     // --- approveConnect tests ---
@@ -223,7 +210,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
         )
 
         // Should not throw
-        tonConnectOperations.approveConnect(event)
+        rpcClient.approveConnect(event)
     }
 
     @Test(expected = WalletKitBridgeException::class)
@@ -236,7 +223,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
             walletId = "some-wallet-id",
         )
 
-        tonConnectOperations.approveConnect(event)
+        rpcClient.approveConnect(event)
     }
 
     @Test(expected = WalletKitBridgeException::class)
@@ -249,7 +236,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
             walletId = null,
         )
 
-        tonConnectOperations.approveConnect(event)
+        rpcClient.approveConnect(event)
     }
 
     // --- rejectConnect tests ---
@@ -261,7 +248,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
         val event = createConnectRequestEvent(id = "req-123")
 
         // Should not throw
-        tonConnectOperations.rejectConnect(event, "User rejected")
+        rpcClient.rejectConnect(event, "User rejected")
     }
 
     @Test
@@ -271,7 +258,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
         val event = createConnectRequestEvent(id = "req-123")
 
         // Should not throw
-        tonConnectOperations.rejectConnect(event, null)
+        rpcClient.rejectConnect(event, null)
     }
 
     // --- approveTransaction tests ---
@@ -287,7 +274,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
         )
 
         // Should not throw
-        tonConnectOperations.approveTransaction(event)
+        rpcClient.approveTransaction(event)
     }
 
     // --- rejectTransaction tests ---
@@ -302,7 +289,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
         )
 
         // Should not throw
-        tonConnectOperations.rejectTransaction(event, "User rejected transaction")
+        rpcClient.rejectTransaction(event, "User rejected transaction")
     }
 
     // --- handleTonConnectRequest (internal browser) tests ---
@@ -317,7 +304,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
         var callbackInvoked = false
         var callbackResponse: JSONObject? = null
 
-        tonConnectOperations.handleTonConnectRequest(
+        rpcClient.handleTonConnectRequest(
             messageId = "msg-123",
             method = "ton_requestAccounts",
             paramsJson = null,
@@ -342,7 +329,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
         // The callback should receive an error response
         var callbackResponse: JSONObject? = null
 
-        tonConnectOperations.handleTonConnectRequest(
+        rpcClient.handleTonConnectRequest(
             messageId = "msg-123",
             method = "ton_requestAccounts",
             // Malformed JSON in params

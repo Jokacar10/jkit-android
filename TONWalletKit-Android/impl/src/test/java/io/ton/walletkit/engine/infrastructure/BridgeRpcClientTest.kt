@@ -54,7 +54,12 @@ class BridgeRpcClientTest {
         coEvery { readyTransport.awaitReady() } returns Unit
         every { webViewManager.transport } returns readyTransport
 
-        rpcClient = BridgeRpcClient(webViewManager, BridgeCodec(Json))
+        rpcClient = BridgeRpcClient(
+            webViewManager = webViewManager,
+            codec = BridgeCodec(Json),
+            ensureInitialized = {},
+            json = Json,
+        )
     }
 
     // --- Handle Response Success Tests ---

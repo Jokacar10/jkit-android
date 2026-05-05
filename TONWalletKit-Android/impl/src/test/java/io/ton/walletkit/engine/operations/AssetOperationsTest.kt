@@ -30,7 +30,6 @@ import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -45,22 +44,10 @@ import org.robolectric.annotation.Config
 @Config(manifest = Config.NONE, sdk = [28])
 class AssetOperationsTest : OperationsTestBase() {
 
-    private lateinit var assetOperations: AssetOperations
-
     companion object {
         const val TEST_ADDRESS = "EQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqB2N"
         const val TEST_NFT_ADDRESS = "EQNft123456789012345678901234567890123456789012"
         const val TEST_JETTON_ADDRESS = "EQJetton12345678901234567890123456789012345678"
-    }
-
-    @Before
-    override fun setup() {
-        super.setup()
-        assetOperations = AssetOperations(
-            ensureInitialized = ensureInitialized,
-            rpcClient = rpcClient,
-            json = json,
-        )
     }
 
     // --- getNfts tests ---
@@ -88,7 +75,7 @@ class AssetOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = assetOperations.getNfts(TEST_ADDRESS, limit = 10, offset = 0)
+        val result = rpcClient.getNfts(TEST_ADDRESS, limit = 10, offset = 0)
 
         assertEquals(1, result.nfts.size)
         assertEquals(TEST_NFT_ADDRESS, result.nfts[0].address.value)
@@ -102,7 +89,7 @@ class AssetOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = assetOperations.getNfts(TEST_ADDRESS, limit = 10, offset = 0)
+        val result = rpcClient.getNfts(TEST_ADDRESS, limit = 10, offset = 0)
 
         assertTrue(result.nfts.isEmpty())
     }
@@ -118,7 +105,7 @@ class AssetOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = assetOperations.getNft(TEST_NFT_ADDRESS)
+        val result = rpcClient.getNft(TEST_NFT_ADDRESS)
 
         assertNotNull(result)
         assertEquals(TEST_NFT_ADDRESS, result!!.address.value)
@@ -128,7 +115,7 @@ class AssetOperationsTest : OperationsTestBase() {
     fun getNft_returnsNullIfNoAddress() = runBlocking {
         givenBridgeReturns(JSONObject()) // No address field
 
-        val result = assetOperations.getNft(TEST_NFT_ADDRESS)
+        val result = rpcClient.getNft(TEST_NFT_ADDRESS)
 
         assertNull(result)
     }
@@ -165,7 +152,7 @@ class AssetOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = assetOperations.getJettons(TEST_ADDRESS, limit = 10, offset = 0)
+        val result = rpcClient.getJettons(TEST_ADDRESS, limit = 10, offset = 0)
 
         assertEquals(1, result.jettons.size)
         assertEquals(TEST_JETTON_ADDRESS, result.jettons[0].address.value)
@@ -180,7 +167,7 @@ class AssetOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = assetOperations.getJettons(TEST_ADDRESS, limit = 10, offset = 0)
+        val result = rpcClient.getJettons(TEST_ADDRESS, limit = 10, offset = 0)
 
         assertTrue(result.jettons.isEmpty())
     }
@@ -192,7 +179,7 @@ class AssetOperationsTest : OperationsTestBase() {
         // JS bridge returns the balance as a raw string
         givenBridgeReturnsRaw("5000000000")
 
-        val result = assetOperations.getJettonBalance(TEST_ADDRESS, TEST_JETTON_ADDRESS)
+        val result = rpcClient.getJettonBalance(TEST_ADDRESS, TEST_JETTON_ADDRESS)
 
         assertEquals("5000000000", result)
     }
@@ -204,7 +191,7 @@ class AssetOperationsTest : OperationsTestBase() {
         // JS bridge returns the address as a raw string
         givenBridgeReturnsRaw(TEST_JETTON_ADDRESS)
 
-        val result = assetOperations.getJettonWalletAddress(TEST_ADDRESS, TEST_JETTON_ADDRESS)
+        val result = rpcClient.getJettonWalletAddress(TEST_ADDRESS, TEST_JETTON_ADDRESS)
 
         assertEquals(TEST_JETTON_ADDRESS, result)
     }
@@ -221,7 +208,7 @@ class AssetOperationsTest : OperationsTestBase() {
             recipientAddress = TONUserFriendlyAddress(TEST_ADDRESS),
             comment = "Test transfer",
         )
-        val result = assetOperations.createTransferNftTransaction(TEST_ADDRESS, params)
+        val result = rpcClient.createTransferNftTransaction(TEST_ADDRESS, params)
 
         assertEquals(1, result.messages.size)
     }
@@ -242,7 +229,7 @@ class AssetOperationsTest : OperationsTestBase() {
                 forwardAmount = "1",
             ),
         )
-        val result = assetOperations.createTransferNftRawTransaction(TEST_ADDRESS, params)
+        val result = rpcClient.createTransferNftRawTransaction(TEST_ADDRESS, params)
 
         assertEquals(1, result.messages.size)
     }
@@ -260,7 +247,7 @@ class AssetOperationsTest : OperationsTestBase() {
             transferAmount = "1000000000",
             comment = "Jetton transfer",
         )
-        val result = assetOperations.createTransferJettonTransaction(TEST_ADDRESS, params)
+        val result = rpcClient.createTransferJettonTransaction(TEST_ADDRESS, params)
 
         assertEquals(1, result.messages.size)
     }

@@ -22,6 +22,7 @@
 package io.ton.walletkit.engine.operations
 
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import io.ton.walletkit.bridge.BridgeCodec
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
@@ -33,7 +34,6 @@ abstract class OperationsTestBase {
 
     internal lateinit var rpcClient: BridgeRpcClient
     protected val json = Json { ignoreUnknownKeys = true }
-    protected val ensureInitialized: suspend () -> Unit = {}
 
     protected var capturedMethod: String? = null
     protected var capturedParams: Any? = null
@@ -44,6 +44,7 @@ abstract class OperationsTestBase {
     @Before
     open fun setup() {
         rpcClient = mockk(relaxed = true)
+        every { rpcClient.json } returns json
         installMocks()
     }
 
@@ -69,23 +70,15 @@ abstract class OperationsTestBase {
             capturedParams = null
             mockResponse
         }
-        coEvery { rpcClient.callRaw(any(), any()) } coAnswers {
-            capturedMethod = firstArg()
-            capturedParams = secondArg()
-            mockRawResponse
-        }
-        coEvery { rpcClient.callRaw(any()) } coAnswers {
-            capturedMethod = firstArg()
-            capturedParams = null
-            mockRawResponse
-        }
         coEvery { rpcClient.send(any(), any()) } coAnswers {
             capturedMethod = firstArg()
             capturedParams = secondArg()
+            mockRawResponse
         }
         coEvery { rpcClient.send(any()) } coAnswers {
             capturedMethod = firstArg()
             capturedParams = null
+            mockRawResponse
         }
     }
 

@@ -23,11 +23,11 @@ package io.ton.walletkit.engine.operations
 
 import io.mockk.coEvery
 import io.ton.walletkit.WalletKitBridgeException
+import io.ton.walletkit.bridge.BridgeConversionError
 import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -42,18 +42,6 @@ import org.robolectric.annotation.Config
 @Config(manifest = Config.NONE, sdk = [28])
 class CryptoOperationsTest : OperationsTestBase() {
 
-    private lateinit var cryptoOperations: CryptoOperations
-
-    @Before
-    override fun setup() {
-        super.setup()
-        cryptoOperations = CryptoOperations(
-            ensureInitialized = ensureInitialized,
-            rpcClient = rpcClient,
-            json = json,
-        )
-    }
-
     // --- createTonMnemonic tests ---
 
     @Test
@@ -66,7 +54,7 @@ class CryptoOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = cryptoOperations.createTonMnemonic(3)
+        val result = rpcClient.createTonMnemonic(3)
 
         assertEquals(3, result.size)
         assertEquals("word1", result[0])
@@ -78,7 +66,7 @@ class CryptoOperationsTest : OperationsTestBase() {
     fun createTonMnemonic_returnsEmptyListIfEmpty() = runBlocking {
         givenBridgeReturnsRaw(JSONArray())
 
-        val result = cryptoOperations.createTonMnemonic(12)
+        val result = rpcClient.createTonMnemonic(12)
 
         assertTrue(result.isEmpty())
     }
@@ -90,7 +78,7 @@ class CryptoOperationsTest : OperationsTestBase() {
             JSONArray().apply { words.forEach { put(it) } },
         )
 
-        val result = cryptoOperations.createTonMnemonic(24)
+        val result = rpcClient.createTonMnemonic(24)
 
         assertEquals(24, result.size)
         assertEquals("word1", result[0])
@@ -119,7 +107,7 @@ class CryptoOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = cryptoOperations.mnemonicToKeyPair(listOf("test", "words"))
+        val result = rpcClient.mnemonicToKeyPair(listOf("test", "words"))
 
         assertEquals(32, result.publicKey.size)
         assertEquals(64, result.secretKey.size)
@@ -148,7 +136,7 @@ class CryptoOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = cryptoOperations.mnemonicToKeyPair(listOf("test"))
+        val result = rpcClient.mnemonicToKeyPair(listOf("test"))
 
         assertEquals(32, result.publicKey.size)
         assertEquals(64, result.secretKey.size)
@@ -158,33 +146,27 @@ class CryptoOperationsTest : OperationsTestBase() {
 
     @Test
     fun mnemonicToKeyPair_throwsIfPublicKeyMissing() {
-        runBlocking {
-            givenBridgeReturns(
-                JSONObject().apply {
-                    put("secretKey", JSONArray().apply { repeat(64) { put(it) } })
-                    // No publicKey!
-                },
-            )
+        givenBridgeReturns(
+            JSONObject().apply {
+                put("secretKey", JSONArray().apply { repeat(64) { put(it) } })
+            },
+        )
 
-            assertThrows(WalletKitBridgeException::class.java) {
-                runBlocking { cryptoOperations.mnemonicToKeyPair(listOf("test")) }
-            }
+        assertThrows(BridgeConversionError::class.java) {
+            runBlocking { rpcClient.mnemonicToKeyPair(listOf("test")) }
         }
     }
 
     @Test
     fun mnemonicToKeyPair_throwsIfSecretKeyMissing() {
-        runBlocking {
-            givenBridgeReturns(
-                JSONObject().apply {
-                    put("publicKey", JSONArray().apply { repeat(32) { put(it) } })
-                    // No secretKey!
-                },
-            )
+        givenBridgeReturns(
+            JSONObject().apply {
+                put("publicKey", JSONArray().apply { repeat(32) { put(it) } })
+            },
+        )
 
-            assertThrows(WalletKitBridgeException::class.java) {
-                runBlocking { cryptoOperations.mnemonicToKeyPair(listOf("test")) }
-            }
+        assertThrows(BridgeConversionError::class.java) {
+            runBlocking { rpcClient.mnemonicToKeyPair(listOf("test")) }
         }
     }
 
@@ -193,9 +175,9 @@ class CryptoOperationsTest : OperationsTestBase() {
     @Test
     fun sign_parsesHexSignature() = runBlocking {
         // JS bridge returns the hex signature directly as a String
-        coEvery { rpcClient.callRaw(any(), any()) } returns "abcd1234ef567890"
+        coEvery { rpcClient.send(any(), any()) } returns "abcd1234ef567890"
 
-        val result = cryptoOperations.sign(
+        val result = rpcClient.sign(
             data = byteArrayOf(1, 2, 3),
             secretKey = ByteArray(64) { it.toByte() },
         )
@@ -208,9 +190,9 @@ class CryptoOperationsTest : OperationsTestBase() {
 
     @Test
     fun sign_handlesHexWithPrefix() = runBlocking {
-        coEvery { rpcClient.callRaw(any(), any()) } returns "0xdeadbeef"
+        coEvery { rpcClient.send(any(), any()) } returns "0xdeadbeef"
 
-        val result = cryptoOperations.sign(
+        val result = rpcClient.sign(
             data = byteArrayOf(1),
             secretKey = ByteArray(64),
         )
@@ -223,11 +205,11 @@ class CryptoOperationsTest : OperationsTestBase() {
     fun sign_throwsIfSignatureEmpty() {
         runBlocking {
             // Empty string signature should throw
-            coEvery { rpcClient.callRaw(any(), any()) } returns ""
+            coEvery { rpcClient.send(any(), any()) } returns ""
 
             assertThrows(WalletKitBridgeException::class.java) {
                 runBlocking {
-                    cryptoOperations.sign(
+                    rpcClient.sign(
                         data = byteArrayOf(1),
                         secretKey = ByteArray(64),
                     )

@@ -39,22 +39,25 @@ import java.util.concurrent.ConcurrentHashMap
 internal class BridgeRpcClient(
     private val webViewManager: WebViewManager,
     private val codec: BridgeCodec,
+    private val ensureInitialized: suspend () -> Unit,
+    @PublishedApi internal val json: Json,
 ) {
     private val pending = ConcurrentHashMap<String, CompletableDeferred<BridgeResponse>>()
     private val ready = CompletableDeferred<Unit>()
 
-    suspend fun call(method: String, params: Any? = null): JSONObject = wrap(callRaw(method, params))
+    /**
+     * Wraps [send] in a JSONObject envelope. Reserved for the [callBridgeMethod] escape hatch
+     * and other callsites that explicitly need an opaque JSONObject result; prefer [callTyped].
+     */
+    suspend fun call(method: String, params: Any? = null): JSONObject = wrap(send(method, params))
 
-    /** Fire-and-forget for side-effect bridge methods that return no useful data. */
-    suspend fun send(method: String, params: Any? = null) {
-        callRaw(method, params)
-    }
-
-    suspend fun callRaw(method: String, params: Any? = null): Any? {
+    /** Send a request to JS and return the raw decoded result; callers may discard it. */
+    suspend fun send(method: String, params: Any? = null): Any? {
         webViewManager.webViewInitialized.await()
         webViewManager.transport.awaitReady()
         if (method != BridgeMethodConstants.METHOD_INIT) {
             ready.await()
+            ensureInitialized()
         }
 
         val callId = UUID.randomUUID().toString()
@@ -131,11 +134,9 @@ internal class BridgeRpcClient(
 internal suspend inline fun <reified T : Any> BridgeRpcClient.callTyped(
     method: String,
     params: Any? = null,
-    json: Json,
-): T = json.decodeFromBridge(callRaw(method, params))
+): T = json.decodeFromBridge(send(method, params))
 
 internal suspend inline fun <reified T : Any> BridgeRpcClient.callTypedOrNull(
     method: String,
     params: Any? = null,
-    json: Json,
-): T? = json.decodeFromBridgeOrNull(callRaw(method, params))
+): T? = json.decodeFromBridgeOrNull(send(method, params))

@@ -28,7 +28,6 @@ import kotlinx.serialization.SerializationException
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -43,8 +42,6 @@ import org.robolectric.annotation.Config
 @Config(manifest = Config.NONE, sdk = [28])
 class TransactionOperationsTest : OperationsTestBase() {
 
-    private lateinit var transactionOperations: TransactionOperations
-
     companion object {
         const val TEST_ADDRESS = "EQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqB2N"
         const val TEST_TO_ADDRESS = "Ef8zMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM0vF"
@@ -52,16 +49,6 @@ class TransactionOperationsTest : OperationsTestBase() {
 
     private fun emptyTx(): io.ton.walletkit.api.generated.TONTransactionRequest =
         io.ton.walletkit.api.generated.TONTransactionRequest(messages = emptyList())
-
-    @Before
-    override fun setup() {
-        super.setup()
-        transactionOperations = TransactionOperations(
-            ensureInitialized = ensureInitialized,
-            rpcClient = rpcClient,
-            json = json,
-        )
-    }
 
     // --- createTransferTonTransaction tests ---
 
@@ -89,7 +76,7 @@ class TransactionOperationsTest : OperationsTestBase() {
             transferAmount = "1000000000",
             comment = "Test",
         )
-        val result = transactionOperations.createTransferTonTransaction(TEST_ADDRESS, params)
+        val result = rpcClient.createTransferTonTransaction(TEST_ADDRESS, params)
 
         assertNotNull(result)
         assertEquals(TEST_ADDRESS, result.fromAddress)
@@ -109,7 +96,7 @@ class TransactionOperationsTest : OperationsTestBase() {
             recipientAddress = TONUserFriendlyAddress(TEST_TO_ADDRESS),
             transferAmount = "1000000000",
         )
-        transactionOperations.createTransferTonTransaction(TEST_ADDRESS, params)
+        rpcClient.createTransferTonTransaction(TEST_ADDRESS, params)
 
         // Verify the method was called with correct params
         assertEquals("createTransferTonTransaction", capturedMethod)
@@ -147,7 +134,7 @@ class TransactionOperationsTest : OperationsTestBase() {
             TONTransferRequest(recipientAddress = TONUserFriendlyAddress(TEST_TO_ADDRESS), transferAmount = "1000000000"),
             TONTransferRequest(recipientAddress = TONUserFriendlyAddress(TEST_ADDRESS), transferAmount = "2000000000"),
         )
-        val result = transactionOperations.createTransferMultiTonTransaction(TEST_ADDRESS, messages)
+        val result = rpcClient.createTransferMultiTonTransaction(TEST_ADDRESS, messages)
 
         assertEquals(TEST_ADDRESS, result.fromAddress)
         assertEquals(2, result.messages.size)
@@ -165,7 +152,7 @@ class TransactionOperationsTest : OperationsTestBase() {
             ),
         )
 
-        val result = transactionOperations.sendTransaction(TEST_ADDRESS, emptyTx())
+        val result = rpcClient.sendTransaction(TEST_ADDRESS, emptyTx())
 
         assertEquals("te6ccgEBAgEA...", result)
     }
@@ -178,7 +165,7 @@ class TransactionOperationsTest : OperationsTestBase() {
             ),
         )
 
-        val result = transactionOperations.sendTransaction(TEST_ADDRESS, emptyTx())
+        val result = rpcClient.sendTransaction(TEST_ADDRESS, emptyTx())
 
         assertEquals("te6ccgEBAgEA...", result)
         val encoded = encodeCapturedParams() as JSONObject
@@ -195,7 +182,7 @@ class TransactionOperationsTest : OperationsTestBase() {
             ),
         )
 
-        val result = transactionOperations.sendTransaction(TEST_ADDRESS, emptyTx())
+        val result = rpcClient.sendTransaction(TEST_ADDRESS, emptyTx())
 
         assertEquals("te6ccgEBAgEA...wallet", result)
     }
@@ -205,7 +192,7 @@ class TransactionOperationsTest : OperationsTestBase() {
         assertThrows(SerializationException::class.java) {
             runBlocking {
                 givenBridgeReturns(JSONObject())
-                transactionOperations.sendTransaction(TEST_ADDRESS, emptyTx())
+                rpcClient.sendTransaction(TEST_ADDRESS, emptyTx())
             }
         }
     }
@@ -220,7 +207,7 @@ class TransactionOperationsTest : OperationsTestBase() {
             },
         )
 
-        val result = transactionOperations.getTransactionPreview(TEST_ADDRESS, emptyTx())
+        val result = rpcClient.getTransactionPreview(TEST_ADDRESS, emptyTx())
 
         // Result should be a Success type
         assertNotNull(result)
@@ -236,7 +223,7 @@ class TransactionOperationsTest : OperationsTestBase() {
         givenBridgeReturns(JSONObject()) // Success, no return value needed
 
         // Should not throw
-        transactionOperations.handleNewTransaction(TEST_ADDRESS, emptyTx())
+        rpcClient.handleNewTransaction(TEST_ADDRESS, emptyTx())
         val encoded = encodeCapturedParams() as JSONObject
         assertTrue(encoded.get("transactionContent") is JSONObject)
     }
