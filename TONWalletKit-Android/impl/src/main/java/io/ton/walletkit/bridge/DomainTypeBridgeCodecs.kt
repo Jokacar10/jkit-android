@@ -24,30 +24,45 @@ package io.ton.walletkit.bridge
 import io.ton.walletkit.model.TONBase64
 import io.ton.walletkit.model.TONHex
 import io.ton.walletkit.model.TONRawAddress
+import io.ton.walletkit.model.TONTokenAmount
 import io.ton.walletkit.model.TONUserFriendlyAddress
 
 fun TONHex.encodeForBridge(): Any = value
+fun TONBase64.encodeForBridge(): Any = value
+fun TONUserFriendlyAddress.encodeForBridge(): Any = value
+fun TONRawAddress.encodeForBridge(): Any = string
+fun TONTokenAmount.encodeForBridge(): Any = value
 
-object TONHexBridgeDecoder : BridgeDecodable<TONHex> {
+internal object TONHexBridgeDecoder : BridgeDecodable<TONHex> {
     override fun decodeFromBridge(raw: Any?): TONHex? = (raw as? String)?.let(::TONHex)
 }
 
-fun TONBase64.encodeForBridge(): Any = value
-
-object TONBase64BridgeDecoder : BridgeDecodable<TONBase64> {
+internal object TONBase64BridgeDecoder : BridgeDecodable<TONBase64> {
     override fun decodeFromBridge(raw: Any?): TONBase64? = (raw as? String)?.let(::TONBase64)
 }
 
-fun TONUserFriendlyAddress.encodeForBridge(): Any = value
-
-object TONUserFriendlyAddressBridgeDecoder : BridgeDecodable<TONUserFriendlyAddress> {
+internal object TONUserFriendlyAddressBridgeDecoder : BridgeDecodable<TONUserFriendlyAddress> {
     override fun decodeFromBridge(raw: Any?): TONUserFriendlyAddress? =
         (raw as? String)?.let { runCatching { TONUserFriendlyAddress.parse(it) }.getOrNull() }
 }
 
-fun TONRawAddress.encodeForBridge(): Any = string
-
-object TONRawAddressBridgeDecoder : BridgeDecodable<TONRawAddress> {
+internal object TONRawAddressBridgeDecoder : BridgeDecodable<TONRawAddress> {
     override fun decodeFromBridge(raw: Any?): TONRawAddress? =
         (raw as? String)?.let { runCatching { TONRawAddress.parse(it) }.getOrNull() }
+}
+
+internal object TONTokenAmountBridgeDecoder : BridgeDecodable<TONTokenAmount> {
+    override fun decodeFromBridge(raw: Any?): TONTokenAmount? = when (raw) {
+        is String -> TONTokenAmount(raw)
+        is Number -> TONTokenAmount(raw.toString())
+        else -> null
+    }
+}
+
+internal fun registerDomainTypeBridgeDecoders() {
+    BridgeDecoders.register(TONHex::class, TONHexBridgeDecoder)
+    BridgeDecoders.register(TONBase64::class, TONBase64BridgeDecoder)
+    BridgeDecoders.register(TONUserFriendlyAddress::class, TONUserFriendlyAddressBridgeDecoder)
+    BridgeDecoders.register(TONRawAddress::class, TONRawAddressBridgeDecoder)
+    BridgeDecoders.register(TONTokenAmount::class, TONTokenAmountBridgeDecoder)
 }

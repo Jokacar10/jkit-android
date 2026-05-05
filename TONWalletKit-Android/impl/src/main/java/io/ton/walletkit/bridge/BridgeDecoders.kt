@@ -19,31 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit
+package io.ton.walletkit.bridge
 
-/**
- * Exception thrown when an error occurs during WalletKit bridge operations.
- *
- * This exception is thrown when the JavaScript bridge encounters issues such as:
- * - Bridge initialization failures
- * - Invalid responses from the JavaScript layer
- * - Communication errors between Kotlin and JavaScript
- * - JavaScript runtime exceptions that propagate to the native layer
- * - Timeout errors when waiting for bridge responses
- *
- * Example scenarios:
- * ```
- * // Bridge not initialized
- * throw WalletKitBridgeException("Bridge not initialized")
- *
- * // Invalid JSON response
- * throw WalletKitBridgeException("Failed to parse bridge response: $jsonString")
- *
- * // JavaScript error
- * throw WalletKitBridgeException("JavaScript error: ${error.message}")
- * ```
- *
- * @property message A descriptive error message explaining what went wrong
- * @see io.ton.walletkit.presentation.WalletKitEngine
- */
-open class WalletKitBridgeException(message: String, cause: Throwable? = null) : Exception(message, cause)
+import kotlin.reflect.KClass
+
+@PublishedApi
+internal object BridgeDecoders {
+    @PublishedApi
+    internal val table = HashMap<KClass<*>, BridgeDecodable<*>>()
+
+    fun <T : Any> register(klass: KClass<T>, decoder: BridgeDecodable<T>) {
+        table[klass] = decoder
+    }
+
+    @PublishedApi
+    internal fun decoderFor(klass: KClass<*>): BridgeDecodable<*>? = table[klass]
+}

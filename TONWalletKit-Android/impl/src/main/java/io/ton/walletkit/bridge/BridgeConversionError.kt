@@ -19,31 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit
+package io.ton.walletkit.bridge
 
-/**
- * Exception thrown when an error occurs during WalletKit bridge operations.
- *
- * This exception is thrown when the JavaScript bridge encounters issues such as:
- * - Bridge initialization failures
- * - Invalid responses from the JavaScript layer
- * - Communication errors between Kotlin and JavaScript
- * - JavaScript runtime exceptions that propagate to the native layer
- * - Timeout errors when waiting for bridge responses
- *
- * Example scenarios:
- * ```
- * // Bridge not initialized
- * throw WalletKitBridgeException("Bridge not initialized")
- *
- * // Invalid JSON response
- * throw WalletKitBridgeException("Failed to parse bridge response: $jsonString")
- *
- * // JavaScript error
- * throw WalletKitBridgeException("JavaScript error: ${error.message}")
- * ```
- *
- * @property message A descriptive error message explaining what went wrong
- * @see io.ton.walletkit.presentation.WalletKitEngine
- */
-open class WalletKitBridgeException(message: String, cause: Throwable? = null) : Exception(message, cause)
+import io.ton.walletkit.WalletKitBridgeException
+import kotlin.reflect.KClass
+
+sealed class BridgeConversionError(message: String, cause: Throwable? = null) : WalletKitBridgeException(message, cause) {
+    class UnableToConvert(type: KClass<*>, raw: Any?) :
+        BridgeConversionError("Unable to convert bridge value to ${type.simpleName}: $raw")
+
+    class UnableToConvertNull(type: KClass<*>) :
+        BridgeConversionError("Unable to convert null bridge value to ${type.simpleName}")
+
+    class UnableToEncode(type: KClass<*>, cause: Throwable) :
+        BridgeConversionError("Unable to encode ${type.simpleName} for bridge: ${cause.message}", cause)
+
+    class UnableToDecode(type: KClass<*>, cause: Throwable) :
+        BridgeConversionError("Unable to decode ${type.simpleName} from bridge: ${cause.message}", cause)
+}

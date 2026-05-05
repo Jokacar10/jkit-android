@@ -24,7 +24,7 @@ package io.ton.walletkit.engine.operations
 import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
 import io.ton.walletkit.api.generated.TONTransferRequest
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
-import io.ton.walletkit.engine.infrastructure.toJSONObject
+import io.ton.walletkit.engine.infrastructure.callTyped
 import io.ton.walletkit.engine.operations.requests.CreateTransferMultiTonRequest
 import io.ton.walletkit.engine.operations.requests.CreateTransferTonRequest
 import io.ton.walletkit.engine.operations.requests.GetTransactionPreviewRequest
@@ -77,8 +77,7 @@ internal class TransactionOperations(
             body = params.payload?.value,
             stateInit = params.stateInit?.value,
         )
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_CREATE_TRANSFER_TON_TRANSACTION, json.toJSONObject(request))
-        return result.toString()
+        return rpcClient.call(BridgeMethodConstants.METHOD_CREATE_TRANSFER_TON_TRANSACTION, request).toString()
     }
 
     suspend fun createTransferMultiTonTransaction(
@@ -88,8 +87,7 @@ internal class TransactionOperations(
         ensureInitialized()
 
         val request = CreateTransferMultiTonRequest(walletId = walletId, messages = messages)
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_CREATE_TRANSFER_MULTI_TON_TRANSACTION, json.toJSONObject(request))
-        return result.toString()
+        return rpcClient.call(BridgeMethodConstants.METHOD_CREATE_TRANSFER_MULTI_TON_TRANSACTION, request).toString()
     }
 
     suspend fun handleNewTransaction(walletId: String, transactionContent: String) {
@@ -99,7 +97,7 @@ internal class TransactionOperations(
             walletId = walletId,
             transactionContent = parseTransactionContent(transactionContent),
         )
-        rpcClient.call(BridgeMethodConstants.METHOD_HANDLE_NEW_TRANSACTION, json.toJSONObject(request))
+        rpcClient.call(BridgeMethodConstants.METHOD_HANDLE_NEW_TRANSACTION, request)
     }
 
     suspend fun sendTransaction(walletId: String, transactionContent: String): String {
@@ -109,7 +107,7 @@ internal class TransactionOperations(
             walletId = walletId,
             transactionContent = parseTransactionContent(transactionContent),
         )
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_SEND_TRANSACTION, json.toJSONObject(request))
+        val result = rpcClient.call(BridgeMethodConstants.METHOD_SEND_TRANSACTION, request)
         return when {
             result.has(ResponseConstants.KEY_BOC) -> result.getString(ResponseConstants.KEY_BOC)
             result.has(ResponseConstants.KEY_SIGNED_BOC) -> result.getString(ResponseConstants.KEY_SIGNED_BOC)
@@ -124,14 +122,6 @@ internal class TransactionOperations(
             walletId = walletId,
             transactionContent = parseTransactionContent(transactionContent),
         )
-        val result = rpcClient.call(BridgeMethodConstants.METHOD_GET_TRANSACTION_PREVIEW, json.toJSONObject(request))
-        return try {
-            json.decodeFromString(TONTransactionEmulatedPreview.serializer(), result.toString())
-        } catch (e: SerializationException) {
-            throw JSValueConversionException.DecodingError(
-                message = "Failed to decode TONTransactionEmulatedPreview: ${e.message}",
-                cause = e,
-            )
-        }
+        return rpcClient.callTyped(BridgeMethodConstants.METHOD_GET_TRANSACTION_PREVIEW, request, json)
     }
 }

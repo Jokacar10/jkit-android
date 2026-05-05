@@ -22,11 +22,14 @@
 package io.ton.walletkit.engine.infrastructure
 
 import io.ton.walletkit.WalletKitBridgeException
+import io.ton.walletkit.bridge.BridgeCodec
+import io.ton.walletkit.bridge.decodeFromBridge
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.LogConstants
 import io.ton.walletkit.internal.constants.ResponseConstants
 import io.ton.walletkit.internal.util.Logger
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
@@ -34,14 +37,14 @@ import java.util.concurrent.ConcurrentHashMap
 
 internal class BridgeRpcClient(
     private val webViewManager: WebViewManager,
+    private val codec: BridgeCodec,
 ) {
     private val pending = ConcurrentHashMap<String, CompletableDeferred<BridgeResponse>>()
     private val ready = CompletableDeferred<Unit>()
 
-    suspend fun call(
-        method: String,
-        params: Any? = null,
-    ): JSONObject {
+    suspend fun call(method: String, params: Any? = null): JSONObject = wrap(callRaw(method, params))
+
+    suspend fun callRaw(method: String, params: Any? = null): Any? {
         webViewManager.webViewInitialized.await()
         webViewManager.transport.awaitReady()
         if (method != BridgeMethodConstants.METHOD_INIT) {
@@ -56,25 +59,17 @@ internal class BridgeRpcClient(
             put(ResponseConstants.KEY_KIND, ResponseConstants.VALUE_KIND_CALL)
             put(ResponseConstants.KEY_ID, callId)
             put(ResponseConstants.KEY_METHOD, method)
-            when (params) {
-                null -> {}
-                is JSONObject -> put(ResponseConstants.KEY_PARAMS, params)
-                is JSONArray -> put(ResponseConstants.KEY_PARAMS, params)
-                is String -> put(ResponseConstants.KEY_PARAMS, params)
-                else -> put(ResponseConstants.KEY_PARAMS, params.toString())
+            val encoded = codec.encode(params)
+            if (encoded != null && encoded != JSONObject.NULL) {
+                put(ResponseConstants.KEY_PARAMS, encoded)
             }
         }
 
         webViewManager.transport.send(envelope.toString())
-
-        val response = deferred.await()
-        return response.result
+        return deferred.await().raw
     }
 
-    fun handleResponse(
-        id: String,
-        response: JSONObject,
-    ) {
+    fun handleResponse(id: String, response: JSONObject) {
         val deferred = pending.remove(id)
         if (deferred == null) {
             Logger.w(TAG, "handleResponse: No deferred found for id: $id")
@@ -87,15 +82,8 @@ internal class BridgeRpcClient(
             deferred.completeExceptionally(WalletKitBridgeException(message))
             return
         }
-        val result = response.opt(ResponseConstants.KEY_RESULT)
-        val payload =
-            when (result) {
-                is JSONObject -> result
-                is JSONArray -> JSONObject().put(ResponseConstants.KEY_ITEMS, result)
-                null -> JSONObject()
-                else -> JSONObject().put(ResponseConstants.KEY_VALUE, result)
-            }
-        deferred.complete(BridgeResponse(payload))
+        val raw = response.opt(ResponseConstants.KEY_RESULT)
+        deferred.complete(BridgeResponse(raw))
     }
 
     fun failAll(exception: WalletKitBridgeException) {
@@ -118,9 +106,14 @@ internal class BridgeRpcClient(
 
     fun isReady(): Boolean = ready.isCompleted
 
-    private data class BridgeResponse(
-        val result: JSONObject,
-    )
+    private fun wrap(raw: Any?): JSONObject = when (raw) {
+        is JSONObject -> raw
+        is JSONArray -> JSONObject().put(ResponseConstants.KEY_ITEMS, raw)
+        null, JSONObject.NULL -> JSONObject()
+        else -> JSONObject().put(ResponseConstants.KEY_VALUE, raw)
+    }
+
+    private data class BridgeResponse(val raw: Any?)
 
     private companion object {
         private const val TAG = LogConstants.TAG_WEBVIEW_ENGINE
@@ -128,3 +121,9 @@ internal class BridgeRpcClient(
         private const val ERROR_FAILED_SUFFIX = "] failed: "
     }
 }
+
+internal suspend inline fun <reified T : Any> BridgeRpcClient.callTyped(
+    method: String,
+    params: Any? = null,
+    json: Json,
+): T = json.decodeFromBridge(callRaw(method, params))

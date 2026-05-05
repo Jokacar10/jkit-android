@@ -25,8 +25,11 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.ton.walletkit.WalletKitBridgeException
+import io.ton.walletkit.bridge.BridgeCodec
+import io.ton.walletkit.bridge.transport.BridgeTransport
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.*
@@ -36,12 +39,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/**
- * Unit tests for BridgeRpcClient - response handling and error cases.
- *
- * Note: We can't easily test the `call` method since it requires WebView,
- * but we can test response handling logic.
- */
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [28])
 class BridgeRpcClientTest {
@@ -51,15 +48,13 @@ class BridgeRpcClientTest {
 
     @Before
     fun setup() {
-        // Mock WebViewManager — webViewInitialized + a transport whose readiness gate
-        // is already complete (the only two awaits in `BridgeRpcClient.call`).
         webViewManager = mockk(relaxed = true)
         every { webViewManager.webViewInitialized } returns CompletableDeferred(Unit).apply { complete(Unit) }
-        val readyTransport = mockk<io.ton.walletkit.bridge.transport.BridgeTransport>(relaxed = true)
+        val readyTransport = mockk<BridgeTransport>(relaxed = true)
         coEvery { readyTransport.awaitReady() } returns Unit
         every { webViewManager.transport } returns readyTransport
 
-        rpcClient = BridgeRpcClient(webViewManager)
+        rpcClient = BridgeRpcClient(webViewManager, BridgeCodec(Json))
     }
 
     // --- Handle Response Success Tests ---

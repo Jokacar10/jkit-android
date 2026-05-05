@@ -52,6 +52,8 @@ import io.ton.walletkit.api.generated.TONTonStakersChainConfig
 import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
 import io.ton.walletkit.api.generated.TONTransferRequest
 import io.ton.walletkit.api.generated.TONUnstakeMode
+import io.ton.walletkit.bridge.BridgeCodec
+import io.ton.walletkit.bridge.registerDomainTypeBridgeDecoders
 import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.config.TONWalletKitConfiguration
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
@@ -175,7 +177,7 @@ internal class WebViewWalletKitEngine private constructor(
                 onMessage = ::handleBridgeMessage,
                 onBridgeError = ::handleBridgeError,
             )
-        rpcClient = BridgeRpcClient(webViewManager)
+        rpcClient = BridgeRpcClient(webViewManager, BridgeCodec(json))
         kotlinStreamingProviderManager = KotlinStreamingProviderManager(rpcClient, json)
         initManager = InitializationManager(appContext, rpcClient)
         eventParser = EventParser(json, this)
@@ -620,6 +622,10 @@ internal class WebViewWalletKitEngine private constructor(
     }
 
     companion object {
+        init {
+            registerDomainTypeBridgeDecoders()
+        }
+
         private val instances = mutableMapOf<TONNetwork, WebViewWalletKitEngine>()
         private val instanceMutex = Mutex()
 

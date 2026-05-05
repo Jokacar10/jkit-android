@@ -178,8 +178,8 @@ class TransactionOperationsTest : OperationsTestBase() {
         val result = transactionOperations.sendTransaction(TEST_ADDRESS, """{"messages":[]}""")
 
         assertEquals("te6ccgEBAgEA...", result)
-        val params = capturedParams as JSONObject
-        assertTrue(params.get("transactionContent") is JSONObject)
+        val encoded = encodeCapturedParams() as JSONObject
+        assertTrue(encoded.get("transactionContent") is JSONObject)
     }
 
     @Test
@@ -222,8 +222,8 @@ class TransactionOperationsTest : OperationsTestBase() {
         // Result should be a Success type
         assertNotNull(result)
         assertNotNull(result.result)
-        val params = capturedParams as JSONObject
-        assertTrue(params.get("transactionContent") is JSONObject)
+        val encoded = encodeCapturedParams() as JSONObject
+        assertTrue(encoded.get("transactionContent") is JSONObject)
     }
 
     // --- handleNewTransaction tests ---
@@ -234,7 +234,7 @@ class TransactionOperationsTest : OperationsTestBase() {
 
         // Should not throw
         transactionOperations.handleNewTransaction(TEST_ADDRESS, """{"boc":"..."}""")
-        val params = capturedParams as JSONObject
-        assertTrue(params.get("transactionContent") is JSONObject)
+        val encoded = encodeCapturedParams() as JSONObject
+        assertTrue(encoded.get("transactionContent") is JSONObject)
     }
 }
