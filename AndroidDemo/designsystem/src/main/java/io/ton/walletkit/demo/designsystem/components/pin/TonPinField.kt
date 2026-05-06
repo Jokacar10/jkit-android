@@ -28,7 +28,9 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -36,10 +38,14 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 
 // PIN entry: visible dot row + invisible TextField that opens the system numeric
 // keypad. Tapping the dots refocuses the field. Non-digit input is filtered.
-// [onComplete] fires once the entered value reaches [length] characters.
+// [onComplete] fires after a short grace once the entered value reaches [length]
+// characters — long enough that the user sees all dots fill before the screen
+// transitions away.
+private const val COMPLETE_GRACE_MS = 800L
 
 @Composable
 fun TonPinField(
@@ -53,6 +59,14 @@ fun TonPinField(
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 
+    val currentOnComplete by rememberUpdatedState(onComplete)
+    LaunchedEffect(pin) {
+        if (pin.length == length) {
+            delay(COMPLETE_GRACE_MS)
+            currentOnComplete(pin)
+        }
+    }
+
     Box(
         modifier = modifier
             .clickable { focusRequester.requestFocus() },
@@ -63,7 +77,6 @@ fun TonPinField(
             onValueChange = { newValue ->
                 val digits = newValue.filter { it.isDigit() }.take(length)
                 onPinChange(digits)
-                if (digits.length == length) onComplete(digits)
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             singleLine = true,
