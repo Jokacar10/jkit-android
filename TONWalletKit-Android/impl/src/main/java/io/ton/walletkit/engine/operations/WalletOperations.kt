@@ -22,7 +22,6 @@
 package io.ton.walletkit.engine.operations
 
 import io.ton.walletkit.WalletKitBridgeException
-import io.ton.walletkit.WalletKitUtils
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONSignatureDomain
 import io.ton.walletkit.engine.adapter.BridgeWalletAdapter
@@ -30,9 +29,11 @@ import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import io.ton.walletkit.engine.infrastructure.toJSONObject
 import io.ton.walletkit.engine.model.WalletAccount
 import io.ton.walletkit.engine.operations.requests.WalletIdRequest
+import io.ton.walletkit.engine.state.AdapterManager
 import io.ton.walletkit.engine.state.SignerManager
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.ResponseConstants
+import io.ton.walletkit.internal.util.WalletKitUtils
 import io.ton.walletkit.model.TONHex
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import io.ton.walletkit.model.TONWalletAdapter
@@ -55,7 +56,7 @@ internal class WalletOperations(
     private val ensureInitialized: suspend () -> Unit,
     private val rpcClient: BridgeRpcClient,
     private val signerManager: SignerManager,
-    private val adapterManager: io.ton.walletkit.engine.state.AdapterManager,
+    private val adapterManager: AdapterManager,
     private val currentNetworkProvider: () -> String,
     private val json: Json,
 ) {
