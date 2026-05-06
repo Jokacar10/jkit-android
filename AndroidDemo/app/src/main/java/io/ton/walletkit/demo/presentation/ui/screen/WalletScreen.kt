@@ -21,6 +21,7 @@
  */
 package io.ton.walletkit.demo.presentation.ui.screen
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -74,6 +75,7 @@ import io.ton.walletkit.demo.designsystem.icons.TonIconImage
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 import io.ton.walletkit.demo.domain.model.WalletInterfaceType
 import io.ton.walletkit.demo.presentation.actions.WalletActions
+import io.ton.walletkit.demo.presentation.dev.DevPreferences
 import io.ton.walletkit.demo.presentation.model.ConnectRequestUi
 import io.ton.walletkit.demo.presentation.model.JettonDetails
 import io.ton.walletkit.demo.presentation.model.JettonSummary
@@ -440,7 +442,6 @@ fun WalletScreen(
                 )
             }
             HomeSubScreen.None -> Unit
-            else -> Unit
         }
         // Drain the rest of the composable to render only the sub-screen + its modals.
         // Falling through would also render the home Scaffold underneath.
@@ -506,6 +507,14 @@ fun WalletScreen(
                 onShowAllNFTs = { subScreen = HomeSubScreen.AllNFTs },
                 onNFTTap = { preview ->
                     nftsList.firstOrNull { it.address.value == preview.address }?.let { selectedNFT = it }
+                },
+                onBalanceSecretTap = {
+                    val nowLegacy = DevPreferences.toggleLegacyMainScreen(context)
+                    Toast.makeText(
+                        context,
+                        if (nowLegacy) "Legacy main screen ON" else "Legacy main screen OFF",
+                        Toast.LENGTH_SHORT,
+                    ).show()
                 },
             )
         }

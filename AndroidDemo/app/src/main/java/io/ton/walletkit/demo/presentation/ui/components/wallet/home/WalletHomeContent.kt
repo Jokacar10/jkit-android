@@ -59,6 +59,7 @@ fun WalletHomeContent(
     onShowAllNFTs: () -> Unit,
     onNFTTap: (WalletHomeNFTPreview) -> Unit,
     modifier: Modifier = Modifier,
+    onBalanceSecretTap: (() -> Unit)? = null,
 ) {
     val scrollState = rememberScrollState()
 
@@ -75,6 +76,7 @@ fun WalletHomeContent(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .padding(top = 8.dp, bottom = 8.dp),
+            onSecretTap = onBalanceSecretTap,
         )
 
         WalletHomeActionsRow(

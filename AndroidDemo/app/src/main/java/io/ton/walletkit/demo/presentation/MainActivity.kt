@@ -41,7 +41,9 @@ import io.ton.walletkit.demo.core.TONWalletKitHelper
 import io.ton.walletkit.demo.core.WalletKitDemoApp
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 import io.ton.walletkit.demo.presentation.actions.WalletActionsImpl
+import io.ton.walletkit.demo.presentation.dev.DevPreferences
 import io.ton.walletkit.demo.presentation.ui.screen.CreatePinScreen
+import io.ton.walletkit.demo.presentation.ui.screen.LegacyWalletScreen
 import io.ton.walletkit.demo.presentation.ui.screen.UnlockPinScreen
 import io.ton.walletkit.demo.presentation.ui.screen.WalletScreen
 import io.ton.walletkit.demo.presentation.viewmodel.WalletKitViewModel
@@ -54,6 +56,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DevPreferences.ensureLoaded(applicationContext)
         setContent {
             TonTheme {
                 Surface(color = TonTheme.colors.bgPrimary) {
@@ -118,13 +121,24 @@ private fun AppNavigation(
         // The AddWalletSheet will be shown automatically if no wallets exist
         else -> {
             walletKit.value?.let { kit ->
-                WalletScreen(
-                    state = state,
-                    walletKit = kit,
-                    nftsViewModel = nftsViewModel,
-                    swapViewModel = swapViewModel,
-                    actions = walletActions,
-                )
+                val useLegacyMainScreen by DevPreferences.useLegacyMainScreen.collectAsState()
+                if (useLegacyMainScreen) {
+                    LegacyWalletScreen(
+                        state = state,
+                        walletKit = kit,
+                        nftsViewModel = nftsViewModel,
+                        swapViewModel = swapViewModel,
+                        actions = walletActions,
+                    )
+                } else {
+                    WalletScreen(
+                        state = state,
+                        walletKit = kit,
+                        nftsViewModel = nftsViewModel,
+                        swapViewModel = swapViewModel,
+                        actions = walletActions,
+                    )
+                }
             }
         }
     }

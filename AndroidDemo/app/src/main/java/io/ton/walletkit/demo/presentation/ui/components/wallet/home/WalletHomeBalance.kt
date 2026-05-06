@@ -31,18 +31,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.ton.walletkit.demo.designsystem.components.text.TonText
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
+import io.ton.walletkit.demo.presentation.dev.devToggleTaps
 
 // "Balance" label + price-style total ("123.456 TON"). Integer part renders in price64,
 // fraction (".456") and the trailing " TON" suffix render in price40 — same baseline
 // as iOS `lastTextBaseline` HStack.
+//
+// [onSecretTap] is the dev-only escape hatch — fires after 5 quick taps on the balance
+// area and is used to toggle between this screen and the legacy debug screen.
 @Composable
 fun WalletHomeBalance(
     totalBalanceInteger: String,
     totalBalanceFraction: String,
     modifier: Modifier = Modifier,
+    onSecretTap: (() -> Unit)? = null,
 ) {
+    val gestureModifier = if (onSecretTap != null) {
+        Modifier.devToggleTaps(onTrigger = onSecretTap)
+    } else {
+        Modifier
+    }
     Column(
-        modifier = modifier,
+        modifier = modifier.then(gestureModifier),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
