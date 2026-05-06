@@ -51,7 +51,6 @@ import kotlinx.serialization.Serializable
  * @param traceId
  * @param dAppInfo
  * @param returnStrategy Raw TonConnect return strategy string.
- * @param embeddedRequest
  */
 @Serializable
 data class TONConnectionRequestEvent(
@@ -108,9 +107,6 @@ data class TONConnectionRequestEvent(
     /* Raw TonConnect return strategy string. */
     @SerialName(value = "returnStrategy")
     val returnStrategy: kotlin.String? = null,
-
-    @SerialName("embeddedRequest")
-    val embeddedRequest: TONEmbeddedRequest? = null,
 
 ) {
 
