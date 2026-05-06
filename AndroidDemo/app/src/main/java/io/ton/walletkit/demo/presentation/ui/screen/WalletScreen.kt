@@ -33,10 +33,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.outlined.Language
-import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,6 +42,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -221,7 +219,13 @@ fun WalletScreen(
 
     // State for NFT details bottom sheet
     var selectedNFT by remember { mutableStateOf<TONNFT?>(null) }
-    val nftDetailsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val nftDetailsSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        // Block swipe-down / scrim-drag dismissal so users scrolling the sheet content
+        // don't accidentally hide it. The explicit close button (and composition removal
+        // when `selectedNFT = null`) handles teardown.
+        confirmValueChange = { it != SheetValue.Hidden },
+    )
 
     // Two independent browser sessions — one with WalletKit injection, one without.
     // Kept at this level so tabs survive Connect/Transaction overlay sheets.
@@ -240,7 +244,12 @@ fun WalletScreen(
         snackbarHostState.showSnackbar(error)
     }
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        // Block swipe-down / scrim-drag dismissal. Each sheet's own close button (and
+        // `actions::onDismissSheet` via the back button) is the only way out.
+        confirmValueChange = { it != SheetValue.Hidden },
+    )
     val sheet = state.sheetState
     val showSheet = sheet !is SheetState.None
     LaunchedEffect(state.sheetState) {
