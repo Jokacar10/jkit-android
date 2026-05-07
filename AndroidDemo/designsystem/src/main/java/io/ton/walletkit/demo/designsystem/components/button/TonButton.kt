@@ -51,15 +51,14 @@ import io.ton.walletkit.demo.designsystem.theme.SmoothCornerShape
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 
 private val CornerRadius = 12.dp
-private val HorizontalPadding = 24.dp
 private val IconLabelSpacing = 8.dp
 
 enum class TonButtonStyle { Primary, Secondary, Tertiary, Text }
 
-enum class TonButtonSize(val height: Dp, val iconSize: Dp) {
-    Small(36.dp, 16.dp),
-    Medium(44.dp, 20.dp),
-    Default(50.dp, 20.dp),
+enum class TonButtonSize(val height: Dp, val iconSize: Dp, val horizontalPadding: Dp) {
+    Small(36.dp, 16.dp, 12.dp),
+    Medium(44.dp, 20.dp, 24.dp),
+    Default(50.dp, 20.dp, 24.dp),
 }
 
 @Immutable
@@ -100,6 +99,7 @@ fun TonButton(
     modifier: Modifier = Modifier,
     config: TonButtonConfig = TonButtonConfig.Primary,
     enabled: Boolean = true,
+    stretch: Boolean = true,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -111,9 +111,10 @@ fun TonButton(
     }
     val properties = config.style.properties(state)
 
+    val widthModifier = if (stretch) Modifier.fillMaxWidth() else Modifier
     Box(
         modifier = modifier
-            .fillMaxWidth()
+            .then(widthModifier)
             .height(config.size.height)
             .clip(SmoothCornerShape(CornerRadius))
             .background(properties.backgroundColor)
@@ -123,7 +124,7 @@ fun TonButton(
                 enabled = enabled && !config.isLoading,
                 onClick = onClick,
             )
-            .padding(horizontal = HorizontalPadding),
+            .padding(horizontal = config.size.horizontalPadding),
         contentAlignment = Alignment.Center,
     ) {
         if (config.isLoading) {

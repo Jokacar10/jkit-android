@@ -53,6 +53,7 @@ import io.ton.walletkit.demo.presentation.model.SignDataRequestUi
 import io.ton.walletkit.demo.presentation.model.TransactionMessageUi
 import io.ton.walletkit.demo.presentation.model.TransactionRequestUi
 import io.ton.walletkit.demo.presentation.model.WalletSummary
+import io.ton.walletkit.demo.presentation.state.CreateWalletFlow
 import io.ton.walletkit.demo.presentation.state.SheetState
 import io.ton.walletkit.demo.presentation.state.WalletUiState
 import io.ton.walletkit.demo.presentation.util.TonFormatter
@@ -138,6 +139,9 @@ class WalletKitViewModel @Inject constructor(
 
     val isPasswordSet: StateFlow<Boolean> = securityController.isPasswordSet
     val isUnlocked: StateFlow<Boolean> = securityController.isUnlocked
+
+    private val _createWalletFlow = MutableStateFlow<CreateWalletFlow>(CreateWalletFlow.Idle)
+    val createWalletFlow: StateFlow<CreateWalletFlow> = _createWalletFlow.asStateFlow()
 
     private val tonConnectViewModel = TonConnectViewModel(
         walletKit = { walletKit ?: error("ITONWalletKit not initialized") },
@@ -600,7 +604,7 @@ class WalletKitViewModel @Inject constructor(
         when (interfaceType) {
             WalletInterfaceType.MNEMONIC, WalletInterfaceType.SIGNER -> {
                 val cleaned = words.map { it.trim().lowercase() }.filter { it.isNotBlank() }
-                if (cleaned.size != 24) {
+                if (cleaned.size != 12 && cleaned.size != 24) {
                     _state.update { it.copy(error = uiString(R.string.wallet_error_recovery_phrase_length)) }
                     return
                 }
@@ -1124,8 +1128,7 @@ class WalletKitViewModel @Inject constructor(
 
     fun removeWallet(address: String) {
         viewModelScope.launch {
-            // The SDK keys wallets by walletId, not by address. The cache maps
-            // address → ITONWallet, so resolve here.
+            // SDK keys wallets by walletId; our cache maps address → ITONWallet.
             val walletId = lifecycleManager.tonWallets[address]?.id
             if (walletId == null) {
                 _state.update { it.copy(error = uiString(R.string.wallet_error_wallet_not_found)) }
@@ -1194,6 +1197,88 @@ class WalletKitViewModel @Inject constructor(
 
             eventLogger.log(R.string.wallet_event_wallet_removed, walletName)
         }
+    }
+
+    fun showCreateWalletOnboarding() {
+        _createWalletFlow.value = CreateWalletFlow.Onboarding
+    }
+
+    fun cancelCreateWalletFlow() {
+        _createWalletFlow.value = CreateWalletFlow.Idle
+    }
+
+    fun startCreateWallet() {
+        viewModelScope.launch {
+            val mnemonic = runCatching { getKit().createTonMnemonic() }
+            mnemonic.onSuccess { words ->
+                _createWalletFlow.value = CreateWalletFlow.Reveal(words)
+            }.onFailure { error ->
+                val fallback = uiString(R.string.wallet_error_generate_failed)
+                _state.update { it.copy(error = error.message ?: fallback) }
+            }
+        }
+    }
+
+    fun revealContinueToQuiz() {
+        val current = _createWalletFlow.value as? CreateWalletFlow.Reveal ?: return
+        val askedIndices = (0 until current.words.size)
+            .shuffled()
+            .take(QUIZ_QUESTION_COUNT)
+            .sorted()
+        _createWalletFlow.value = CreateWalletFlow.Quiz(
+            words = current.words,
+            askedIndices = askedIndices,
+        )
+    }
+
+    fun quizBackToReveal() {
+        val current = _createWalletFlow.value as? CreateWalletFlow.Quiz ?: return
+        _createWalletFlow.value = CreateWalletFlow.Reveal(current.words)
+    }
+
+    fun setQuizAnswer(index: Int, value: String) {
+        val current = _createWalletFlow.value as? CreateWalletFlow.Quiz ?: return
+        _createWalletFlow.value = current.copy(
+            answers = current.answers + (index to value),
+        )
+    }
+
+    fun confirmQuizAndCreate() {
+        val current = _createWalletFlow.value as? CreateWalletFlow.Quiz ?: return
+        if (!current.isComplete) return
+        importWallet(name = "", network = DEFAULT_NETWORK, words = current.words)
+        _createWalletFlow.value = CreateWalletFlow.Idle
+    }
+
+    fun startImportWalletFlow() {
+        _createWalletFlow.value = CreateWalletFlow.ImportEntry()
+    }
+
+    fun setImportWordCount(count: Int) {
+        val current = _createWalletFlow.value as? CreateWalletFlow.ImportEntry ?: return
+        if (count != 12 && count != 24) return
+        if (count == current.wordCount) return
+        val trimmedWords = current.words.filterKeys { it < count }
+        _createWalletFlow.value = current.copy(wordCount = count, words = trimmedWords)
+    }
+
+    fun setImportWord(index: Int, value: String) {
+        val current = _createWalletFlow.value as? CreateWalletFlow.ImportEntry ?: return
+        // Pasting a full phrase into one field distributes across all slots.
+        val tokens = value.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+        if (tokens.size == 12 || tokens.size == 24) {
+            val newWords = tokens.withIndex().associate { (i, w) -> i to w }
+            _createWalletFlow.value = current.copy(wordCount = tokens.size, words = newWords)
+            return
+        }
+        _createWalletFlow.value = current.copy(words = current.words + (index to value))
+    }
+
+    fun confirmImportWallet() {
+        val current = _createWalletFlow.value as? CreateWalletFlow.ImportEntry ?: return
+        if (!current.isComplete) return
+        importWallet(name = "", network = DEFAULT_NETWORK, words = current.asPhrase())
+        _createWalletFlow.value = CreateWalletFlow.Idle
     }
 
     fun renameWallet(address: String, newName: String) {
@@ -1712,8 +1797,6 @@ class WalletKitViewModel @Inject constructor(
     fun resetWallet() {
         viewModelScope.launch {
             try {
-                // Remove all wallets from SDK first. removeWallet expects a walletId,
-                // not an address — pull the id off each cached ITONWallet.
                 val kit = getKit()
                 val allWalletIds = lifecycleManager.tonWallets.values.map { it.id }
                 allWalletIds.forEach { walletId ->
@@ -1807,6 +1890,7 @@ class WalletKitViewModel @Inject constructor(
         private const val HIDE_MESSAGE_MS = 10_000L
         private const val MAX_EVENT_LOG = 12
         private const val DEFAULT_WALLET_VERSION = WalletVersions.V5R1
+        private const val QUIZ_QUESTION_COUNT = 3
         private const val TRANSACTION_FETCH_LIMIT = 20
         private val DEFAULT_NETWORK = TONNetwork.MAINNET
         private const val LOG_TAG = "WalletKitVM"

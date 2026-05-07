@@ -99,11 +99,8 @@ import io.ton.walletkit.demo.presentation.util.TestTags
 import io.ton.walletkit.demo.presentation.viewmodel.NFTsListViewModel
 import io.ton.walletkit.demo.presentation.viewmodel.SwapViewModel
 
-// Pre-redesign main screen, kept around behind a hidden dev toggle. Shape and behavior
-// match the version that lived on `main` before TON-922 — sectioned debug UI with the
-// status header, quick actions, raw wallet/jetton/NFT/session lists, and the event log.
-// Tap the title bar 5 times to flip back to the new home screen.
-
+// Pre-redesign main screen, kept behind a dev toggle. 5 taps on the title bar
+// flips back to the new home screen.
 private const val DEFAULT_DAPP_URL = "https://allure-test-runner.vercel.app/e2e"
 
 @OptIn(ExperimentalMaterial3Api::class)
