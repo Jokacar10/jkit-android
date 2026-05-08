@@ -4081,7 +4081,7 @@ function hexToByteArray(hexString) {
 	for (let i = 0; i < hexString.length; i += 2) result[i / 2] = parseInt(hexString.slice(i, i + 2), 16);
 	return result;
 }
-var import_nacl_util, import_nacl_fast$1, CONNECT_EVENT_ERROR_CODES, CONNECT_ITEM_ERROR_CODES, SEND_TRANSACTION_ERROR_CODES, SIGN_DATA_ERROR_CODES, DISCONNECT_ERROR_CODES, SIGN_MESSAGE_ERROR_CODES, CHAIN, Base64, SessionCrypto;
+var import_nacl_util, import_nacl_fast$1, CONNECT_EVENT_ERROR_CODES, CONNECT_ITEM_ERROR_CODES, SEND_TRANSACTION_ERROR_CODES, SIGN_DATA_ERROR_CODES, DISCONNECT_ERROR_CODES, CHAIN, Base64, SessionCrypto;
 var init_esm$1 = __esmMin((() => {
 	import_nacl_util = /* @__PURE__ */ __toESM(require_nacl_util(), 1);
 	import_nacl_fast$1 = /* @__PURE__ */ __toESM(require_nacl_fast(), 1);
