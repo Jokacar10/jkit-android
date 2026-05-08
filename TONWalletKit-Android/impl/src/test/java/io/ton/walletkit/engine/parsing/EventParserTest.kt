@@ -26,8 +26,10 @@ import io.ton.walletkit.engine.WalletKitEngine
 import io.ton.walletkit.event.TONWalletKitEvent
 import io.ton.walletkit.internal.constants.EventTypeConstants
 import kotlinx.serialization.json.Json
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -58,65 +60,37 @@ class EventParserTest {
     // --- Disconnect Event Tests ---
 
     @Test
-    fun parseEvent_disconnect_extractsSessionId() {
-        val data = JSONObject().apply {
+    fun parseEvent_disconnect_decodesFullPayload() {
+        val data = buildJsonObject {
+            put("id", "evt-789")
             put("sessionId", "session-123")
+            put("preview", buildJsonObject {})
         }
-        val raw = JSONObject()
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, data)
 
         assertNotNull("Should parse disconnect event", event)
         assertTrue("Should be Disconnect event", event is TONWalletKitEvent.Disconnect)
-        assertEquals("session-123", (event as TONWalletKitEvent.Disconnect).event.sessionId)
+        val payload = (event as TONWalletKitEvent.Disconnect).event
+        assertEquals("evt-789", payload.id)
+        assertEquals("session-123", payload.sessionId)
     }
 
-    @Test
-    fun parseEvent_disconnect_fallsBackToIdField() {
-        val data = JSONObject().apply {
-            put("id", "session-456")
-        }
-        val raw = JSONObject()
-
-        val event = parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, data)
-
-        assertNotNull("Should parse disconnect event", event)
-        assertTrue("Should be Disconnect event", event is TONWalletKitEvent.Disconnect)
-        assertEquals("session-456", (event as TONWalletKitEvent.Disconnect).event.sessionId)
-    }
-
-    @Test
-    fun parseEvent_disconnect_noSessionId_returnsNull() {
-        val data = JSONObject() // No sessionId or id
-        val raw = JSONObject()
-
-        val event = parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, data)
-
-        assertNull("Should return null when no session ID", event)
-    }
-
-    @Test
-    fun parseEvent_disconnect_prefersSessionIdOverId() {
-        val data = JSONObject().apply {
-            put("sessionId", "primary-session")
-            put("id", "fallback-id")
-        }
-        val raw = JSONObject()
-
-        val event = parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, data)
-
-        assertNotNull("Should parse disconnect event", event)
-        assertEquals("primary-session", (event as TONWalletKitEvent.Disconnect).event.sessionId)
+    @Test(expected = Exception::class)
+    fun parseEvent_disconnect_missingRequiredFields_throws() {
+        // Missing both `id` and `preview` — kotlinx decode throws.
+        // The dispatcher catches and logs; here we assert the strict-decode contract.
+        parser.parseEvent(EventTypeConstants.EVENT_DISCONNECT, JsonObject(emptyMap()))
     }
 
     // --- Browser Events Tests ---
 
     @Test
     fun parseEvent_browserPageStarted_returnsNull() {
-        val data = JSONObject().apply {
+        val data = buildJsonObject {
             put("url", "https://example.com")
         }
-        val raw = JSONObject()
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_PAGE_STARTED, data)
 
@@ -126,8 +100,8 @@ class EventParserTest {
 
     @Test
     fun parseEvent_browserPageStarted_missingUrl_returnsNull() {
-        val data = JSONObject()
-        val raw = JSONObject()
+        val data = JsonObject(emptyMap())
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_PAGE_STARTED, data)
 
@@ -137,10 +111,10 @@ class EventParserTest {
 
     @Test
     fun parseEvent_browserPageFinished_returnsNull() {
-        val data = JSONObject().apply {
+        val data = buildJsonObject {
             put("url", "https://example.com/page")
         }
-        val raw = JSONObject()
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_PAGE_FINISHED, data)
 
@@ -150,10 +124,10 @@ class EventParserTest {
 
     @Test
     fun parseEvent_browserError_returnsNull() {
-        val data = JSONObject().apply {
+        val data = buildJsonObject {
             put("message", "Page load failed")
         }
-        val raw = JSONObject()
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_ERROR, data)
 
@@ -163,8 +137,8 @@ class EventParserTest {
 
     @Test
     fun parseEvent_browserError_missingMessage_returnsNull() {
-        val data = JSONObject()
-        val raw = JSONObject()
+        val data = JsonObject(emptyMap())
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_ERROR, data)
 
@@ -174,12 +148,12 @@ class EventParserTest {
 
     @Test
     fun parseEvent_browserBridgeRequest_returnsNull() {
-        val data = JSONObject().apply {
+        val data = buildJsonObject {
             put("messageId", "msg-123")
             put("method", "sendTransaction")
             put("request", """{"to":"..."}""")
         }
-        val raw = JSONObject()
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_BROWSER_BRIDGE_REQUEST, data)
 
@@ -191,8 +165,8 @@ class EventParserTest {
 
     @Test
     fun parseEvent_unknownType_returnsNull() {
-        val data = JSONObject()
-        val raw = JSONObject()
+        val data = JsonObject(emptyMap())
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent("someUnknownEventType", data)
 
@@ -201,8 +175,8 @@ class EventParserTest {
 
     @Test
     fun parseEvent_stateChanged_returnsNull() {
-        val data = JSONObject()
-        val raw = JSONObject()
+        val data = JsonObject(emptyMap())
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_STATE_CHANGED, data)
 
@@ -211,8 +185,8 @@ class EventParserTest {
 
     @Test
     fun parseEvent_walletStateChanged_returnsNull() {
-        val data = JSONObject()
-        val raw = JSONObject()
+        val data = JsonObject(emptyMap())
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_WALLET_STATE_CHANGED, data)
 
@@ -221,8 +195,8 @@ class EventParserTest {
 
     @Test
     fun parseEvent_sessionsChanged_returnsNull() {
-        val data = JSONObject()
-        val raw = JSONObject()
+        val data = JsonObject(emptyMap())
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_SESSIONS_CHANGED, data)
 
@@ -234,17 +208,17 @@ class EventParserTest {
     @Test
     fun parseEvent_connectRequest_parsesValidJson() {
         // ConnectRequestEvent requires id, requestedItems, and preview
-        val data = JSONObject().apply {
+        val data = buildJsonObject {
             put("id", "conn-req-123")
             put("sessionId", "connect-session-123")
-            put("requestedItems", JSONArray())
+            put("requestedItems", JsonArray(emptyList()))
             put(
                 "preview",
-                JSONObject().apply {
-                    put("permissions", JSONArray())
+                buildJsonObject {
+                    put("permissions", JsonArray(emptyList()))
                     put(
                         "dAppInfo",
-                        JSONObject().apply {
+                        buildJsonObject {
                             put("name", "Test DApp")
                             put("url", "https://testdapp.com")
                             put("iconUrl", "https://testdapp.com/icon.png")
@@ -253,7 +227,7 @@ class EventParserTest {
                 },
             )
         }
-        val raw = JSONObject()
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_CONNECT_REQUEST, data)
 
@@ -263,17 +237,17 @@ class EventParserTest {
 
     @Test
     fun parseEvent_connectRequest_normalizesManifestUrl() {
-        val data = JSONObject().apply {
+        val data = buildJsonObject {
             put("id", "conn-req-norm")
             put("sessionId", "session-123")
-            put("requestedItems", JSONArray())
+            put("requestedItems", JsonArray(emptyList()))
             put(
                 "preview",
-                JSONObject().apply {
-                    put("permissions", JSONArray())
+                buildJsonObject {
+                    put("permissions", JsonArray(emptyList()))
                     put(
                         "dAppInfo",
-                        JSONObject().apply {
+                        buildJsonObject {
                             put("name", "Test DApp")
                             put("url", "testdapp.com") // Missing https://
                             put("iconUrl", "https://testdapp.com/icon.png")
@@ -282,7 +256,7 @@ class EventParserTest {
                 },
             )
         }
-        val raw = JSONObject()
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_CONNECT_REQUEST, data)
 
@@ -294,17 +268,17 @@ class EventParserTest {
     @Test
     fun parseEvent_connectRequest_withEmptyPermissions_parsesSuccessfully() {
         // Empty permissions array should work since it's still a valid list
-        val data = JSONObject().apply {
+        val data = buildJsonObject {
             put("id", "conn-req-empty")
             put("sessionId", "session-123")
-            put("requestedItems", JSONArray())
+            put("requestedItems", JsonArray(emptyList()))
             put(
                 "preview",
-                JSONObject().apply {
-                    put("permissions", JSONArray()) // Empty array
+                buildJsonObject {
+                    put("permissions", JsonArray(emptyList())) // Empty array
                     put(
                         "dAppInfo",
-                        JSONObject().apply {
+                        buildJsonObject {
                             put("name", "Test DApp")
                             put("url", "https://example.com")
                         },
@@ -312,7 +286,7 @@ class EventParserTest {
                 },
             )
         }
-        val raw = JSONObject()
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_CONNECT_REQUEST, data)
 
@@ -323,18 +297,18 @@ class EventParserTest {
     @Test
     fun parseEvent_connectRequest_withoutPreview_parsesSuccessfully() {
         // preview is required but can have minimal structure with empty permissions
-        val data = JSONObject().apply {
+        val data = buildJsonObject {
             put("id", "conn-req-no-preview")
             put("sessionId", "session-no-preview")
-            put("requestedItems", JSONArray())
+            put("requestedItems", JsonArray(emptyList()))
             put(
                 "preview",
-                JSONObject().apply {
-                    put("permissions", JSONArray())
+                buildJsonObject {
+                    put("permissions", JsonArray(emptyList()))
                 },
             )
         }
-        val raw = JSONObject()
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_CONNECT_REQUEST, data)
 
@@ -346,16 +320,16 @@ class EventParserTest {
 
     @Test
     fun parseEvent_transactionRequest_parsesValidJson() {
-        val data = JSONObject().apply {
+        val data = buildJsonObject {
             put("id", "tx-req-123")
             put("sessionId", "tx-session-123")
             put("walletAddress", "EQD...")
             put(
                 "preview",
-                JSONObject().apply {
+                buildJsonObject {
                     put(
                         "data",
-                        JSONObject().apply {
+                        buildJsonObject {
                             put("result", "success")
                         },
                     )
@@ -363,12 +337,12 @@ class EventParserTest {
             )
             put(
                 "request",
-                JSONObject().apply {
-                    put("messages", JSONArray())
+                buildJsonObject {
+                    put("messages", JsonArray(emptyList()))
                 },
             )
         }
-        val raw = JSONObject()
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_TRANSACTION_REQUEST, data)
 
@@ -380,20 +354,20 @@ class EventParserTest {
 
     @Test
     fun parseEvent_signDataRequest_parsesValidJson() {
-        val data = JSONObject().apply {
+        val data = buildJsonObject {
             put("id", "sign-req-123")
             put("sessionId", "sign-session-123")
             put("walletAddress", "EQD...")
             put(
                 "payload",
-                JSONObject().apply {
+                buildJsonObject {
                     put(
                         "data",
-                        JSONObject().apply {
+                        buildJsonObject {
                             put("type", "text")
                             put(
                                 "value",
-                                JSONObject().apply {
+                                buildJsonObject {
                                     put("content", "Hello World")
                                 },
                             )
@@ -403,14 +377,14 @@ class EventParserTest {
             )
             put(
                 "preview",
-                JSONObject().apply {
+                buildJsonObject {
                     put(
                         "data",
-                        JSONObject().apply {
+                        buildJsonObject {
                             put("type", "text")
                             put(
                                 "value",
-                                JSONObject().apply {
+                                buildJsonObject {
                                     put("content", "Hello World")
                                 },
                             )
@@ -419,7 +393,7 @@ class EventParserTest {
                 },
             )
         }
-        val raw = JSONObject()
+        val raw = JsonObject(emptyMap())
 
         val event = parser.parseEvent(EventTypeConstants.EVENT_SIGN_DATA_REQUEST, data)
 

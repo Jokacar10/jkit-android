@@ -21,26 +21,32 @@
  */
 package io.ton.walletkit.bridge
 
+import io.ton.walletkit.model.TONBase64
+import io.ton.walletkit.model.TONHex
+import io.ton.walletkit.model.TONRawAddress
+import io.ton.walletkit.model.TONTokenAmount
+import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.serializer
-import org.json.JSONArray
-import org.json.JSONObject
 import kotlin.reflect.KClass
 
-inline fun <reified T : Any> Json.decodeFromBridge(raw: Any?): T {
+inline fun <reified T : Any> Json.decodeFromBridge(raw: JsonElement?): T {
     val klass = T::class
-    if (raw == null || raw == JSONObject.NULL) {
+    if (raw == null || raw is JsonNull) {
         throw BridgeConversionError.UnableToConvertNull(klass)
     }
 
-    BridgeDecoders.decoderFor(klass)?.let { decoder ->
+    decodeDomainType(klass, raw)?.let {
         @Suppress("UNCHECKED_CAST")
-        return (decoder.decodeFromBridge(raw) as? T)
-            ?: throw BridgeConversionError.UnableToConvert(klass, raw)
+        return it as T
     }
 
     val primitive = decodePrimitive(klass, raw)
@@ -52,7 +58,7 @@ inline fun <reified T : Any> Json.decodeFromBridge(raw: Any?): T {
     return try {
         @Suppress("UNCHECKED_CAST")
         val ks = serializersModule.serializer<T>() as KSerializer<T>
-        decodeFromJsonElement(ks, orgJsonToJsonElement(raw))
+        decodeFromJsonElement(ks, raw)
     } catch (e: BridgeConversionError) {
         throw e
     } catch (e: Throwable) {
@@ -60,30 +66,43 @@ inline fun <reified T : Any> Json.decodeFromBridge(raw: Any?): T {
     }
 }
 
-inline fun <reified T : Any> Json.decodeFromBridgeOrNull(raw: Any?): T? =
-    if (raw == null || raw == JSONObject.NULL) null else decodeFromBridge<T>(raw)
-
 @PublishedApi
-internal fun decodePrimitive(klass: KClass<*>, raw: Any): Any? = when (klass) {
-    String::class -> (raw as? String)
-    Boolean::class -> (raw as? Boolean)
-    Int::class -> (raw as? Number)?.toInt()
-    Long::class -> (raw as? Number)?.toLong()
-    Short::class -> (raw as? Number)?.toShort()
-    Byte::class -> (raw as? Number)?.toByte()
-    Float::class -> (raw as? Number)?.toFloat()
-    Double::class -> (raw as? Number)?.toDouble()
-    else -> null
+internal fun decodeDomainType(klass: KClass<*>, raw: JsonElement): Any? {
+    val string = raw.asStringOrNull()
+    return when (klass) {
+        TONHex::class -> string?.let(::TONHex)
+            ?: throw BridgeConversionError.UnableToConvert(klass, raw)
+        TONBase64::class -> string?.let(::TONBase64)
+            ?: throw BridgeConversionError.UnableToConvert(klass, raw)
+        TONTokenAmount::class -> string?.let(::TONTokenAmount)
+            ?: throw BridgeConversionError.UnableToConvert(klass, raw)
+        TONUserFriendlyAddress::class ->
+            string?.let { runCatching { TONUserFriendlyAddress.parse(it) }.getOrNull() }
+                ?: throw BridgeConversionError.UnableToConvert(klass, raw)
+        TONRawAddress::class ->
+            string?.let { runCatching { TONRawAddress.parse(it) }.getOrNull() }
+                ?: throw BridgeConversionError.UnableToConvert(klass, raw)
+        else -> null
+    }
 }
 
+inline fun <reified T : Any> Json.decodeFromBridgeOrNull(raw: JsonElement?): T? =
+    if (raw == null || raw is JsonNull) null else decodeFromBridge<T>(raw)
+
 @PublishedApi
-internal fun orgJsonToJsonElement(raw: Any): JsonElement = when (raw) {
-    JSONObject.NULL -> JsonNull
-    is JSONObject -> Json.parseToJsonElement(raw.toString())
-    is JSONArray -> Json.parseToJsonElement(raw.toString())
-    is String -> JsonPrimitive(raw)
-    is Boolean -> JsonPrimitive(raw)
-    is Number -> JsonPrimitive(raw)
-    is JsonElement -> raw
-    else -> JsonPrimitive(raw.toString())
+internal fun decodePrimitive(klass: KClass<*>, raw: JsonElement): Any? {
+    val primitive = raw as? JsonPrimitive ?: return null
+    return when (klass) {
+        String::class -> primitive.contentOrNull()
+        Boolean::class -> primitive.booleanOrNull
+        Int::class -> primitive.intOrNull
+        Long::class -> primitive.longOrNull
+        Short::class -> primitive.intOrNull?.toShort()
+        Byte::class -> primitive.intOrNull?.toByte()
+        Float::class -> primitive.doubleOrNull?.toFloat()
+        Double::class -> primitive.doubleOrNull
+        else -> null
+    }
 }
+
+private fun JsonPrimitive.contentOrNull(): String? = if (this is JsonNull) null else content

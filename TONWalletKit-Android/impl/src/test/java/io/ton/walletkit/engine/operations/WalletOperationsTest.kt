@@ -23,8 +23,12 @@ package io.ton.walletkit.engine.operations
 
 import io.ton.walletkit.api.WalletVersions
 import kotlinx.coroutines.runBlocking
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -64,13 +68,13 @@ class WalletOperationsTest : OperationsTestBase() {
     @Test
     fun getWallets_decodesRawArray() = runBlocking {
         givenBridgeReturnsRaw(
-            JSONArray().apply {
-                put(
-                    JSONObject().apply {
+            buildJsonArray {
+                add(
+                    buildJsonObject {
                         put("walletId", "-239:wallet-1")
                         put(
                             "wallet",
-                            JSONObject().apply {
+                            buildJsonObject {
                                 put("publicKey", "0xpub1")
                                 put("version", WalletVersions.V5R1)
                             },
@@ -90,7 +94,7 @@ class WalletOperationsTest : OperationsTestBase() {
 
     @Test
     fun getWallets_returnsEmptyListIfEmptyArray() = runBlocking {
-        givenBridgeReturnsRaw(JSONArray())
+        givenBridgeReturnsRaw(JsonArray(emptyList()))
 
         assertTrue(rpcClient.getWallets().isEmpty())
     }
@@ -102,7 +106,7 @@ class WalletOperationsTest : OperationsTestBase() {
         givenBridgeReturns(
             jsonOf(
                 "walletId" to "-239:$TEST_ADDRESS_1",
-                "wallet" to JSONObject().apply {
+                "wallet" to buildJsonObject {
                     put("publicKey", "0xsinglekey")
                     put("version", WalletVersions.V5R1)
                 },
@@ -118,7 +122,7 @@ class WalletOperationsTest : OperationsTestBase() {
 
     @Test
     fun getWallet_returnsNullIfBridgeReturnsNull() = runBlocking {
-        givenBridgeReturnsRaw(null)
+        givenBridgeReturnsRawNull()
 
         assertNull(rpcClient.getWallet("nonexistent"))
     }
@@ -143,7 +147,7 @@ class WalletOperationsTest : OperationsTestBase() {
 
     @Test
     fun removeWallet_completesSuccessfully() = runBlocking {
-        givenBridgeReturns(JSONObject())
+        givenBridgeReturns(JsonObject(emptyMap()))
 
         rpcClient.removeWallet("walletId")
     }
@@ -155,7 +159,7 @@ class WalletOperationsTest : OperationsTestBase() {
         givenBridgeReturns(
             jsonOf(
                 "walletId" to "-239:$TEST_ADDRESS_1",
-                "wallet" to JSONObject().apply {
+                "wallet" to buildJsonObject {
                     put("publicKey", "0xnewkey")
                     put("version", WalletVersions.V5R1)
                 },

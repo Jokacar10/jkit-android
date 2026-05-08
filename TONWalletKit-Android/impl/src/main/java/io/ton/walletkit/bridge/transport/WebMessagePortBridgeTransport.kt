@@ -56,11 +56,15 @@ internal class WebMessagePortBridgeTransport(
 
     override fun send(json: String) {
         val port = portRef.get()
-        if (port == null) {
-            pendingOutbound.add(json)
+        if (port != null) {
+            post(port, json)
             return
         }
-        post(port, json)
+        pendingOutbound.add(json)
+        // If portRef was set between our get and our add, handOffPortToJs's drain
+        // may have already finished and our message would be stranded. Re-check
+        // and drain ourselves so we don't lose it.
+        portRef.get()?.let { drainPending(it) }
     }
 
     override fun fail(cause: Throwable) {
@@ -87,6 +91,9 @@ internal class WebMessagePortBridgeTransport(
         }
 
         val ports = WebViewCompat.createWebMessageChannel(webView)
+        check(ports.size >= 2) {
+            "WebViewCompat.createWebMessageChannel returned ${ports.size} ports, expected 2."
+        }
         val kotlinPort = ports[0]
         val jsPort = ports[1]
 

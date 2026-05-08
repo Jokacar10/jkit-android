@@ -31,10 +31,15 @@ import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEventPreview
 import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
 import io.ton.walletkit.api.generated.TONTransactionRequest
+import io.ton.walletkit.bridge.optString
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.coroutines.runBlocking
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,9 +68,9 @@ class TonConnectOperationsTest : OperationsTestBase() {
     @Test
     fun listSessions_parsesSessionArray() = runBlocking {
         givenBridgeReturnsRaw(
-            JSONArray().apply {
-                put(
-                    JSONObject().apply {
+            buildJsonArray {
+                add(
+                    buildJsonObject {
                         put("sessionId", TEST_SESSION_ID)
                         put("walletId", "-239:$TEST_ADDRESS")
                         put("walletAddress", TEST_ADDRESS)
@@ -74,14 +79,10 @@ class TonConnectOperationsTest : OperationsTestBase() {
                         put("privateKey", "test-private-key")
                         put("publicKey", "test-public-key")
                         put("domain", "example.com")
-                        put(
-                            "dAppInfo",
-                            JSONObject().apply {
-                                put("name", "Test dApp")
-                                put("url", TEST_DAPP_URL)
-                                put("iconUrl", "https://example.com/icon.png")
-                            },
-                        )
+                        put("schemaVersion", 1)
+                        put("dAppName", "Test dApp")
+                        put("dAppUrl", TEST_DAPP_URL)
+                        put("dAppIconUrl", "https://example.com/icon.png")
                     },
                 )
             },
@@ -99,7 +100,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun listSessions_returnsEmptyListIfNoSessions() = runBlocking {
-        givenBridgeReturnsRaw(JSONArray())
+        givenBridgeReturnsRaw(JsonArray(emptyList()))
 
         val result = rpcClient.listSessions()
 
@@ -109,9 +110,9 @@ class TonConnectOperationsTest : OperationsTestBase() {
     @Test
     fun listSessions_handlesNullOptionalFields() = runBlocking {
         givenBridgeReturnsRaw(
-            JSONArray().apply {
-                put(
-                    JSONObject().apply {
+            buildJsonArray {
+                add(
+                    buildJsonObject {
                         put("sessionId", TEST_SESSION_ID)
                         put("walletId", "-239:$TEST_ADDRESS")
                         put("walletAddress", TEST_ADDRESS)
@@ -120,13 +121,9 @@ class TonConnectOperationsTest : OperationsTestBase() {
                         put("privateKey", "")
                         put("publicKey", "")
                         put("domain", "")
-                        put(
-                            "dAppInfo",
-                            JSONObject().apply {
-                                put("name", "Minimal dApp")
-                                // No optional url/iconUrl fields
-                            },
-                        )
+                        put("schemaVersion", 1)
+                        put("dAppName", "Minimal dApp")
+                        // No optional dAppUrl/dAppIconUrl fields
                     },
                 )
             },
@@ -142,7 +139,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun listSessions_handlesMultipleSessions() = runBlocking {
-        fun sessionEntry(sessionId: String, dAppName: String): JSONObject = JSONObject().apply {
+        fun sessionEntry(sessionId: String, dAppName: String): JsonObject = buildJsonObject {
             put("sessionId", sessionId)
             put("walletId", "-239:$TEST_ADDRESS")
             put("walletAddress", TEST_ADDRESS)
@@ -151,13 +148,14 @@ class TonConnectOperationsTest : OperationsTestBase() {
             put("privateKey", "")
             put("publicKey", "")
             put("domain", "")
-            put("dAppInfo", JSONObject().apply { put("name", dAppName) })
+            put("schemaVersion", 1)
+            put("dAppName", dAppName)
         }
         givenBridgeReturnsRaw(
-            JSONArray().apply {
-                put(sessionEntry("session-1", "dApp 1"))
-                put(sessionEntry("session-2", "dApp 2"))
-                put(sessionEntry("session-3", "dApp 3"))
+            buildJsonArray {
+                add(sessionEntry("session-1", "dApp 1"))
+                add(sessionEntry("session-2", "dApp 2"))
+                add(sessionEntry("session-3", "dApp 3"))
             },
         )
 
@@ -173,7 +171,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun handleTonConnectUrl_completesSuccessfully() = runBlocking {
-        givenBridgeReturns(JSONObject())
+        givenBridgeReturns(JsonObject(emptyMap()))
 
         // Should not throw
         rpcClient.handleTonConnectUrl("tc://connect?...")
@@ -183,7 +181,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun disconnectSession_completesSuccessfully() = runBlocking {
-        givenBridgeReturns(JSONObject())
+        givenBridgeReturns(JsonObject(emptyMap()))
 
         // Should not throw
         rpcClient.disconnectSession(TEST_SESSION_ID)
@@ -191,7 +189,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun disconnectSession_handlesNullSessionId() = runBlocking {
-        givenBridgeReturns(JSONObject())
+        givenBridgeReturns(JsonObject(emptyMap()))
 
         // Should not throw - null means disconnect all
         rpcClient.disconnectSession(null)
@@ -201,7 +199,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun approveConnect_completesSuccessfully() = runBlocking {
-        givenBridgeReturns(JSONObject())
+        givenBridgeReturns(JsonObject(emptyMap()))
 
         val event = createConnectRequestEvent(
             id = "req-123",
@@ -215,7 +213,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test(expected = WalletKitBridgeException::class)
     fun approveConnect_throwsIfWalletAddressMissing() = runBlocking {
-        givenBridgeReturns(JSONObject())
+        givenBridgeReturns(JsonObject(emptyMap()))
 
         val event = createConnectRequestEvent(
             id = "req-123",
@@ -228,7 +226,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test(expected = WalletKitBridgeException::class)
     fun approveConnect_throwsIfWalletIdMissing() = runBlocking {
-        givenBridgeReturns(JSONObject())
+        givenBridgeReturns(JsonObject(emptyMap()))
 
         val event = createConnectRequestEvent(
             id = "req-123",
@@ -243,7 +241,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun rejectConnect_completesSuccessfully() = runBlocking {
-        givenBridgeReturns(JSONObject())
+        givenBridgeReturns(JsonObject(emptyMap()))
 
         val event = createConnectRequestEvent(id = "req-123")
 
@@ -253,7 +251,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun rejectConnect_handlesNullReason() = runBlocking {
-        givenBridgeReturns(JSONObject())
+        givenBridgeReturns(JsonObject(emptyMap()))
 
         val event = createConnectRequestEvent(id = "req-123")
 
@@ -265,7 +263,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun approveTransaction_completesSuccessfully() = runBlocking {
-        givenBridgeReturns(JSONObject())
+        givenBridgeReturns(JsonObject(emptyMap()))
 
         val event = createTransactionRequestEvent(
             id = "tx-req-123",
@@ -281,7 +279,7 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun rejectTransaction_completesSuccessfully() = runBlocking {
-        givenBridgeReturns(JSONObject())
+        givenBridgeReturns(JsonObject(emptyMap()))
 
         val event = createTransactionRequestEvent(
             id = "tx-req-123",
@@ -296,13 +294,13 @@ class TonConnectOperationsTest : OperationsTestBase() {
 
     @Test
     fun handleTonConnectRequest_callsResponseCallback() = runBlocking {
-        val responseJson = JSONObject().apply {
+        val responseJson = buildJsonObject {
             put("result", "success")
         }
         givenBridgeReturns(responseJson)
 
         var callbackInvoked = false
-        var callbackResponse: JSONObject? = null
+        var callbackResponse: JsonObject? = null
 
         rpcClient.handleTonConnectRequest(
             messageId = "msg-123",
@@ -323,11 +321,11 @@ class TonConnectOperationsTest : OperationsTestBase() {
     @Test
     fun handleTonConnectRequest_handlesErrorGracefully() = runBlocking {
         // Simulate bridge throwing an exception
-        givenBridgeReturns(JSONObject()) // This won't matter as we'll override
+        givenBridgeReturns(JsonObject(emptyMap())) // This won't matter as we'll override
 
         // For this test, we need to verify error handling
         // The callback should receive an error response
-        var callbackResponse: JSONObject? = null
+        var callbackResponse: JsonObject? = null
 
         rpcClient.handleTonConnectRequest(
             messageId = "msg-123",

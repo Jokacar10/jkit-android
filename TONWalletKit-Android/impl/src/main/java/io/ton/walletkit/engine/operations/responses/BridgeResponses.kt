@@ -102,30 +102,3 @@ internal data class SendTransactionResponse(
     val boc: String? = null,
     val signedBoc: String? = null,
 )
-
-@Serializable
-internal data class DAppInfoDto(
-    val name: String? = null,
-    val description: String? = null,
-    val url: String? = null,
-    val iconUrl: String? = null,
-)
-
-@Serializable
-internal data class SessionEntryDto(
-    val sessionId: String? = null,
-    val walletId: String? = null,
-    val walletAddress: String? = null,
-    val createdAt: String? = null,
-    val lastActivityAt: String? = null,
-    val privateKey: String? = null,
-    val publicKey: String? = null,
-    val domain: String? = null,
-    val schemaVersion: Int? = null,
-    val dAppName: String? = null,
-    val dAppDescription: String? = null,
-    val dAppUrl: String? = null,
-    val dAppIconUrl: String? = null,
-    val dAppInfo: DAppInfoDto? = null,
-    val isJsBridge: Boolean? = null,
-)

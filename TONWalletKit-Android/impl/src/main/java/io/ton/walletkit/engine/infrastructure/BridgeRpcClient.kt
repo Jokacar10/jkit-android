@@ -25,14 +25,19 @@ import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.bridge.BridgeCodec
 import io.ton.walletkit.bridge.decodeFromBridge
 import io.ton.walletkit.bridge.decodeFromBridgeOrNull
+import io.ton.walletkit.bridge.optString
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.LogConstants
 import io.ton.walletkit.internal.constants.ResponseConstants
 import io.ton.walletkit.internal.util.Logger
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.json.Json
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
@@ -46,13 +51,13 @@ internal class BridgeRpcClient(
     private val ready = CompletableDeferred<Unit>()
 
     /**
-     * Wraps [send] in a JSONObject envelope. Reserved for the [callBridgeMethod] escape hatch
-     * and other callsites that explicitly need an opaque JSONObject result; prefer [callTyped].
+     * Wraps [send] in a JsonObject envelope. Reserved for the [callBridgeMethod] escape hatch
+     * and other callsites that explicitly need an opaque JsonObject result; prefer [callTyped].
      */
-    suspend fun call(method: String, params: Any? = null): JSONObject = wrap(send(method, params))
+    suspend fun call(method: String, params: Any? = null): JsonObject = wrap(send(method, params))
 
     /** Send a request to JS and return the raw decoded result; callers may discard it. */
-    suspend fun send(method: String, params: Any? = null): Any? {
+    suspend fun send(method: String, params: Any? = null): JsonElement {
         webViewManager.webViewInitialized.await()
         webViewManager.transport.awaitReady()
         if (method != BridgeMethodConstants.METHOD_INIT) {
@@ -64,12 +69,12 @@ internal class BridgeRpcClient(
         val deferred = CompletableDeferred<BridgeResponse>()
         pending[callId] = deferred
 
-        val envelope = JSONObject().apply {
+        val envelope = buildJsonObject {
             put(ResponseConstants.KEY_KIND, ResponseConstants.VALUE_KIND_CALL)
             put(ResponseConstants.KEY_ID, callId)
             put(ResponseConstants.KEY_METHOD, method)
             val encoded = codec.encode(params)
-            if (encoded != null && encoded != JSONObject.NULL) {
+            if (encoded !is JsonNull) {
                 put(ResponseConstants.KEY_PARAMS, encoded)
             }
         }
@@ -78,20 +83,20 @@ internal class BridgeRpcClient(
         return deferred.await().raw
     }
 
-    fun handleResponse(id: String, response: JSONObject) {
+    fun handleResponse(id: String, response: JsonObject) {
         val deferred = pending.remove(id)
         if (deferred == null) {
             Logger.w(TAG, "handleResponse: No deferred found for id: $id")
             return
         }
-        val error = response.optJSONObject(ResponseConstants.KEY_ERROR)
+        val error = response[ResponseConstants.KEY_ERROR] as? JsonObject
         if (error != null) {
             val message = error.optString(ResponseConstants.KEY_MESSAGE, ResponseConstants.ERROR_MESSAGE_DEFAULT)
             Logger.e(TAG, ERROR_CALL_FAILED + id + ERROR_FAILED_SUFFIX + message)
             deferred.completeExceptionally(WalletKitBridgeException(message))
             return
         }
-        val raw = response.opt(ResponseConstants.KEY_RESULT)
+        val raw = response[ResponseConstants.KEY_RESULT] ?: JsonNull
         deferred.complete(BridgeResponse(raw))
     }
 
@@ -115,14 +120,14 @@ internal class BridgeRpcClient(
 
     fun isReady(): Boolean = ready.isCompleted
 
-    private fun wrap(raw: Any?): JSONObject = when (raw) {
-        is JSONObject -> raw
-        is JSONArray -> JSONObject().put(ResponseConstants.KEY_ITEMS, raw)
-        null, JSONObject.NULL -> JSONObject()
-        else -> JSONObject().put(ResponseConstants.KEY_VALUE, raw)
+    private fun wrap(raw: JsonElement): JsonObject = when (raw) {
+        is JsonObject -> raw
+        is JsonArray -> buildJsonObject { put(ResponseConstants.KEY_ITEMS, raw) }
+        is JsonNull -> JsonObject(emptyMap())
+        else -> buildJsonObject { put(ResponseConstants.KEY_VALUE, raw) }
     }
 
-    private data class BridgeResponse(val raw: Any?)
+    private data class BridgeResponse(val raw: JsonElement)
 
     private companion object {
         private const val TAG = LogConstants.TAG_WEBVIEW_ENGINE

@@ -27,8 +27,12 @@ import io.ton.walletkit.api.generated.TONNFTRawTransferRequestMessage
 import io.ton.walletkit.api.generated.TONNFTTransferRequest
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.coroutines.runBlocking
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,16 +59,16 @@ class AssetOperationsTest : OperationsTestBase() {
     @Test
     fun getNfts_parsesNftItemsArray() = runBlocking {
         givenBridgeReturns(
-            JSONObject().apply {
+            buildJsonObject {
                 put(
                     "nfts",
-                    JSONArray().apply {
-                        put(
-                            JSONObject().apply {
+                    buildJsonArray {
+                        add(
+                            buildJsonObject {
                                 put("address", TEST_NFT_ADDRESS)
                                 put(
                                     "owner",
-                                    JSONObject().apply {
+                                    buildJsonObject {
                                         put("address", TEST_ADDRESS)
                                     },
                                 )
@@ -84,8 +88,8 @@ class AssetOperationsTest : OperationsTestBase() {
     @Test
     fun getNfts_returnsEmptyItemsIfNone() = runBlocking {
         givenBridgeReturns(
-            JSONObject().apply {
-                put("nfts", JSONArray())
+            buildJsonObject {
+                put("nfts", JsonArray(emptyList()))
             },
         )
 
@@ -99,7 +103,7 @@ class AssetOperationsTest : OperationsTestBase() {
     @Test
     fun getNft_parsesSingleNft() = runBlocking {
         givenBridgeReturns(
-            JSONObject().apply {
+            buildJsonObject {
                 put("address", TEST_NFT_ADDRESS)
                 put("ownerAddress", TEST_ADDRESS)
             },
@@ -113,7 +117,7 @@ class AssetOperationsTest : OperationsTestBase() {
 
     @Test
     fun getNft_returnsNullIfNoAddress() = runBlocking {
-        givenBridgeReturns(JSONObject()) // No address field
+        givenBridgeReturns(JsonObject(emptyMap())) // No address field
 
         val result = rpcClient.getNft(TEST_NFT_ADDRESS)
 
@@ -126,25 +130,25 @@ class AssetOperationsTest : OperationsTestBase() {
     fun getJettons_parsesJettonWallets() = runBlocking {
         // TONJettonWallets uses "jettons" for items, and TONJettonWallet requires "jettonWalletAddress"
         givenBridgeReturns(
-            JSONObject().apply {
-                put("addressBook", JSONObject())
+            buildJsonObject {
+                put("addressBook", JsonObject(emptyMap()))
                 put(
                     "jettons",
-                    JSONArray().apply {
-                        put(
-                            JSONObject().apply {
+                    buildJsonArray {
+                        add(
+                            buildJsonObject {
                                 put("address", TEST_JETTON_ADDRESS) // Jetton master address
                                 put("walletAddress", TEST_JETTON_ADDRESS) // Wallet address
                                 put("balance", "1000000000")
                                 put(
                                     "info",
-                                    JSONObject().apply {
+                                    buildJsonObject {
                                         put("name", "Test Jetton")
                                         put("symbol", "TST")
                                     },
                                 )
                                 put("isVerified", false)
-                                put("prices", JSONArray())
+                                put("prices", JsonArray(emptyList()))
                             },
                         )
                     },
@@ -161,9 +165,9 @@ class AssetOperationsTest : OperationsTestBase() {
     @Test
     fun getJettons_returnsEmptyIfNone() = runBlocking {
         givenBridgeReturns(
-            JSONObject().apply {
-                put("addressBook", JSONObject())
-                put("jettons", JSONArray())
+            buildJsonObject {
+                put("addressBook", JsonObject(emptyMap()))
+                put("jettons", JsonArray(emptyList()))
             },
         )
 
@@ -201,7 +205,7 @@ class AssetOperationsTest : OperationsTestBase() {
     @Test
     fun createTransferNftTransaction_returnsTransactionString() = runBlocking {
         val transactionContent = """{"messages":[{"address":"EQ...","amount":"50000000"}]}"""
-        givenBridgeReturns(JSONObject(transactionContent))
+        givenBridgeReturns(transactionContent)
 
         val params = TONNFTTransferRequest(
             nftAddress = TONUserFriendlyAddress(TEST_NFT_ADDRESS),
@@ -218,7 +222,7 @@ class AssetOperationsTest : OperationsTestBase() {
     @Test
     fun createTransferNftRawTransaction_returnsTransactionString() = runBlocking {
         val transactionContent = """{"messages":[{"address":"EQ...","amount":"1"}]}"""
-        givenBridgeReturns(JSONObject(transactionContent))
+        givenBridgeReturns(transactionContent)
 
         val params = TONNFTRawTransferRequest(
             nftAddress = TONUserFriendlyAddress(TEST_NFT_ADDRESS),
@@ -239,7 +243,7 @@ class AssetOperationsTest : OperationsTestBase() {
     @Test
     fun createTransferJettonTransaction_returnsTransactionString() = runBlocking {
         val transactionContent = """{"messages":[{"address":"EQ...","amount":"100"}]}"""
-        givenBridgeReturns(JSONObject(transactionContent))
+        givenBridgeReturns(transactionContent)
 
         val params = TONJettonsTransferRequest(
             recipientAddress = TONUserFriendlyAddress(TEST_ADDRESS),

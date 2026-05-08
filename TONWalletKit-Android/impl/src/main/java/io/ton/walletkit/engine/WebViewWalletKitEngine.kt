@@ -53,7 +53,6 @@ import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.api.generated.TONTransferRequest
 import io.ton.walletkit.api.generated.TONUnstakeMode
 import io.ton.walletkit.bridge.BridgeCodec
-import io.ton.walletkit.bridge.registerDomainTypeBridgeDecoders
 import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.config.TONWalletKitConfiguration
 import io.ton.walletkit.engine.adapter.BridgeWalletAdapter
@@ -154,8 +153,9 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 /**
  * WebView-backed WalletKit engine. Orchestrates the WebView, JS bridge transport,
@@ -252,7 +252,7 @@ internal class WebViewWalletKitEngine private constructor(
         persistentStorageEnabled = initManager.isPersistentStorageEnabled()
     }
 
-    private fun handleBridgeMessage(payload: JSONObject) {
+    private fun handleBridgeMessage(payload: JsonObject) {
         messageDispatcher.dispatchMessage(payload)
     }
 
@@ -264,7 +264,7 @@ internal class WebViewWalletKitEngine private constructor(
         messageDispatcher.ensureEventListenersSetUp()
     }
 
-    private suspend fun call(method: String, params: Any? = null): JSONObject {
+    private suspend fun call(method: String, params: Any? = null): JsonObject {
         if (isDestroyed) {
             throw WalletKitBridgeException("Cannot call method '$method' - SDK has been destroyed")
         }
@@ -359,7 +359,7 @@ internal class WebViewWalletKitEngine private constructor(
         method: String,
         paramsJson: String?,
         url: String?,
-        responseCallback: (JSONObject) -> Unit,
+        responseCallback: (JsonObject) -> Unit,
         walletId: String?,
     ) = rpcClient.handleTonConnectRequest(messageId, method, paramsJson, url, responseCallback, walletId)
 
@@ -471,7 +471,7 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun registerKotlinSwapProvider(providerId: String) {
         callBridgeMethod(
             BridgeMethodConstants.METHOD_REGISTER_KOTLIN_SWAP_PROVIDER,
-            JSONObject().apply { put("providerId", providerId) },
+            buildJsonObject { put("providerId", providerId) },
         )
     }
 
@@ -496,9 +496,9 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun registerKotlinStakingProvider(providerId: String, supportedUnstakeModesJson: String) {
         callBridgeMethod(
             BridgeMethodConstants.METHOD_REGISTER_KOTLIN_STAKING_PROVIDER,
-            JSONObject().apply {
+            buildJsonObject {
                 put("providerId", providerId)
-                put("supportedUnstakeModes", JSONArray(supportedUnstakeModesJson))
+                put("supportedUnstakeModes", json.parseToJsonElement(supportedUnstakeModesJson))
             },
         )
     }
@@ -551,7 +551,7 @@ internal class WebViewWalletKitEngine private constructor(
         )
     }
 
-    override suspend fun callBridgeMethod(method: String, params: Any?): JSONObject {
+    override suspend fun callBridgeMethod(method: String, params: Any?): JsonObject {
         return call(method, params)
     }
 
@@ -608,10 +608,6 @@ internal class WebViewWalletKitEngine private constructor(
     }
 
     companion object {
-        init {
-            registerDomainTypeBridgeDecoders()
-        }
-
         private val instances = mutableMapOf<TONNetwork, WebViewWalletKitEngine>()
         private val instanceMutex = Mutex()
 

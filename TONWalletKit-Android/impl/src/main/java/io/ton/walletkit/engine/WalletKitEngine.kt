@@ -67,7 +67,7 @@ import io.ton.walletkit.request.TONWalletConnectionRequest
 import io.ton.walletkit.session.TONConnectSession
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.serialization.json.JsonElement
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonObject
 
 /**
  * Abstraction over a runtime that can execute the WalletKit JavaScript bundle and expose
@@ -224,7 +224,7 @@ internal interface WalletKitEngine : RequestHandler {
         method: String,
         paramsJson: String?,
         url: String? = null,
-        responseCallback: (JSONObject) -> Unit,
+        responseCallback: (JsonObject) -> Unit,
         walletId: String? = null,
     )
 
@@ -564,7 +564,7 @@ internal interface WalletKitEngine : RequestHandler {
      * @return The JSON response from the bridge
      * @throws WalletKitBridgeException if the call fails
      */
-    suspend fun callBridgeMethod(method: String, params: Any? = null): JSONObject
+    suspend fun callBridgeMethod(method: String, params: Any? = null): JsonObject
 
     /**
      * Add an event handler to receive SDK events.

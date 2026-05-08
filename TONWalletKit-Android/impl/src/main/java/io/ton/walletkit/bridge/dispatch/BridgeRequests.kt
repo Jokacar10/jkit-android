@@ -79,10 +79,10 @@ internal data class KotlinStakingGetProviderInfoRequest(
 @Serializable
 internal data class KotlinProviderWatchRequest(
     val providerId: String,
-    val subId: String,
+    val subscriptionId: String,
     val type: String,
     val address: String? = null,
 )
 
 @Serializable
-internal data class KotlinProviderUnwatchRequest(val subId: String)
+internal data class KotlinProviderUnwatchRequest(val subscriptionId: String)

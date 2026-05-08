@@ -42,6 +42,8 @@ import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONRawStackItem
 import io.ton.walletkit.api.isTestnet
 import io.ton.walletkit.bridge.BuildConfig
+import io.ton.walletkit.bridge.optString
+import io.ton.walletkit.bridge.optStringOrNull
 import io.ton.walletkit.bridge.transport.BridgeTransport
 import io.ton.walletkit.bridge.transport.WebMessagePortBridgeTransport
 import io.ton.walletkit.client.TONAPIClient
@@ -60,11 +62,16 @@ import io.ton.walletkit.session.TONConnectSessionManager
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.put
 
 /**
  * Owns the WebView lifecycle, asset loading, and JavaScript bridge integration.
@@ -79,7 +86,7 @@ internal class WebViewManager(
     private val apiClients: List<TONAPIClient>,
     private val adapterManager: AdapterManager,
     private val json: Json,
-    private val onMessage: (JSONObject) -> Unit,
+    private val onMessage: (JsonObject) -> Unit,
     private val onBridgeError: (WalletKitBridgeException, String?) -> Unit,
 ) {
     private val appContext = context.applicationContext
@@ -143,14 +150,14 @@ internal class WebViewManager(
                 mainHandler = mainHandler,
                 callbackHandler = mainHandler,
             )
-            transportImpl.setOnMessage { json ->
+            transportImpl.setOnMessage { jsonString ->
                 try {
-                    onMessage(JSONObject(json))
-                } catch (err: JSONException) {
-                    Logger.e(TAG, "JSONException: " + LogConstants.MSG_MALFORMED_PAYLOAD, err)
+                    onMessage(json.parseToJsonElement(jsonString).jsonObject)
+                } catch (err: SerializationException) {
+                    Logger.e(TAG, "SerializationException: " + LogConstants.MSG_MALFORMED_PAYLOAD, err)
                     onBridgeError(
                         WalletKitBridgeException(LogConstants.ERROR_MALFORMED_PAYLOAD_PREFIX + err.message),
-                        json,
+                        jsonString,
                     )
                 }
             }
@@ -279,13 +286,13 @@ internal class WebViewManager(
         @JavascriptInterface
         fun adapterCallSync(method: String, paramsJson: String): String = runBlocking {
             withTimeout(1000) {
-                val params = JSONObject(paramsJson)
-                val adapterId = params.getString("adapterId")
+                val params = json.parseToJsonElement(paramsJson).jsonObject
+                val adapterId = params.optString("adapterId")
                 val adapter = adapterManager.getAdapter(adapterId)
                     ?: throw IllegalArgumentException("Adapter not found: $adapterId")
                 when (method) {
                     "getPublicKey" -> adapter.publicKey().value
-                    "getNetwork" -> JSONObject().apply { put("chainId", adapter.network().chainId) }.toString()
+                    "getNetwork" -> buildJsonObject { put("chainId", adapter.network().chainId) }.toString()
                     "getAddress" -> adapter.address(adapter.network().isTestnet).value
                     "getWalletId" -> adapter.identifier()
                     "getSupportedFeatures" -> {
@@ -320,12 +327,12 @@ internal class WebViewManager(
                 try {
                     Logger.d(TAG, "sessionCreate: sessionId=$sessionId, dAppInfo=$dAppInfoJson")
 
-                    val dAppInfoObj = JSONObject(dAppInfoJson)
+                    val dAppInfoObj = json.parseToJsonElement(dAppInfoJson).jsonObject
                     val dAppInfo = TONDAppInfo(
                         name = dAppInfoObj.optString("name", ""),
-                        url = dAppInfoObj.optNullableString("url"),
-                        iconUrl = dAppInfoObj.optNullableString("iconUrl"),
-                        description = dAppInfoObj.optNullableString("description"),
+                        url = dAppInfoObj.optStringOrNull("url"),
+                        iconUrl = dAppInfoObj.optStringOrNull("iconUrl"),
+                        description = dAppInfoObj.optStringOrNull("description"),
                     )
 
                     val session = manager.createSession(
@@ -521,24 +528,18 @@ internal class WebViewManager(
             }
         }
 
-        private fun JSONObject.optNullableString(key: String): String? {
-            val value = opt(key)
-            return when (value) {
-                null, JSONObject.NULL -> null
-                else -> value.toString()
-            }
-        }
-
         private fun parseSessionFilter(filterJson: String): SessionFilter? {
             return try {
-                val jsonObj = JSONObject(filterJson)
-                if (jsonObj.length() == 0) {
+                val jsonObj = json.parseToJsonElement(filterJson).jsonObject
+                if (jsonObj.isEmpty()) {
                     null
                 } else {
                     SessionFilter(
-                        walletId = jsonObj.optNullableString("walletId"),
-                        domain = jsonObj.optNullableString("domain"),
-                        isJsBridge = if (jsonObj.has("isJsBridge")) jsonObj.getBoolean("isJsBridge") else null,
+                        walletId = jsonObj.optStringOrNull("walletId"),
+                        domain = jsonObj.optStringOrNull("domain"),
+                        isJsBridge = (jsonObj["isJsBridge"] as? kotlinx.serialization.json.JsonPrimitive)?.let {
+                            it.content.toBooleanStrictOrNull()
+                        },
                     )
                 }
             } catch (e: Exception) {
@@ -547,13 +548,13 @@ internal class WebViewManager(
             }
         }
 
-        private fun featuresToJson(features: List<TONWalletKitConfiguration.Feature>): JSONArray {
-            return JSONArray().apply {
+        private fun featuresToJson(features: List<TONWalletKitConfiguration.Feature>): JsonArray =
+            buildJsonArray {
                 for (feature in features) {
                     when (feature) {
                         is TONWalletKitConfiguration.SendTransactionFeature -> {
-                            put(
-                                JSONObject().apply {
+                            add(
+                                buildJsonObject {
                                     put(JsonConstants.KEY_NAME, JsonConstants.FEATURE_SEND_TRANSACTION)
                                     feature.maxMessages?.let { put(JsonConstants.KEY_MAX_MESSAGES, it) }
                                     feature.extraCurrencySupported?.let { put("extraCurrencySupported", it) }
@@ -561,14 +562,14 @@ internal class WebViewManager(
                             )
                         }
                         is TONWalletKitConfiguration.SignDataFeature -> {
-                            put(
-                                JSONObject().apply {
+                            add(
+                                buildJsonObject {
                                     put(JsonConstants.KEY_NAME, JsonConstants.FEATURE_SIGN_DATA)
                                     put(
                                         JsonConstants.KEY_TYPES,
-                                        JSONArray().apply {
+                                        buildJsonArray {
                                             for (type in feature.types) {
-                                                put(
+                                                add(
                                                     when (type) {
                                                         SignDataType.TEXT -> JsonConstants.VALUE_SIGN_DATA_TEXT
                                                         SignDataType.BINARY -> JsonConstants.VALUE_SIGN_DATA_BINARY
@@ -584,7 +585,6 @@ internal class WebViewManager(
                     }
                 }
             }
-        }
     }
 
     private companion object {

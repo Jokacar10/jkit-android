@@ -51,7 +51,7 @@ internal suspend fun BridgeRpcClient.sign(data: ByteArray, secretKey: ByteArray)
             secretKey = secretKey.map { it.toInt() and 0xFF },
         ),
     )
-    if (signatureHex.isEmpty() || signatureHex == "null") {
+    if (signatureHex.isEmpty()) {
         throw WalletKitBridgeException("Signature missing from sign result")
     }
     return WalletKitUtils.hexToByteArray(signatureHex)

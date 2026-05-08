@@ -21,10 +21,28 @@
  */
 package io.ton.walletkit.bridge
 
-interface BridgeEncodable {
-    fun encodeForBridge(): Any?
-}
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
 
-interface BridgeDecodable<T> {
-    fun decodeFromBridge(raw: Any?): T?
-}
+internal fun JsonElement?.asStringOrNull(): String? =
+    (this as? JsonPrimitive)?.takeIf { it !is JsonNull }?.contentOrNull
+
+internal fun JsonObject.optString(key: String, default: String = ""): String =
+    this[key]?.asStringOrNull() ?: default
+
+internal fun JsonObject.optStringOrNull(key: String): String? =
+    this[key]?.asStringOrNull()
+
+internal fun JsonObject.optBoolean(key: String, default: Boolean = false): Boolean =
+    (this[key] as? JsonPrimitive)?.booleanOrNull ?: default
+
+internal fun JsonObject.optJsonObject(key: String): JsonObject? =
+    this[key] as? JsonObject
+
+internal fun JsonObject.optJsonArray(key: String): JsonArray? =
+    this[key] as? JsonArray

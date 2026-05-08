@@ -25,8 +25,12 @@ import io.ton.walletkit.api.generated.TONTransferRequest
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,12 +59,12 @@ class TransactionOperationsTest : OperationsTestBase() {
     @Test
     fun createTransferTonTransaction_returnsTransactionJson() = runBlocking {
         givenBridgeReturns(
-            JSONObject().apply {
+            buildJsonObject {
                 put(
                     "messages",
-                    JSONArray().apply {
-                        put(
-                            JSONObject().apply {
+                    buildJsonArray {
+                        add(
+                            buildJsonObject {
                                 put("address", TEST_TO_ADDRESS)
                                 put("amount", "1000000000")
                             },
@@ -86,8 +90,8 @@ class TransactionOperationsTest : OperationsTestBase() {
     @Test
     fun createTransferTonTransaction_passesCorrectParams() = runBlocking {
         givenBridgeReturns(
-            JSONObject().apply {
-                put("messages", JSONArray())
+            buildJsonObject {
+                put("messages", JsonArray(emptyList()))
                 put("fromAddress", TEST_ADDRESS)
             },
         )
@@ -108,18 +112,18 @@ class TransactionOperationsTest : OperationsTestBase() {
     @Test
     fun createTransferMultiTonTransaction_returnsTransactionJson() = runBlocking {
         givenBridgeReturns(
-            JSONObject().apply {
+            buildJsonObject {
                 put(
                     "messages",
-                    JSONArray().apply {
-                        put(
-                            JSONObject().apply {
+                    buildJsonArray {
+                        add(
+                            buildJsonObject {
                                 put("address", TEST_TO_ADDRESS)
                                 put("amount", "1000000000")
                             },
                         )
-                        put(
-                            JSONObject().apply {
+                        add(
+                            buildJsonObject {
                                 put("address", TEST_ADDRESS)
                                 put("amount", "2000000000")
                             },
@@ -168,8 +172,8 @@ class TransactionOperationsTest : OperationsTestBase() {
         val result = rpcClient.sendTransaction(TEST_ADDRESS, emptyTx())
 
         assertEquals("te6ccgEBAgEA...", result)
-        val encoded = encodeCapturedParams() as JSONObject
-        assertTrue(encoded.get("transactionContent") is JSONObject)
+        val encoded = encodeCapturedParams() as JsonObject
+        assertTrue(encoded.get("transactionContent") is JsonObject)
     }
 
     @Test
@@ -191,7 +195,7 @@ class TransactionOperationsTest : OperationsTestBase() {
     fun sendTransaction_throwsIfSignedBocAndBocMissing() {
         assertThrows(SerializationException::class.java) {
             runBlocking {
-                givenBridgeReturns(JSONObject())
+                givenBridgeReturns(JsonObject(emptyMap()))
                 rpcClient.sendTransaction(TEST_ADDRESS, emptyTx())
             }
         }
@@ -202,7 +206,7 @@ class TransactionOperationsTest : OperationsTestBase() {
     @Test
     fun getTransactionPreview_parsesSuccessPreview() = runBlocking {
         givenBridgeReturns(
-            JSONObject().apply {
+            buildJsonObject {
                 put("result", "success")
             },
         )
@@ -212,19 +216,19 @@ class TransactionOperationsTest : OperationsTestBase() {
         // Result should be a Success type
         assertNotNull(result)
         assertNotNull(result.result)
-        val encoded = encodeCapturedParams() as JSONObject
-        assertTrue(encoded.get("transactionContent") is JSONObject)
+        val encoded = encodeCapturedParams() as JsonObject
+        assertTrue(encoded.get("transactionContent") is JsonObject)
     }
 
     // --- handleNewTransaction tests ---
 
     @Test
     fun handleNewTransaction_completesWithoutError() = runBlocking {
-        givenBridgeReturns(JSONObject()) // Success, no return value needed
+        givenBridgeReturns(JsonObject(emptyMap())) // Success, no return value needed
 
         // Should not throw
         rpcClient.handleNewTransaction(TEST_ADDRESS, emptyTx())
-        val encoded = encodeCapturedParams() as JSONObject
-        assertTrue(encoded.get("transactionContent") is JSONObject)
+        val encoded = encodeCapturedParams() as JsonObject
+        assertTrue(encoded.get("transactionContent") is JsonObject)
     }
 }

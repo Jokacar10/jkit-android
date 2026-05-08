@@ -4081,7 +4081,7 @@ function hexToByteArray(hexString) {
 	for (let i = 0; i < hexString.length; i += 2) result[i / 2] = parseInt(hexString.slice(i, i + 2), 16);
 	return result;
 }
-var import_nacl_util, import_nacl_fast$1, CONNECT_EVENT_ERROR_CODES, CONNECT_ITEM_ERROR_CODES, SEND_TRANSACTION_ERROR_CODES, SIGN_DATA_ERROR_CODES, DISCONNECT_ERROR_CODES, CHAIN, Base64, SessionCrypto;
+var import_nacl_util, import_nacl_fast$1, CONNECT_EVENT_ERROR_CODES, CONNECT_ITEM_ERROR_CODES, SEND_TRANSACTION_ERROR_CODES, SIGN_DATA_ERROR_CODES, DISCONNECT_ERROR_CODES, SIGN_MESSAGE_ERROR_CODES, CHAIN, Base64, SessionCrypto;
 var init_esm$1 = __esmMin((() => {
 	import_nacl_util = /* @__PURE__ */ __toESM(require_nacl_util(), 1);
 	import_nacl_fast$1 = /* @__PURE__ */ __toESM(require_nacl_fast(), 1);
@@ -4118,6 +4118,13 @@ var init_esm$1 = __esmMin((() => {
 		DISCONNECT_ERROR_CODES[DISCONNECT_ERROR_CODES["UNKNOWN_APP_ERROR"] = 100] = "UNKNOWN_APP_ERROR";
 		DISCONNECT_ERROR_CODES[DISCONNECT_ERROR_CODES["METHOD_NOT_SUPPORTED"] = 400] = "METHOD_NOT_SUPPORTED";
 	})(DISCONNECT_ERROR_CODES || (DISCONNECT_ERROR_CODES = {}));
+	(function(SIGN_MESSAGE_ERROR_CODES) {
+		SIGN_MESSAGE_ERROR_CODES[SIGN_MESSAGE_ERROR_CODES["UNKNOWN_ERROR"] = 0] = "UNKNOWN_ERROR";
+		SIGN_MESSAGE_ERROR_CODES[SIGN_MESSAGE_ERROR_CODES["BAD_REQUEST_ERROR"] = 1] = "BAD_REQUEST_ERROR";
+		SIGN_MESSAGE_ERROR_CODES[SIGN_MESSAGE_ERROR_CODES["UNKNOWN_APP_ERROR"] = 100] = "UNKNOWN_APP_ERROR";
+		SIGN_MESSAGE_ERROR_CODES[SIGN_MESSAGE_ERROR_CODES["USER_REJECTS_ERROR"] = 300] = "USER_REJECTS_ERROR";
+		SIGN_MESSAGE_ERROR_CODES[SIGN_MESSAGE_ERROR_CODES["METHOD_NOT_SUPPORTED"] = 400] = "METHOD_NOT_SUPPORTED";
+	})(SIGN_MESSAGE_ERROR_CODES || (SIGN_MESSAGE_ERROR_CODES = {}));
 	(function(CHAIN) {
 		CHAIN["MAINNET"] = "-239";
 		CHAIN["TESTNET"] = "-3";
@@ -39106,18 +39113,18 @@ init_esm();
 init_dist();
 var kotlinSubCallbacks = /* @__PURE__ */ new Map();
 var kotlinProviderSubs = /* @__PURE__ */ new Map();
-function trackKotlinSub(providerId, subId) {
+function trackKotlinSub(providerId, subscriptionId) {
 	let subs = kotlinProviderSubs.get(providerId);
 	if (!subs) {
 		subs = /* @__PURE__ */ new Set();
 		kotlinProviderSubs.set(providerId, subs);
 	}
-	subs.add(subId);
+	subs.add(subscriptionId);
 }
-function forgetKotlinSub(providerId, subId) {
+function forgetKotlinSub(providerId, subscriptionId) {
 	const subs = kotlinProviderSubs.get(providerId);
 	if (!subs) return;
-	subs.delete(subId);
+	subs.delete(subscriptionId);
 	if (subs.size === 0) kotlinProviderSubs.delete(providerId);
 }
 function cleanupReplacedKotlinProvider(instance, nextProviderId, network) {
@@ -39139,19 +39146,19 @@ var ProxyStreamingProvider = class {
 		this.network = network;
 	}
 	watch(type, address, onChange) {
-		const subId = v7();
-		kotlinSubCallbacks.set(subId, onChange);
-		trackKotlinSub(this.providerId, subId);
+		const subscriptionId = v7();
+		kotlinSubCallbacks.set(subscriptionId, onChange);
+		trackKotlinSub(this.providerId, subscriptionId);
 		bridgeRequest("kotlinProviderWatch", {
 			providerId: this.providerId,
-			subId,
+			subscriptionId,
 			type,
 			address
 		});
 		return () => {
-			kotlinSubCallbacks.delete(subId);
-			forgetKotlinSub(this.providerId, subId);
-			bridgeRequest("kotlinProviderUnwatch", { subId });
+			kotlinSubCallbacks.delete(subscriptionId);
+			forgetKotlinSub(this.providerId, subscriptionId);
+			bridgeRequest("kotlinProviderUnwatch", { subscriptionId });
 		};
 	}
 	watchBalance(address, onChange) {
@@ -39175,18 +39182,18 @@ var ProxyStreamingProvider = class {
 	dispose() {
 		const subs = kotlinProviderSubs.get(this.providerId);
 		if (!subs) return;
-		for (const subId of subs) {
-			kotlinSubCallbacks.delete(subId);
-			bridgeRequest("kotlinProviderUnwatch", { subId });
+		for (const subscriptionId of subs) {
+			kotlinSubCallbacks.delete(subscriptionId);
+			bridgeRequest("kotlinProviderUnwatch", { subscriptionId });
 		}
 		kotlinProviderSubs.delete(this.providerId);
 	}
 };
-async function createTonCenterStreamingProvider(args) {
-	return { providerId: retain("streamingProvider", new TonCenterStreamingProvider((await getKit()).createFactoryContext(), args.config)) };
+async function createTonCenterStreamingProvider(config) {
+	return { providerId: retain("streamingProvider", new TonCenterStreamingProvider((await getKit()).createFactoryContext(), config)) };
 }
-async function createTonApiStreamingProvider(args) {
-	return { providerId: retain("streamingProvider", new TonApiStreamingProvider((await getKit()).createFactoryContext(), args.config)) };
+async function createTonApiStreamingProvider(config) {
+	return { providerId: retain("streamingProvider", new TonApiStreamingProvider((await getKit()).createFactoryContext(), config)) };
 }
 async function registerStreamingProvider(args) {
 	const instance = await getKit();
@@ -39273,7 +39280,7 @@ async function registerKotlinStreamingProvider(args) {
 	instance.streaming.registerProvider(() => provider);
 }
 async function kotlinProviderDispatch(args) {
-	const callback = kotlinSubCallbacks.get(args.subId);
+	const callback = kotlinSubCallbacks.get(args.subscriptionId);
 	if (callback) try {
 		callback(JSON.parse(args.updateJson));
 	} catch {}

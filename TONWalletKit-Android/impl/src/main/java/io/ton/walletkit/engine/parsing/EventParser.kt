@@ -24,7 +24,6 @@ package io.ton.walletkit.engine.parsing
 import io.ton.walletkit.api.generated.TONBalanceUpdate
 import io.ton.walletkit.api.generated.TONConnectionRequestEvent
 import io.ton.walletkit.api.generated.TONDisconnectionEvent
-import io.ton.walletkit.api.generated.TONDisconnectionEventPreview
 import io.ton.walletkit.api.generated.TONJettonUpdate
 import io.ton.walletkit.api.generated.TONRequestErrorEvent
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
@@ -32,19 +31,20 @@ import io.ton.walletkit.api.generated.TONSignDataRequestEvent
 import io.ton.walletkit.api.generated.TONStreamingUpdate
 import io.ton.walletkit.api.generated.TONTransactionsUpdate
 import io.ton.walletkit.bridge.decodeFromBridge
+import io.ton.walletkit.bridge.optBoolean
+import io.ton.walletkit.bridge.optJsonObject
+import io.ton.walletkit.bridge.optString
 import io.ton.walletkit.core.streaming.StreamingEvent
 import io.ton.walletkit.engine.WalletKitEngine
 import io.ton.walletkit.event.TONWalletKitEvent
 import io.ton.walletkit.internal.constants.EventTypeConstants
-import io.ton.walletkit.internal.constants.JsonConstants
 import io.ton.walletkit.internal.constants.LogConstants
-import io.ton.walletkit.internal.constants.ResponseConstants
 import io.ton.walletkit.internal.util.Logger
 import io.ton.walletkit.request.TONWalletConnectionRequest
 import io.ton.walletkit.request.TONWalletSignDataRequest
 import io.ton.walletkit.request.TONWalletTransactionRequest
 import kotlinx.serialization.json.Json
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonObject
 
 /**
  * Parses raw JSON event payloads from the JS bridge into typed SDK events.
@@ -55,7 +55,7 @@ internal class EventParser(
     private val json: Json,
     private val engine: WalletKitEngine,
 ) {
-    fun parseEvent(type: String, data: JSONObject): TONWalletKitEvent? = when (type) {
+    fun parseEvent(type: String, data: JsonObject): TONWalletKitEvent? = when (type) {
         EventTypeConstants.EVENT_CONNECT_REQUEST ->
             TONWalletKitEvent.ConnectRequest(
                 TONWalletConnectionRequest(decode<TONConnectionRequestEvent>(data), engine),
@@ -74,24 +74,13 @@ internal class EventParser(
         EventTypeConstants.EVENT_REQUEST_ERROR ->
             TONWalletKitEvent.RequestError(decode<TONRequestErrorEvent>(data))
 
-        EventTypeConstants.EVENT_DISCONNECT -> {
-            val sessionId = data.optNullableString(ResponseConstants.KEY_SESSION_ID)
-                ?: data.optNullableString(JsonConstants.KEY_ID)
-                ?: return null
-            Logger.d(TAG, "Disconnect event received. sessionId=$sessionId, dataKeys=${data.keys().asSequence().toList()}")
-            TONWalletKitEvent.Disconnect(
-                TONDisconnectionEvent(
-                    id = sessionId,
-                    sessionId = sessionId,
-                    preview = TONDisconnectionEventPreview(),
-                ),
-            )
-        }
+        EventTypeConstants.EVENT_DISCONNECT ->
+            TONWalletKitEvent.Disconnect(decode<TONDisconnectionEvent>(data))
 
         else -> null
     }
 
-    fun parseStreamingEvent(type: String, data: JSONObject): StreamingEvent? {
+    fun parseStreamingEvent(type: String, data: JsonObject): StreamingEvent? {
         val subscriptionId = data.optString("subscriptionId")
         return when (type) {
             EventTypeConstants.EVENT_STREAMING_UPDATE ->
@@ -108,19 +97,14 @@ internal class EventParser(
         }
     }
 
-    private inline fun <reified T : Any> decode(data: JSONObject): T = json.decodeFromBridge(data)
+    private inline fun <reified T : Any> decode(data: JsonObject): T = json.decodeFromBridge(data)
 
-    private inline fun <reified T : Any> decodeUpdate(type: String, data: JSONObject): T? = try {
-        val update = data.optJSONObject("update") ?: error("Missing 'update' field")
+    private inline fun <reified T : Any> decodeUpdate(type: String, data: JsonObject): T? = try {
+        val update = data.optJsonObject("update") ?: error("Missing 'update' field")
         json.decodeFromBridge<T>(update)
     } catch (e: Exception) {
         Logger.e(TAG, "Failed to parse $type: ${e.message}", e)
         null
-    }
-
-    private fun JSONObject.optNullableString(key: String): String? = when (val value = opt(key)) {
-        null, JSONObject.NULL -> null
-        else -> value.toString()
     }
 
     private companion object {

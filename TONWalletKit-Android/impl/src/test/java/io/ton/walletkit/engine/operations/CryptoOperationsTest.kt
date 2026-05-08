@@ -25,8 +25,12 @@ import io.mockk.coEvery
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.bridge.BridgeConversionError
 import kotlinx.coroutines.runBlocking
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,10 +51,10 @@ class CryptoOperationsTest : OperationsTestBase() {
     @Test
     fun createTonMnemonic_parsesArray() = runBlocking {
         givenBridgeReturnsRaw(
-            JSONArray().apply {
-                put("word1")
-                put("word2")
-                put("word3")
+            buildJsonArray {
+                add("word1")
+                add("word2")
+                add("word3")
             },
         )
 
@@ -64,7 +68,7 @@ class CryptoOperationsTest : OperationsTestBase() {
 
     @Test
     fun createTonMnemonic_returnsEmptyListIfEmpty() = runBlocking {
-        givenBridgeReturnsRaw(JSONArray())
+        givenBridgeReturnsRaw(JsonArray(emptyList()))
 
         val result = rpcClient.createTonMnemonic(12)
 
@@ -75,7 +79,7 @@ class CryptoOperationsTest : OperationsTestBase() {
     fun createTonMnemonic_handles24Words() = runBlocking {
         val words = (1..24).map { "word$it" }
         givenBridgeReturnsRaw(
-            JSONArray().apply { words.forEach { put(it) } },
+            buildJsonArray { words.forEach { add(it) } },
         )
 
         val result = rpcClient.createTonMnemonic(24)
@@ -89,19 +93,19 @@ class CryptoOperationsTest : OperationsTestBase() {
 
     @Test
     fun mnemonicToKeyPair_parsesKeyPairFromArrays() = runBlocking {
-        // Keys as JSONArray (Uint8Array serialization)
+        // Keys as JsonArray (Uint8Array serialization)
         givenBridgeReturns(
-            JSONObject().apply {
+            buildJsonObject {
                 put(
                     "publicKey",
-                    JSONArray().apply {
-                        repeat(32) { put(it) } // 0, 1, 2, ..., 31
+                    buildJsonArray {
+                        repeat(32) { add(it) } // 0, 1, 2, ..., 31
                     },
                 )
                 put(
                     "secretKey",
-                    JSONArray().apply {
-                        repeat(64) { put(it + 100) } // 100, 101, ..., 163
+                    buildJsonArray {
+                        repeat(64) { add(it + 100) } // 100, 101, ..., 163
                     },
                 )
             },
@@ -118,18 +122,18 @@ class CryptoOperationsTest : OperationsTestBase() {
 
     @Test
     fun mnemonicToKeyPair_parsesKeyPairFromIndexedObject() = runBlocking {
-        // Keys as JSONObject with indexed keys (alternative Uint8Array serialization)
+        // Keys as JsonObject with indexed keys (alternative Uint8Array serialization)
         givenBridgeReturns(
-            JSONObject().apply {
+            buildJsonObject {
                 put(
                     "publicKey",
-                    JSONObject().apply {
+                    buildJsonObject {
                         repeat(32) { put(it.toString(), it * 2) }
                     },
                 )
                 put(
                     "secretKey",
-                    JSONObject().apply {
+                    buildJsonObject {
                         repeat(64) { put(it.toString(), it + 50) }
                     },
                 )
@@ -147,8 +151,8 @@ class CryptoOperationsTest : OperationsTestBase() {
     @Test
     fun mnemonicToKeyPair_throwsIfPublicKeyMissing() {
         givenBridgeReturns(
-            JSONObject().apply {
-                put("secretKey", JSONArray().apply { repeat(64) { put(it) } })
+            buildJsonObject {
+                put("secretKey", buildJsonArray { repeat(64) { add(it) } })
             },
         )
 
@@ -160,8 +164,8 @@ class CryptoOperationsTest : OperationsTestBase() {
     @Test
     fun mnemonicToKeyPair_throwsIfSecretKeyMissing() {
         givenBridgeReturns(
-            JSONObject().apply {
-                put("publicKey", JSONArray().apply { repeat(32) { put(it) } })
+            buildJsonObject {
+                put("publicKey", buildJsonArray { repeat(32) { add(it) } })
             },
         )
 
@@ -175,7 +179,7 @@ class CryptoOperationsTest : OperationsTestBase() {
     @Test
     fun sign_parsesHexSignature() = runBlocking {
         // JS bridge returns the hex signature directly as a String
-        coEvery { rpcClient.send(any(), any()) } returns "abcd1234ef567890"
+        coEvery { rpcClient.send(any(), any()) } returns JsonPrimitive("abcd1234ef567890")
 
         val result = rpcClient.sign(
             data = byteArrayOf(1, 2, 3),
@@ -190,7 +194,7 @@ class CryptoOperationsTest : OperationsTestBase() {
 
     @Test
     fun sign_handlesHexWithPrefix() = runBlocking {
-        coEvery { rpcClient.send(any(), any()) } returns "0xdeadbeef"
+        coEvery { rpcClient.send(any(), any()) } returns JsonPrimitive("0xdeadbeef")
 
         val result = rpcClient.sign(
             data = byteArrayOf(1),
@@ -205,7 +209,7 @@ class CryptoOperationsTest : OperationsTestBase() {
     fun sign_throwsIfSignatureEmpty() {
         runBlocking {
             // Empty string signature should throw
-            coEvery { rpcClient.send(any(), any()) } returns ""
+            coEvery { rpcClient.send(any(), any()) } returns JsonPrimitive("")
 
             assertThrows(WalletKitBridgeException::class.java) {
                 runBlocking {

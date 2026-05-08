@@ -28,51 +28,29 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.doubleOrNull
-import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.serializer
-import org.json.JSONArray
-import org.json.JSONObject
 
 internal class BridgeCodec(private val json: Json) {
 
-    fun encode(value: Any?): Any? = when (value) {
-        null -> JSONObject.NULL
-        is BridgeEncodable -> encode(value.encodeForBridge())
-        is String, is Boolean -> value
-        is Number -> value
-        is JSONObject, is JSONArray -> value
-        is JsonElement -> jsonElementToOrgJson(value)
-        is List<*> -> JSONArray().also { arr -> value.forEach { arr.put(encode(it)) } }
-        is Map<*, *> -> JSONObject().also { obj ->
-            value.forEach { (k, v) -> obj.put(k.toString(), encode(v)) }
-        }
+    fun encode(value: Any?): JsonElement = when (value) {
+        null -> JsonNull
+        is JsonElement -> value
+        is String -> JsonPrimitive(value)
+        is Boolean -> JsonPrimitive(value)
+        is Number -> JsonPrimitive(value)
+        is List<*> -> JsonArray(value.map { encode(it) })
+        is Map<*, *> -> JsonObject(value.entries.associate { (k, v) -> k.toString() to encode(v) })
         else -> encodeSerializable(value)
     }
 
-    private fun encodeSerializable(value: Any): Any {
+    private fun encodeSerializable(value: Any): JsonElement {
         val klass = value::class
         return try {
             @Suppress("UNCHECKED_CAST")
             val ks = json.serializersModule.serializer(klass.java) as KSerializer<Any>
-            jsonElementToOrgJson(json.encodeToJsonElement(ks, value))
+            json.encodeToJsonElement(ks, value)
         } catch (e: Throwable) {
             throw BridgeConversionError.UnableToEncode(klass, e)
-        }
-    }
-
-    private fun jsonElementToOrgJson(element: JsonElement): Any = when (element) {
-        is JsonObject -> JSONObject(element.toString())
-        is JsonArray -> JSONArray(element.toString())
-        is JsonPrimitive -> when {
-            element is JsonNull -> JSONObject.NULL
-            element.isString -> element.content
-            else ->
-                element.booleanOrNull
-                    ?: element.longOrNull
-                    ?: element.doubleOrNull
-                    ?: element.content
         }
     }
 }

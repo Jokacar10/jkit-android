@@ -30,15 +30,19 @@ import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
 import io.ton.walletkit.api.generated.TONSignDataRequestEvent
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import io.ton.walletkit.engine.infrastructure.callTyped
-import io.ton.walletkit.engine.operations.responses.SessionEntryDto
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.constants.LogConstants
 import io.ton.walletkit.internal.constants.ResponseConstants
 import io.ton.walletkit.internal.util.Logger
-import io.ton.walletkit.model.TONUserFriendlyAddress
 import io.ton.walletkit.session.TONConnectSession
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.net.URL
 
 private const val TAG = "${LogConstants.TAG_WEBVIEW_ENGINE}:TonConnectOps"
@@ -57,43 +61,39 @@ internal suspend fun BridgeRpcClient.handleTonConnectRequest(
     method: String,
     paramsJson: String?,
     url: String?,
-    responseCallback: (JSONObject) -> Unit,
+    responseCallback: (JsonObject) -> Unit,
     walletId: String? = null,
 ) {
     try {
-        // params can be JSONObject (connect: {manifestUrl, items, ...}) or JSONArray (other methods).
-        val params: Any = paramsJson?.let {
-            runCatching { JSONObject(it) as Any }
-                .recoverCatching { JSONArray(it) as Any }
-                .getOrDefault(JSONArray())
-        } ?: JSONArray()
+        val params: JsonElement = paramsJson?.let { Json.parseToJsonElement(it) }
+            ?: JsonArray(emptyList())
 
-        val messageInfo = JSONObject().apply {
+        val messageInfo = buildJsonObject {
             put("messageId", messageId)
             put("tabId", messageId)
-            put("domain", url?.let(::extractDomainFromUrl) ?: "internal-browser")
+            put("domain", url?.let(::extractOriginFromUrl) ?: "internal-browser")
             walletId?.let { put("walletId", it) }
         }
 
-        val request = JSONObject().apply {
+        val request = buildJsonObject {
             put("id", messageId)
             put("method", method)
             put("params", params)
         }
 
-        val argsArray = JSONArray().apply {
-            put(messageInfo)
-            put(request)
+        val argsArray = buildJsonArray {
+            add(messageInfo)
+            add(request)
         }
 
         responseCallback(call(BridgeMethodConstants.METHOD_PROCESS_INTERNAL_BROWSER_REQUEST, argsArray))
     } catch (e: Exception) {
         Logger.e(TAG, "Failed to process internal browser request", e)
         responseCallback(
-            JSONObject().apply {
+            buildJsonObject {
                 put(
                     ResponseConstants.KEY_ERROR,
-                    JSONObject().apply {
+                    buildJsonObject {
                         put(ResponseConstants.KEY_MESSAGE, e.message ?: "Failed to process request")
                         put(ResponseConstants.KEY_CODE, 500)
                     },
@@ -103,7 +103,9 @@ internal suspend fun BridgeRpcClient.handleTonConnectRequest(
     }
 }
 
-private fun extractDomainFromUrl(url: String): String = runCatching {
+// Returns scheme://host[:port]. The protocol is required: walletkit's ConnectHandler
+// passes this through `new URL(event.domain)` to validate the dApp URL.
+private fun extractOriginFromUrl(url: String): String = runCatching {
     val parsed = URL(url)
     val hasExplicitPort = parsed.port != -1 && parsed.port != parsed.defaultPort
     "${parsed.protocol}://${parsed.host}" + if (hasExplicitPort) ":${parsed.port}" else ""
@@ -161,27 +163,8 @@ internal suspend fun BridgeRpcClient.rejectSignData(
     send(BridgeMethodConstants.METHOD_REJECT_SIGN_DATA_REQUEST, listOf(event, reason))
 }
 
-internal suspend fun BridgeRpcClient.listSessions(): List<TONConnectSession> {
-    val items: List<SessionEntryDto> = callTyped(BridgeMethodConstants.METHOD_LIST_SESSIONS)
-    return items.map { it.toSession() }
-}
-
-private fun SessionEntryDto.toSession(): TONConnectSession = TONConnectSession(
-    sessionId = sessionId ?: "",
-    walletId = walletId ?: "",
-    walletAddress = TONUserFriendlyAddress(walletAddress ?: ""),
-    createdAt = createdAt ?: "",
-    lastActivityAt = lastActivityAt ?: "",
-    privateKey = privateKey ?: "",
-    publicKey = publicKey ?: "",
-    domain = domain ?: "",
-    schemaVersion = schemaVersion ?: 1,
-    dAppName = dAppInfo?.name ?: dAppName,
-    dAppDescription = dAppInfo?.description ?: dAppDescription,
-    dAppUrl = dAppInfo?.url ?: dAppUrl,
-    dAppIconUrl = dAppInfo?.iconUrl ?: dAppIconUrl,
-    isJsBridge = isJsBridge ?: false,
-)
+internal suspend fun BridgeRpcClient.listSessions(): List<TONConnectSession> =
+    callTyped(BridgeMethodConstants.METHOD_LIST_SESSIONS)
 
 internal suspend fun BridgeRpcClient.disconnectSession(sessionId: String?) {
     send(BridgeMethodConstants.METHOD_DISCONNECT_SESSION, sessionId)

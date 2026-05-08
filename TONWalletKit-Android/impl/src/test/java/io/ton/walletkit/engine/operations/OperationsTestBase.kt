@@ -27,7 +27,10 @@ import io.mockk.mockk
 import io.ton.walletkit.bridge.BridgeCodec
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import kotlinx.serialization.json.Json
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Before
 
 abstract class OperationsTestBase {
@@ -38,8 +41,8 @@ abstract class OperationsTestBase {
     protected var capturedMethod: String? = null
     protected var capturedParams: Any? = null
 
-    private var mockResponse: JSONObject = JSONObject()
-    private var mockRawResponse: Any? = JSONObject()
+    private var mockResponse: JsonObject = JsonObject(emptyMap())
+    private var mockRawResponse: JsonElement = JsonObject(emptyMap())
 
     @Before
     open fun setup() {
@@ -48,15 +51,27 @@ abstract class OperationsTestBase {
         installMocks()
     }
 
-    protected fun givenBridgeReturns(response: JSONObject) {
+    protected fun givenBridgeReturns(response: JsonObject) {
         mockResponse = response
         mockRawResponse = response
         installMocks()
     }
 
-    protected fun givenBridgeReturnsRaw(response: Any?) {
+    protected fun givenBridgeReturns(jsonString: String) {
+        givenBridgeReturns(json.parseToJsonElement(jsonString).let { it as JsonObject })
+    }
+
+    protected fun givenBridgeReturnsRaw(response: JsonElement) {
         mockRawResponse = response
         installMocks()
+    }
+
+    protected fun givenBridgeReturnsRaw(string: String) {
+        givenBridgeReturnsRaw(JsonPrimitive(string))
+    }
+
+    protected fun givenBridgeReturnsRawNull() {
+        givenBridgeReturnsRaw(JsonNull)
     }
 
     private fun installMocks() {
@@ -82,8 +97,19 @@ abstract class OperationsTestBase {
         }
     }
 
-    protected fun encodeCapturedParams(): Any? = BridgeCodec(json).encode(capturedParams)
+    protected fun encodeCapturedParams(): JsonElement = BridgeCodec(json).encode(capturedParams)
 
-    protected fun jsonOf(vararg pairs: Pair<String, Any?>): JSONObject =
-        JSONObject().apply { pairs.forEach { (key, value) -> put(key, value) } }
+    protected fun jsonOf(vararg pairs: Pair<String, Any?>): JsonObject =
+        JsonObject(
+            pairs.associate { (key, value) ->
+                key to when (value) {
+                    null -> JsonNull
+                    is JsonElement -> value
+                    is String -> JsonPrimitive(value)
+                    is Boolean -> JsonPrimitive(value)
+                    is Number -> JsonPrimitive(value)
+                    else -> JsonPrimitive(value.toString())
+                }
+            },
+        )
 }

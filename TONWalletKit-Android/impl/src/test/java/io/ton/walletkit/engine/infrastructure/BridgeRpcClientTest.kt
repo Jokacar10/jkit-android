@@ -30,8 +30,11 @@ import io.ton.walletkit.bridge.transport.BridgeTransport
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -71,12 +74,12 @@ class BridgeRpcClientTest {
         // by using reflection or by testing handleResponse behavior
 
         // For this test, we verify the response parsing works correctly
-        val response = JSONObject().apply {
+        val response = buildJsonObject {
             put("kind", "response")
             put("id", "test-id-1")
             put(
                 "result",
-                JSONObject().apply {
+                buildJsonObject {
                     put("value", "test-value")
                 },
             )
@@ -90,10 +93,10 @@ class BridgeRpcClientTest {
 
     @Test
     fun handleResponse_unknownId_doesNotThrow() {
-        val response = JSONObject().apply {
+        val response = buildJsonObject {
             put("kind", "response")
             put("id", "unknown-id")
-            put("result", JSONObject())
+            put("result", JsonObject(emptyMap()))
         }
 
         // Should not throw, just log warning
@@ -102,12 +105,12 @@ class BridgeRpcClientTest {
 
     @Test
     fun handleResponse_errorInResponse_logsError() {
-        val response = JSONObject().apply {
+        val response = buildJsonObject {
             put("kind", "response")
             put("id", "test-id")
             put(
                 "error",
-                JSONObject().apply {
+                buildJsonObject {
                     put("message", "Something went wrong")
                 },
             )
@@ -163,7 +166,7 @@ class BridgeRpcClientTest {
 
     @Test
     fun handleResponse_nullResult_createsEmptyJsonObject() {
-        val response = JSONObject().apply {
+        val response = buildJsonObject {
             put("kind", "response")
             put("id", "test-id")
             // No "result" key
@@ -175,14 +178,14 @@ class BridgeRpcClientTest {
 
     @Test
     fun handleResponse_jsonArrayResult_wrapsInItems() {
-        val response = JSONObject().apply {
+        val response = buildJsonObject {
             put("kind", "response")
             put("id", "test-id")
             put(
                 "result",
-                JSONArray().apply {
-                    put("item1")
-                    put("item2")
+                buildJsonArray {
+                    add("item1")
+                    add("item2")
                 },
             )
         }
@@ -193,7 +196,7 @@ class BridgeRpcClientTest {
 
     @Test
     fun handleResponse_primitiveResult_wrapsInValue() {
-        val response = JSONObject().apply {
+        val response = buildJsonObject {
             put("kind", "response")
             put("id", "test-id")
             put("result", "simple-string")
@@ -205,7 +208,7 @@ class BridgeRpcClientTest {
 
     @Test
     fun handleResponse_integerResult_wrapsInValue() {
-        val response = JSONObject().apply {
+        val response = buildJsonObject {
             put("kind", "response")
             put("id", "test-id")
             put("result", 42)
@@ -217,7 +220,7 @@ class BridgeRpcClientTest {
 
     @Test
     fun handleResponse_booleanResult_wrapsInValue() {
-        val response = JSONObject().apply {
+        val response = buildJsonObject {
             put("kind", "response")
             put("id", "test-id")
             put("result", true)
@@ -229,10 +232,10 @@ class BridgeRpcClientTest {
 
     @Test
     fun handleResponse_errorWithDefaultMessage() {
-        val response = JSONObject().apply {
+        val response = buildJsonObject {
             put("kind", "response")
             put("id", "test-id")
-            put("error", JSONObject()) // No message key
+            put("error", JsonObject(emptyMap())) // No message key
         }
 
         // Should use default message "Bridge call failed"

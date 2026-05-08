@@ -44,6 +44,9 @@ import io.ton.walletkit.bridge.dispatch.KotlinProviderWatchRequest
 import io.ton.walletkit.bridge.dispatch.KotlinStakingGetProviderInfoRequest
 import io.ton.walletkit.bridge.dispatch.KotlinStakingGetStakedBalanceRequest
 import io.ton.walletkit.bridge.dispatch.SignWithCustomSignerRequest
+import io.ton.walletkit.bridge.optJsonObject
+import io.ton.walletkit.bridge.optString
+import io.ton.walletkit.bridge.optStringOrNull
 import io.ton.walletkit.browser.TonConnectInjector
 import io.ton.walletkit.core.streaming.StreamingEvent
 import io.ton.walletkit.engine.parsing.EventParser
@@ -70,7 +73,9 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import org.json.JSONObject
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.util.UUID
 
 /**
@@ -167,12 +172,12 @@ internal class MessageDispatcher(
         }
 
         registerTyped<KotlinProviderWatchRequest>(REQUEST_METHOD_KOTLIN_PROVIDER_WATCH) { req ->
-            kotlinStreamingProviderManager.watch(req.providerId, req.subId, req.type, req.address)
+            kotlinStreamingProviderManager.watch(req.providerId, req.subscriptionId, req.type, req.address)
             EMPTY_JSON_OBJECT
         }
 
         registerTyped<KotlinProviderUnwatchRequest>(REQUEST_METHOD_KOTLIN_PROVIDER_UNWATCH) { req ->
-            kotlinStreamingProviderManager.unwatch(req.subId)
+            kotlinStreamingProviderManager.unwatch(req.subscriptionId)
             EMPTY_JSON_OBJECT
         }
 
@@ -192,13 +197,13 @@ internal class MessageDispatcher(
         }
     }
 
-    fun dispatchMessage(payload: JSONObject) {
+    fun dispatchMessage(payload: JsonObject) {
         val kind = payload.optString(ResponseConstants.KEY_KIND)
 
         when (kind) {
             ResponseConstants.VALUE_KIND_READY -> handleReady(payload)
             ResponseConstants.VALUE_KIND_EVENT -> {
-                val event = payload.optJSONObject(ResponseConstants.KEY_EVENT)
+                val event = payload.optJsonObject(ResponseConstants.KEY_EVENT)
                 if (event != null) {
                     handleEvent(event)
                 } else {
@@ -229,7 +234,7 @@ internal class MessageDispatcher(
                 initManager.ensureInitialized()
                 onInitialized()
 
-                rpcClient.send(BridgeMethodConstants.METHOD_SET_EVENTS_LISTENERS, JSONObject())
+                rpcClient.send(BridgeMethodConstants.METHOD_SET_EVENTS_LISTENERS, JsonObject(emptyMap()))
                 areEventListenersSetUp = true
             } catch (err: Throwable) {
                 Logger.e(TAG, "Failed to set up event listeners", err)
@@ -243,7 +248,7 @@ internal class MessageDispatcher(
             return
         }
         try {
-            rpcClient.send(BridgeMethodConstants.METHOD_REMOVE_EVENT_LISTENERS, JSONObject())
+            rpcClient.send(BridgeMethodConstants.METHOD_REMOVE_EVENT_LISTENERS, JsonObject(emptyMap()))
             areEventListenersSetUp = false
             Logger.d(TAG, "Event listeners removed from JS bridge (no handlers remaining)")
         } catch (e: Exception) {
@@ -253,12 +258,12 @@ internal class MessageDispatcher(
 
     fun areEventListenersSetUp(): Boolean = areEventListenersSetUp
 
-    private fun handleRequest(payload: JSONObject) {
+    private fun handleRequest(payload: JsonObject) {
         val id = payload.optString(ResponseConstants.KEY_ID)
         val method = payload.optString(ResponseConstants.KEY_METHOD)
-        val params = payload.optJSONObject(ResponseConstants.KEY_PARAMS) ?: JSONObject()
+        val params = payload.optJsonObject(ResponseConstants.KEY_PARAMS) ?: JsonObject(emptyMap())
 
-        if (id.isNullOrEmpty() || method.isNullOrEmpty()) {
+        if (id.isEmpty() || method.isEmpty()) {
             Logger.e(TAG, "Reverse-RPC request missing id or method")
             return
         }
@@ -274,9 +279,8 @@ internal class MessageDispatcher(
         }
     }
 
-    private suspend fun executeNativeRequest(method: String, params: JSONObject): String {
-        val element: JsonElement = json.parseToJsonElement(params.toString())
-        return requestRegistry.dispatch(method, element)
+    private suspend fun executeNativeRequest(method: String, params: JsonObject): String {
+        return requestRegistry.dispatch(method, params)
     }
 
     /** JS pre-stringifies generic provider params; decode them before handing off to the manager. */
@@ -287,13 +291,13 @@ internal class MessageDispatcher(
             ?: throw IllegalArgumentException("Adapter not found: $adapterId")
 
     private fun respondToJs(id: String, result: String?, errorMessage: String?) {
-        val envelope = JSONObject().apply {
+        val envelope = buildJsonObject {
             put(ResponseConstants.KEY_KIND, ResponseConstants.VALUE_KIND_RESPONSE)
             put(ResponseConstants.KEY_ID, id)
             if (errorMessage != null) {
                 put(
                     ResponseConstants.KEY_ERROR,
-                    JSONObject().put(ResponseConstants.KEY_MESSAGE, errorMessage),
+                    buildJsonObject { put(ResponseConstants.KEY_MESSAGE, errorMessage) },
                 )
             } else if (result != null) {
                 put(ResponseConstants.KEY_RESULT, result)
@@ -302,9 +306,9 @@ internal class MessageDispatcher(
         webViewManager.transport.send(envelope.toString())
     }
 
-    private fun handleReady(payload: JSONObject) {
-        initManager.updateNetwork(payload.optNullableString(ResponseConstants.KEY_NETWORK))
-        initManager.updateApiBaseUrl(payload.optNullableString(ResponseConstants.KEY_TON_API_URL))
+    private fun handleReady(payload: JsonObject) {
+        initManager.updateNetwork(payload.optStringOrNull(ResponseConstants.KEY_NETWORK))
+        initManager.updateApiBaseUrl(payload.optStringOrNull(ResponseConstants.KEY_TON_API_URL))
 
         val wasAlreadyReady = rpcClient.isReady()
 
@@ -324,28 +328,17 @@ internal class MessageDispatcher(
             }
         }
 
-        val data = JSONObject()
-        val keys = payload.keys()
-        while (keys.hasNext()) {
-            val key = keys.next()
-            if (key == ResponseConstants.KEY_KIND) continue
-            if (payload.isNull(key)) {
-                data.put(key, JSONObject.NULL)
-            } else {
-                data.put(key, payload.get(key))
-            }
+        val data = JsonObject(payload.filterKeys { it != ResponseConstants.KEY_KIND })
+        val readyEvent = buildJsonObject {
+            put(ResponseConstants.KEY_TYPE, ResponseConstants.VALUE_KIND_READY)
+            put(ResponseConstants.KEY_DATA, data)
         }
-        val readyEvent =
-            JSONObject().apply {
-                put(ResponseConstants.KEY_TYPE, ResponseConstants.VALUE_KIND_READY)
-                put(ResponseConstants.KEY_DATA, data)
-            }
         handleEvent(readyEvent)
     }
 
-    private fun handleEvent(event: JSONObject) {
+    private fun handleEvent(event: JsonObject) {
         val type = event.optString(JsonConstants.KEY_TYPE, EventTypeConstants.EVENT_TYPE_UNKNOWN)
-        val data = event.optJSONObject(ResponseConstants.KEY_DATA) ?: JSONObject()
+        val data = event.optJsonObject(ResponseConstants.KEY_DATA) ?: JsonObject(emptyMap())
         val eventId = event.optString(JsonConstants.KEY_ID, UUID.randomUUID().toString())
 
         // Streaming events are routed through the dedicated streaming channel
@@ -373,9 +366,9 @@ internal class MessageDispatcher(
         }
     }
 
-    private fun handleJsBridgeEvent(payload: JSONObject) {
+    private fun handleJsBridgeEvent(payload: JsonObject) {
         val sessionId = payload.optString("sessionId")
-        val event = payload.optJSONObject("event")
+        val event = payload.optJsonObject("event")
 
         if (event == null) {
             Logger.e(TAG, "No event object in ${ResponseConstants.VALUE_KIND_JS_BRIDGE_EVENT} payload")
@@ -385,7 +378,7 @@ internal class MessageDispatcher(
         mainHandler.post {
             try {
                 // If sessionId is empty (e.g., wallet-initiated disconnect), broadcast to all WebViews
-                if (sessionId.isNullOrEmpty()) {
+                if (sessionId.isEmpty()) {
                     TonConnectInjector.broadcastEventToAllWebViews(event)
                     return@post
                 }
@@ -426,12 +419,12 @@ internal class MessageDispatcher(
 
         if (callId != null) {
             // Create error response for this specific call
-            val errorResponse = JSONObject().apply {
+            val errorResponse = buildJsonObject {
                 put(ResponseConstants.KEY_KIND, ResponseConstants.VALUE_KIND_RESPONSE)
                 put(ResponseConstants.KEY_ID, callId)
                 put(
                     ResponseConstants.KEY_ERROR,
-                    JSONObject().apply {
+                    buildJsonObject {
                         put(ResponseConstants.KEY_MESSAGE, exception.message ?: "Bridge error")
                     },
                 )
@@ -457,14 +450,6 @@ internal class MessageDispatcher(
         } catch (e: Exception) {
             Logger.e(TAG, "Failed to extract call ID from malformed JSON", e)
             null
-        }
-    }
-
-    private fun JSONObject.optNullableString(key: String): String? {
-        val value = opt(key)
-        return when (value) {
-            null, JSONObject.NULL -> null
-            else -> value.toString()
         }
     }
 
