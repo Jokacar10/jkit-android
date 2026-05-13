@@ -34,11 +34,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Event containing a connection request from a dApp via TON Connect.
+ *
  *
  * @param id Unique identifier for the bridge event
- * @param requestedItems Items requested by the dApp (e.g., wallet address, proof)
  * @param preview
+ * @param request
+ * @param connectionResult Opaque type holding the pre-built connection approval response. Created by approveConnectRequest when an embedded request is present. Passed through to the action approval method which attaches the action result and sends it.
  * @param from
  * @param walletAddress
  * @param walletId Wallet identifier associated with the event
@@ -51,21 +52,23 @@ import kotlinx.serialization.Serializable
  * @param traceId
  * @param dAppInfo
  * @param returnStrategy Raw TonConnect return strategy string.
- * @param embeddedRequest
  */
 @Serializable
-data class TONConnectionRequestEvent(
+data class TONEmbeddedSignMessageRequestEvent(
 
     /* Unique identifier for the bridge event */
     @SerialName(value = "id")
     val id: kotlin.String,
 
-    /* Items requested by the dApp (e.g., wallet address, proof) */
-    @SerialName(value = "requestedItems")
-    val requestedItems: kotlin.collections.List<TONConnectionRequestEventRequestedItem>,
-
     @SerialName(value = "preview")
-    val preview: TONConnectionRequestEventPreview,
+    val preview: TONSendTransactionRequestEventPreview,
+
+    @SerialName(value = "request")
+    val request: TONTransactionRequest,
+
+    /* Opaque type holding the pre-built connection approval response. Created by approveConnectRequest when an embedded request is present. Passed through to the action approval method which attaches the action result and sends it. */
+    @Contextual @SerialName(value = "connectionResult")
+    val connectionResult: kotlinx.serialization.json.JsonElement?,
 
     @SerialName(value = "from")
     val from: kotlin.String? = null,
@@ -108,10 +111,8 @@ data class TONConnectionRequestEvent(
     /* Raw TonConnect return strategy string. */
     @SerialName(value = "returnStrategy")
     val returnStrategy: kotlin.String? = null,
-
-    @SerialName("embeddedRequest")
-    val embeddedRequest: TONEmbeddedRequest? = null,
-
+    @SerialName("type")
+    val type: kotlin.String = "signMessage",
 ) {
 
     companion object

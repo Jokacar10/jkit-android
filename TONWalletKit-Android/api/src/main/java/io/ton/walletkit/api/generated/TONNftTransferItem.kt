@@ -28,7 +28,7 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
+import io.ton.walletkit.model.TONBase64
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -36,28 +36,43 @@ import kotlinx.serialization.Serializable
 /**
  *
  *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param nftAddress
+ * @param newOwner
+ * @param attachAmount
+ * @param queryId
+ * @param responseDestination
+ * @param customPayload
+ * @param forwardAmount
+ * @param forwardPayload
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONNftTransferItem(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @SerialName(value = "nftAddress")
+    val nftAddress: kotlin.String,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    @SerialName(value = "newOwner")
+    val newOwner: kotlin.String,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    @SerialName(value = "attachAmount")
+    val attachAmount: kotlin.String? = null,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
+    @SerialName(value = "queryId")
+    val queryId: kotlin.String? = null,
+
+    @SerialName(value = "responseDestination")
+    val responseDestination: kotlin.String? = null,
+
+    @Contextual @SerialName(value = "customPayload")
+    val customPayload: io.ton.walletkit.model.TONBase64? = null,
+
+    @SerialName(value = "forwardAmount")
+    val forwardAmount: kotlin.String? = null,
+
+    @Contextual @SerialName(value = "forwardPayload")
+    val forwardPayload: io.ton.walletkit.model.TONBase64? = null,
     @SerialName("type")
-    val type: kotlin.String = "balance",
+    val type: kotlin.String = "nft",
 ) {
 
     companion object
