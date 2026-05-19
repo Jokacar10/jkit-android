@@ -36,6 +36,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +49,7 @@ import io.ton.walletkit.demo.designsystem.components.segmentedcontrol.TonSegment
 import io.ton.walletkit.demo.designsystem.components.text.TonText
 import io.ton.walletkit.demo.designsystem.icons.TonIcon
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
+import io.ton.walletkit.demo.presentation.util.TestTags
 
 @Composable
 fun ImportWalletScreen(
@@ -123,6 +125,7 @@ fun ImportWalletScreen(
             onClick = onContinue,
             config = TonButtonConfig.Primary,
             enabled = canContinue,
+            modifier = Modifier.testTag(TestTags.IMPORT_WALLET_CONTINUE_BUTTON),
         )
         Spacer(modifier = Modifier.height(24.dp))
     }
@@ -140,12 +143,18 @@ private fun ImportWordGrid(
             val leftIdx = rowIndex
             val rightIdx = rowIndex + rowCount
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                val leftFieldModifier = if (leftIdx == 0) {
+                    Modifier.testTag(TestTags.IMPORT_WALLET_WORD_FIELD)
+                } else {
+                    Modifier
+                }
                 SeedWordField(
                     index = leftIdx + 1,
                     value = words[leftIdx].orEmpty(),
                     onValueChange = { onWordChange(leftIdx, it) },
                     imeAction = ImeAction.Next,
                     modifier = Modifier.weight(1f),
+                    fieldModifier = leftFieldModifier,
                 )
                 if (rightIdx < wordCount) {
                     SeedWordField(

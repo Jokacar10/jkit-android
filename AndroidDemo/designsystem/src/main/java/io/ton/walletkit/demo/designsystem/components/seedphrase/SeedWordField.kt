@@ -64,6 +64,7 @@ fun SeedWordField(
     isError: Boolean = false,
     imeAction: ImeAction = ImeAction.Next,
     keyboardActions: KeyboardActions = KeyboardActions(),
+    fieldModifier: Modifier = Modifier,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -112,6 +113,7 @@ fun SeedWordField(
                     imeAction = imeAction,
                 ),
                 keyboardActions = keyboardActions,
+                modifier = fieldModifier,
             )
         }
     }

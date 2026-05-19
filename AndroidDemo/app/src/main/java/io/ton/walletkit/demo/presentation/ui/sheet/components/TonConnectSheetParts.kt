@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -84,8 +85,8 @@ internal fun TonConnectSheetHeader(
                 .size(28.dp)
                 .clip(CircleShape)
                 .background(TonTheme.colors.bgSecondary)
-                .clickable(onClick = onClose)
-                .then(closeButtonModifier),
+                .then(closeButtonModifier)
+                .clickable(role = Role.Button, onClick = onClose),
             contentAlignment = Alignment.Center,
         ) {
             TonIconImage(icon = TonIcon.Close, size = 14.dp, tint = TonTheme.colors.textSecondary)

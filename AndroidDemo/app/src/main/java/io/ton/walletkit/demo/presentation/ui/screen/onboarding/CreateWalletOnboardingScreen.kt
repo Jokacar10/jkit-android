@@ -36,6 +36,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,7 @@ import io.ton.walletkit.demo.designsystem.components.text.TonText
 import io.ton.walletkit.demo.designsystem.icons.TonIcon
 import io.ton.walletkit.demo.designsystem.icons.TonIconImage
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
+import io.ton.walletkit.demo.presentation.util.TestTags
 
 // Icon40 vectors stand in for placeholder illustration art until final assets land.
 private data class OnboardingPage(
@@ -111,12 +113,14 @@ fun CreateWalletOnboardingScreen(
             text = "Create a new wallet",
             onClick = onCreate,
             config = TonButtonConfig.Primary,
+            modifier = Modifier.testTag(TestTags.ONBOARDING_CREATE_WALLET_BUTTON),
         )
         Spacer(modifier = Modifier.height(8.dp))
         TonButton(
             text = "Add an existing wallet",
             onClick = onImport,
             config = TonButtonConfig.Secondary,
+            modifier = Modifier.testTag(TestTags.ONBOARDING_IMPORT_WALLET_BUTTON),
         )
         Spacer(modifier = Modifier.height(12.dp))
         TonText(

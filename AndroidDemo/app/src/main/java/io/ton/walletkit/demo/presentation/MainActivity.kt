@@ -116,10 +116,10 @@ private fun AppNavigation(
             walletKit.value?.let { kit ->
                 val useLegacyMainScreen by DevPreferences.useLegacyMainScreen.collectAsState()
                 val createFlow by viewModel.createWalletFlow.collectAsState()
+                val walletsBootstrapped = state.walletsBootstrapped
 
-                // First-run gate: with no wallets, drop into the add-wallet UI that
-                // matches the active main-screen flag.
-                LaunchedEffect(hasWallet, useLegacyMainScreen) {
+                LaunchedEffect(hasWallet, useLegacyMainScreen, walletsBootstrapped) {
+                    if (!walletsBootstrapped) return@LaunchedEffect
                     if (hasWallet) return@LaunchedEffect
                     if (useLegacyMainScreen) {
                         if (state.sheetState !is SheetState.AddWallet) {
