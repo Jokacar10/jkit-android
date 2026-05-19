@@ -73,6 +73,9 @@ internal fun TonConnectSheetHeader(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     dAppIconUrl: String? = null,
+    // Applied to the close (X) button — callers attach their reject testTag here so e2e
+    // tests can target the only reject path on the redesigned sheet.
+    closeButtonModifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
         Box(
@@ -81,7 +84,8 @@ internal fun TonConnectSheetHeader(
                 .size(28.dp)
                 .clip(CircleShape)
                 .background(TonTheme.colors.bgSecondary)
-                .clickable(onClick = onClose),
+                .clickable(onClick = onClose)
+                .then(closeButtonModifier),
             contentAlignment = Alignment.Center,
         ) {
             TonIconImage(icon = TonIcon.Close, size = 14.dp, tint = TonTheme.colors.textSecondary)

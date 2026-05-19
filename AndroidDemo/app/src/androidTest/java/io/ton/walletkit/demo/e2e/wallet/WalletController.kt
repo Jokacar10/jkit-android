@@ -32,6 +32,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import io.qameta.allure.kotlin.Step
 import io.ton.walletkit.demo.presentation.MainActivity
@@ -52,6 +53,10 @@ class WalletController(composeTestRule: ComposeTestRule? = null) {
 
         const val PIN_LENGTH = 4
         const val DEFAULT_PIN = "1234"
+
+        // Sign-data approve uses TonHoldToSignButton (DEFAULT_HOLD_DURATION_MS = 700ms). Press
+        // for noticeably longer so the test isn't racy with the fill animation completing.
+        const val SIGN_DATA_HOLD_DURATION_MS = 1_200L
     }
 
     private lateinit var composeTestRule: ComposeTestRule
@@ -626,6 +631,11 @@ class WalletController(composeTestRule: ComposeTestRule? = null) {
 
     /**
      * Approve a sign data request.
+     *
+     * The redesigned sheet uses a hold-to-sign button — `onComplete` only fires after a
+     * sustained ~700ms press (DEFAULT_HOLD_DURATION_MS in TonHoldToSignButton). A single
+     * click would just animate the fill back to zero and do nothing, so we simulate a
+     * touch-down, advance the event time past the hold threshold, then release.
      */
     @Step("Approve sign data request")
     fun approveSignData() {
@@ -635,9 +645,14 @@ class WalletController(composeTestRule: ComposeTestRule? = null) {
                 .fetchSemanticsNodes().isNotEmpty()
         }
 
-        // Click approve button
         composeTestRule.onNodeWithTag(TestTags.SIGN_DATA_APPROVE_BUTTON)
-            .performClick()
+            .performTouchInput {
+                down(center)
+                // 700ms hold + comfortable margin so the progress animation settles to 1.0
+                // and onComplete fires before we release.
+                advanceEventTime(SIGN_DATA_HOLD_DURATION_MS)
+                up()
+            }
 
         composeTestRule.waitForIdle()
     }

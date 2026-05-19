@@ -71,6 +71,7 @@ fun SignDataSheet(
             subtitle = stringResource(R.string.sign_request_subtitle),
             onClose = onReject,
             modifier = Modifier.testTag(TestTags.SIGN_DATA_REQUEST_TITLE),
+            closeButtonModifier = Modifier.testTag(TestTags.SIGN_DATA_REJECT_BUTTON),
         )
 
         wallet?.let {

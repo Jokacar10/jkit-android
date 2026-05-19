@@ -73,6 +73,7 @@ fun ConnectRequestSheet(
             dAppIconUrl = request.iconUrl,
             onClose = { onReject(request) },
             modifier = Modifier.testTag(TestTags.CONNECT_REQUEST_TITLE),
+            closeButtonModifier = Modifier.testTag(TestTags.CONNECT_REJECT_BUTTON),
         )
 
         TonConnectWalletPicker(
