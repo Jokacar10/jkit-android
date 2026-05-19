@@ -29,7 +29,6 @@
 package io.ton.walletkit.api.generated
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -38,8 +37,6 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonEncoder
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.serializer
@@ -52,43 +49,33 @@ import kotlinx.serialization.serializer
 @Serializable(with = TONStreamingUpdate.Serializer::class)
 sealed class TONStreamingUpdate {
 
-    /**
-     * The discriminator value for this union type
-     */
-    abstract val type: String
+    companion object {
+        internal const val DISCRIMINATOR_FIELD = "type"
+    }
 
     /**
      *
      */
     @Serializable
     data class Balance(
-        @SerialName("value")
         val value: TONBalanceUpdate,
-    ) : TONStreamingUpdate() {
-        override val type: String = "balance"
-    }
+    ) : TONStreamingUpdate()
 
     /**
      *
      */
     @Serializable
     data class Transactions(
-        @SerialName("value")
         val value: TONTransactionsUpdate,
-    ) : TONStreamingUpdate() {
-        override val type: String = "transactions"
-    }
+    ) : TONStreamingUpdate()
 
     /**
      *
      */
     @Serializable
     data class Jettons(
-        @SerialName("value")
         val value: TONJettonUpdate,
-    ) : TONStreamingUpdate() {
-        override val type: String = "jettons"
-    }
+    ) : TONStreamingUpdate()
 
     internal object Serializer : KSerializer<TONStreamingUpdate> {
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("TONStreamingUpdate")
@@ -98,33 +85,17 @@ sealed class TONStreamingUpdate {
             val jsonEncoder = encoder as? JsonEncoder
                 ?: throw SerializationException("TONStreamingUpdate can only be serialized with JSON")
 
-            val jsonObject = when (value) {
-                is Balance -> {
-                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONBalanceUpdate>(), value.value)
-                    buildJsonObject {
-                        put("type", JsonPrimitive("balance"))
-                        put("value", valueJson)
-                    }
-                }
-                is Transactions -> {
-                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONTransactionsUpdate>(), value.value)
-                    buildJsonObject {
-                        put("type", JsonPrimitive("transactions"))
-                        put("value", valueJson)
-                    }
-                }
-                is Jettons -> {
-                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONJettonUpdate>(), value.value)
-                    buildJsonObject {
-                        put("type", JsonPrimitive("jettons"))
-                        put("value", valueJson)
-                    }
-                }
+            val jsonElement = when (value) {
+                is Balance ->
+                    jsonEncoder.json.encodeToJsonElement(serializer<TONBalanceUpdate>(), value.value)
+
+                is Transactions ->
+                    jsonEncoder.json.encodeToJsonElement(serializer<TONTransactionsUpdate>(), value.value)
+
+                is Jettons ->
+                    jsonEncoder.json.encodeToJsonElement(serializer<TONJettonUpdate>(), value.value)
             }
-            jsonEncoder.encodeJsonElement(jsonObject)
+            jsonEncoder.encodeJsonElement(jsonElement)
         }
 
         override fun deserialize(decoder: Decoder): TONStreamingUpdate {
@@ -132,32 +103,26 @@ sealed class TONStreamingUpdate {
                 ?: throw SerializationException("TONStreamingUpdate can only be deserialized from JSON")
 
             val jsonObject = jsonDecoder.decodeJsonElement().jsonObject
-            val typeValue = jsonObject["type"]?.jsonPrimitive?.content
-                ?: throw SerializationException("Missing 'type' discriminator for TONStreamingUpdate")
+            val discriminatorValue = jsonObject[DISCRIMINATOR_FIELD]?.jsonPrimitive?.content
+                ?: throw SerializationException("Missing '$DISCRIMINATOR_FIELD' discriminator for TONStreamingUpdate")
 
-            return when (typeValue) {
-                "balance" -> {
-                    val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONStreamingUpdate.Balance")
+            return when (discriminatorValue) {
+                "balance" ->
                     Balance(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<TONBalanceUpdate>(), valueJson),
+                        jsonDecoder.json.decodeFromJsonElement(serializer<TONBalanceUpdate>(), jsonObject),
                     )
-                }
-                "transactions" -> {
-                    val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONStreamingUpdate.Transactions")
+
+                "transactions" ->
                     Transactions(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<TONTransactionsUpdate>(), valueJson),
+                        jsonDecoder.json.decodeFromJsonElement(serializer<TONTransactionsUpdate>(), jsonObject),
                     )
-                }
-                "jettons" -> {
-                    val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONStreamingUpdate.Jettons")
+
+                "jettons" ->
                     Jettons(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<TONJettonUpdate>(), valueJson),
+                        jsonDecoder.json.decodeFromJsonElement(serializer<TONJettonUpdate>(), jsonObject),
                     )
-                }
-                else -> throw SerializationException("Unknown type '$typeValue' for TONStreamingUpdate")
+
+                else -> throw SerializationException("Unknown discriminator '$discriminatorValue' for TONStreamingUpdate")
             }
         }
     }

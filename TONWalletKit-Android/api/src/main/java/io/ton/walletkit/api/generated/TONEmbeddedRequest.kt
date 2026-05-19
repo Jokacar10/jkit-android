@@ -29,7 +29,6 @@
 package io.ton.walletkit.api.generated
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -47,48 +46,38 @@ import kotlinx.serialization.serializer
 /**
  *
  *
- * This is a discriminated union type. Use the appropriate subclass based on the `type` field.
+ * This is a discriminated union type. Use the appropriate subclass based on the `method` field.
  */
 @Serializable(with = TONEmbeddedRequest.Serializer::class)
 sealed class TONEmbeddedRequest {
 
-    /**
-     * The discriminator value for this union type
-     */
-    abstract val type: String
+    companion object {
+        internal const val DISCRIMINATOR_FIELD = "method"
+    }
 
     /**
      *
      */
     @Serializable
     data class SendTransaction(
-        @SerialName("value")
-        val value: TONTransactionRequest,
-    ) : TONEmbeddedRequest() {
-        override val type: String = "sendTransaction"
-    }
+        val transactionRequest: TONTransactionRequest,
+    ) : TONEmbeddedRequest()
 
     /**
      *
      */
     @Serializable
     data class SignMessage(
-        @SerialName("value")
-        val value: TONTransactionRequest,
-    ) : TONEmbeddedRequest() {
-        override val type: String = "signMessage"
-    }
+        val transactionRequest: TONTransactionRequest,
+    ) : TONEmbeddedRequest()
 
     /**
      *
      */
     @Serializable
     data class SignData(
-        @SerialName("value")
-        val value: TONSignDataPayload,
-    ) : TONEmbeddedRequest() {
-        override val type: String = "signData"
-    }
+        val payload: TONSignDataPayload,
+    ) : TONEmbeddedRequest()
 
     internal object Serializer : KSerializer<TONEmbeddedRequest> {
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("TONEmbeddedRequest")
@@ -98,33 +87,26 @@ sealed class TONEmbeddedRequest {
             val jsonEncoder = encoder as? JsonEncoder
                 ?: throw SerializationException("TONEmbeddedRequest can only be serialized with JSON")
 
-            val jsonObject = when (value) {
-                is SendTransaction -> {
-                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONTransactionRequest>(), value.value)
+            val jsonElement = when (value) {
+                is SendTransaction ->
                     buildJsonObject {
-                        put("type", JsonPrimitive("sendTransaction"))
-                        put("value", valueJson)
+                        put(DISCRIMINATOR_FIELD, JsonPrimitive("sendTransaction"))
+                        put("transactionRequest", jsonEncoder.json.encodeToJsonElement(serializer<TONTransactionRequest>(), value.transactionRequest))
                     }
-                }
-                is SignMessage -> {
-                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONTransactionRequest>(), value.value)
+
+                is SignMessage ->
                     buildJsonObject {
-                        put("type", JsonPrimitive("signMessage"))
-                        put("value", valueJson)
+                        put(DISCRIMINATOR_FIELD, JsonPrimitive("signMessage"))
+                        put("transactionRequest", jsonEncoder.json.encodeToJsonElement(serializer<TONTransactionRequest>(), value.transactionRequest))
                     }
-                }
-                is SignData -> {
-                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONSignDataPayload>(), value.value)
+
+                is SignData ->
                     buildJsonObject {
-                        put("type", JsonPrimitive("signData"))
-                        put("value", valueJson)
+                        put(DISCRIMINATOR_FIELD, JsonPrimitive("signData"))
+                        put("payload", jsonEncoder.json.encodeToJsonElement(serializer<TONSignDataPayload>(), value.payload))
                     }
-                }
             }
-            jsonEncoder.encodeJsonElement(jsonObject)
+            jsonEncoder.encodeJsonElement(jsonElement)
         }
 
         override fun deserialize(decoder: Decoder): TONEmbeddedRequest {
@@ -132,32 +114,26 @@ sealed class TONEmbeddedRequest {
                 ?: throw SerializationException("TONEmbeddedRequest can only be deserialized from JSON")
 
             val jsonObject = jsonDecoder.decodeJsonElement().jsonObject
-            val typeValue = jsonObject["type"]?.jsonPrimitive?.content
-                ?: throw SerializationException("Missing 'type' discriminator for TONEmbeddedRequest")
+            val discriminatorValue = jsonObject[DISCRIMINATOR_FIELD]?.jsonPrimitive?.content
+                ?: throw SerializationException("Missing '$DISCRIMINATOR_FIELD' discriminator for TONEmbeddedRequest")
 
-            return when (typeValue) {
-                "sendTransaction" -> {
-                    val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONEmbeddedRequest.SendTransaction")
+            return when (discriminatorValue) {
+                "sendTransaction" ->
                     SendTransaction(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<TONTransactionRequest>(), valueJson),
+                        transactionRequest = jsonDecoder.json.decodeFromJsonElement(serializer<TONTransactionRequest>(), jsonObject["transactionRequest"] ?: throw SerializationException("Missing 'transactionRequest' for TONEmbeddedRequest")),
                     )
-                }
-                "signMessage" -> {
-                    val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONEmbeddedRequest.SignMessage")
+
+                "signMessage" ->
                     SignMessage(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<TONTransactionRequest>(), valueJson),
+                        transactionRequest = jsonDecoder.json.decodeFromJsonElement(serializer<TONTransactionRequest>(), jsonObject["transactionRequest"] ?: throw SerializationException("Missing 'transactionRequest' for TONEmbeddedRequest")),
                     )
-                }
-                "signData" -> {
-                    val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONEmbeddedRequest.SignData")
+
+                "signData" ->
                     SignData(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<TONSignDataPayload>(), valueJson),
+                        payload = jsonDecoder.json.decodeFromJsonElement(serializer<TONSignDataPayload>(), jsonObject["payload"] ?: throw SerializationException("Missing 'payload' for TONEmbeddedRequest")),
                     )
-                }
-                else -> throw SerializationException("Unknown type '$typeValue' for TONEmbeddedRequest")
+
+                else -> throw SerializationException("Unknown discriminator '$discriminatorValue' for TONEmbeddedRequest")
             }
         }
     }

@@ -29,7 +29,6 @@
 package io.ton.walletkit.api.generated
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -38,8 +37,6 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonEncoder
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.serializer
@@ -52,43 +49,33 @@ import kotlinx.serialization.serializer
 @Serializable(with = TONStructuredItem.Serializer::class)
 sealed class TONStructuredItem {
 
-    /**
-     * The discriminator value for this union type
-     */
-    abstract val type: String
+    companion object {
+        internal const val DISCRIMINATOR_FIELD = "type"
+    }
 
     /**
      *
      */
     @Serializable
     data class Ton(
-        @SerialName("value")
         val value: TONTonTransferItem,
-    ) : TONStructuredItem() {
-        override val type: String = "ton"
-    }
+    ) : TONStructuredItem()
 
     /**
      *
      */
     @Serializable
     data class Jetton(
-        @SerialName("value")
         val value: TONJettonTransferItem,
-    ) : TONStructuredItem() {
-        override val type: String = "jetton"
-    }
+    ) : TONStructuredItem()
 
     /**
      *
      */
     @Serializable
     data class Nft(
-        @SerialName("value")
         val value: TONNftTransferItem,
-    ) : TONStructuredItem() {
-        override val type: String = "nft"
-    }
+    ) : TONStructuredItem()
 
     internal object Serializer : KSerializer<TONStructuredItem> {
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("TONStructuredItem")
@@ -98,33 +85,17 @@ sealed class TONStructuredItem {
             val jsonEncoder = encoder as? JsonEncoder
                 ?: throw SerializationException("TONStructuredItem can only be serialized with JSON")
 
-            val jsonObject = when (value) {
-                is Ton -> {
-                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONTonTransferItem>(), value.value)
-                    buildJsonObject {
-                        put("type", JsonPrimitive("ton"))
-                        put("value", valueJson)
-                    }
-                }
-                is Jetton -> {
-                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONJettonTransferItem>(), value.value)
-                    buildJsonObject {
-                        put("type", JsonPrimitive("jetton"))
-                        put("value", valueJson)
-                    }
-                }
-                is Nft -> {
-                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONNftTransferItem>(), value.value)
-                    buildJsonObject {
-                        put("type", JsonPrimitive("nft"))
-                        put("value", valueJson)
-                    }
-                }
+            val jsonElement = when (value) {
+                is Ton ->
+                    jsonEncoder.json.encodeToJsonElement(serializer<TONTonTransferItem>(), value.value)
+
+                is Jetton ->
+                    jsonEncoder.json.encodeToJsonElement(serializer<TONJettonTransferItem>(), value.value)
+
+                is Nft ->
+                    jsonEncoder.json.encodeToJsonElement(serializer<TONNftTransferItem>(), value.value)
             }
-            jsonEncoder.encodeJsonElement(jsonObject)
+            jsonEncoder.encodeJsonElement(jsonElement)
         }
 
         override fun deserialize(decoder: Decoder): TONStructuredItem {
@@ -132,32 +103,26 @@ sealed class TONStructuredItem {
                 ?: throw SerializationException("TONStructuredItem can only be deserialized from JSON")
 
             val jsonObject = jsonDecoder.decodeJsonElement().jsonObject
-            val typeValue = jsonObject["type"]?.jsonPrimitive?.content
-                ?: throw SerializationException("Missing 'type' discriminator for TONStructuredItem")
+            val discriminatorValue = jsonObject[DISCRIMINATOR_FIELD]?.jsonPrimitive?.content
+                ?: throw SerializationException("Missing '$DISCRIMINATOR_FIELD' discriminator for TONStructuredItem")
 
-            return when (typeValue) {
-                "ton" -> {
-                    val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONStructuredItem.Ton")
+            return when (discriminatorValue) {
+                "ton" ->
                     Ton(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<TONTonTransferItem>(), valueJson),
+                        jsonDecoder.json.decodeFromJsonElement(serializer<TONTonTransferItem>(), jsonObject),
                     )
-                }
-                "jetton" -> {
-                    val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONStructuredItem.Jetton")
+
+                "jetton" ->
                     Jetton(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<TONJettonTransferItem>(), valueJson),
+                        jsonDecoder.json.decodeFromJsonElement(serializer<TONJettonTransferItem>(), jsonObject),
                     )
-                }
-                "nft" -> {
-                    val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONStructuredItem.Nft")
+
+                "nft" ->
                     Nft(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<TONNftTransferItem>(), valueJson),
+                        jsonDecoder.json.decodeFromJsonElement(serializer<TONNftTransferItem>(), jsonObject),
                     )
-                }
-                else -> throw SerializationException("Unknown type '$typeValue' for TONStructuredItem")
+
+                else -> throw SerializationException("Unknown discriminator '$discriminatorValue' for TONStructuredItem")
             }
         }
     }

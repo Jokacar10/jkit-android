@@ -29,7 +29,6 @@
 package io.ton.walletkit.api.generated
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -47,37 +46,30 @@ import kotlinx.serialization.serializer
 /**
  *
  *
- * This is a discriminated union type. Use the appropriate subclass based on the `type` field.
+ * This is a discriminated union type. Use the appropriate subclass based on the `result` field.
  */
 @Serializable(with = TONEmulationResult.Serializer::class)
 sealed class TONEmulationResult {
 
-    /**
-     * The discriminator value for this union type
-     */
-    abstract val type: String
+    companion object {
+        internal const val DISCRIMINATOR_FIELD = "result"
+    }
 
     /**
      *
      */
     @Serializable
     data class Success(
-        @SerialName("value")
-        val value: TONEmulationResponse,
-    ) : TONEmulationResult() {
-        override val type: String = "success"
-    }
+        val emulationResult: TONEmulationResponse,
+    ) : TONEmulationResult()
 
     /**
      *
      */
     @Serializable
     data class Error(
-        @SerialName("value")
-        val value: TONEmulationError,
-    ) : TONEmulationResult() {
-        override val type: String = "error"
-    }
+        val emulationError: TONEmulationError,
+    ) : TONEmulationResult()
 
     internal object Serializer : KSerializer<TONEmulationResult> {
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("TONEmulationResult")
@@ -87,25 +79,20 @@ sealed class TONEmulationResult {
             val jsonEncoder = encoder as? JsonEncoder
                 ?: throw SerializationException("TONEmulationResult can only be serialized with JSON")
 
-            val jsonObject = when (value) {
-                is Success -> {
-                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONEmulationResponse>(), value.value)
+            val jsonElement = when (value) {
+                is Success ->
                     buildJsonObject {
-                        put("type", JsonPrimitive("success"))
-                        put("value", valueJson)
+                        put(DISCRIMINATOR_FIELD, JsonPrimitive("success"))
+                        put("emulationResult", jsonEncoder.json.encodeToJsonElement(serializer<TONEmulationResponse>(), value.emulationResult))
                     }
-                }
-                is Error -> {
-                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONEmulationError>(), value.value)
+
+                is Error ->
                     buildJsonObject {
-                        put("type", JsonPrimitive("error"))
-                        put("value", valueJson)
+                        put(DISCRIMINATOR_FIELD, JsonPrimitive("error"))
+                        put("emulationError", jsonEncoder.json.encodeToJsonElement(serializer<TONEmulationError>(), value.emulationError))
                     }
-                }
             }
-            jsonEncoder.encodeJsonElement(jsonObject)
+            jsonEncoder.encodeJsonElement(jsonElement)
         }
 
         override fun deserialize(decoder: Decoder): TONEmulationResult {
@@ -113,25 +100,21 @@ sealed class TONEmulationResult {
                 ?: throw SerializationException("TONEmulationResult can only be deserialized from JSON")
 
             val jsonObject = jsonDecoder.decodeJsonElement().jsonObject
-            val typeValue = jsonObject["type"]?.jsonPrimitive?.content
-                ?: throw SerializationException("Missing 'type' discriminator for TONEmulationResult")
+            val discriminatorValue = jsonObject[DISCRIMINATOR_FIELD]?.jsonPrimitive?.content
+                ?: throw SerializationException("Missing '$DISCRIMINATOR_FIELD' discriminator for TONEmulationResult")
 
-            return when (typeValue) {
-                "success" -> {
-                    val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONEmulationResult.Success")
+            return when (discriminatorValue) {
+                "success" ->
                     Success(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<TONEmulationResponse>(), valueJson),
+                        emulationResult = jsonDecoder.json.decodeFromJsonElement(serializer<TONEmulationResponse>(), jsonObject["emulationResult"] ?: throw SerializationException("Missing 'emulationResult' for TONEmulationResult")),
                     )
-                }
-                "error" -> {
-                    val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONEmulationResult.Error")
+
+                "error" ->
                     Error(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<TONEmulationError>(), valueJson),
+                        emulationError = jsonDecoder.json.decodeFromJsonElement(serializer<TONEmulationError>(), jsonObject["emulationError"] ?: throw SerializationException("Missing 'emulationError' for TONEmulationResult")),
                     )
-                }
-                else -> throw SerializationException("Unknown type '$typeValue' for TONEmulationResult")
+
+                else -> throw SerializationException("Unknown discriminator '$discriminatorValue' for TONEmulationResult")
             }
         }
     }

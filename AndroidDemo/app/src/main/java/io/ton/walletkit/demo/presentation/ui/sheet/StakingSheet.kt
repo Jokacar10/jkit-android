@@ -406,4 +406,3 @@ private fun formatTokenDisplay(value: String?): String = runCatching {
         .stripTrailingZeros()
         .toPlainString()
 }.getOrDefault(value ?: "0")
-
