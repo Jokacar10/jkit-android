@@ -28,36 +28,31 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
+import io.ton.walletkit.model.TONBase64
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Decoded content of an emulation message body.
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param hash
+ * @param body
+ * @param decoded Structured decoded representation of the message body, if available
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONEmulationMessageContent(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @Contextual @SerialName(value = "hash")
+    val hash: io.ton.walletkit.model.TONHex? = null,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    @Contextual @SerialName(value = "body")
+    val body: io.ton.walletkit.model.TONBase64? = null,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    /* Structured decoded representation of the message body, if available */
+    @Contextual @SerialName(value = "decoded")
+    val decoded: kotlinx.serialization.json.JsonElement? = null,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
 ) {
 
     companion object

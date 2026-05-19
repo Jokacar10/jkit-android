@@ -28,37 +28,47 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  *
  *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * Values: send,sign
  */
 @Serializable
-data class TONBalanceUpdate(
+enum class TONTransactionPreviewMode(val value: kotlin.String) {
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @SerialName(value = "send")
+    send("send"),
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    @SerialName(value = "sign")
+    sign("sign"),
+    ;
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    /**
+     * Override [toString()] to avoid using the enum variable name as the value, and instead use
+     * the actual value defined in the API spec file.
+     *
+     * This solves a problem when the variable name and its value are different, and ensures that
+     * the client sends the correct enum values to the server always.
+     */
+    override fun toString(): kotlin.String = value
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
-) {
+    companion object {
+        /**
+         * Converts the provided [data] to a [String] on success, null otherwise.
+         */
+        fun encode(data: kotlin.Any?): kotlin.String? = if (data is TONTransactionPreviewMode) "$data" else null
 
-    companion object
+        /**
+         * Returns a valid [TONTransactionPreviewMode] for [data], null otherwise.
+         */
+        fun decode(data: kotlin.Any?): TONTransactionPreviewMode? = data?.let {
+            val normalizedData = "$it".lowercase()
+            values().firstOrNull { value ->
+                it == value || normalizedData == "$value".lowercase()
+            }
+        }
+    }
 }

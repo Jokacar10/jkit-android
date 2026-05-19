@@ -49,8 +49,8 @@ import kotlinx.serialization.serializer
  *
  * This is a discriminated union type. Use the appropriate subclass based on the `type` field.
  */
-@Serializable(with = TONSignatureDomain.Serializer::class)
-sealed class TONSignatureDomain {
+@Serializable(with = TONEmbeddedRequest.Serializer::class)
+sealed class TONEmbeddedRequest {
 
     /**
      * The discriminator value for this union type
@@ -61,46 +61,65 @@ sealed class TONSignatureDomain {
      *
      */
     @Serializable
-    data class L2(
+    data class SendTransaction(
         @SerialName("value")
-        val value: kotlin.Int,
-    ) : TONSignatureDomain() {
-        override val type: String = "l2"
+        val value: TONTransactionRequest,
+    ) : TONEmbeddedRequest() {
+        override val type: String = "sendTransaction"
     }
 
     /**
      *
      */
     @Serializable
-    data class Empty(
+    data class SignMessage(
         @SerialName("value")
-        val value: kotlinx.serialization.json.JsonElement,
-    ) : TONSignatureDomain() {
-        override val type: String = "empty"
+        val value: TONTransactionRequest,
+    ) : TONEmbeddedRequest() {
+        override val type: String = "signMessage"
     }
 
-    internal object Serializer : KSerializer<TONSignatureDomain> {
-        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("TONSignatureDomain")
+    /**
+     *
+     */
+    @Serializable
+    data class SignData(
+        @SerialName("value")
+        val value: TONSignDataPayload,
+    ) : TONEmbeddedRequest() {
+        override val type: String = "signData"
+    }
+
+    internal object Serializer : KSerializer<TONEmbeddedRequest> {
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("TONEmbeddedRequest")
 
         @Suppress("UNCHECKED_CAST")
-        override fun serialize(encoder: Encoder, value: TONSignatureDomain) {
+        override fun serialize(encoder: Encoder, value: TONEmbeddedRequest) {
             val jsonEncoder = encoder as? JsonEncoder
-                ?: throw SerializationException("TONSignatureDomain can only be serialized with JSON")
+                ?: throw SerializationException("TONEmbeddedRequest can only be serialized with JSON")
 
             val jsonObject = when (value) {
-                is L2 -> {
+                is SendTransaction -> {
                     // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<kotlin.Int>(), value.value)
+                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONTransactionRequest>(), value.value)
                     buildJsonObject {
-                        put("type", JsonPrimitive("l2"))
+                        put("type", JsonPrimitive("sendTransaction"))
                         put("value", valueJson)
                     }
                 }
-                is Empty -> {
+                is SignMessage -> {
                     // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<kotlinx.serialization.json.JsonElement>(), value.value)
+                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONTransactionRequest>(), value.value)
                     buildJsonObject {
-                        put("type", JsonPrimitive("empty"))
+                        put("type", JsonPrimitive("signMessage"))
+                        put("value", valueJson)
+                    }
+                }
+                is SignData -> {
+                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
+                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONSignDataPayload>(), value.value)
+                    buildJsonObject {
+                        put("type", JsonPrimitive("signData"))
                         put("value", valueJson)
                     }
                 }
@@ -108,30 +127,37 @@ sealed class TONSignatureDomain {
             jsonEncoder.encodeJsonElement(jsonObject)
         }
 
-        override fun deserialize(decoder: Decoder): TONSignatureDomain {
+        override fun deserialize(decoder: Decoder): TONEmbeddedRequest {
             val jsonDecoder = decoder as? JsonDecoder
-                ?: throw SerializationException("TONSignatureDomain can only be deserialized from JSON")
+                ?: throw SerializationException("TONEmbeddedRequest can only be deserialized from JSON")
 
             val jsonObject = jsonDecoder.decodeJsonElement().jsonObject
             val typeValue = jsonObject["type"]?.jsonPrimitive?.content
-                ?: throw SerializationException("Missing 'type' discriminator for TONSignatureDomain")
+                ?: throw SerializationException("Missing 'type' discriminator for TONEmbeddedRequest")
 
             return when (typeValue) {
-                "l2" -> {
+                "sendTransaction" -> {
                     val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONSignatureDomain.L2")
-                    L2(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<kotlin.Int>(), valueJson),
+                        ?: throw SerializationException("Missing 'value' for TONEmbeddedRequest.SendTransaction")
+                    SendTransaction(
+                        jsonDecoder.json.decodeFromJsonElement(serializer<TONTransactionRequest>(), valueJson),
                     )
                 }
-                "empty" -> {
+                "signMessage" -> {
                     val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONSignatureDomain.Empty")
-                    Empty(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<kotlinx.serialization.json.JsonElement>(), valueJson),
+                        ?: throw SerializationException("Missing 'value' for TONEmbeddedRequest.SignMessage")
+                    SignMessage(
+                        jsonDecoder.json.decodeFromJsonElement(serializer<TONTransactionRequest>(), valueJson),
                     )
                 }
-                else -> throw SerializationException("Unknown type '$typeValue' for TONSignatureDomain")
+                "signData" -> {
+                    val valueJson = jsonObject["value"]
+                        ?: throw SerializationException("Missing 'value' for TONEmbeddedRequest.SignData")
+                    SignData(
+                        jsonDecoder.json.decodeFromJsonElement(serializer<TONSignDataPayload>(), valueJson),
+                    )
+                }
+                else -> throw SerializationException("Unknown type '$typeValue' for TONEmbeddedRequest")
             }
         }
     }

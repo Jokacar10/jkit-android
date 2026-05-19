@@ -28,36 +28,46 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * State of an account at a specific point in an emulated transaction.
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param balance
+ * @param accountStatus
+ * @param hash
+ * @param extraCurrencies Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages.
+ * @param frozenHash
+ * @param dataHash
+ * @param codeHash
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONEmulationAccountState(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
-
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
-
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
-
-    /* The formatted balance */
     @SerialName(value = "balance")
     val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
+
+    @Contextual @SerialName(value = "accountStatus")
+    val accountStatus: TONAccountStatus,
+
+    @Contextual @SerialName(value = "hash")
+    val hash: io.ton.walletkit.model.TONHex? = null,
+
+    /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
+    @SerialName(value = "extraCurrencies")
+    val extraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+
+    @Contextual @SerialName(value = "frozenHash")
+    val frozenHash: io.ton.walletkit.model.TONHex? = null,
+
+    @Contextual @SerialName(value = "dataHash")
+    val dataHash: io.ton.walletkit.model.TONHex? = null,
+
+    @Contextual @SerialName(value = "codeHash")
+    val codeHash: io.ton.walletkit.model.TONHex? = null,
+
 ) {
 
     companion object

@@ -49,8 +49,8 @@ import kotlinx.serialization.serializer
  *
  * This is a discriminated union type. Use the appropriate subclass based on the `type` field.
  */
-@Serializable(with = TONSignatureDomain.Serializer::class)
-sealed class TONSignatureDomain {
+@Serializable(with = TONStructuredItem.Serializer::class)
+sealed class TONStructuredItem {
 
     /**
      * The discriminator value for this union type
@@ -61,46 +61,65 @@ sealed class TONSignatureDomain {
      *
      */
     @Serializable
-    data class L2(
+    data class Ton(
         @SerialName("value")
-        val value: kotlin.Int,
-    ) : TONSignatureDomain() {
-        override val type: String = "l2"
+        val value: TONTonTransferItem,
+    ) : TONStructuredItem() {
+        override val type: String = "ton"
     }
 
     /**
      *
      */
     @Serializable
-    data class Empty(
+    data class Jetton(
         @SerialName("value")
-        val value: kotlinx.serialization.json.JsonElement,
-    ) : TONSignatureDomain() {
-        override val type: String = "empty"
+        val value: TONJettonTransferItem,
+    ) : TONStructuredItem() {
+        override val type: String = "jetton"
     }
 
-    internal object Serializer : KSerializer<TONSignatureDomain> {
-        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("TONSignatureDomain")
+    /**
+     *
+     */
+    @Serializable
+    data class Nft(
+        @SerialName("value")
+        val value: TONNftTransferItem,
+    ) : TONStructuredItem() {
+        override val type: String = "nft"
+    }
+
+    internal object Serializer : KSerializer<TONStructuredItem> {
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("TONStructuredItem")
 
         @Suppress("UNCHECKED_CAST")
-        override fun serialize(encoder: Encoder, value: TONSignatureDomain) {
+        override fun serialize(encoder: Encoder, value: TONStructuredItem) {
             val jsonEncoder = encoder as? JsonEncoder
-                ?: throw SerializationException("TONSignatureDomain can only be serialized with JSON")
+                ?: throw SerializationException("TONStructuredItem can only be serialized with JSON")
 
             val jsonObject = when (value) {
-                is L2 -> {
+                is Ton -> {
                     // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<kotlin.Int>(), value.value)
+                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONTonTransferItem>(), value.value)
                     buildJsonObject {
-                        put("type", JsonPrimitive("l2"))
+                        put("type", JsonPrimitive("ton"))
                         put("value", valueJson)
                     }
                 }
-                is Empty -> {
+                is Jetton -> {
                     // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
-                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<kotlinx.serialization.json.JsonElement>(), value.value)
+                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONJettonTransferItem>(), value.value)
                     buildJsonObject {
-                        put("type", JsonPrimitive("empty"))
+                        put("type", JsonPrimitive("jetton"))
+                        put("value", valueJson)
+                    }
+                }
+                is Nft -> {
+                    // Use explicit type serializer to avoid runtime class serialization issues (e.g., LinkedHashMap)
+                    val valueJson = jsonEncoder.json.encodeToJsonElement(serializer<TONNftTransferItem>(), value.value)
+                    buildJsonObject {
+                        put("type", JsonPrimitive("nft"))
                         put("value", valueJson)
                     }
                 }
@@ -108,30 +127,37 @@ sealed class TONSignatureDomain {
             jsonEncoder.encodeJsonElement(jsonObject)
         }
 
-        override fun deserialize(decoder: Decoder): TONSignatureDomain {
+        override fun deserialize(decoder: Decoder): TONStructuredItem {
             val jsonDecoder = decoder as? JsonDecoder
-                ?: throw SerializationException("TONSignatureDomain can only be deserialized from JSON")
+                ?: throw SerializationException("TONStructuredItem can only be deserialized from JSON")
 
             val jsonObject = jsonDecoder.decodeJsonElement().jsonObject
             val typeValue = jsonObject["type"]?.jsonPrimitive?.content
-                ?: throw SerializationException("Missing 'type' discriminator for TONSignatureDomain")
+                ?: throw SerializationException("Missing 'type' discriminator for TONStructuredItem")
 
             return when (typeValue) {
-                "l2" -> {
+                "ton" -> {
                     val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONSignatureDomain.L2")
-                    L2(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<kotlin.Int>(), valueJson),
+                        ?: throw SerializationException("Missing 'value' for TONStructuredItem.Ton")
+                    Ton(
+                        jsonDecoder.json.decodeFromJsonElement(serializer<TONTonTransferItem>(), valueJson),
                     )
                 }
-                "empty" -> {
+                "jetton" -> {
                     val valueJson = jsonObject["value"]
-                        ?: throw SerializationException("Missing 'value' for TONSignatureDomain.Empty")
-                    Empty(
-                        jsonDecoder.json.decodeFromJsonElement(serializer<kotlinx.serialization.json.JsonElement>(), valueJson),
+                        ?: throw SerializationException("Missing 'value' for TONStructuredItem.Jetton")
+                    Jetton(
+                        jsonDecoder.json.decodeFromJsonElement(serializer<TONJettonTransferItem>(), valueJson),
                     )
                 }
-                else -> throw SerializationException("Unknown type '$typeValue' for TONSignatureDomain")
+                "nft" -> {
+                    val valueJson = jsonObject["value"]
+                        ?: throw SerializationException("Missing 'value' for TONStructuredItem.Nft")
+                    Nft(
+                        jsonDecoder.json.decodeFromJsonElement(serializer<TONNftTransferItem>(), valueJson),
+                    )
+                }
+                else -> throw SerializationException("Unknown type '$typeValue' for TONStructuredItem")
             }
         }
     }

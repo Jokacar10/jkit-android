@@ -34,30 +34,26 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Address book entry providing human-readable metadata for an on-chain address.
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param userFriendly
+ * @param interfaces List of known interfaces implemented by the contract
+ * @param domain DNS domain name associated with the address, if any
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONEmulationAddressBookEntry(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @Contextual @SerialName(value = "userFriendly")
+    val userFriendly: io.ton.walletkit.model.TONUserFriendlyAddress,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    /* List of known interfaces implemented by the contract */
+    @SerialName(value = "interfaces")
+    val interfaces: kotlin.collections.List<kotlin.String>,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    /* DNS domain name associated with the address, if any */
+    @SerialName(value = "domain")
+    val domain: kotlin.String? = null,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
 ) {
 
     companion object

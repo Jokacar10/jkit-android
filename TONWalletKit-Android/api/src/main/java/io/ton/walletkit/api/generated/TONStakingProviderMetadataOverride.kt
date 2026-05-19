@@ -34,30 +34,36 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Used in provider configuration to override fields of the provider's metadata.
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param name
+ * @param stakeToken
+ * @param receiveToken
+ * @param contractAddress
+ * @param supportedUnstakeModes
+ * @param supportsReversedQuote
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONStakingProviderMetadataOverride(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @SerialName(value = "name")
+    val name: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    @SerialName(value = "stakeToken")
+    val stakeToken: TONStakingTokenInfo? = null,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    @SerialName(value = "receiveToken")
+    val receiveToken: TONStakingTokenInfo? = null,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
+    @Contextual @SerialName(value = "contractAddress")
+    val contractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+
+    @SerialName(value = "supportedUnstakeModes")
+    val supportedUnstakeModes: kotlin.collections.List<@Contextual TONUnstakeMode>? = null,
+
+    @SerialName(value = "supportsReversedQuote")
+    val supportsReversedQuote: kotlin.Boolean? = null,
+
 ) {
 
     companion object

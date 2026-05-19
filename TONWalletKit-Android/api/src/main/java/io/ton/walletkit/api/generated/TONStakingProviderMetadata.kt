@@ -34,30 +34,39 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Static metadata for a staking provider
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param name Human-readable provider name (e.g. \"Tonstakers\")
+ * @param supportedUnstakeModes Supported unstake modes for this provider
+ * @param supportsReversedQuote Whether provider supports reversed quote format (e.g., passing TON instead of tsTON for unstake)
+ * @param stakeToken
+ * @param receiveToken
+ * @param contractAddress
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONStakingProviderMetadata(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    /* Human-readable provider name (e.g. \"Tonstakers\") */
+    @SerialName(value = "name")
+    val name: kotlin.String,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    /* Supported unstake modes for this provider */
+    @SerialName(value = "supportedUnstakeModes")
+    val supportedUnstakeModes: kotlin.collections.List<@Contextual TONUnstakeMode>,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    /* Whether provider supports reversed quote format (e.g., passing TON instead of tsTON for unstake) */
+    @SerialName(value = "supportsReversedQuote")
+    val supportsReversedQuote: kotlin.Boolean,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
+    @SerialName(value = "stakeToken")
+    val stakeToken: TONStakingTokenInfo,
+
+    @SerialName(value = "receiveToken")
+    val receiveToken: TONStakingTokenInfo? = null,
+
+    @Contextual @SerialName(value = "contractAddress")
+    val contractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+
 ) {
 
     companion object

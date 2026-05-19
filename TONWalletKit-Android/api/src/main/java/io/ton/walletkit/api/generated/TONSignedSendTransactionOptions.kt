@@ -32,20 +32,15 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Fee information for swap
+ * Copyright (c) TonTech.  This source code is licensed under the MIT license found in the LICENSE file in the root directory of this source tree.
  *
- * @param amount Amount of the fee
- * @param token
+ * @param fakeSignature
  */
 @Serializable
-data class TONSwapFee(
+data class TONSignedSendTransactionOptions(
 
-    /* Amount of the fee */
-    @SerialName(value = "amount")
-    val amount: kotlin.String,
-
-    @SerialName(value = "token")
-    val token: TONSwapToken,
+    @SerialName(value = "fakeSignature")
+    val fakeSignature: kotlin.Boolean? = null,
 
 ) {
 

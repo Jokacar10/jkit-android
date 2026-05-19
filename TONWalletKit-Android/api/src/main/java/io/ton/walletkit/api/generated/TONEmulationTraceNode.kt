@@ -28,36 +28,30 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Node in the emulation execution tree.
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param txHash
+ * @param children Child nodes representing spawned messages
+ * @param inMsgHash
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONEmulationTraceNode(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @Contextual @SerialName(value = "txHash")
+    val txHash: io.ton.walletkit.model.TONHex,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    /* Child nodes representing spawned messages */
+    @SerialName(value = "children")
+    val children: kotlin.collections.List<TONEmulationTraceNode>,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    @Contextual @SerialName(value = "inMsgHash")
+    val inMsgHash: io.ton.walletkit.model.TONHex? = null,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
 ) {
 
     companion object

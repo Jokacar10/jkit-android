@@ -28,36 +28,26 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Error returned when transaction emulation fails.
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param code Numeric error code
+ * @param message Human-readable error message
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONEmulationError(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    /* Numeric error code */
+    @SerialName(value = "code")
+    val code: kotlin.Int,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    /* Human-readable error message */
+    @SerialName(value = "message")
+    val message: kotlin.String,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
-
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
 ) {
 
     companion object

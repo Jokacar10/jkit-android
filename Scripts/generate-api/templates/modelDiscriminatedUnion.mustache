@@ -2,23 +2,23 @@
   Template for discriminated union types (sealed classes in Kotlin).
 
   Two variants:
-  1. Inline object unions (x-interface-union is false/absent):
+  1. Inline object unions (x-inline-interface-union is false/absent):
      e.g., { type: 'null' } | { type: 'num'; value: string }
      Uses type/value JSON wrapper with per-case value decoding.
 
-  2. Interface unions (x-interface-union is true):
+  2. Interface unions (x-inline-interface-union is true):
      e.g., /** @discriminator name */ export type Test = TestWithMessage | TestWithNumber;
      Uses discriminator field from full JSON object, decodes full member type.
 
   Vendor extensions used:
   - x-discriminated-union: boolean indicating this is a discriminated union
-  - x-interface-union: boolean indicating this uses interface-based members
+  - x-inline-interface-union: boolean indicating this uses interface-based members
   - x-discriminator-field: string name of the JSON discriminator property
   - x-enum-cases: array of {name, rawValue, hasAssociatedValue, valuePropertyName}
   - x-enum-case-name: camelCase Kotlin case name (on vars)
   - x-enum-case-raw-value: original JSON value for encoding/decoding (on vars)
 --}}
-{{#vendorExtensions.x-interface-union}}
+{{#vendorExtensions.x-inline-interface-union}}
 {{!-- ====== Interface union variant ====== --}}
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -172,8 +172,8 @@ sealed class {{classname}} {
         }
     }
 }
-{{/vendorExtensions.x-interface-union}}
-{{^vendorExtensions.x-interface-union}}
+{{/vendorExtensions.x-inline-interface-union}}
+{{^vendorExtensions.x-inline-interface-union}}
 {{!-- ====== Type/value wrapper variant (original) ====== --}}
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -295,4 +295,4 @@ sealed class {{classname}} {
         }
     }
 }
-{{/vendorExtensions.x-interface-union}}
+{{/vendorExtensions.x-inline-interface-union}}
