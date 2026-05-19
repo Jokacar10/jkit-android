@@ -28,36 +28,26 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Canonical (lt, hash) pair identifying a transaction on the TON blockchain.
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param lt Logical time of the transaction as a decimal string. Uniquely orders transactions within an account.
+ * @param hash
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONTransactionId(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    /* Logical time of the transaction as a decimal string. Uniquely orders transactions within an account. */
+    @SerialName(value = "lt")
+    val lt: kotlin.String,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    @Contextual @SerialName(value = "hash")
+    val hash: io.ton.walletkit.model.TONHex,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
-
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
 ) {
 
     companion object

@@ -28,7 +28,7 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
+import io.ton.walletkit.model.TONBase64
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -36,28 +36,32 @@ import kotlinx.serialization.Serializable
 /**
  *
  *
- * @param status
  * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param amount
+ * @param payload
+ * @param stateInit
+ * @param extraCurrency Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages.
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONTonTransferItem(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @SerialName(value = "address")
+    val address: kotlin.String,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    @SerialName(value = "amount")
+    val amount: kotlin.String,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    @Contextual @SerialName(value = "payload")
+    val payload: io.ton.walletkit.model.TONBase64? = null,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
+    @Contextual @SerialName(value = "stateInit")
+    val stateInit: io.ton.walletkit.model.TONBase64? = null,
+
+    /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
+    @SerialName(value = "extraCurrency")
+    val extraCurrency: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
     @SerialName("type")
-    val type: kotlin.String = "balance",
+    val type: kotlin.String = "ton",
 ) {
 
     companion object

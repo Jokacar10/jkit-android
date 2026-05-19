@@ -28,36 +28,31 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Reference to a block in the TON blockchain.
  *
- *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param workchain Workchain identifier
+ * @param shard Shard identifier
+ * @param seqno Block sequence number
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONEmulationBlockRef(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    /* Workchain identifier */
+    @SerialName(value = "workchain")
+    val workchain: kotlin.Int,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    /* Shard identifier */
+    @SerialName(value = "shard")
+    val shard: kotlin.String,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    /* Block sequence number */
+    @SerialName(value = "seqno")
+    val seqno: kotlin.Int,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
 ) {
 
     companion object

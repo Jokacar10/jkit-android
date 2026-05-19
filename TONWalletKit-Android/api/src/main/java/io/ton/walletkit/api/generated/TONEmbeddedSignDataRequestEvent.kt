@@ -34,11 +34,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Event containing a connection request from a dApp via TON Connect.
+ *
  *
  * @param id Unique identifier for the bridge event
- * @param requestedItems Items requested by the dApp (e.g., wallet address, proof)
+ * @param payload
  * @param preview
+ * @param connectionResult
  * @param from
  * @param walletAddress
  * @param walletId Wallet identifier associated with the event
@@ -51,21 +52,22 @@ import kotlinx.serialization.Serializable
  * @param traceId
  * @param dAppInfo
  * @param returnStrategy Raw TonConnect return strategy string.
- * @param embeddedRequest
  */
 @Serializable
-data class TONConnectionRequestEvent(
+data class TONEmbeddedSignDataRequestEvent(
 
     /* Unique identifier for the bridge event */
     @SerialName(value = "id")
     val id: kotlin.String,
 
-    /* Items requested by the dApp (e.g., wallet address, proof) */
-    @SerialName(value = "requestedItems")
-    val requestedItems: kotlin.collections.List<TONConnectionRequestEventRequestedItem>,
+    @SerialName(value = "payload")
+    val payload: TONSignDataPayload,
 
     @SerialName(value = "preview")
-    val preview: TONConnectionRequestEventPreview,
+    val preview: TONSignDataRequestEventPreview,
+
+    @SerialName("connectionResult")
+    private val connectionResult: kotlinx.serialization.json.JsonElement,
 
     @SerialName(value = "from")
     val from: kotlin.String? = null,
@@ -108,10 +110,8 @@ data class TONConnectionRequestEvent(
     /* Raw TonConnect return strategy string. */
     @SerialName(value = "returnStrategy")
     val returnStrategy: kotlin.String? = null,
-
-    @SerialName("embeddedRequest")
-    val embeddedRequest: TONEmbeddedRequest? = null,
-
+    @SerialName("type")
+    val type: kotlin.String = "signData",
 ) {
 
     companion object

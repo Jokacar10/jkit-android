@@ -28,36 +28,29 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  *
  *
- * @param status
- * @param address
- * @param rawBalance
- * @param balance The formatted balance
+ * @param ticker
+ * @param decimals
+ * @param address 'ton' for native TON, otherwise contract address in friendly format
  */
 @Serializable
-data class TONBalanceUpdate(
+data class TONStakingTokenInfo(
 
-    @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    @SerialName(value = "ticker")
+    val ticker: kotlin.String,
 
-    @Contextual @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    @SerialName(value = "decimals")
+    val decimals: kotlin.Int,
 
-    @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    /* 'ton' for native TON, otherwise contract address in friendly format */
+    @SerialName(value = "address")
+    val address: kotlin.String,
 
-    /* The formatted balance */
-    @SerialName(value = "balance")
-    val balance: kotlin.String,
-    @SerialName("type")
-    val type: kotlin.String = "balance",
 ) {
 
     companion object
