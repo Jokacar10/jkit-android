@@ -686,28 +686,25 @@ class WalletController(composeTestRule: ComposeTestRule? = null) {
     /**
      * Approve a sign data request.
      *
-     * The redesigned sheet uses a hold-to-sign button — `onComplete` only fires after a
-     * sustained ~700ms press (DEFAULT_HOLD_DURATION_MS in TonHoldToSignButton). A single
-     * click would just animate the fill back to zero and do nothing, so we simulate a
-     * touch-down, advance the event time past the hold threshold, then release.
+     * The redesigned sheet uses a hold-to-sign button — `onComplete` fires only after a
+     * sustained ~700ms press (DEFAULT_HOLD_DURATION_MS in TonHoldToSignButton). On
+     * instrumented tests `advanceEventTime` only stamps the next input event; it does
+     * not actually advance the device's frame clock, so the underlying animation never
+     * gets time to reach 1.0. We split the touch into two `performTouchInput` calls
+     * with a real `Thread.sleep` between them so the device's frame loop drives the
+     * animation to completion before we release.
      */
     @Step("Approve sign data request")
     fun approveSignData() {
-        // Wait for sign data sheet
         composeTestRule.waitUntil(SHEET_APPEAR_TIMEOUT) {
             composeTestRule.onAllNodesWithTag(TestTags.SIGN_DATA_SHEET)
                 .fetchSemanticsNodes().isNotEmpty()
         }
 
-        composeTestRule.onNodeWithTag(TestTags.SIGN_DATA_APPROVE_BUTTON)
-            .performTouchInput {
-                down(center)
-                // 700ms hold + comfortable margin so the progress animation settles to 1.0
-                // and onComplete fires before we release.
-                advanceEventTime(SIGN_DATA_HOLD_DURATION_MS)
-                up()
-            }
-
+        val node = composeTestRule.onNodeWithTag(TestTags.SIGN_DATA_APPROVE_BUTTON)
+        node.performTouchInput { down(center) }
+        Thread.sleep(SIGN_DATA_HOLD_DURATION_MS)
+        node.performTouchInput { up() }
         composeTestRule.waitForIdle()
     }
 
