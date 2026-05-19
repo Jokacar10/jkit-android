@@ -126,21 +126,27 @@ sealed class StackItem {
         override fun deserialize(decoder: Decoder): StackItem {
             val jsonDecoder = decoder as? JsonDecoder
                 ?: throw SerializationException("StackItem can only be deserialized from JSON")
-            
-            val jsonObject = jsonDecoder.decodeJsonElement().jsonObject
-            val typeValue = jsonObject["type"]?.jsonPrimitive?.content
+
+            // Cases without an associated value arrive as bare strings on the wire
+            // (e.g. "active" rather than { "type": "active" }). Accept both shapes so the
+            // discriminated-union decode doesn't crash with "JsonLiteral is not a JsonObject".
+            val element = jsonDecoder.decodeJsonElement()
+            val asPrimitive = element as? JsonPrimitive
+            val jsonObject: JsonObject? = if (asPrimitive != null && asPrimitive.isString) null else element.jsonObject
+            val typeValue: String = jsonObject?.get("type")?.jsonPrimitive?.content
+                ?: asPrimitive?.content
                 ?: throw SerializationException("Missing 'type' discriminator for StackItem")
-            
+
             return when (typeValue) {
                 "int" -> {
-                    val valueJson = jsonObject["value"]
+                    val valueJson = jsonObject?.get("value")
                         ?: throw SerializationException("Missing 'value' for StackItem.Int")
                     Int(
                         jsonDecoder.json.decodeFromJsonElement(serializer<kotlin.Int>(), valueJson)
                     )
                 }
                 "str" -> {
-                    val valueJson = jsonObject["value"]
+                    val valueJson = jsonObject?.get("value")
                         ?: throw SerializationException("Missing 'value' for StackItem.Str")
                     Str(
                         jsonDecoder.json.decodeFromJsonElement(serializer<kotlin.String>(), valueJson)
