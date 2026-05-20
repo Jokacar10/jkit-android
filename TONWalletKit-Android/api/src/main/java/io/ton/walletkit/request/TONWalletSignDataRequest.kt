@@ -21,44 +21,45 @@
  */
 package io.ton.walletkit.request
 
+import io.ton.walletkit.api.generated.TONEmbeddedSignDataRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
 import io.ton.walletkit.api.generated.TONSignDataRequestEvent
 
 /**
- * Represents a data signing request from a dApp.
+ * A data signing request from a dApp. Mirrors iOS `TONWalletSignDataRequest`.
  *
- * Mirrors iOS TONWalletSignDataRequest for cross-platform consistency.
- *
- * Handle this request by calling [approve] to sign the data
- * or [reject] to deny it.
- *
- * @property event The underlying sign data request event with all details
+ * When this request is the embedded follow-up of a connect-with-intent flow, [event] is
+ * projected from the embedded event but [approve] / [reject] route the embedded shape to
+ * the bridge so the JS side can finalise the connect session.
  */
-class TONWalletSignDataRequest(
+class TONWalletSignDataRequest internal constructor(
     val event: TONSignDataRequestEvent,
+    private val embeddedEvent: TONEmbeddedSignDataRequestEvent?,
     private val handler: RequestHandler,
 ) {
-    /**
-     * Approve this sign data request.
-     *
-     * @param response Optional pre-computed approval response. If provided, the SDK will use
-     *                 this response directly instead of signing the data internally.
-     * @throws io.ton.walletkit.WalletKitBridgeException if approval fails
-     */
-    suspend fun approve(
-        response: TONSignDataApprovalResponse? = null,
-    ) {
-        handler.approveSignData(event, response)
+    constructor(
+        event: TONSignDataRequestEvent,
+        handler: RequestHandler,
+    ) : this(event = event, embeddedEvent = null, handler = handler)
+
+    internal constructor(
+        embeddedEvent: TONEmbeddedSignDataRequestEvent,
+        handler: RequestHandler,
+    ) : this(event = embeddedEvent.requestEvent, embeddedEvent = embeddedEvent, handler = handler)
+
+    suspend fun approve(response: TONSignDataApprovalResponse? = null) {
+        if (embeddedEvent != null) {
+            handler.approveSignData(embeddedEvent, response)
+        } else {
+            handler.approveSignData(event, response)
+        }
     }
 
-    /**
-     * Reject this sign data request.
-     *
-     * @param reason Optional reason for rejection
-     * @param errorCode Optional error code for the TON Connect protocol
-     * @throws io.ton.walletkit.WalletKitBridgeException if rejection fails
-     */
     suspend fun reject(reason: String? = null, errorCode: Int? = null) {
-        handler.rejectSignData(event, reason, errorCode)
+        if (embeddedEvent != null) {
+            handler.rejectSignData(embeddedEvent, reason, errorCode)
+        } else {
+            handler.rejectSignData(event, reason, errorCode)
+        }
     }
 }

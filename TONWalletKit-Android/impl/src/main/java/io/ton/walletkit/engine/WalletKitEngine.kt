@@ -24,6 +24,7 @@ package io.ton.walletkit.engine
 import io.ton.walletkit.api.generated.TONConnectionApprovalResponse
 import io.ton.walletkit.api.generated.TONConnectionRequestEvent
 import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
+import io.ton.walletkit.api.generated.TONEmbeddedRequestEvent
 import io.ton.walletkit.api.generated.TONGetMethodResult
 import io.ton.walletkit.api.generated.TONJettonsResponse
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
@@ -285,7 +286,7 @@ internal interface WalletKitEngine : RequestHandler {
     override suspend fun approveConnect(
         event: TONConnectionRequestEvent,
         response: TONConnectionApprovalResponse?,
-    )
+    ): TONEmbeddedRequestEvent?
 
     /**
      * Reject a connection request from a dApp.

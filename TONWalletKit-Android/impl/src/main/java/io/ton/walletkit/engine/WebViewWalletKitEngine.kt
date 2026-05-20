@@ -26,6 +26,10 @@ import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.generated.TONConnectionApprovalResponse
 import io.ton.walletkit.api.generated.TONConnectionRequestEvent
 import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
+import io.ton.walletkit.api.generated.TONEmbeddedRequestEvent
+import io.ton.walletkit.api.generated.TONEmbeddedSendTransactionRequestEvent
+import io.ton.walletkit.api.generated.TONEmbeddedSignDataRequestEvent
+import io.ton.walletkit.api.generated.TONEmbeddedSignMessageRequestEvent
 import io.ton.walletkit.api.generated.TONGetMethodResult
 import io.ton.walletkit.api.generated.TONJettonsResponse
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
@@ -398,7 +402,7 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun approveConnect(
         event: TONConnectionRequestEvent,
         response: TONConnectionApprovalResponse?,
-    ) = rpcClient.approveConnect(event, response)
+    ): TONEmbeddedRequestEvent? = rpcClient.approveConnect(event, response)
 
     override suspend fun rejectConnect(
         event: TONConnectionRequestEvent,
@@ -417,6 +421,17 @@ internal class WebViewWalletKitEngine private constructor(
         errorCode: Int?,
     ) = rpcClient.rejectTransaction(event, reason, errorCode)
 
+    override suspend fun approveTransaction(
+        event: TONEmbeddedSendTransactionRequestEvent,
+        response: TONSendTransactionApprovalResponse?,
+    ) = rpcClient.approveTransaction(event, response)
+
+    override suspend fun rejectTransaction(
+        event: TONEmbeddedSendTransactionRequestEvent,
+        reason: String?,
+        errorCode: Int?,
+    ) = rpcClient.rejectTransaction(event, reason, errorCode)
+
     override suspend fun approveSignData(
         event: TONSignDataRequestEvent,
         response: TONSignDataApprovalResponse?,
@@ -428,6 +443,17 @@ internal class WebViewWalletKitEngine private constructor(
         errorCode: Int?,
     ) = rpcClient.rejectSignData(event, reason, errorCode)
 
+    override suspend fun approveSignData(
+        event: TONEmbeddedSignDataRequestEvent,
+        response: TONSignDataApprovalResponse?,
+    ) = rpcClient.approveSignData(event, response)
+
+    override suspend fun rejectSignData(
+        event: TONEmbeddedSignDataRequestEvent,
+        reason: String?,
+        errorCode: Int?,
+    ) = rpcClient.rejectSignData(event, reason, errorCode)
+
     override suspend fun approveSignMessage(
         event: TONSignMessageRequestEvent,
         response: TONSignMessageApprovalResponse?,
@@ -435,6 +461,17 @@ internal class WebViewWalletKitEngine private constructor(
 
     override suspend fun rejectSignMessage(
         event: TONSignMessageRequestEvent,
+        reason: String?,
+        errorCode: Int?,
+    ) = rpcClient.rejectSignMessage(event, reason, errorCode)
+
+    override suspend fun approveSignMessage(
+        event: TONEmbeddedSignMessageRequestEvent,
+        response: TONSignMessageApprovalResponse?,
+    ) = rpcClient.approveSignMessage(event, response)
+
+    override suspend fun rejectSignMessage(
+        event: TONEmbeddedSignMessageRequestEvent,
         reason: String?,
         errorCode: Int?,
     ) = rpcClient.rejectSignMessage(event, reason, errorCode)

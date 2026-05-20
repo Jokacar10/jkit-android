@@ -21,44 +21,47 @@
  */
 package io.ton.walletkit.request
 
+import io.ton.walletkit.api.generated.TONEmbeddedSignMessageRequestEvent
 import io.ton.walletkit.api.generated.TONSignMessageApprovalResponse
 import io.ton.walletkit.api.generated.TONSignMessageRequestEvent
 
 /**
- * Represents a sign-message (sign-only) transaction request from a dApp.
+ * A sign-message (sign-only) transaction request from a dApp. Mirrors iOS
+ * `TONWalletSignMessageRequest`. Unlike [TONWalletTransactionRequest], the signed BoC is
+ * returned to the dApp rather than broadcast.
  *
- * Unlike [TONWalletTransactionRequest], the wallet signs but does NOT broadcast the
- * transaction — it returns a signed BoC that the dApp relays through its own infrastructure.
- *
- * Handle this request by calling [approve] to sign or [reject] to deny.
- *
- * @property event The underlying sign-message request event with all details
+ * When this request is the embedded follow-up of a connect-with-intent flow, [event] is
+ * projected from the embedded event but [approve] / [reject] route the embedded shape to
+ * the bridge so the JS side can finalise the connect session.
  */
-class TONWalletSignMessageRequest(
+class TONWalletSignMessageRequest internal constructor(
     val event: TONSignMessageRequestEvent,
+    private val embeddedEvent: TONEmbeddedSignMessageRequestEvent?,
     private val handler: RequestHandler,
 ) {
-    /**
-     * Approve this sign-message request.
-     *
-     * @param response Optional pre-computed approval response. If provided, the SDK will use
-     *                 this response directly instead of signing the transaction internally.
-     * @throws io.ton.walletkit.WalletKitBridgeException if approval fails
-     */
-    suspend fun approve(
-        response: TONSignMessageApprovalResponse? = null,
-    ) {
-        handler.approveSignMessage(event, response)
+    constructor(
+        event: TONSignMessageRequestEvent,
+        handler: RequestHandler,
+    ) : this(event = event, embeddedEvent = null, handler = handler)
+
+    internal constructor(
+        embeddedEvent: TONEmbeddedSignMessageRequestEvent,
+        handler: RequestHandler,
+    ) : this(event = embeddedEvent.requestEvent, embeddedEvent = embeddedEvent, handler = handler)
+
+    suspend fun approve(response: TONSignMessageApprovalResponse? = null) {
+        if (embeddedEvent != null) {
+            handler.approveSignMessage(embeddedEvent, response)
+        } else {
+            handler.approveSignMessage(event, response)
+        }
     }
 
-    /**
-     * Reject this sign-message request.
-     *
-     * @param reason Optional reason for rejection
-     * @param errorCode Optional error code for the TON Connect protocol
-     * @throws io.ton.walletkit.WalletKitBridgeException if rejection fails
-     */
     suspend fun reject(reason: String? = null, errorCode: Int? = null) {
-        handler.rejectSignMessage(event, reason, errorCode)
+        if (embeddedEvent != null) {
+            handler.rejectSignMessage(embeddedEvent, reason, errorCode)
+        } else {
+            handler.rejectSignMessage(event, reason, errorCode)
+        }
     }
 }
