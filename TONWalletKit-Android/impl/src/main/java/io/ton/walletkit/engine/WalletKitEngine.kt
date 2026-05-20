@@ -450,8 +450,6 @@ internal interface WalletKitEngine : RequestHandler {
 
     // ===== Per-wallet API client bridge =====
 
-    suspend fun walletClientGetNetwork(walletId: String): TONNetwork
-
     suspend fun walletClientSendBoc(walletId: String, boc: String): String
 
     suspend fun walletClientRunGetMethod(
@@ -461,12 +459,6 @@ internal interface WalletKitEngine : RequestHandler {
         stack: List<TONRawStackItem>? = null,
         seqno: Int? = null,
     ): TONGetMethodResult
-
-    suspend fun walletClientGetBalance(
-        walletId: String,
-        address: String,
-        seqno: Int? = null,
-    ): String
 
     suspend fun walletClientGetMasterchainInfo(walletId: String): TONMasterchainInfo
 

@@ -23,13 +23,11 @@ package io.ton.walletkit.core
 
 import io.ton.walletkit.api.generated.TONGetMethodResult
 import io.ton.walletkit.api.generated.TONMasterchainInfo
-import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONRawStackItem
 import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.engine.WalletKitEngine
 import io.ton.walletkit.model.TONBase64
 import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.coroutines.runBlocking
 
 /**
  * [TONAPIClient] backed by the JS-side `ApiClient` bound to a specific wallet — the
@@ -41,15 +39,7 @@ import kotlinx.coroutines.runBlocking
 internal class BridgedJSAPIClient(
     private val walletId: String,
     private val engine: WalletKitEngine,
-    initialNetwork: TONNetwork,
 ) : TONAPIClient {
-
-    @Volatile private var cachedNetwork: TONNetwork = initialNetwork
-
-    override val network: TONNetwork
-        get() = runCatching { runBlocking { engine.walletClientGetNetwork(walletId) } }
-            .onSuccess { cachedNetwork = it }
-            .getOrDefault(cachedNetwork)
 
     override suspend fun sendBoc(boc: TONBase64): String =
         engine.walletClientSendBoc(walletId, boc.value)
@@ -60,11 +50,6 @@ internal class BridgedJSAPIClient(
         stack: List<TONRawStackItem>?,
         seqno: Int?,
     ): TONGetMethodResult = engine.walletClientRunGetMethod(walletId, address.value, method, stack, seqno)
-
-    override suspend fun getBalance(
-        address: TONUserFriendlyAddress,
-        seqno: Int?,
-    ): String = engine.walletClientGetBalance(walletId, address.value, seqno)
 
     override suspend fun getMasterchainInfo(): TONMasterchainInfo =
         engine.walletClientGetMasterchainInfo(walletId)

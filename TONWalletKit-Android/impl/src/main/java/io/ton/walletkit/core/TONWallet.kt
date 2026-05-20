@@ -69,7 +69,6 @@ internal class TONWallet internal constructor(
     override val client: TONAPIClient = BridgedJSAPIClient(
         walletId = id,
         engine = engine,
-        initialNetwork = TONNetwork(chainId = "-239"),
     )
     companion object {
         /**

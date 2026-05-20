@@ -239,17 +239,11 @@ internal object BridgeMethodConstants {
 
     // Wallet API client methods (per-wallet TONAPIClient bridge).
 
-    /** Get the network for the wallet's API client. */
-    const val METHOD_WALLET_CLIENT_GET_NETWORK = "walletClientGetNetwork"
-
     /** Send a signed BOC via the wallet's API client. */
     const val METHOD_WALLET_CLIENT_SEND_BOC = "walletClientSendBoc"
 
     /** Run a get method via the wallet's API client. */
     const val METHOD_WALLET_CLIENT_RUN_GET_METHOD = "walletClientRunGetMethod"
-
-    /** Get the balance for an arbitrary address via the wallet's API client. */
-    const val METHOD_WALLET_CLIENT_GET_BALANCE = "walletClientGetBalance"
 
     /** Get masterchain info via the wallet's API client. */
     const val METHOD_WALLET_CLIENT_GET_MASTERCHAIN_INFO = "walletClientGetMasterchainInfo"
