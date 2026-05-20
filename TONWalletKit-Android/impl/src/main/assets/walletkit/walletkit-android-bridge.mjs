@@ -40395,8 +40395,7 @@ var TonStakersStakingProvider = class TonStakersStakingProvider extends StakingP
 //#region src/api/staking.ts
 /**
 * JS-side proxy that implements [StakingProviderInterface] by forwarding every call to a
-* Kotlin-implemented `ITONStakingProvider` via reverse-RPC. Mirrors the streaming
-* `ProxyStreamingProvider` pattern.
+* Kotlin-implemented `ITONStakingProvider` via reverse-RPC.
 *
 * `getStakingProviderMetadata` and `getSupportedNetworks` are synchronous per the interface
 * contract, so both values are passed in at registration and cached on this instance.
@@ -40455,8 +40454,19 @@ async function registerStakingProvider(args) {
 	if (!provider) throw new Error(`Staking provider not found: ${args.providerId}`);
 	(await getKit()).staking.registerProvider(provider);
 }
+async function removeStakingProvider(args) {
+	const instance = await getKit();
+	if (!instance.staking.hasProvider(args.providerId)) return;
+	instance.staking.removeProvider(instance.staking.getProvider(args.providerId));
+}
 async function setDefaultStakingProvider(args) {
 	(await getKit()).staking.setDefaultProvider(args.providerId);
+}
+async function getRegisteredStakingProviders() {
+	return { providerIds: (await getKit()).staking.getProviders().map((provider) => provider.providerId) };
+}
+async function hasStakingProvider(args) {
+	return { result: (await getKit()).staking.hasProvider(args.providerId) };
 }
 async function getStakingQuote(args) {
 	const { providerId, ...params } = args;
@@ -40474,6 +40484,9 @@ async function getStakingProviderInfo(args) {
 }
 async function getStakingProviderMetadata(args) {
 	return (await getKit()).staking.getStakingProviderMetadata(args.network, args.providerId);
+}
+async function getStakingProviderSupportedNetworks(args) {
+	return { networks: (await getKit()).staking.getProvider(args.providerId).getSupportedNetworks() };
 }
 /**
 * Tell the JS staking manager that a Kotlin-implemented provider is available.
@@ -45081,12 +45094,16 @@ var api = {
 	kotlinProviderDispatch,
 	createTonStakersStakingProvider,
 	registerStakingProvider,
+	removeStakingProvider,
 	setDefaultStakingProvider,
+	getRegisteredStakingProviders,
+	hasStakingProvider,
 	getStakingQuote,
 	buildStakeTransaction,
 	getStakedBalance,
 	getStakingProviderInfo,
 	getStakingProviderMetadata,
+	getStakingProviderSupportedNetworks,
 	registerKotlinStakingProvider,
 	createOmnistonSwapProvider,
 	createDeDustSwapProvider,
