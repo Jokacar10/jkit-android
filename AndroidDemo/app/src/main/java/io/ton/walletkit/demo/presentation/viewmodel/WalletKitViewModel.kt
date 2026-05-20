@@ -147,6 +147,7 @@ class WalletKitViewModel @Inject constructor(
         onRequestApproved = { onTonConnectRequestApproved() },
         onRequestRejected = { onTonConnectRequestRejected() },
         onSessionsChanged = { viewModelScope.launch { sessionsViewModel.refresh() } },
+        onEmbeddedRequest = { followUp -> handleSdkEvent(followUp) },
     )
 
     private val walletOperationsViewModel = WalletOperationsViewModel(

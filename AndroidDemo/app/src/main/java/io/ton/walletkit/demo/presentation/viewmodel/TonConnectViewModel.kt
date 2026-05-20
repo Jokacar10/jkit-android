@@ -31,6 +31,7 @@ import io.ton.walletkit.demo.presentation.model.ConnectRequestUi
 import io.ton.walletkit.demo.presentation.model.SignDataRequestUi
 import io.ton.walletkit.demo.presentation.model.SignMessageRequestUi
 import io.ton.walletkit.demo.presentation.model.TransactionRequestUi
+import io.ton.walletkit.event.TONWalletKitEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,6 +47,7 @@ class TonConnectViewModel(
     private val onRequestApproved: () -> Unit = {},
     private val onRequestRejected: () -> Unit = {},
     private val onSessionsChanged: () -> Unit = {},
+    private val onEmbeddedRequest: (TONWalletKitEvent) -> Unit = {},
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TonConnectState())
@@ -128,15 +130,20 @@ class TonConnectViewModel(
             runCatching {
                 val wallet = getWalletByAddress(walletAddress)
                     ?: error("Wallet not found for address: $walletAddress")
-                request.connectRequest?.approve(wallet)
+                val connectRequest = request.connectRequest
                     ?: error("Connect request not available")
-            }.onSuccess {
+                connectRequest.approve(wallet)
+            }.onSuccess { followUp ->
                 _state.value = _state.value.copy(
                     isProcessing = false,
                     successMessage = "Connection approved",
                 )
                 onRequestApproved()
                 onSessionsChanged()
+                if (followUp != null) {
+                    Log.d(TAG, "Connect carried embedded ${followUp::class.simpleName}; dispatching")
+                    onEmbeddedRequest(followUp)
+                }
                 Log.d(TAG, "Approved connect request for ${request.dAppName}")
             }.onFailure { error ->
                 Log.e(TAG, "Failed to approve connect", error)
