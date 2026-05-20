@@ -59,5 +59,6 @@ data class TONBalanceUpdate(
     @SerialName("type")
     val type: kotlin.String = "balance",
 ) {
+
     companion object
 }
