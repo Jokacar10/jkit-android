@@ -50,7 +50,7 @@ import io.ton.walletkit.demo.designsystem.theme.SmoothCornerShape
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 
 private val FieldHeight = 44.dp
-private val FieldCornerRadius = 12.dp
+private val FieldCornerRadius = 6.dp
 private val IndexColumnWidth = 24.dp
 private val IndexFieldGap = 8.dp
 

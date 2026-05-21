@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -50,7 +51,7 @@ import io.ton.walletkit.demo.designsystem.icons.TonIconImage
 import io.ton.walletkit.demo.designsystem.theme.SmoothCornerShape
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 
-private val CornerRadius = 12.dp
+private val CornerRadius = 10.dp
 private val IconLabelSpacing = 8.dp
 
 enum class TonButtonStyle { Primary, Secondary, Tertiary, Text }
@@ -112,11 +113,13 @@ fun TonButton(
     val properties = config.style.properties(state)
 
     val widthModifier = if (stretch) Modifier.fillMaxWidth() else Modifier
+    // Tertiary renders as an iOS-style chip (pill); Primary/Secondary/Text keep the squircle.
+    val shape = if (config.style == TonButtonStyle.Tertiary) CircleShape else SmoothCornerShape(CornerRadius)
     Box(
         modifier = modifier
             .then(widthModifier)
             .height(config.size.height)
-            .clip(SmoothCornerShape(CornerRadius))
+            .clip(shape)
             .background(properties.backgroundColor)
             .clickable(
                 interactionSource = interactionSource,
@@ -201,13 +204,13 @@ private fun TonButtonStyle.properties(state: ButtonState): TonButtonProperties {
         TonButtonStyle.Tertiary -> when (state) {
             ButtonState.Default -> TonButtonProperties(
                 iconColor = colors.textPrimary,
-                backgroundColor = colors.bgSecondary,
+                backgroundColor = colors.bgLightGray,
                 labelColor = colors.textPrimary,
                 loaderColor = colors.textBrand,
             )
             ButtonState.Pressed -> TonButtonProperties(
                 iconColor = colors.textBrand,
-                backgroundColor = colors.bgSecondary,
+                backgroundColor = colors.bgLightGray,
                 labelColor = colors.textBrand,
                 loaderColor = colors.textBrand,
             )

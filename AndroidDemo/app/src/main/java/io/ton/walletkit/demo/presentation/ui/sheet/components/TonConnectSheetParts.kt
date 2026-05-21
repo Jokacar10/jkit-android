@@ -89,7 +89,7 @@ internal fun TonConnectSheetHeader(
                 .clickable(role = Role.Button, onClick = onClose),
             contentAlignment = Alignment.Center,
         ) {
-            TonIconImage(icon = TonIcon.Close, size = 14.dp, tint = TonTheme.colors.textSecondary)
+            TonIconImage(icon = TonIcon.Close, size = 12.dp, tint = TonTheme.colors.textSecondary)
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
             PairedAvatars(dAppIconUrl = dAppIconUrl)
