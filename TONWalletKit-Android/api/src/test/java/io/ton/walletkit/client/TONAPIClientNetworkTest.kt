@@ -45,6 +45,7 @@ class TONAPIClientNetworkTest {
             stack: List<TONRawStackItem>?,
             seqno: Int?,
         ): TONGetMethodResult = error("not used")
+        override suspend fun getBalance(address: TONUserFriendlyAddress, seqno: Int?): String = ""
         override suspend fun getMasterchainInfo(): TONMasterchainInfo = error("not used")
     }
 

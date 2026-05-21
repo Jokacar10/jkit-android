@@ -129,6 +129,7 @@ import io.ton.walletkit.engine.operations.sendTransaction
 import io.ton.walletkit.engine.operations.setDefaultStakingProvider
 import io.ton.walletkit.engine.operations.setDefaultSwapProvider
 import io.ton.walletkit.engine.operations.sign
+import io.ton.walletkit.engine.operations.walletClientGetBalance
 import io.ton.walletkit.engine.operations.walletClientGetMasterchainInfo
 import io.ton.walletkit.engine.operations.walletClientRunGetMethod
 import io.ton.walletkit.engine.operations.walletClientSendBoc
@@ -473,6 +474,12 @@ internal class WebViewWalletKitEngine private constructor(
         stack: List<TONRawStackItem>?,
         seqno: Int?,
     ): TONGetMethodResult = rpcClient.walletClientRunGetMethod(walletId, address, method, stack, seqno)
+
+    override suspend fun walletClientGetBalance(
+        walletId: String,
+        address: String,
+        seqno: Int?,
+    ): String = rpcClient.walletClientGetBalance(walletId, address, seqno)
 
     override suspend fun walletClientGetMasterchainInfo(walletId: String): TONMasterchainInfo =
         rpcClient.walletClientGetMasterchainInfo(walletId)

@@ -462,6 +462,12 @@ internal interface WalletKitEngine : RequestHandler {
         seqno: Int? = null,
     ): TONGetMethodResult
 
+    suspend fun walletClientGetBalance(
+        walletId: String,
+        address: String,
+        seqno: Int? = null,
+    ): String
+
     suspend fun walletClientGetMasterchainInfo(walletId: String): TONMasterchainInfo
 
     /**

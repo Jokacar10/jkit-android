@@ -245,6 +245,9 @@ internal object BridgeMethodConstants {
     /** Run a get method via the wallet's API client. */
     const val METHOD_WALLET_CLIENT_RUN_GET_METHOD = "walletClientRunGetMethod"
 
+    /** Get the balance of an account via the wallet's API client. */
+    const val METHOD_WALLET_CLIENT_GET_BALANCE = "walletClientGetBalance"
+
     /** Get masterchain info via the wallet's API client. */
     const val METHOD_WALLET_CLIENT_GET_MASTERCHAIN_INFO = "walletClientGetMasterchainInfo"
 

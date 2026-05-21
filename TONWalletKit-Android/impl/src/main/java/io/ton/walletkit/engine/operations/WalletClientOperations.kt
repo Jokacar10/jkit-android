@@ -48,6 +48,13 @@ internal data class WalletClientRunGetMethodRequest(
 )
 
 @Serializable
+internal data class WalletClientGetBalanceRequest(
+    val walletId: String,
+    val address: String,
+    val seqno: Int? = null,
+)
+
+@Serializable
 internal data class WalletClientSendBocResponse(val result: String)
 
 internal suspend fun BridgeRpcClient.walletClientSendBoc(walletId: String, boc: String): String {
@@ -74,6 +81,18 @@ internal suspend fun BridgeRpcClient.walletClientRunGetMethod(
         seqno = seqno,
     ),
 )
+
+internal suspend fun BridgeRpcClient.walletClientGetBalance(
+    walletId: String,
+    address: String,
+    seqno: Int?,
+): String {
+    val response: WalletClientSendBocResponse = callTyped(
+        BridgeMethodConstants.METHOD_WALLET_CLIENT_GET_BALANCE,
+        WalletClientGetBalanceRequest(walletId = walletId, address = address, seqno = seqno),
+    )
+    return response.result
+}
 
 internal suspend fun BridgeRpcClient.walletClientGetMasterchainInfo(walletId: String): TONMasterchainInfo =
     callTyped(

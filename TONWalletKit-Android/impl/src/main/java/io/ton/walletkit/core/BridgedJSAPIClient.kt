@@ -49,6 +49,11 @@ internal class BridgedJSAPIClient(
         seqno: Int?,
     ): TONGetMethodResult = engine.walletClientRunGetMethod(walletId, address.value, method, stack, seqno)
 
+    override suspend fun getBalance(
+        address: TONUserFriendlyAddress,
+        seqno: Int?,
+    ): String = engine.walletClientGetBalance(walletId, address.value, seqno)
+
     override suspend fun getMasterchainInfo(): TONMasterchainInfo =
         engine.walletClientGetMasterchainInfo(walletId)
 }

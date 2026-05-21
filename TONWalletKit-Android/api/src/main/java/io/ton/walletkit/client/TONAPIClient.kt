@@ -44,5 +44,10 @@ interface TONAPIClient {
         seqno: Int? = null,
     ): TONGetMethodResult
 
+    suspend fun getBalance(
+        address: TONUserFriendlyAddress,
+        seqno: Int? = null,
+    ): String
+
     suspend fun getMasterchainInfo(): TONMasterchainInfo
 }
