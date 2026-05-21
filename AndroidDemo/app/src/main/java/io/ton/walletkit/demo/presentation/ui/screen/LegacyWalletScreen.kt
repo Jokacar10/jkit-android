@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import io.ton.walletkit.ITONWalletKit
 import io.ton.walletkit.api.generated.TONNFT
 import io.ton.walletkit.demo.R
+import io.ton.walletkit.demo.designsystem.theme.TonTheme
 import io.ton.walletkit.demo.presentation.actions.WalletActions
 import io.ton.walletkit.demo.presentation.dev.DevPreferences
 import io.ton.walletkit.demo.presentation.dev.devToggleTaps
@@ -163,6 +164,7 @@ fun LegacyWalletScreen(
         ModalBottomSheet(
             onDismissRequest = actions::onDismissSheet,
             sheetState = sheetState,
+            containerColor = TonTheme.colors.bgPrimary,
             dragHandle = null,
         ) {
             when (sheet) {
@@ -190,6 +192,8 @@ fun LegacyWalletScreen(
                     request = sheet.request,
                     onApprove = { actions.onApproveSignData(sheet.request) },
                     onReject = { actions.onRejectSignData(sheet.request) },
+                    wallet = state.wallets.firstOrNull { it.address == sheet.request.walletAddress }
+                        ?: activeWallet,
                 )
 
                 is SheetState.WalletDetails -> WalletDetailsSheet(
@@ -408,6 +412,7 @@ fun LegacyWalletScreen(
         ModalBottomSheet(
             onDismissRequest = { selectedNFT = null },
             sheetState = nftDetailsSheetState,
+            containerColor = TonTheme.colors.bgPrimary,
             dragHandle = null,
         ) {
             activeWallet?.let { wallet ->

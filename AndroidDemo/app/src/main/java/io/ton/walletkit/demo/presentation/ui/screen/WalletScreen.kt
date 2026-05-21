@@ -274,6 +274,7 @@ fun WalletScreen(
         ModalBottomSheet(
             onDismissRequest = actions::onDismissSheet,
             sheetState = sheetState,
+            containerColor = TonTheme.colors.bgPrimary,
             dragHandle = null,
         ) {
             when (sheet) {
@@ -525,6 +526,7 @@ fun WalletScreen(
         ModalBottomSheet(
             onDismissRequest = { showWalletsSheet = false },
             sheetState = walletsSheetState,
+            containerColor = TonTheme.colors.bgPrimary,
             dragHandle = null,
         ) {
             WalletsBottomSheet(
@@ -556,6 +558,7 @@ fun WalletScreen(
         ModalBottomSheet(
             onDismissRequest = { selectedNFT = null },
             sheetState = nftDetailsSheetState,
+            containerColor = TonTheme.colors.bgPrimary,
             dragHandle = null,
         ) {
             // Get the wallet to pass to NFTDetailsScreen

@@ -124,7 +124,7 @@ internal fun TonConnectSheetHeader(
     }
 }
 
-private val AvatarShape = SmoothCornerShape(12.dp)
+private val AvatarShape = SmoothCornerShape(8.dp)
 private val AvatarSize = 56.dp
 
 @Composable
@@ -159,8 +159,8 @@ private fun PairedAvatars(dAppIconUrl: String?) {
 }
 
 /**
- * Section: small uppercase grey label + content rendered on a tinted card.
- * Mirrors the Figma section pattern (REQUESTED PERMISSIONS / DATA TO SIGN / etc.).
+ * Section card with a small uppercase grey label rendered inside the tinted card,
+ * matching the Figma (REQUESTED PERMISSIONS: / DATA TO SIGN: / etc.).
  */
 @Composable
 internal fun TonConnectSheetSection(
@@ -169,20 +169,19 @@ internal fun TonConnectSheetSection(
     accent: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        TonText(
-            text = label,
-            style = TonTheme.typography.footnoteCaps,
-            color = TonTheme.colors.textSecondary,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(SmoothCornerShape(12.dp))
-                .background(if (accent) TonTheme.colors.bgBrandSubtle else TonTheme.colors.bgSecondary)
-                .padding(16.dp),
-        ) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(SmoothCornerShape(12.dp))
+            .background(if (accent) TonTheme.colors.bgBrandSubtle else TonTheme.colors.bgSecondary)
+            .padding(16.dp),
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            TonText(
+                text = label,
+                style = TonTheme.typography.footnoteCaps,
+                color = TonTheme.colors.textSecondary,
+            )
             content()
         }
     }
@@ -204,17 +203,17 @@ internal fun TonConnectWalletPicker(
     var expanded by remember { mutableStateOf(false) }
     val current = selected ?: wallets.firstOrNull() ?: return
 
-    val shape = SmoothCornerShape(12.dp)
+    val shape = SmoothCornerShape(10.dp)
     Column(
         modifier = modifier
             .fillMaxWidth()
             .clip(shape)
             .background(TonTheme.colors.bgPrimary)
-            .border(1.dp, TonTheme.colors.bgFillTertiary, shape),
+            .border(1.dp, TonTheme.colors.bgLightGray, shape),
     ) {
         WalletPickerRow(
             wallet = current,
-            showPicker = true,
+            showPicker = multi,
             onClick = if (multi) ({ expanded = !expanded }) else null,
         )
         if (expanded) {
@@ -223,7 +222,7 @@ internal fun TonConnectWalletPicker(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(1.dp)
-                        .background(TonTheme.colors.bgFillTertiary),
+                        .background(TonTheme.colors.bgLightGray),
                 )
                 WalletPickerRow(
                     wallet = other,
@@ -248,17 +247,17 @@ private fun WalletPickerRow(
         modifier = Modifier
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
-                .size(36.dp)
-                .clip(SmoothCornerShape(8.dp))
+                .size(44.dp)
+                .clip(SmoothCornerShape(10.dp))
                 .background(TonTheme.colors.bgFillTertiary),
             contentAlignment = Alignment.Center,
         ) {
-            TonIconImage(icon = TonIcon.Wallet, size = 20.dp, tint = TonTheme.colors.textSecondary)
+            TonIconImage(icon = TonIcon.Wallet, size = 24.dp, tint = TonTheme.colors.textSecondary)
         }
         Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
