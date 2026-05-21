@@ -21,23 +21,12 @@
  */
 package io.ton.walletkit.demo.presentation.state
 
-// Mnemonic / quiz state is held only in memory — a process kill drops it and the
-// user re-rolls, which is the right trade-off for unconfirmed seed material.
+// Mnemonic state is held only in memory — a process kill drops it and the user
+// re-rolls, which is the right trade-off for unconfirmed seed material.
 sealed interface CreateWalletFlow {
     data object Idle : CreateWalletFlow
     data object Onboarding : CreateWalletFlow
     data class Reveal(val words: List<String>) : CreateWalletFlow
-
-    data class Quiz(
-        val words: List<String>,
-        val askedIndices: List<Int>,
-        val answers: Map<Int, String> = emptyMap(),
-    ) : CreateWalletFlow {
-        val isComplete: Boolean
-            get() = askedIndices.all { idx ->
-                answers[idx]?.trim()?.lowercase() == words[idx]
-            }
-    }
 
     data class ImportEntry(
         val wordCount: Int = 24,

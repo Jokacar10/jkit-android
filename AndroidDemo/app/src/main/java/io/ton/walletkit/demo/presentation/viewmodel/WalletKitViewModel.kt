@@ -1220,33 +1220,8 @@ class WalletKitViewModel @Inject constructor(
         }
     }
 
-    fun revealContinueToQuiz() {
+    fun confirmRevealAndCreate() {
         val current = _createWalletFlow.value as? CreateWalletFlow.Reveal ?: return
-        val askedIndices = (0 until current.words.size)
-            .shuffled()
-            .take(QUIZ_QUESTION_COUNT)
-            .sorted()
-        _createWalletFlow.value = CreateWalletFlow.Quiz(
-            words = current.words,
-            askedIndices = askedIndices,
-        )
-    }
-
-    fun quizBackToReveal() {
-        val current = _createWalletFlow.value as? CreateWalletFlow.Quiz ?: return
-        _createWalletFlow.value = CreateWalletFlow.Reveal(current.words)
-    }
-
-    fun setQuizAnswer(index: Int, value: String) {
-        val current = _createWalletFlow.value as? CreateWalletFlow.Quiz ?: return
-        _createWalletFlow.value = current.copy(
-            answers = current.answers + (index to value),
-        )
-    }
-
-    fun confirmQuizAndCreate() {
-        val current = _createWalletFlow.value as? CreateWalletFlow.Quiz ?: return
-        if (!current.isComplete) return
         importWallet(name = "", network = DEFAULT_NETWORK, words = current.words)
         _createWalletFlow.value = CreateWalletFlow.Idle
     }
@@ -1897,7 +1872,6 @@ class WalletKitViewModel @Inject constructor(
         private const val HIDE_MESSAGE_MS = 10_000L
         private const val MAX_EVENT_LOG = 12
         private const val DEFAULT_WALLET_VERSION = WalletVersions.V5R1
-        private const val QUIZ_QUESTION_COUNT = 3
         private const val TRANSACTION_FETCH_LIMIT = 20
         private val DEFAULT_NETWORK = TONNetwork.MAINNET
         private const val LOG_TAG = "WalletKitVM"

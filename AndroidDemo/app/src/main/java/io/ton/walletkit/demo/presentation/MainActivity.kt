@@ -49,7 +49,6 @@ import io.ton.walletkit.demo.presentation.ui.screen.CreatePinScreen
 import io.ton.walletkit.demo.presentation.ui.screen.LegacyWalletScreen
 import io.ton.walletkit.demo.presentation.ui.screen.UnlockPinScreen
 import io.ton.walletkit.demo.presentation.ui.screen.WalletScreen
-import io.ton.walletkit.demo.presentation.ui.screen.onboarding.ConfirmSeedPhraseScreen
 import io.ton.walletkit.demo.presentation.ui.screen.onboarding.CreateWalletOnboardingScreen
 import io.ton.walletkit.demo.presentation.ui.screen.onboarding.ImportWalletScreen
 import io.ton.walletkit.demo.presentation.ui.screen.onboarding.RevealSeedPhraseScreen
@@ -185,20 +184,7 @@ private fun CreateWalletFlowHost(
             RevealSeedPhraseScreen(
                 words = flow.words,
                 onBack = { viewModel.showCreateWalletOnboarding() },
-                onContinue = { viewModel.revealContinueToQuiz() },
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
-
-        is CreateWalletFlow.Quiz -> {
-            BackHandler { viewModel.quizBackToReveal() }
-            ConfirmSeedPhraseScreen(
-                askedIndices = flow.askedIndices,
-                answers = flow.answers,
-                canContinue = flow.isComplete,
-                onAnswerChange = { idx, value -> viewModel.setQuizAnswer(idx, value) },
-                onBack = { viewModel.quizBackToReveal() },
-                onContinue = { viewModel.confirmQuizAndCreate() },
+                onContinue = { viewModel.confirmRevealAndCreate() },
                 modifier = Modifier.fillMaxSize(),
             )
         }
