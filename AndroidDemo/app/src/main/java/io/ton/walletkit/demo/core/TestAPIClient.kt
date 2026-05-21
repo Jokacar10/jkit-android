@@ -26,10 +26,15 @@ import android.util.Log
 import io.ton.walletkit.api.MAINNET
 import io.ton.walletkit.api.TESTNET
 import io.ton.walletkit.api.TETRA
+import io.ton.walletkit.api.generated.TONAccountState
+import io.ton.walletkit.api.generated.TONEmulationResult
 import io.ton.walletkit.api.generated.TONGetMethodResult
 import io.ton.walletkit.api.generated.TONMasterchainInfo
+import io.ton.walletkit.api.generated.TONNFTsRequest
+import io.ton.walletkit.api.generated.TONNFTsResponse
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONRawStackItem
+import io.ton.walletkit.api.generated.TONUserNFTsRequest
 import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.demo.BuildConfig
 import io.ton.walletkit.model.TONBase64
@@ -147,6 +152,20 @@ class TestAPIClient(
         }
     }
 
+    override suspend fun nftItemsByAddress(request: TONNFTsRequest): TONNFTsResponse =
+        throw NotImplementedError("nftItemsByAddress not implemented in TestAPIClient")
+    override suspend fun nftItemsByOwner(request: TONUserNFTsRequest): TONNFTsResponse =
+        throw NotImplementedError("nftItemsByOwner not implemented in TestAPIClient")
+    override suspend fun fetchEmulation(messageBoc: TONBase64, ignoreSignature: Boolean?): TONEmulationResult =
+        throw NotImplementedError("fetchEmulation not implemented in TestAPIClient")
+    override suspend fun accountState(address: TONUserFriendlyAddress, seqno: Int?): TONAccountState =
+        throw NotImplementedError("accountState not implemented in TestAPIClient")
+    override suspend fun accountStates(
+        addresses: List<TONUserFriendlyAddress>,
+    ): Map<TONUserFriendlyAddress, TONAccountState> = emptyMap()
+    override suspend fun resolveDnsWallet(domain: String): String? = null
+    override suspend fun backResolveDnsWallet(address: TONUserFriendlyAddress): String? = null
+
     companion object {
         /**
          * Create a TestAPIClient for mainnet.
@@ -235,6 +254,20 @@ class ToncenterAPIClient(
         }
     }
 
+    override suspend fun nftItemsByAddress(request: TONNFTsRequest): TONNFTsResponse =
+        throw NotImplementedError("nftItemsByAddress not implemented in ToncenterAPIClient")
+    override suspend fun nftItemsByOwner(request: TONUserNFTsRequest): TONNFTsResponse =
+        throw NotImplementedError("nftItemsByOwner not implemented in ToncenterAPIClient")
+    override suspend fun fetchEmulation(messageBoc: TONBase64, ignoreSignature: Boolean?): TONEmulationResult =
+        throw NotImplementedError("fetchEmulation not implemented in ToncenterAPIClient")
+    override suspend fun accountState(address: TONUserFriendlyAddress, seqno: Int?): TONAccountState =
+        throw NotImplementedError("accountState not implemented in ToncenterAPIClient")
+    override suspend fun accountStates(
+        addresses: List<TONUserFriendlyAddress>,
+    ): Map<TONUserFriendlyAddress, TONAccountState> = emptyMap()
+    override suspend fun resolveDnsWallet(domain: String): String? = null
+    override suspend fun backResolveDnsWallet(address: TONUserFriendlyAddress): String? = null
+
     companion object {
         fun mainnet(apiKey: String = "") = ToncenterAPIClient(TONNetwork.MAINNET, apiKey)
         fun testnet(apiKey: String = "") = ToncenterAPIClient(TONNetwork.TESTNET, apiKey)
@@ -305,6 +338,20 @@ class TonAPIClient(
             }
         }
     }
+
+    override suspend fun nftItemsByAddress(request: TONNFTsRequest): TONNFTsResponse =
+        throw NotImplementedError("nftItemsByAddress not implemented in TonAPIClient")
+    override suspend fun nftItemsByOwner(request: TONUserNFTsRequest): TONNFTsResponse =
+        throw NotImplementedError("nftItemsByOwner not implemented in TonAPIClient")
+    override suspend fun fetchEmulation(messageBoc: TONBase64, ignoreSignature: Boolean?): TONEmulationResult =
+        throw NotImplementedError("fetchEmulation not implemented in TonAPIClient")
+    override suspend fun accountState(address: TONUserFriendlyAddress, seqno: Int?): TONAccountState =
+        throw NotImplementedError("accountState not implemented in TonAPIClient")
+    override suspend fun accountStates(
+        addresses: List<TONUserFriendlyAddress>,
+    ): Map<TONUserFriendlyAddress, TONAccountState> = emptyMap()
+    override suspend fun resolveDnsWallet(domain: String): String? = null
+    override suspend fun backResolveDnsWallet(address: TONUserFriendlyAddress): String? = null
 
     companion object {
         fun mainnet(apiKey: String = BuildConfig.MAINNET_API_KEY) = TonAPIClient(TONNetwork.MAINNET, apiKey)

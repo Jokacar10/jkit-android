@@ -38938,9 +38938,19 @@ var AndroidAPIClientAdapter = class {
 		const androidWindow = window;
 		if (!androidWindow.WalletKitNative) throw new Error("WalletKitNative bridge not available");
 		this.androidBridge = androidWindow.WalletKitNative;
+		this.registeredChainId = network.chainId;
 		this.network = network;
 	}
 	getNetwork() {
+		const lookup = this.androidBridge.apiGetNetworkForChainId;
+		if (typeof lookup === "function") try {
+			const json = lookup(this.registeredChainId);
+			const network = JSON.parse(json);
+			this.network = network;
+			return network;
+		} catch (err) {
+			error("[AndroidAPIClientAdapter] getNetwork live lookup failed, using cache:", err);
+		}
 		return this.network;
 	}
 	/**
@@ -38984,20 +38994,57 @@ var AndroidAPIClientAdapter = class {
 			throw err;
 		}
 	}
-	async nftItemsByAddress(_request) {
-		throw new Error("nftItemsByAddress is not implemented yet");
+	async nftItemsByAddress(request) {
+		try {
+			const networkJson = JSON.stringify(this.network);
+			const result = this.androidBridge.apiNftItemsByAddress(networkJson, JSON.stringify(request));
+			return JSON.parse(result);
+		} catch (err) {
+			error("[AndroidAPIClientAdapter] nftItemsByAddress failed:", err);
+			throw err;
+		}
 	}
-	async nftItemsByOwner(_request) {
-		throw new Error("nftItemsByOwner is not implemented yet");
+	async nftItemsByOwner(request) {
+		try {
+			const networkJson = JSON.stringify(this.network);
+			const result = this.androidBridge.apiNftItemsByOwner(networkJson, JSON.stringify(request));
+			return JSON.parse(result);
+		} catch (err) {
+			error("[AndroidAPIClientAdapter] nftItemsByOwner failed:", err);
+			throw err;
+		}
 	}
-	async fetchEmulation(_messageBoc, _ignoreSignature) {
-		throw new Error("fetchEmulation is not implemented yet");
+	async fetchEmulation(messageBoc, ignoreSignature) {
+		try {
+			const networkJson = JSON.stringify(this.network);
+			const flag = ignoreSignature === void 0 ? -1 : ignoreSignature ? 1 : 0;
+			const result = this.androidBridge.apiFetchEmulation(networkJson, messageBoc, flag);
+			return JSON.parse(result);
+		} catch (err) {
+			error("[AndroidAPIClientAdapter] fetchEmulation failed:", err);
+			throw err;
+		}
 	}
-	async getAccountState(_address, _seqno) {
-		throw new Error("getAccountState is not implemented yet");
+	async getAccountState(address, seqno) {
+		try {
+			const networkJson = JSON.stringify(this.network);
+			const seqnoArg = seqno ?? -1;
+			const result = this.androidBridge.apiAccountState(networkJson, address, seqnoArg);
+			return JSON.parse(result);
+		} catch (err) {
+			error("[AndroidAPIClientAdapter] getAccountState failed:", err);
+			throw err;
+		}
 	}
-	async getAccountStates(_addresses) {
-		throw new Error("getAccountStates is not implemented yet");
+	async getAccountStates(addresses) {
+		try {
+			const networkJson = JSON.stringify(this.network);
+			const result = this.androidBridge.apiAccountStates(networkJson, JSON.stringify(addresses));
+			return JSON.parse(result);
+		} catch (err) {
+			error("[AndroidAPIClientAdapter] getAccountStates failed:", err);
+			throw err;
+		}
 	}
 	async getBalance(address, seqno) {
 		try {
@@ -39024,11 +39071,23 @@ var AndroidAPIClientAdapter = class {
 	async getPendingTrace(_request) {
 		throw new Error("getPendingTrace is not implemented yet");
 	}
-	async resolveDnsWallet(_domain) {
-		throw new Error("resolveDnsWallet is not implemented yet");
+	async resolveDnsWallet(domain) {
+		try {
+			const networkJson = JSON.stringify(this.network);
+			return this.androidBridge.apiResolveDnsWallet(networkJson, domain) ?? void 0;
+		} catch (err) {
+			error("[AndroidAPIClientAdapter] resolveDnsWallet failed:", err);
+			throw err;
+		}
 	}
-	async backResolveDnsWallet(_address) {
-		throw new Error("backResolveDnsWallet is not implemented yet");
+	async backResolveDnsWallet(address) {
+		try {
+			const networkJson = JSON.stringify(this.network);
+			return this.androidBridge.apiBackResolveDnsWallet(networkJson, address) ?? void 0;
+		} catch (err) {
+			error("[AndroidAPIClientAdapter] backResolveDnsWallet failed:", err);
+			throw err;
+		}
 	}
 	async jettonsByAddress(_request) {
 		throw new Error("jettonsByAddress is not implemented yet");

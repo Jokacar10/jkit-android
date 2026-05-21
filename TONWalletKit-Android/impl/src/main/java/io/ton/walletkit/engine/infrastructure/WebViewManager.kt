@@ -38,8 +38,10 @@ import android.webkit.WebViewClient
 import androidx.webkit.WebViewAssetLoader
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.generated.TONDAppInfo
+import io.ton.walletkit.api.generated.TONNFTsRequest
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONRawStackItem
+import io.ton.walletkit.api.generated.TONUserNFTsRequest
 import io.ton.walletkit.api.isTestnet
 import io.ton.walletkit.bridge.BuildConfig
 import io.ton.walletkit.bridge.optString
@@ -531,6 +533,81 @@ internal class WebViewManager(
                     json.encodeToString(result)
                 } catch (e: Exception) {
                     Logger.e(TAG, "Failed to get masterchain info", e)
+                    throw e
+                }
+            }
+        }
+
+        @JavascriptInterface
+        fun apiNftItemsByAddress(networkJson: String, requestJson: String): String =
+            invokeApiClient(networkJson, "apiNftItemsByAddress") { client ->
+                val request = json.decodeFromString<TONNFTsRequest>(requestJson)
+                json.encodeToString(client.nftItemsByAddress(request))
+            }
+
+        @JavascriptInterface
+        fun apiNftItemsByOwner(networkJson: String, requestJson: String): String =
+            invokeApiClient(networkJson, "apiNftItemsByOwner") { client ->
+                val request = json.decodeFromString<TONUserNFTsRequest>(requestJson)
+                json.encodeToString(client.nftItemsByOwner(request))
+            }
+
+        @JavascriptInterface
+        fun apiFetchEmulation(networkJson: String, messageBoc: String, ignoreSignature: Int): String =
+            invokeApiClient(networkJson, "apiFetchEmulation") { client ->
+                // JS passes -1 to represent a missing optional boolean, 0/1 otherwise.
+                val ignoreSignatureArg: Boolean? = when (ignoreSignature) {
+                    -1 -> null
+                    0 -> false
+                    else -> true
+                }
+                json.encodeToString(client.fetchEmulation(TONBase64(messageBoc), ignoreSignatureArg))
+            }
+
+        @JavascriptInterface
+        fun apiAccountState(networkJson: String, address: String, seqno: Int): String =
+            invokeApiClient(networkJson, "apiAccountState") { client ->
+                val seqnoArg = if (seqno == -1) null else seqno
+                json.encodeToString(client.accountState(TONUserFriendlyAddress(address), seqnoArg))
+            }
+
+        @JavascriptInterface
+        fun apiAccountStates(networkJson: String, addressesJson: String): String =
+            invokeApiClient(networkJson, "apiAccountStates") { client ->
+                val addresses = json.decodeFromString<List<String>>(addressesJson)
+                    .map { TONUserFriendlyAddress(it) }
+                val result = client.accountStates(addresses)
+                // Re-key by raw address string so the JS side gets `{ "<addr>": <state>, ... }`.
+                val stringKeyed = result.mapKeys { it.key.value }
+                json.encodeToString(stringKeyed)
+            }
+
+        @JavascriptInterface
+        fun apiResolveDnsWallet(networkJson: String, domain: String): String? =
+            invokeApiClient(networkJson, "apiResolveDnsWallet") { client ->
+                client.resolveDnsWallet(domain)
+            }
+
+        @JavascriptInterface
+        fun apiBackResolveDnsWallet(networkJson: String, address: String): String? =
+            invokeApiClient(networkJson, "apiBackResolveDnsWallet") { client ->
+                client.backResolveDnsWallet(TONUserFriendlyAddress(address))
+            }
+
+        private inline fun <T> invokeApiClient(
+            networkJson: String,
+            opName: String,
+            crossinline block: suspend (TONAPIClient) -> T,
+        ): T {
+            val network = json.decodeFromString<TONNetwork>(networkJson)
+            val client = apiClients.find { it.first == network }?.second
+                ?: throw IllegalArgumentException("No API client configured for network: $network")
+            return runBlocking {
+                try {
+                    Logger.d(TAG, "$opName: network=$network")
+                    block(client)
+                } catch (e: Exception) {
+                    Logger.e(TAG, "Failed $opName: network=$network", e)
                     throw e
                 }
             }

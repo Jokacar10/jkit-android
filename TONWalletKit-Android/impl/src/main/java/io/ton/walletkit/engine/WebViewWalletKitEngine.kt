@@ -33,7 +33,11 @@ import io.ton.walletkit.api.generated.TONMasterchainInfo
 import io.ton.walletkit.api.generated.TONNFT
 import io.ton.walletkit.api.generated.TONNFTRawTransferRequest
 import io.ton.walletkit.api.generated.TONNFTTransferRequest
+import io.ton.walletkit.api.generated.TONAccountState
+import io.ton.walletkit.api.generated.TONEmulationResult
+import io.ton.walletkit.api.generated.TONNFTsRequest
 import io.ton.walletkit.api.generated.TONNFTsResponse
+import io.ton.walletkit.api.generated.TONUserNFTsRequest
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONRawStackItem
@@ -129,8 +133,15 @@ import io.ton.walletkit.engine.operations.sendTransaction
 import io.ton.walletkit.engine.operations.setDefaultStakingProvider
 import io.ton.walletkit.engine.operations.setDefaultSwapProvider
 import io.ton.walletkit.engine.operations.sign
+import io.ton.walletkit.engine.operations.walletClientAccountState
+import io.ton.walletkit.engine.operations.walletClientAccountStates
+import io.ton.walletkit.engine.operations.walletClientBackResolveDnsWallet
+import io.ton.walletkit.engine.operations.walletClientFetchEmulation
 import io.ton.walletkit.engine.operations.walletClientGetBalance
 import io.ton.walletkit.engine.operations.walletClientGetMasterchainInfo
+import io.ton.walletkit.engine.operations.walletClientNftItemsByAddress
+import io.ton.walletkit.engine.operations.walletClientNftItemsByOwner
+import io.ton.walletkit.engine.operations.walletClientResolveDnsWallet
 import io.ton.walletkit.engine.operations.walletClientRunGetMethod
 import io.ton.walletkit.engine.operations.walletClientSendBoc
 import io.ton.walletkit.engine.parsing.EventParser
@@ -483,6 +494,35 @@ internal class WebViewWalletKitEngine private constructor(
 
     override suspend fun walletClientGetMasterchainInfo(walletId: String): TONMasterchainInfo =
         rpcClient.walletClientGetMasterchainInfo(walletId)
+
+    override suspend fun walletClientNftItemsByAddress(walletId: String, request: TONNFTsRequest): TONNFTsResponse =
+        rpcClient.walletClientNftItemsByAddress(walletId, request)
+
+    override suspend fun walletClientNftItemsByOwner(walletId: String, request: TONUserNFTsRequest): TONNFTsResponse =
+        rpcClient.walletClientNftItemsByOwner(walletId, request)
+
+    override suspend fun walletClientFetchEmulation(
+        walletId: String,
+        messageBoc: String,
+        ignoreSignature: Boolean?,
+    ): TONEmulationResult = rpcClient.walletClientFetchEmulation(walletId, messageBoc, ignoreSignature)
+
+    override suspend fun walletClientAccountState(
+        walletId: String,
+        address: String,
+        seqno: Int?,
+    ): TONAccountState = rpcClient.walletClientAccountState(walletId, address, seqno)
+
+    override suspend fun walletClientAccountStates(
+        walletId: String,
+        addresses: List<String>,
+    ): Map<String, TONAccountState> = rpcClient.walletClientAccountStates(walletId, addresses)
+
+    override suspend fun walletClientResolveDnsWallet(walletId: String, domain: String): String? =
+        rpcClient.walletClientResolveDnsWallet(walletId, domain)
+
+    override suspend fun walletClientBackResolveDnsWallet(walletId: String, address: String): String? =
+        rpcClient.walletClientBackResolveDnsWallet(walletId, address)
 
     override suspend fun getJettonBalance(walletId: String, jettonAddress: String): String =
         rpcClient.getJettonBalance(walletId, jettonAddress)
