@@ -162,6 +162,10 @@ abstract class BaseE2ETest {
             }
             DevPreferences.reset(context)
 
+            // Process-wide singleton retains its cached value across the activity recreate
+            // between test classes; resetting it ensures the legacy toggle doesn't leak.
+            DevPreferences.reset(context)
+
             // 2. Clear files and cache
             context.filesDir?.deleteRecursively()
             context.cacheDir?.deleteRecursively()
