@@ -43,11 +43,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.ton.walletkit.demo.designsystem.components.button.TonButton
 import io.ton.walletkit.demo.designsystem.components.button.TonButtonConfig
-import io.ton.walletkit.demo.designsystem.components.navbarbutton.TonNavbarActionButton
+import io.ton.walletkit.demo.designsystem.components.navbarbutton.TonBackButton
 import io.ton.walletkit.demo.designsystem.components.seedphrase.SeedWordField
 import io.ton.walletkit.demo.designsystem.components.segmentedcontrol.TonSegmentedControl
 import io.ton.walletkit.demo.designsystem.components.text.TonText
-import io.ton.walletkit.demo.designsystem.icons.TonIcon
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 import io.ton.walletkit.demo.presentation.util.TestTags
 
@@ -73,11 +72,7 @@ fun ImportWalletScreen(
             .padding(horizontal = 16.dp),
     ) {
         Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-            TonNavbarActionButton(
-                icon = TonIcon.ChevronBackSmall,
-                onClick = onBack,
-                contentDescription = "Back",
-            )
+            TonBackButton(onClick = onBack)
         }
 
         Column(
