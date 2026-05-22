@@ -37,7 +37,6 @@ import io.ton.walletkit.model.TONUserFriendlyAddress
  * Interface for custom API client implementations. Mirrors iOS `TONAPIClient` protocol.
  */
 interface TONAPIClient {
-    /** Must not block — the JS bridge reads this synchronously via `apiGetNetworkForChainId`. */
     fun network(): TONNetwork
 
     suspend fun sendBoc(boc: TONBase64): String
