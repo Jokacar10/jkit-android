@@ -122,6 +122,7 @@ import kotlinx.serialization.json.Json
 internal class TONWalletKit private constructor(
     @JvmSynthetic
     internal val engine: WalletKitEngine,
+    private val network: TONNetwork,
 ) : ITONWalletKit {
 
     private val swapManager: ITONSwapManager = TONSwapManager(engine)
@@ -145,7 +146,7 @@ internal class TONWalletKit private constructor(
                 eventsHandler = null,
             ).apply { init(configuration) }
 
-            return TONWalletKit(newEngine)
+            return TONWalletKit(newEngine, configuration.network)
         }
     }
 
@@ -298,6 +299,7 @@ internal class TONWalletKit private constructor(
         return TONWallet(
             id = account.walletId,
             address = account.address,
+            network = network,
             engine = engine,
             account = account,
         )
@@ -314,6 +316,7 @@ internal class TONWalletKit private constructor(
             TONWallet(
                 id = account.walletId,
                 address = account.address,
+                network = network,
                 engine = engine,
                 account = account,
             )
@@ -329,6 +332,7 @@ internal class TONWalletKit private constructor(
         return TONWallet(
             id = account.walletId,
             address = account.address,
+            network = network,
             engine = engine,
             account = account,
         )

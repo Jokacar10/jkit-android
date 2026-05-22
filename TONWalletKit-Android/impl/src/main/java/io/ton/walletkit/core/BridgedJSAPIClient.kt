@@ -39,10 +39,10 @@ import io.ton.walletkit.model.TONUserFriendlyAddress
 internal class BridgedJSAPIClient(
     private val walletId: String,
     private val engine: WalletKitEngine,
-    private val walletNetwork: TONNetwork,
+    private val network: TONNetwork,
 ) : TONAPIClient {
 
-    override fun network(): TONNetwork = walletNetwork
+    override fun network(): TONNetwork = network
 
     override suspend fun sendBoc(boc: TONBase64): String =
         engine.walletClientSendBoc(walletId, boc.value)
