@@ -33,6 +33,7 @@ import io.ton.walletkit.api.generated.TONUserNFTsRequest
 import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.engine.WalletKitEngine
 import io.ton.walletkit.model.TONBase64
+import io.ton.walletkit.model.TONTokenAmount
 import io.ton.walletkit.model.TONUserFriendlyAddress
 
 /** Android counterpart of iOS `JSTONAPIClient` — routes through the WebView bridge. */
@@ -51,13 +52,13 @@ internal class BridgedJSAPIClient(
         address: TONUserFriendlyAddress,
         method: String,
         stack: List<TONRawStackItem>?,
-        seqno: Int?,
+        seqno: UInt?,
     ): TONGetMethodResult = engine.walletClientRunGetMethod(walletId, address.value, method, stack, seqno)
 
     override suspend fun getBalance(
         address: TONUserFriendlyAddress,
-        seqno: Int?,
-    ): String = engine.walletClientGetBalance(walletId, address.value, seqno)
+        seqno: UInt?,
+    ): TONTokenAmount = TONTokenAmount(engine.walletClientGetBalance(walletId, address.value, seqno))
 
     override suspend fun getMasterchainInfo(): TONMasterchainInfo =
         engine.walletClientGetMasterchainInfo(walletId)
@@ -75,7 +76,7 @@ internal class BridgedJSAPIClient(
 
     override suspend fun accountState(
         address: TONUserFriendlyAddress,
-        seqno: Int?,
+        seqno: UInt?,
     ): TONAccountState = engine.walletClientAccountState(walletId, address.value, seqno)
 
     override suspend fun accountStates(

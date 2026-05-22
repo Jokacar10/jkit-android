@@ -461,13 +461,13 @@ internal interface WalletKitEngine : RequestHandler {
         address: String,
         method: String,
         stack: List<TONRawStackItem>? = null,
-        seqno: Int? = null,
+        seqno: UInt? = null,
     ): TONGetMethodResult
 
     suspend fun walletClientGetBalance(
         walletId: String,
         address: String,
-        seqno: Int? = null,
+        seqno: UInt? = null,
     ): String
 
     suspend fun walletClientGetMasterchainInfo(walletId: String): TONMasterchainInfo
@@ -485,7 +485,7 @@ internal interface WalletKitEngine : RequestHandler {
     suspend fun walletClientAccountState(
         walletId: String,
         address: String,
-        seqno: Int? = null,
+        seqno: UInt? = null,
     ): TONAccountState
 
     suspend fun walletClientAccountStates(

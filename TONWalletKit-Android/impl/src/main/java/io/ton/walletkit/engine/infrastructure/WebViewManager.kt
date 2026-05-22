@@ -459,7 +459,8 @@ internal class WebViewManager(
         @JavascriptInterface
         fun apiGetBalance(paramsJson: String): String =
             callApi<ApiAddressSeqnoParams, _>(paramsJson) { client, p ->
-                client.getBalance(TONUserFriendlyAddress(p.address), p.seqno)
+                // Return the raw nano-units string — JS-side TokenAmount === string.
+                client.getBalance(TONUserFriendlyAddress(p.address), p.seqno).value
             }
 
         @JavascriptInterface

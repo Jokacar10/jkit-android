@@ -31,6 +31,7 @@ import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONRawStackItem
 import io.ton.walletkit.api.generated.TONUserNFTsRequest
 import io.ton.walletkit.model.TONBase64
+import io.ton.walletkit.model.TONTokenAmount
 import io.ton.walletkit.model.TONUserFriendlyAddress
 
 /**
@@ -45,13 +46,13 @@ interface TONAPIClient {
         address: TONUserFriendlyAddress,
         method: String,
         stack: List<TONRawStackItem>? = null,
-        seqno: Int? = null,
+        seqno: UInt? = null,
     ): TONGetMethodResult
 
     suspend fun getBalance(
         address: TONUserFriendlyAddress,
-        seqno: Int? = null,
-    ): String
+        seqno: UInt? = null,
+    ): TONTokenAmount
 
     suspend fun getMasterchainInfo(): TONMasterchainInfo
 
@@ -66,7 +67,7 @@ interface TONAPIClient {
 
     suspend fun accountState(
         address: TONUserFriendlyAddress,
-        seqno: Int? = null,
+        seqno: UInt? = null,
     ): TONAccountState
 
     suspend fun accountStates(

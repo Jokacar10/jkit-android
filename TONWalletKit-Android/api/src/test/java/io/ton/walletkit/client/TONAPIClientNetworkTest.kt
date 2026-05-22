@@ -34,6 +34,7 @@ import io.ton.walletkit.api.generated.TONRawStackItem
 import io.ton.walletkit.api.generated.TONUserNFTsRequest
 import io.ton.walletkit.config.TONWalletKitConfiguration
 import io.ton.walletkit.model.TONBase64
+import io.ton.walletkit.model.TONTokenAmount
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -48,15 +49,16 @@ class TONAPIClientNetworkTest {
             address: TONUserFriendlyAddress,
             method: String,
             stack: List<TONRawStackItem>?,
-            seqno: Int?,
+            seqno: UInt?,
         ): TONGetMethodResult = error("not used")
-        override suspend fun getBalance(address: TONUserFriendlyAddress, seqno: Int?): String = ""
+        override suspend fun getBalance(address: TONUserFriendlyAddress, seqno: UInt?): TONTokenAmount =
+            TONTokenAmount.ZERO
         override suspend fun getMasterchainInfo(): TONMasterchainInfo = error("not used")
         override suspend fun nftItemsByAddress(request: TONNFTsRequest): TONNFTsResponse = error("not used")
         override suspend fun nftItemsByOwner(request: TONUserNFTsRequest): TONNFTsResponse = error("not used")
         override suspend fun fetchEmulation(messageBoc: TONBase64, ignoreSignature: Boolean): TONEmulationResult =
             error("not used")
-        override suspend fun accountState(address: TONUserFriendlyAddress, seqno: Int?): TONAccountState =
+        override suspend fun accountState(address: TONUserFriendlyAddress, seqno: UInt?): TONAccountState =
             error("not used")
         override suspend fun accountStates(
             addresses: List<TONUserFriendlyAddress>,

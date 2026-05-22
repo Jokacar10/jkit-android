@@ -49,14 +49,14 @@ internal data class WalletClientRunGetMethodRequest(
     val address: String,
     val method: String,
     val stack: List<TONRawStackItem>? = null,
-    val seqno: Int? = null,
+    val seqno: UInt? = null,
 )
 
 @Serializable
 internal data class WalletClientGetBalanceRequest(
     val walletId: String,
     val address: String,
-    val seqno: Int? = null,
+    val seqno: UInt? = null,
 )
 
 @Serializable
@@ -82,7 +82,7 @@ internal data class WalletClientFetchEmulationRequest(
 internal data class WalletClientAccountStateRequest(
     val walletId: String,
     val address: String,
-    val seqno: Int? = null,
+    val seqno: UInt? = null,
 )
 
 @Serializable
@@ -122,7 +122,7 @@ internal suspend fun BridgeRpcClient.walletClientRunGetMethod(
     address: String,
     method: String,
     stack: List<TONRawStackItem>?,
-    seqno: Int?,
+    seqno: UInt?,
 ): TONGetMethodResult = callTyped(
     BridgeMethodConstants.METHOD_WALLET_CLIENT_RUN_GET_METHOD,
     WalletClientRunGetMethodRequest(
@@ -137,7 +137,7 @@ internal suspend fun BridgeRpcClient.walletClientRunGetMethod(
 internal suspend fun BridgeRpcClient.walletClientGetBalance(
     walletId: String,
     address: String,
-    seqno: Int?,
+    seqno: UInt?,
 ): String {
     val response: WalletClientSendBocResponse = callTyped(
         BridgeMethodConstants.METHOD_WALLET_CLIENT_GET_BALANCE,
@@ -180,7 +180,7 @@ internal suspend fun BridgeRpcClient.walletClientFetchEmulation(
 internal suspend fun BridgeRpcClient.walletClientAccountState(
     walletId: String,
     address: String,
-    seqno: Int?,
+    seqno: UInt?,
 ): TONAccountState = callTyped(
     BridgeMethodConstants.METHOD_WALLET_CLIENT_ACCOUNT_STATE,
     WalletClientAccountStateRequest(walletId = walletId, address = address, seqno = seqno),

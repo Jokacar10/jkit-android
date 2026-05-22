@@ -482,13 +482,13 @@ internal class WebViewWalletKitEngine private constructor(
         address: String,
         method: String,
         stack: List<TONRawStackItem>?,
-        seqno: Int?,
+        seqno: UInt?,
     ): TONGetMethodResult = rpcClient.walletClientRunGetMethod(walletId, address, method, stack, seqno)
 
     override suspend fun walletClientGetBalance(
         walletId: String,
         address: String,
-        seqno: Int?,
+        seqno: UInt?,
     ): String = rpcClient.walletClientGetBalance(walletId, address, seqno)
 
     override suspend fun walletClientGetMasterchainInfo(walletId: String): TONMasterchainInfo =
@@ -509,7 +509,7 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun walletClientAccountState(
         walletId: String,
         address: String,
-        seqno: Int?,
+        seqno: UInt?,
     ): TONAccountState = rpcClient.walletClientAccountState(walletId, address, seqno)
 
     override suspend fun walletClientAccountStates(

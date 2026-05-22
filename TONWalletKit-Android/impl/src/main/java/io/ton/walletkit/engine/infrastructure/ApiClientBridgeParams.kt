@@ -46,14 +46,14 @@ internal data class ApiRunGetMethodParams(
     val address: String,
     val method: String,
     val stack: List<TONRawStackItem>? = null,
-    val seqno: Int? = null,
+    val seqno: UInt? = null,
 ) : ApiParamsWithNetwork
 
 @Serializable
 internal data class ApiAddressSeqnoParams(
     override val network: TONNetwork,
     val address: String,
-    val seqno: Int? = null,
+    val seqno: UInt? = null,
 ) : ApiParamsWithNetwork
 
 @Serializable
