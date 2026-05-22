@@ -24,6 +24,7 @@ package io.ton.walletkit.config
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.internal.constants.JsonConsts
+import io.ton.walletkit.model.TONManifestFetchResult
 import io.ton.walletkit.session.TONConnectSessionManager
 import io.ton.walletkit.storage.TONWalletKitStorageType
 import kotlinx.serialization.SerialName
@@ -65,6 +66,12 @@ data class TONWalletKitConfiguration(
     val dev: DevOptions? = null,
     @Transient
     val eventsConfiguration: EventsConfiguration? = null,
+    /**
+     * Optional callback that supplies a dApp's manifest by URL. When set, the SDK delegates
+     * manifest resolution to this lambda instead of issuing the built-in HTTPS fetch.
+     */
+    @Transient
+    val fetchManifest: (suspend (manifestUrl: String) -> TONManifestFetchResult)? = null,
 ) {
     /**
      * Returns the primary network (first in the set).

@@ -56,6 +56,7 @@ import io.ton.walletkit.internal.constants.ResponseConstants
 import io.ton.walletkit.internal.constants.WebViewConstants
 import io.ton.walletkit.internal.util.Logger
 import io.ton.walletkit.model.TONBase64
+import io.ton.walletkit.model.TONManifestFetchResult
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import io.ton.walletkit.session.SessionFilter
 import io.ton.walletkit.session.TONConnectSessionManager
@@ -84,6 +85,7 @@ internal class WebViewManager(
     private val storageManager: StorageManager,
     private val sessionManager: TONConnectSessionManager?,
     private val apiClients: List<Pair<TONNetwork, TONAPIClient>>,
+    private val fetchManifest: (suspend (String) -> TONManifestFetchResult)?,
     private val adapterManager: AdapterManager,
     private val json: Json,
     private val onMessage: (JsonObject) -> Unit,
@@ -443,6 +445,23 @@ internal class WebViewManager(
                 json.encodeToString(network)
             }
             return "[${ networks.joinToString(",") }]"
+        }
+
+        @JavascriptInterface
+        fun hasCustomFetchManifest(): Boolean = fetchManifest != null
+
+        @JavascriptInterface
+        fun apiFetchManifest(url: String): String {
+            val fetch = fetchManifest
+                ?: throw IllegalStateException("No fetchManifest configured")
+            return runBlocking {
+                try {
+                    json.encodeToString(fetch(url))
+                } catch (e: Exception) {
+                    Logger.e(TAG, "Failed to fetch manifest: $url", e)
+                    throw e
+                }
+            }
         }
 
         @JavascriptInterface

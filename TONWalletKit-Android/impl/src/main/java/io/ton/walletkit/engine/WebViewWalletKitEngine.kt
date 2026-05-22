@@ -147,6 +147,7 @@ import io.ton.walletkit.internal.util.WalletKitUtils
 import io.ton.walletkit.listener.TONBridgeEventsHandler
 import io.ton.walletkit.model.KeyPair
 import io.ton.walletkit.model.TONHex
+import io.ton.walletkit.model.TONManifestFetchResult
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import io.ton.walletkit.model.TONWalletAdapter
 import io.ton.walletkit.model.WalletSigner
@@ -182,6 +183,7 @@ internal class WebViewWalletKitEngine private constructor(
     private val storageAdapter: BridgeStorageAdapter,
     private val sessionManager: TONConnectSessionManager?,
     private val apiClients: List<Pair<TONNetwork, TONAPIClient>>,
+    private val fetchManifest: (suspend (String) -> TONManifestFetchResult)?,
     private val assetPath: String = WebViewConstants.DEFAULT_ASSET_PATH,
 ) : WalletKitEngine {
     override val streamingEvents get() = messageDispatcher.streamingEvents
@@ -219,6 +221,7 @@ internal class WebViewWalletKitEngine private constructor(
                 storageManager = storageManager,
                 sessionManager = sessionManager,
                 apiClients = apiClients,
+                fetchManifest = fetchManifest,
                 adapterManager = adapterManager,
                 json = json,
                 onMessage = ::handleBridgeMessage,
@@ -723,7 +726,15 @@ internal class WebViewWalletKitEngine private constructor(
 
                     Logger.d(TAG, "Creating new WebView engine for network: $network")
                     val storageAdapter = createStorageAdapter(context, configuration.storageType)
-                    WebViewWalletKitEngine(context, eventsHandler, storageAdapter, configuration.sessionManager, configuration.apiClients, assetPath).also {
+                    WebViewWalletKitEngine(
+                        context,
+                        eventsHandler,
+                        storageAdapter,
+                        configuration.sessionManager,
+                        configuration.apiClients,
+                        configuration.fetchManifest,
+                        assetPath,
+                    ).also {
                         instances[network] = it
                     }
                 }
