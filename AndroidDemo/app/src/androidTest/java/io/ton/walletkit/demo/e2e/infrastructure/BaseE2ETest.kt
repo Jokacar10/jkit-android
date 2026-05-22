@@ -160,6 +160,7 @@ abstract class BaseE2ETest {
                     Log.w("BaseE2ETest", "Failed to clear prefs $prefName: ${e.message}")
                 }
             }
+            DevPreferences.reset(context)
 
             // Process-wide singleton retains its cached value across the activity recreate
             // between test classes; resetting it ensures the legacy toggle doesn't leak.
