@@ -154,7 +154,7 @@ class TestAPIClient(
 
     override suspend fun nftItemsByAddress(request: TONNFTsRequest): TONNFTsResponse = throw NotImplementedError("nftItemsByAddress not implemented in TestAPIClient")
     override suspend fun nftItemsByOwner(request: TONUserNFTsRequest): TONNFTsResponse = throw NotImplementedError("nftItemsByOwner not implemented in TestAPIClient")
-    override suspend fun fetchEmulation(messageBoc: TONBase64, ignoreSignature: Boolean?): TONEmulationResult = throw NotImplementedError("fetchEmulation not implemented in TestAPIClient")
+    override suspend fun fetchEmulation(messageBoc: TONBase64, ignoreSignature: Boolean): TONEmulationResult = throw NotImplementedError("fetchEmulation not implemented in TestAPIClient")
     override suspend fun accountState(address: TONUserFriendlyAddress, seqno: Int?): TONAccountState = throw NotImplementedError("accountState not implemented in TestAPIClient")
     override suspend fun accountStates(
         addresses: List<TONUserFriendlyAddress>,
@@ -252,7 +252,7 @@ class ToncenterAPIClient(
 
     override suspend fun nftItemsByAddress(request: TONNFTsRequest): TONNFTsResponse = throw NotImplementedError("nftItemsByAddress not implemented in ToncenterAPIClient")
     override suspend fun nftItemsByOwner(request: TONUserNFTsRequest): TONNFTsResponse = throw NotImplementedError("nftItemsByOwner not implemented in ToncenterAPIClient")
-    override suspend fun fetchEmulation(messageBoc: TONBase64, ignoreSignature: Boolean?): TONEmulationResult = throw NotImplementedError("fetchEmulation not implemented in ToncenterAPIClient")
+    override suspend fun fetchEmulation(messageBoc: TONBase64, ignoreSignature: Boolean): TONEmulationResult = throw NotImplementedError("fetchEmulation not implemented in ToncenterAPIClient")
     override suspend fun accountState(address: TONUserFriendlyAddress, seqno: Int?): TONAccountState = throw NotImplementedError("accountState not implemented in ToncenterAPIClient")
     override suspend fun accountStates(
         addresses: List<TONUserFriendlyAddress>,
@@ -333,7 +333,7 @@ class TonAPIClient(
 
     override suspend fun nftItemsByAddress(request: TONNFTsRequest): TONNFTsResponse = throw NotImplementedError("nftItemsByAddress not implemented in TonAPIClient")
     override suspend fun nftItemsByOwner(request: TONUserNFTsRequest): TONNFTsResponse = throw NotImplementedError("nftItemsByOwner not implemented in TonAPIClient")
-    override suspend fun fetchEmulation(messageBoc: TONBase64, ignoreSignature: Boolean?): TONEmulationResult = throw NotImplementedError("fetchEmulation not implemented in TonAPIClient")
+    override suspend fun fetchEmulation(messageBoc: TONBase64, ignoreSignature: Boolean): TONEmulationResult = throw NotImplementedError("fetchEmulation not implemented in TonAPIClient")
     override suspend fun accountState(address: TONUserFriendlyAddress, seqno: Int?): TONAccountState = throw NotImplementedError("accountState not implemented in TonAPIClient")
     override suspend fun accountStates(
         addresses: List<TONUserFriendlyAddress>,

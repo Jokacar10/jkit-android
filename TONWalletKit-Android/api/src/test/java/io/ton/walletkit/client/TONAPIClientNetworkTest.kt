@@ -54,7 +54,7 @@ class TONAPIClientNetworkTest {
         override suspend fun getMasterchainInfo(): TONMasterchainInfo = error("not used")
         override suspend fun nftItemsByAddress(request: TONNFTsRequest): TONNFTsResponse = error("not used")
         override suspend fun nftItemsByOwner(request: TONUserNFTsRequest): TONNFTsResponse = error("not used")
-        override suspend fun fetchEmulation(messageBoc: TONBase64, ignoreSignature: Boolean?): TONEmulationResult =
+        override suspend fun fetchEmulation(messageBoc: TONBase64, ignoreSignature: Boolean): TONEmulationResult =
             error("not used")
         override suspend fun accountState(address: TONUserFriendlyAddress, seqno: Int?): TONAccountState =
             error("not used")

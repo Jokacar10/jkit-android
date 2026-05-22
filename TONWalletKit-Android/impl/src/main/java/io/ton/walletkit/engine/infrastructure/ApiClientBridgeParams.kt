@@ -72,7 +72,7 @@ internal data class ApiNftItemsByOwnerParams(
 internal data class ApiFetchEmulationParams(
     override val network: TONNetwork,
     val messageBoc: String,
-    val ignoreSignature: Boolean? = null,
+    val ignoreSignature: Boolean = false,
 ) : ApiParamsWithNetwork
 
 @Serializable

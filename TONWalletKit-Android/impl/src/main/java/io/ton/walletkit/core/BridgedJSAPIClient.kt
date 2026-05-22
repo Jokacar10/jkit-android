@@ -70,7 +70,7 @@ internal class BridgedJSAPIClient(
 
     override suspend fun fetchEmulation(
         messageBoc: TONBase64,
-        ignoreSignature: Boolean?,
+        ignoreSignature: Boolean,
     ): TONEmulationResult = engine.walletClientFetchEmulation(walletId, messageBoc.value, ignoreSignature)
 
     override suspend fun accountState(

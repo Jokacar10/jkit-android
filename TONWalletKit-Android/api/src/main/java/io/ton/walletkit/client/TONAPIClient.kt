@@ -61,7 +61,7 @@ interface TONAPIClient {
 
     suspend fun fetchEmulation(
         messageBoc: TONBase64,
-        ignoreSignature: Boolean? = null,
+        ignoreSignature: Boolean = false,
     ): TONEmulationResult
 
     suspend fun accountState(

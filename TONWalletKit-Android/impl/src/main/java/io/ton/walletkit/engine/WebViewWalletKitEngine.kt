@@ -503,7 +503,7 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun walletClientFetchEmulation(
         walletId: String,
         messageBoc: String,
-        ignoreSignature: Boolean?,
+        ignoreSignature: Boolean,
     ): TONEmulationResult = rpcClient.walletClientFetchEmulation(walletId, messageBoc, ignoreSignature)
 
     override suspend fun walletClientAccountState(

@@ -75,7 +75,7 @@ internal data class WalletClientNftItemsByOwnerRequest(
 internal data class WalletClientFetchEmulationRequest(
     val walletId: String,
     val messageBoc: String,
-    val ignoreSignature: Boolean? = null,
+    val ignoreSignature: Boolean = false,
 )
 
 @Serializable
@@ -171,7 +171,7 @@ internal suspend fun BridgeRpcClient.walletClientNftItemsByOwner(
 internal suspend fun BridgeRpcClient.walletClientFetchEmulation(
     walletId: String,
     messageBoc: String,
-    ignoreSignature: Boolean?,
+    ignoreSignature: Boolean,
 ): TONEmulationResult = callTyped(
     BridgeMethodConstants.METHOD_WALLET_CLIENT_FETCH_EMULATION,
     WalletClientFetchEmulationRequest(walletId = walletId, messageBoc = messageBoc, ignoreSignature = ignoreSignature),

@@ -45089,6 +45089,41 @@ async function registerKotlinSwapProvider(args) {
 	(await getSwap()).registerProvider(provider);
 }
 //#endregion
+//#region src/api/walletClient.ts
+async function walletClientSendBoc(args) {
+	return { result: await (await getWallet(args.walletId)).client.sendBoc(args.boc) };
+}
+async function walletClientRunGetMethod(args) {
+	return (await getWallet(args.walletId)).client.runGetMethod(args.address, args.method, args.stack, args.seqno);
+}
+async function walletClientGetBalance(args) {
+	return { result: await (await getWallet(args.walletId)).client.getBalance(args.address, args.seqno) };
+}
+async function walletClientGetMasterchainInfo(args) {
+	return (await getWallet(args.walletId)).client.getMasterchainInfo();
+}
+async function walletClientNftItemsByAddress(args) {
+	return (await getWallet(args.walletId)).client.nftItemsByAddress(args.request);
+}
+async function walletClientNftItemsByOwner(args) {
+	return (await getWallet(args.walletId)).client.nftItemsByOwner(args.request);
+}
+async function walletClientFetchEmulation(args) {
+	return (await getWallet(args.walletId)).client.fetchEmulation(args.messageBoc, args.ignoreSignature);
+}
+async function walletClientAccountState(args) {
+	return (await getWallet(args.walletId)).client.getAccountState(args.address, args.seqno);
+}
+async function walletClientAccountStates(args) {
+	return (await getWallet(args.walletId)).client.getAccountStates(args.addresses);
+}
+async function walletClientResolveDnsWallet(args) {
+	return { result: await (await getWallet(args.walletId)).client.resolveDnsWallet(args.domain) ?? null };
+}
+async function walletClientBackResolveDnsWallet(args) {
+	return { result: await (await getWallet(args.walletId)).client.backResolveDnsWallet(args.address) ?? null };
+}
+//#endregion
 //#region src/api/index.ts
 var api = {
 	init,
@@ -45178,7 +45213,18 @@ var api = {
 	hasSwapProvider,
 	getSwapQuote,
 	buildSwapTransaction,
-	registerKotlinSwapProvider
+	registerKotlinSwapProvider,
+	walletClientSendBoc,
+	walletClientRunGetMethod,
+	walletClientGetBalance,
+	walletClientGetMasterchainInfo,
+	walletClientNftItemsByAddress,
+	walletClientNftItemsByOwner,
+	walletClientFetchEmulation,
+	walletClientAccountState,
+	walletClientAccountStates,
+	walletClientResolveDnsWallet,
+	walletClientBackResolveDnsWallet
 };
 //#endregion
 //#region src/bridge.ts

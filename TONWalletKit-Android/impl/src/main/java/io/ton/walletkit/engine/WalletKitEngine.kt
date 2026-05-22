@@ -479,7 +479,7 @@ internal interface WalletKitEngine : RequestHandler {
     suspend fun walletClientFetchEmulation(
         walletId: String,
         messageBoc: String,
-        ignoreSignature: Boolean? = null,
+        ignoreSignature: Boolean = false,
     ): TONEmulationResult
 
     suspend fun walletClientAccountState(
