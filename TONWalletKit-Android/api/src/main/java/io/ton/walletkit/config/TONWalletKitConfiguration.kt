@@ -21,10 +21,10 @@
  */
 package io.ton.walletkit.config
 
+import io.ton.walletkit.api.generated.TONManifestFetchResult
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.internal.constants.JsonConsts
-import io.ton.walletkit.model.TONManifestFetchResult
 import io.ton.walletkit.session.TONConnectSessionManager
 import io.ton.walletkit.storage.TONWalletKitStorageType
 import kotlinx.serialization.SerialName

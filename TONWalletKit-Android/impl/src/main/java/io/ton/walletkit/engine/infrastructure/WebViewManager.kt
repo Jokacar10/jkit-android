@@ -38,6 +38,7 @@ import android.webkit.WebViewClient
 import androidx.webkit.WebViewAssetLoader
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.generated.TONDAppInfo
+import io.ton.walletkit.api.generated.TONManifestFetchResult
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONRawStackItem
 import io.ton.walletkit.api.isTestnet
@@ -56,7 +57,6 @@ import io.ton.walletkit.internal.constants.ResponseConstants
 import io.ton.walletkit.internal.constants.WebViewConstants
 import io.ton.walletkit.internal.util.Logger
 import io.ton.walletkit.model.TONBase64
-import io.ton.walletkit.model.TONManifestFetchResult
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import io.ton.walletkit.session.SessionFilter
 import io.ton.walletkit.session.TONConnectSessionManager
@@ -452,8 +452,7 @@ internal class WebViewManager(
 
         @JavascriptInterface
         fun apiFetchManifest(url: String): String {
-            val fetch = fetchManifest
-                ?: throw IllegalStateException("No fetchManifest configured")
+            val fetch = fetchManifest ?: return ""
             return runBlocking {
                 try {
                     json.encodeToString(fetch(url))

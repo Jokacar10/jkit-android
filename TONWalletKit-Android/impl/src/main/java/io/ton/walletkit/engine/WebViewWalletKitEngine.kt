@@ -29,6 +29,7 @@ import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONGetMethodResult
 import io.ton.walletkit.api.generated.TONJettonsResponse
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
+import io.ton.walletkit.api.generated.TONManifestFetchResult
 import io.ton.walletkit.api.generated.TONMasterchainInfo
 import io.ton.walletkit.api.generated.TONNFT
 import io.ton.walletkit.api.generated.TONNFTRawTransferRequest
@@ -147,7 +148,6 @@ import io.ton.walletkit.internal.util.WalletKitUtils
 import io.ton.walletkit.listener.TONBridgeEventsHandler
 import io.ton.walletkit.model.KeyPair
 import io.ton.walletkit.model.TONHex
-import io.ton.walletkit.model.TONManifestFetchResult
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import io.ton.walletkit.model.TONWalletAdapter
 import io.ton.walletkit.model.WalletSigner

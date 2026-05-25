@@ -19,17 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit.model
+@file:Suppress(
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport",
+)
 
+package io.ton.walletkit.api.generated
+
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
 
 /**
- * Result of a custom manifest fetch. On failure, leave [manifest] null and set
- * [manifestFetchErrorCode] so the SDK can surface the right TonConnect error.
+ *
+ *
+ * @param manifest
+ * @param manifestFetchErrorCode
  */
 @Serializable
 data class TONManifestFetchResult(
-    val manifest: JsonElement? = null,
+
+    @Contextual @SerialName(value = "manifest")
+    val manifest: kotlinx.serialization.json.JsonElement?,
+
+    @Contextual @SerialName(value = "manifestFetchErrorCode")
     val manifestFetchErrorCode: TONConnectEventErrorCodes? = null,
-)
+
+) {
+
+    companion object
+}
