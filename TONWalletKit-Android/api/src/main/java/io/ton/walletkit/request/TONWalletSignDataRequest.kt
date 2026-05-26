@@ -21,45 +21,25 @@
  */
 package io.ton.walletkit.request
 
-import io.ton.walletkit.api.generated.TONEmbeddedSignDataRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
 import io.ton.walletkit.api.generated.TONSignDataRequestEvent
 
 /**
  * A data signing request from a dApp. Mirrors iOS `TONWalletSignDataRequest`.
  *
- * When this request is the embedded follow-up of a connect-with-intent flow, [event] is
- * projected from the embedded event but [approve] / [reject] route the embedded shape to
- * the bridge so the JS side can finalise the connect session.
+ * When this request is the embedded follow-up of a connect-with-intent flow, [event] is the
+ * embedded variant (a subclass of [TONSignDataRequestEvent]); the bridge picks up the
+ * `connectionResult` field at serialization time so the JS side can finalise the session.
  */
-class TONWalletSignDataRequest internal constructor(
+class TONWalletSignDataRequest(
     val event: TONSignDataRequestEvent,
-    private val embeddedEvent: TONEmbeddedSignDataRequestEvent?,
     private val handler: RequestHandler,
 ) {
-    constructor(
-        event: TONSignDataRequestEvent,
-        handler: RequestHandler,
-    ) : this(event = event, embeddedEvent = null, handler = handler)
-
-    internal constructor(
-        embeddedEvent: TONEmbeddedSignDataRequestEvent,
-        handler: RequestHandler,
-    ) : this(event = embeddedEvent.requestEvent, embeddedEvent = embeddedEvent, handler = handler)
-
     suspend fun approve(response: TONSignDataApprovalResponse? = null) {
-        if (embeddedEvent != null) {
-            handler.approveSignData(embeddedEvent, response)
-        } else {
-            handler.approveSignData(event, response)
-        }
+        handler.approveSignData(event, response)
     }
 
     suspend fun reject(reason: String? = null, errorCode: Int? = null) {
-        if (embeddedEvent != null) {
-            handler.rejectSignData(embeddedEvent, reason, errorCode)
-        } else {
-            handler.rejectSignData(event, reason, errorCode)
-        }
+        handler.rejectSignData(event, reason, errorCode)
     }
 }

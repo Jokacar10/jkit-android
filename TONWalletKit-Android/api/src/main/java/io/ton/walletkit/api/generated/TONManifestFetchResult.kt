@@ -19,29 +19,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package io.ton.walletkit.request
+@file:Suppress(
+    "ArrayInDataClass",
+    "EnumEntryName",
+    "RemoveRedundantQualifierName",
+    "UnusedImport",
+)
 
-import io.ton.walletkit.api.generated.TONSignMessageApprovalResponse
-import io.ton.walletkit.api.generated.TONSignMessageRequestEvent
+package io.ton.walletkit.api.generated
+
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
- * A sign-message (sign-only) transaction request from a dApp. Mirrors iOS
- * `TONWalletSignMessageRequest`. Unlike [TONWalletTransactionRequest], the signed BoC is
- * returned to the dApp rather than broadcast.
  *
- * When this request is the embedded follow-up of a connect-with-intent flow, [event] is the
- * embedded variant (a subclass of [TONSignMessageRequestEvent]); the bridge picks up the
- * `connectionResult` field at serialization time so the JS side can finalise the session.
+ *
+ * @param manifest
+ * @param manifestFetchErrorCode
  */
-class TONWalletSignMessageRequest(
-    val event: TONSignMessageRequestEvent,
-    private val handler: RequestHandler,
-) {
-    suspend fun approve(response: TONSignMessageApprovalResponse? = null) {
-        handler.approveSignMessage(event, response)
-    }
+@Serializable
+data class TONManifestFetchResult(
 
-    suspend fun reject(reason: String? = null, errorCode: Int? = null) {
-        handler.rejectSignMessage(event, reason, errorCode)
-    }
+    @Contextual @SerialName(value = "manifest")
+    val manifest: kotlinx.serialization.json.JsonElement?,
+
+    @Contextual @SerialName(value = "manifestFetchErrorCode")
+    val manifestFetchErrorCode: TONCONNECTEVENTERRORCODES? = null,
+
+) {
+
+    companion object
 }

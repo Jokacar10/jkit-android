@@ -51,15 +51,15 @@ class TONWalletConnectionRequest(
         return when (embedded) {
             is TONEmbeddedRequestEvent.SendTransaction ->
                 TONWalletKitEvent.SendTransactionRequest(
-                    TONWalletTransactionRequest(embeddedEvent = embedded.value, handler = handler),
+                    TONWalletTransactionRequest(event = embedded.value, handler = handler),
                 )
             is TONEmbeddedRequestEvent.SignMessage ->
                 TONWalletKitEvent.SignMessageRequest(
-                    TONWalletSignMessageRequest(embeddedEvent = embedded.value, handler = handler),
+                    TONWalletSignMessageRequest(event = embedded.value, handler = handler),
                 )
             is TONEmbeddedRequestEvent.SignData ->
                 TONWalletKitEvent.SignDataRequest(
-                    TONWalletSignDataRequest(embeddedEvent = embedded.value, handler = handler),
+                    TONWalletSignDataRequest(event = embedded.value, handler = handler),
                 )
         }
     }

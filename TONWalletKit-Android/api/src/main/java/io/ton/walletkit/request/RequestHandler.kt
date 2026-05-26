@@ -24,9 +24,6 @@ package io.ton.walletkit.request
 import io.ton.walletkit.api.generated.TONConnectionApprovalResponse
 import io.ton.walletkit.api.generated.TONConnectionRequestEvent
 import io.ton.walletkit.api.generated.TONEmbeddedRequestEvent
-import io.ton.walletkit.api.generated.TONEmbeddedSendTransactionRequestEvent
-import io.ton.walletkit.api.generated.TONEmbeddedSignDataRequestEvent
-import io.ton.walletkit.api.generated.TONEmbeddedSignMessageRequestEvent
 import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
@@ -59,13 +56,6 @@ interface RequestHandler {
 
     suspend fun rejectTransaction(event: TONSendTransactionRequestEvent, reason: String?, errorCode: Int?)
 
-    suspend fun approveTransaction(
-        event: TONEmbeddedSendTransactionRequestEvent,
-        response: TONSendTransactionApprovalResponse? = null,
-    )
-
-    suspend fun rejectTransaction(event: TONEmbeddedSendTransactionRequestEvent, reason: String?, errorCode: Int?)
-
     suspend fun approveSignData(
         event: TONSignDataRequestEvent,
         response: TONSignDataApprovalResponse? = null,
@@ -73,24 +63,10 @@ interface RequestHandler {
 
     suspend fun rejectSignData(event: TONSignDataRequestEvent, reason: String?, errorCode: Int?)
 
-    suspend fun approveSignData(
-        event: TONEmbeddedSignDataRequestEvent,
-        response: TONSignDataApprovalResponse? = null,
-    )
-
-    suspend fun rejectSignData(event: TONEmbeddedSignDataRequestEvent, reason: String?, errorCode: Int?)
-
     suspend fun approveSignMessage(
         event: TONSignMessageRequestEvent,
         response: TONSignMessageApprovalResponse? = null,
     )
 
     suspend fun rejectSignMessage(event: TONSignMessageRequestEvent, reason: String?, errorCode: Int?)
-
-    suspend fun approveSignMessage(
-        event: TONEmbeddedSignMessageRequestEvent,
-        response: TONSignMessageApprovalResponse? = null,
-    )
-
-    suspend fun rejectSignMessage(event: TONEmbeddedSignMessageRequestEvent, reason: String?, errorCode: Int?)
 }

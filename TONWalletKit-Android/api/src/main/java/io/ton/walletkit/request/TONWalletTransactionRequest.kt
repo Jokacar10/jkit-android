@@ -21,45 +21,25 @@
  */
 package io.ton.walletkit.request
 
-import io.ton.walletkit.api.generated.TONEmbeddedSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 
 /**
  * A transaction request from a dApp. Mirrors iOS `TONWalletTransactionRequest`.
  *
- * When this request is the embedded follow-up of a connect-with-intent flow, [event] is
- * projected from the embedded event but [approve] / [reject] route the embedded shape (with
- * `connectionResult`) to the bridge so the JS side can finalise the connect session.
+ * When this request is the embedded follow-up of a connect-with-intent flow, [event] is the
+ * embedded variant (a subclass of [TONSendTransactionRequestEvent]); the bridge picks up the
+ * `connectionResult` field at serialization time so the JS side can finalise the session.
  */
-class TONWalletTransactionRequest internal constructor(
+class TONWalletTransactionRequest(
     val event: TONSendTransactionRequestEvent,
-    private val embeddedEvent: TONEmbeddedSendTransactionRequestEvent?,
     private val handler: RequestHandler,
 ) {
-    constructor(
-        event: TONSendTransactionRequestEvent,
-        handler: RequestHandler,
-    ) : this(event = event, embeddedEvent = null, handler = handler)
-
-    internal constructor(
-        embeddedEvent: TONEmbeddedSendTransactionRequestEvent,
-        handler: RequestHandler,
-    ) : this(event = embeddedEvent.requestEvent, embeddedEvent = embeddedEvent, handler = handler)
-
     suspend fun approve(response: TONSendTransactionApprovalResponse? = null) {
-        if (embeddedEvent != null) {
-            handler.approveTransaction(embeddedEvent, response)
-        } else {
-            handler.approveTransaction(event, response)
-        }
+        handler.approveTransaction(event, response)
     }
 
     suspend fun reject(reason: String? = null, errorCode: Int? = null) {
-        if (embeddedEvent != null) {
-            handler.rejectTransaction(embeddedEvent, reason, errorCode)
-        } else {
-            handler.rejectTransaction(event, reason, errorCode)
-        }
+        handler.rejectTransaction(event, reason, errorCode)
     }
 }
