@@ -451,8 +451,8 @@ internal class WebViewManager(
         fun hasCustomFetchManifest(): Boolean = fetchManifest != null
 
         @JavascriptInterface
-        fun apiFetchManifest(url: String): String {
-            val fetch = fetchManifest ?: return ""
+        fun apiFetchManifest(url: String): String? {
+            val fetch = fetchManifest ?: return null
             return runBlocking {
                 try {
                     json.encodeToString(fetch(url))
