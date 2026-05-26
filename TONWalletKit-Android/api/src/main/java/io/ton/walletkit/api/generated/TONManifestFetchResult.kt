@@ -45,7 +45,7 @@ data class TONManifestFetchResult(
     val manifest: kotlinx.serialization.json.JsonElement?,
 
     @Contextual @SerialName(value = "manifestFetchErrorCode")
-    val manifestFetchErrorCode: TONCONNECTEVENTERRORCODES? = null,
+    val manifestFetchErrorCode: TONConnectEventErrorCodes? = null,
 
 ) {
 

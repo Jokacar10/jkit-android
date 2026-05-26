@@ -39,8 +39,8 @@ import kotlinx.serialization.encoding.Encoder
  *
  * Values: unknownError,badRequestError,manifestNotFoundError,manifestContentError,unknownAppError,userRejectsError,methodNotSupported
  */
-@Serializable(with = TONCONNECTEVENTERRORCODESSerializer::class)
-enum class TONCONNECTEVENTERRORCODES(val value: kotlin.Double) {
+@Serializable(with = TONConnectEventErrorCodesSerializer::class)
+enum class TONConnectEventErrorCodes(val value: kotlin.Double) {
 
     unknownError(0.0),
 
@@ -70,12 +70,12 @@ enum class TONCONNECTEVENTERRORCODES(val value: kotlin.Double) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: kotlin.Any?): kotlin.String? = if (data is TONCONNECTEVENTERRORCODES) "$data" else null
+        fun encode(data: kotlin.Any?): kotlin.String? = if (data is TONConnectEventErrorCodes) "$data" else null
 
         /**
-         * Returns a valid [TONCONNECTEVENTERRORCODES] for [data], null otherwise.
+         * Returns a valid [TONConnectEventErrorCodes] for [data], null otherwise.
          */
-        fun decode(data: kotlin.Any?): TONCONNECTEVENTERRORCODES? = data?.let {
+        fun decode(data: kotlin.Any?): TONConnectEventErrorCodes? = data?.let {
             val normalizedData = "$it".lowercase()
             values().firstOrNull { value ->
                 it == value || normalizedData == "$value".lowercase()
@@ -84,16 +84,16 @@ enum class TONCONNECTEVENTERRORCODES(val value: kotlin.Double) {
     }
 }
 
-internal object TONCONNECTEVENTERRORCODESSerializer : KSerializer<TONCONNECTEVENTERRORCODES> {
+internal object TONConnectEventErrorCodesSerializer : KSerializer<TONConnectEventErrorCodes> {
     override val descriptor = kotlin.Double.serializer().descriptor
 
-    override fun deserialize(decoder: Decoder): TONCONNECTEVENTERRORCODES {
+    override fun deserialize(decoder: Decoder): TONConnectEventErrorCodes {
         val value = decoder.decodeSerializableValue(kotlin.Double.serializer())
-        return TONCONNECTEVENTERRORCODES.values().firstOrNull { it.value == value }
+        return TONConnectEventErrorCodes.values().firstOrNull { it.value == value }
             ?: throw IllegalArgumentException("Unknown enum value: $value")
     }
 
-    override fun serialize(encoder: Encoder, value: TONCONNECTEVENTERRORCODES) {
+    override fun serialize(encoder: Encoder, value: TONConnectEventErrorCodes) {
         encoder.encodeSerializableValue(kotlin.Double.serializer(), value.value)
     }
 }

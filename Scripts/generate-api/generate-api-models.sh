@@ -176,6 +176,50 @@ def add_inheritance(child_name, parent_name):
 for child_name, parent_name in INHERITANCE_PAIRS:
     add_inheritance(child_name, parent_name)
 
+# Normalize SCREAMING_SNAKE_CASE schema names (e.g. CONNECT_EVENT_ERROR_CODES, enums
+# mirrored from external SCREAMING_SNAKE sources) to PascalCase. Otherwise openapi-generator
+# strips the underscores but keeps the casing, producing TONCONNECTEVENTERRORCODES instead of
+# the idiomatic TONConnectEventErrorCodes. Mutates the rewritten `data` (see add_inheritance).
+def normalize_screaming_snake_type_names():
+    import re
+    out_schemas = data.get("components", {}).get("schemas", {}) or {}
+
+    def to_pascal(name):
+        return "".join(part[:1].upper() + part[1:].lower() for part in name.split("_") if part)
+
+    renames = {}
+    for name in list(out_schemas.keys()):
+        if re.fullmatch(r"[A-Z0-9]+(_[A-Z0-9]+)+", name):
+            pascal = to_pascal(name)
+            if pascal != name and pascal not in out_schemas:
+                renames[name] = pascal
+
+    if not renames:
+        return
+
+    for old_name, new_name in renames.items():
+        out_schemas[new_name] = out_schemas.pop(old_name)
+
+    ref_map = {}
+    for old_name, new_name in renames.items():
+        ref_map["#/definitions/%s" % old_name] = "#/definitions/%s" % new_name
+        ref_map["#/components/schemas/%s" % old_name] = "#/components/schemas/%s" % new_name
+
+    def update_refs(node):
+        if isinstance(node, dict):
+            ref = node.get("$ref")
+            if isinstance(ref, str) and ref in ref_map:
+                node["$ref"] = ref_map[ref]
+            for value in node.values():
+                update_refs(value)
+        elif isinstance(node, list):
+            for item in node:
+                update_refs(item)
+
+    update_refs(data)
+
+normalize_screaming_snake_type_names()
+
 with open(target, "w", encoding="utf-8") as f:
     json.dump(data, f, indent=2)
 PY
