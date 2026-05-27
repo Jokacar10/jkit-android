@@ -25,7 +25,6 @@ import android.content.Context
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.MAINNET
 import io.ton.walletkit.api.TESTNET
-import io.ton.walletkit.api.generated.TONManifestFetchResult
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.bridge.dispatch.WrappedFunctionRegistry
 import io.ton.walletkit.config.SignDataType
@@ -64,18 +63,14 @@ internal class InitializationManager(
     context: Context,
     private val rpcClient: BridgeRpcClient,
     private val wrappedFunctions: WrappedFunctionRegistry,
-    private val fetchManifest: (suspend (String) -> TONManifestFetchResult)?,
     private val json: Json,
 ) {
     private val appContext = context.applicationContext
     private val walletKitInitMutex = Mutex()
-    private val fetchManifestRef: String? by lazy {
-        fetchManifest?.let { fetch ->
-            wrappedFunctions.register { args ->
-                json.encodeToString(fetch(args[0].jsonPrimitive.content))
-            }
-        }
-    }
+
+    // Reference to the host's fetchManifest callback (read from the init config), registered once
+    // and reused across re-inits. null when the host configured no custom fetcher.
+    @Volatile private var fetchManifestRef: String? = null
 
     @Volatile private var isWalletKitInitialized: Boolean = false
 
@@ -263,7 +258,7 @@ internal class InitializationManager(
                 put("disableTransactionEmulation", eventsConfig.disableTransactionEmulation)
             }
 
-            fetchManifestRef?.let { ref ->
+            registerFetchManifest(configuration)?.let { ref ->
                 putJsonObject("fetchManifest") { put("__wrappedFn", ref) }
             }
         }
@@ -285,6 +280,18 @@ internal class InitializationManager(
         currentConfig = configuration
 
         Logger.d(TAG, "WalletKit initialized. Event listeners will be set up on-demand.")
+    }
+
+    /**
+     * Registers the host's [TONWalletKitConfiguration.fetchManifest] callback (if any) as a wrapped
+     * function and returns its reference, registering once and reusing it across re-inits.
+     */
+    private fun registerFetchManifest(configuration: TONWalletKitConfiguration): String? {
+        fetchManifestRef?.let { return it }
+        val fetch = configuration.fetchManifest ?: return null
+        return wrappedFunctions
+            .register { args -> json.encodeToString(fetch(args[0].jsonPrimitive.content)) }
+            .also { fetchManifestRef = it }
     }
 
     private fun resolveNetworkName(configuration: TONWalletKitConfiguration): String =
