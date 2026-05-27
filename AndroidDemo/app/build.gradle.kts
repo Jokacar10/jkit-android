@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hiltAndroid)
-    alias(libs.plugins.firebaseAppdistribution)
 }
 
 // Force OkHttp version to avoid conflicts between app dependencies and test dependencies
@@ -120,11 +119,6 @@ android {
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("debug")
-            firebaseAppDistribution {
-                appId = System.getenv("FIREBASE_APP_ID") ?: ""
-                releaseNotes = System.getenv("FIREBASE_RELEASE_NOTES") ?: "Build from CI"
-                groups = "testers"
-            }
         }
     }
 
