@@ -43,8 +43,12 @@ internal class WrappedFunctionRegistry {
      * an already-JSON-encoded result.
      */
     fun register(fn: suspend (JsonArray) -> String): String {
-        val id = UUID.randomUUID().toString()
-        functions[id] = fn
+        var id = UUID.randomUUID().toString()
+        // Guard against an id collision: putIfAbsent is atomic and returns non-null only if the
+        // key was already taken, so regenerate until we claim a free reference.
+        while (functions.putIfAbsent(id, fn) != null) {
+            id = UUID.randomUUID().toString()
+        }
         return id
     }
 
