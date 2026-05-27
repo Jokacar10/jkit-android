@@ -39,8 +39,10 @@ import androidx.webkit.WebViewAssetLoader
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.generated.TONDAppInfo
 import io.ton.walletkit.api.generated.TONManifestFetchResult
+import io.ton.walletkit.api.generated.TONNFTsRequest
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONRawStackItem
+import io.ton.walletkit.api.generated.TONUserNFTsRequest
 import io.ton.walletkit.api.isTestnet
 import io.ton.walletkit.bridge.BuildConfig
 import io.ton.walletkit.bridge.optString
@@ -341,6 +343,44 @@ internal class WebViewManager(
                     json.encodeToString(client.runGetMethod(address, methodName, stack, seqno))
                 }
                 "api.getMasterchainInfo" -> json.encodeToString(client.getMasterchainInfo())
+                "api.getBalance" -> {
+                    val address = TONUserFriendlyAddress.parse(params.optString("address"))
+                    val seqno = (params["seqno"] as? JsonPrimitive)?.content?.toUIntOrNull()
+                    client.getBalance(address, seqno).value
+                }
+                "api.fetchEmulation" -> {
+                    val messageBoc = TONBase64.parse(params.optString("messageBoc"))
+                    val ignoreSignature = (params["ignoreSignature"] as? JsonPrimitive)?.content?.toBooleanStrictOrNull() ?: false
+                    json.encodeToString(client.fetchEmulation(messageBoc, ignoreSignature))
+                }
+                "api.getAccountState" -> {
+                    val address = TONUserFriendlyAddress.parse(params.optString("address"))
+                    val seqno = (params["seqno"] as? JsonPrimitive)?.content?.toUIntOrNull()
+                    json.encodeToString(client.accountState(address, seqno))
+                }
+                "api.getAccountStates" -> {
+                    val addresses = json.decodeFromJsonElement<List<String>>(
+                        params["addresses"] ?: throw IllegalArgumentException("api.getAccountStates: missing addresses"),
+                    ).map { TONUserFriendlyAddress.parse(it) }
+                    // Mirror iOS: serialize as a JSON object keyed by the user-friendly address string.
+                    json.encodeToString(client.accountStates(addresses).mapKeys { it.key.value })
+                }
+                "api.nftItemsByAddress" -> {
+                    val request = json.decodeFromJsonElement<TONNFTsRequest>(
+                        params["request"] ?: throw IllegalArgumentException("api.nftItemsByAddress: missing request"),
+                    )
+                    json.encodeToString(client.nftItemsByAddress(request))
+                }
+                "api.nftItemsByOwner" -> {
+                    val request = json.decodeFromJsonElement<TONUserNFTsRequest>(
+                        params["request"] ?: throw IllegalArgumentException("api.nftItemsByOwner: missing request"),
+                    )
+                    json.encodeToString(client.nftItemsByOwner(request))
+                }
+                // DNS resolution returns null when unresolved; JS treats "" as undefined (`raw || undefined`).
+                "api.resolveDnsWallet" -> client.resolveDnsWallet(params.optString("domain")) ?: ""
+                "api.backResolveDnsWallet" ->
+                    client.backResolveDnsWallet(TONUserFriendlyAddress.parse(params.optString("address"))) ?: ""
                 else -> throw IllegalArgumentException("api method not implemented on host: $method")
             }
         }
