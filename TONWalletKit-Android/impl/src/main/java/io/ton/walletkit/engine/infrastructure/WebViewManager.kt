@@ -291,11 +291,8 @@ internal class WebViewManager(
         @JavascriptInterface
         fun adapterCallSync(method: String, paramsJson: String): String = runBlocking {
             try {
-                val params = json.parseToJsonElement(paramsJson).jsonObject
-                if (method.startsWith("api.")) {
-                    dispatchApi(method, params)
-                } else {
-                    withTimeout(1000) { dispatchAdapter(method, params) }
+                withTimeout(CALL_TIMEOUT_MS) {
+                    dispatch(method, json.parseToJsonElement(paramsJson).jsonObject)
                 }
             } catch (e: Exception) {
                 Logger.e(TAG, "adapterCallSync($method) failed", e)
@@ -303,33 +300,24 @@ internal class WebViewManager(
             }
         }
 
-        private fun dispatchAdapter(method: String, params: JsonObject): String {
-            val adapterId = params.optString("adapterId")
-            val adapter = adapterManager.getAdapter(adapterId)
-                ?: throw IllegalArgumentException("Adapter not found: $adapterId")
-            return when (method) {
-                "getPublicKey" -> adapter.publicKey().value
-                "getNetwork" -> buildJsonObject { put("chainId", adapter.network().chainId) }.toString()
-                "getAddress" -> adapter.address(adapter.network().isTestnet).value
-                "getWalletId" -> adapter.identifier()
-                "getSupportedFeatures" -> {
-                    val features = adapter.supportedFeatures() ?: return "null"
-                    featuresToJson(features).toString()
-                }
-                else -> throw IllegalArgumentException("Unknown sync adapter method: $method")
-            }
-        }
+        private fun requireAdapter(params: JsonObject) =
+            adapterManager.getAdapter(params.optString("adapterId"))
+                ?: throw IllegalArgumentException("Adapter not found: ${params.optString("adapterId")}")
 
-        /**
-         * Wire seam for the `api.*` namespace. Every param that maps to a typed value
-         * class is validated here ([TONBase64.parse], [TONUserFriendlyAddress.parse]) so
-         * bad input from JS surfaces as a structured BridgeError at the boundary instead
-         * of leaking through to the http layer with no context.
-         */
-        private suspend fun dispatchApi(method: String, params: JsonObject): String {
-            if (method == "api.getNetworks") return json.encodeToString(apiClients.keys.toList())
-            val client = clientForParams(params)
+        private suspend fun dispatch(method: String, params: JsonObject): String {
+            // Lazy so adapter-only calls (which carry no chainId) never trigger client resolution.
+            val client by lazy { clientForParams(params) }
             return when (method) {
+                // ---- Wallet adapter (resolved per-wallet by adapterId) ----
+                "getPublicKey" -> requireAdapter(params).publicKey().value
+                "getNetwork" -> buildJsonObject { put("chainId", requireAdapter(params).network().chainId) }.toString()
+                "getAddress" -> requireAdapter(params).let { it.address(it.network().isTestnet).value }
+                "getWalletId" -> requireAdapter(params).identifier()
+                "getSupportedFeatures" ->
+                    requireAdapter(params).supportedFeatures()?.let { featuresToJson(it).toString() } ?: "null"
+
+                // ---- Network API client (resolved per-network by chainId) ----
+                "api.getNetworks" -> json.encodeToString(apiClients.keys.toList())
                 "api.sendBoc" -> client.sendBoc(TONBase64.parse(params.optString("boc")))
                 "api.runGetMethod" -> {
                     val address = TONUserFriendlyAddress.parse(params.optString("address"))
@@ -360,7 +348,6 @@ internal class WebViewManager(
                     val addresses = json.decodeFromJsonElement<List<String>>(
                         params["addresses"] ?: throw IllegalArgumentException("api.getAccountStates: missing addresses"),
                     ).map { TONUserFriendlyAddress.parse(it) }
-                    // Mirror iOS: serialize as a JSON object keyed by the user-friendly address string.
                     json.encodeToString(client.accountStates(addresses).mapKeys { it.key.value })
                 }
                 "api.nftItemsByAddress" -> {
@@ -379,7 +366,7 @@ internal class WebViewManager(
                 "api.resolveDnsWallet" -> client.resolveDnsWallet(params.optString("domain")) ?: ""
                 "api.backResolveDnsWallet" ->
                     client.backResolveDnsWallet(TONUserFriendlyAddress.parse(params.optString("address"))) ?: ""
-                else -> throw IllegalArgumentException("api method not implemented on host: $method")
+                else -> throw IllegalArgumentException("Unknown bridge method: $method")
             }
         }
 
@@ -574,6 +561,8 @@ internal class WebViewManager(
 
     private companion object {
         private const val TAG = LogConstants.TAG_WEBVIEW_ENGINE
+
+        private const val CALL_TIMEOUT_MS = 1000L
         private const val MSG_FAILED_INITIALIZE_WEBVIEW = "Failed to initialize WebView"
         private const val MSG_FAILED_EVALUATE_JS_BRIDGE = "Failed to evaluate JS bridge readiness"
         private const val MSG_URL_SEPARATOR = " url="
