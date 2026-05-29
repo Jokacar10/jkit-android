@@ -39167,23 +39167,6 @@ function bridgeRequest(method, params) {
 		});
 	});
 }
-/**
-* Reconstructs a native callback that crossed the bridge as a WrappedFunctionRef into a callable.
-* The function itself can't be serialized, so the returned wrapper forwards its arguments through
-* the async `callByReference` reverse-RPC method. Returns undefined when there's no reference.
-* Wrappers are memoized under window.wrapped_funcs (keyed by reference id), not on global scope.
-*/
-function unwrapRef(ref) {
-	if (!ref?.__wrappedFn) return;
-	const refId = ref.__wrappedFn;
-	const registry = window;
-	registry.wrapped_funcs ??= {};
-	registry.wrapped_funcs[refId] ??= (...args) => bridgeRequest("callByReference", {
-		refId,
-		args
-	});
-	return registry.wrapped_funcs[refId];
-}
 function handleNativeResponse(id, resultJson, errorJson) {
 	const entry = pendingRequests.get(id);
 	if (!entry) {
@@ -39250,7 +39233,17 @@ async function initTonWalletKit(config, deps) {
 		for (const nativeNetwork of availableNetworks) networksConfig[nativeNetwork.chainId] = { apiClient: new AndroidAPIClientAdapter(nativeNetwork) };
 	}
 	const kitOptions = { networks: networksConfig };
-	kitOptions.fetchManifest = unwrapRef(config?.fetchManifest);
+	const fetchManifestRef = config?.fetchManifest;
+	if (fetchManifestRef?.__wrappedFn) {
+		const refId = fetchManifestRef.__wrappedFn;
+		const wrappedFns = window;
+		wrappedFns.wrapped_funcs ??= {};
+		wrappedFns.wrapped_funcs[refId] ??= (url) => bridgeRequest("callByReference", {
+			refId,
+			args: [url]
+		});
+		kitOptions.fetchManifest = wrappedFns.wrapped_funcs[refId];
+	}
 	const devOptions = {};
 	if (config?.disableNetworkSend) devOptions.disableNetworkSend = true;
 	if (Object.keys(devOptions).length > 0) kitOptions.dev = devOptions;

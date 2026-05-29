@@ -284,8 +284,8 @@ internal class WebViewWalletKitEngine private constructor(
         return rpcClient.call(method, params)
     }
 
-    override suspend fun init(configuration: TONWalletKitConfiguration, kitInstanceId: String?) {
-        initManager.initialize(configuration, kitInstanceId)
+    override suspend fun init(configuration: TONWalletKitConfiguration) {
+        initManager.initialize(configuration)
         refreshDerivedState()
     }
 
