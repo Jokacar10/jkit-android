@@ -38,7 +38,6 @@ import android.webkit.WebViewClient
 import androidx.webkit.WebViewAssetLoader
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.generated.TONDAppInfo
-import io.ton.walletkit.api.generated.TONManifestFetchResult
 import io.ton.walletkit.api.generated.TONNFTsRequest
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONRawStackItem
@@ -90,7 +89,6 @@ internal class WebViewManager(
     private val storageManager: StorageManager,
     private val sessionManager: TONConnectSessionManager?,
     private val apiClients: Map<TONNetwork, TONAPIClient>,
-    private val fetchManifest: (suspend (String) -> TONManifestFetchResult)?,
     private val adapterManager: AdapterManager,
     private val json: Json,
     private val onMessage: (JsonObject) -> Unit,
@@ -511,22 +509,6 @@ internal class WebViewManager(
                     manager.clearSessions()
                 } catch (e: Exception) {
                     Logger.e(TAG, "Failed to clear sessions", e)
-                }
-            }
-        }
-
-        @JavascriptInterface
-        fun hasCustomFetchManifest(): Boolean = fetchManifest != null
-
-        @JavascriptInterface
-        fun apiFetchManifest(url: String): String? {
-            val fetch = fetchManifest ?: return null
-            return runBlocking {
-                try {
-                    json.encodeToString(fetch(url))
-                } catch (e: Exception) {
-                    Logger.e(TAG, "Failed to fetch manifest: $url", e)
-                    throw e
                 }
             }
         }

@@ -27,11 +27,11 @@ import io.ton.walletkit.api.generated.TONAccountState
 import io.ton.walletkit.api.generated.TONConnectionApprovalResponse
 import io.ton.walletkit.api.generated.TONConnectionRequestEvent
 import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
+import io.ton.walletkit.api.generated.TONEmbeddedRequestEvent
 import io.ton.walletkit.api.generated.TONEmulationResult
 import io.ton.walletkit.api.generated.TONGetMethodResult
 import io.ton.walletkit.api.generated.TONJettonsResponse
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
-import io.ton.walletkit.api.generated.TONManifestFetchResult
 import io.ton.walletkit.api.generated.TONMasterchainInfo
 import io.ton.walletkit.api.generated.TONNFT
 import io.ton.walletkit.api.generated.TONNFTRawTransferRequest
@@ -46,6 +46,8 @@ import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
 import io.ton.walletkit.api.generated.TONSendTransactionResponse
 import io.ton.walletkit.api.generated.TONSignDataApprovalResponse
 import io.ton.walletkit.api.generated.TONSignDataRequestEvent
+import io.ton.walletkit.api.generated.TONSignMessageApprovalResponse
+import io.ton.walletkit.api.generated.TONSignMessageRequestEvent
 import io.ton.walletkit.api.generated.TONSignatureDomain
 import io.ton.walletkit.api.generated.TONStakeParams
 import io.ton.walletkit.api.generated.TONStakingBalance
@@ -75,6 +77,7 @@ import io.ton.walletkit.engine.model.WalletAccount
 import io.ton.walletkit.engine.operations.addWallet
 import io.ton.walletkit.engine.operations.approveConnect
 import io.ton.walletkit.engine.operations.approveSignData
+import io.ton.walletkit.engine.operations.approveSignMessage
 import io.ton.walletkit.engine.operations.approveTransaction
 import io.ton.walletkit.engine.operations.buildStakeTransaction
 import io.ton.walletkit.engine.operations.buildSwapTransaction
@@ -125,6 +128,7 @@ import io.ton.walletkit.engine.operations.registerStakingProvider
 import io.ton.walletkit.engine.operations.registerSwapProvider
 import io.ton.walletkit.engine.operations.rejectConnect
 import io.ton.walletkit.engine.operations.rejectSignData
+import io.ton.walletkit.engine.operations.rejectSignMessage
 import io.ton.walletkit.engine.operations.rejectTransaction
 import io.ton.walletkit.engine.operations.removeStakingProvider
 import io.ton.walletkit.engine.operations.removeSwapProvider
@@ -196,7 +200,6 @@ internal class WebViewWalletKitEngine private constructor(
     private val storageAdapter: BridgeStorageAdapter,
     private val sessionManager: TONConnectSessionManager?,
     private val apiClients: Map<TONNetwork, TONAPIClient>,
-    private val fetchManifest: (suspend (String) -> TONManifestFetchResult)?,
     private val assetPath: String = WebViewConstants.DEFAULT_ASSET_PATH,
 ) : WalletKitEngine {
     override val streamingEvents get() = messageDispatcher.streamingEvents
@@ -234,7 +237,6 @@ internal class WebViewWalletKitEngine private constructor(
                 storageManager = storageManager,
                 sessionManager = sessionManager,
                 apiClients = apiClients,
-                fetchManifest = fetchManifest,
                 adapterManager = adapterManager,
                 json = json,
                 onMessage = ::handleBridgeMessage,
@@ -412,7 +414,7 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun approveConnect(
         event: TONConnectionRequestEvent,
         response: TONConnectionApprovalResponse?,
-    ) = rpcClient.approveConnect(event, response)
+    ): TONEmbeddedRequestEvent? = rpcClient.approveConnect(event, response)
 
     override suspend fun rejectConnect(
         event: TONConnectionRequestEvent,
@@ -441,6 +443,17 @@ internal class WebViewWalletKitEngine private constructor(
         reason: String?,
         errorCode: Int?,
     ) = rpcClient.rejectSignData(event, reason, errorCode)
+
+    override suspend fun approveSignMessage(
+        event: TONSignMessageRequestEvent,
+        response: TONSignMessageApprovalResponse?,
+    ) = rpcClient.approveSignMessage(event, response)
+
+    override suspend fun rejectSignMessage(
+        event: TONSignMessageRequestEvent,
+        reason: String?,
+        errorCode: Int?,
+    ) = rpcClient.rejectSignMessage(event, reason, errorCode)
 
     override suspend fun listSessions(): List<TONConnectSession> = rpcClient.listSessions()
 
@@ -784,7 +797,6 @@ internal class WebViewWalletKitEngine private constructor(
                         storageAdapter,
                         configuration.sessionManager,
                         configuration.apiClients,
-                        configuration.fetchManifest,
                         assetPath,
                     ).also {
                         instances[network] = it
