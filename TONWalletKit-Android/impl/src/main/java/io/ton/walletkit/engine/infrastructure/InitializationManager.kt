@@ -247,6 +247,13 @@ internal class InitializationManager(
             configuration.eventsConfiguration?.let { eventsConfig ->
                 put("disableTransactionEmulation", eventsConfig.disableTransactionEmulation)
             }
+
+            // Register the host's fetchManifest callback fresh on each init. The registry has no
+            // eviction, so a failed-then-retried init leaks the prior registration — acceptable
+            // since init normally succeeds first try and the host callback is tiny.
+            configuration.fetchManifest?.let { fetch ->
+                putJsonObject("fetchManifest") { put("__wrappedFn", rpcClient.wrappedFunctions.registerTyped(fetch)) }
+            }
         }
 
         Logger.d(

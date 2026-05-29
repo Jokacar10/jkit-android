@@ -30,7 +30,6 @@ import io.ton.walletkit.api.generated.TONEmbeddedRequestEvent
 import io.ton.walletkit.api.generated.TONGetMethodResult
 import io.ton.walletkit.api.generated.TONJettonsResponse
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
-import io.ton.walletkit.api.generated.TONManifestFetchResult
 import io.ton.walletkit.api.generated.TONMasterchainInfo
 import io.ton.walletkit.api.generated.TONNFT
 import io.ton.walletkit.api.generated.TONNFTRawTransferRequest
@@ -188,7 +187,6 @@ internal class WebViewWalletKitEngine private constructor(
     private val storageAdapter: BridgeStorageAdapter,
     private val sessionManager: TONConnectSessionManager?,
     private val apiClients: List<Pair<TONNetwork, TONAPIClient>>,
-    private val fetchManifest: (suspend (String) -> TONManifestFetchResult)?,
     private val assetPath: String = WebViewConstants.DEFAULT_ASSET_PATH,
 ) : WalletKitEngine {
     override val streamingEvents get() = messageDispatcher.streamingEvents
@@ -226,7 +224,6 @@ internal class WebViewWalletKitEngine private constructor(
                 storageManager = storageManager,
                 sessionManager = sessionManager,
                 apiClients = apiClients,
-                fetchManifest = fetchManifest,
                 adapterManager = adapterManager,
                 json = json,
                 onMessage = ::handleBridgeMessage,
@@ -748,7 +745,6 @@ internal class WebViewWalletKitEngine private constructor(
                         storageAdapter,
                         configuration.sessionManager,
                         configuration.apiClients,
-                        configuration.fetchManifest,
                         assetPath,
                     ).also {
                         instances[network] = it

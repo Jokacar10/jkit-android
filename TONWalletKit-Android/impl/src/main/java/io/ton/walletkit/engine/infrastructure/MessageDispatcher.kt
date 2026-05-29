@@ -36,6 +36,7 @@ import io.ton.walletkit.bridge.dispatch.AdapterSignDataRequest
 import io.ton.walletkit.bridge.dispatch.AdapterSignTonProofRequest
 import io.ton.walletkit.bridge.dispatch.AdapterSignTransactionRequest
 import io.ton.walletkit.bridge.dispatch.BridgeRequestRegistry
+import io.ton.walletkit.bridge.dispatch.CallByReferenceRequest
 import io.ton.walletkit.bridge.dispatch.KotlinProviderBuildRequest
 import io.ton.walletkit.bridge.dispatch.KotlinProviderIdRequest
 import io.ton.walletkit.bridge.dispatch.KotlinProviderQuoteRequest
@@ -199,6 +200,10 @@ internal class MessageDispatcher(
         registerTyped<KotlinProviderIdRequest>(REQUEST_METHOD_KOTLIN_PROVIDER_RELEASE) { req ->
             kotlinStreamingProviderManager.unregister(req.providerId)
             EMPTY_JSON_OBJECT
+        }
+
+        registerTyped<CallByReferenceRequest>(REQUEST_METHOD_CALL_BY_REFERENCE) { req ->
+            rpcClient.wrappedFunctions.invoke(req.refId, req.args)
         }
     }
 
@@ -485,6 +490,7 @@ internal class MessageDispatcher(
         private const val REQUEST_METHOD_KOTLIN_PROVIDER_CONNECT = "kotlinProviderConnect"
         private const val REQUEST_METHOD_KOTLIN_PROVIDER_DISCONNECT = "kotlinProviderDisconnect"
         private const val REQUEST_METHOD_KOTLIN_PROVIDER_RELEASE = "kotlinProviderRelease"
+        private const val REQUEST_METHOD_CALL_BY_REFERENCE = "callByReference"
     }
 }
 
