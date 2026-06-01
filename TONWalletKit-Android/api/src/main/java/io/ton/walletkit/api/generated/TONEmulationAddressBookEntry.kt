@@ -29,7 +29,6 @@
 package io.ton.walletkit.api.generated
 
 import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -43,7 +42,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TONEmulationAddressBookEntry(
 
-    @Contextual @SerialName(value = "userFriendly")
+    @SerialName(value = "userFriendly")
     val userFriendly: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     /* List of known interfaces implemented by the contract */

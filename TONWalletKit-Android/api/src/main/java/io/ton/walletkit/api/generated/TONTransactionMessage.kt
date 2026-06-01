@@ -62,10 +62,10 @@ data class TONTransactionMessage(
     @Contextual @SerialName(value = "normalizedHash")
     val normalizedHash: io.ton.walletkit.model.TONHex? = null,
 
-    @Contextual @SerialName(value = "source")
+    @SerialName(value = "source")
     val source: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
-    @Contextual @SerialName(value = "destination")
+    @SerialName(value = "destination")
     val destination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "value")

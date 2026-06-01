@@ -60,7 +60,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TONTransaction(
 
-    @Contextual @SerialName(value = "account")
+    @SerialName(value = "account")
     val account: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @Contextual @SerialName(value = "hash")

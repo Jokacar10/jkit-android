@@ -60,7 +60,7 @@ data class TONEmulationMessage(
     @Contextual @SerialName(value = "hash")
     val hash: io.ton.walletkit.model.TONHex,
 
-    @Contextual @SerialName(value = "destination")
+    @SerialName(value = "destination")
     val destination: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
@@ -73,7 +73,7 @@ data class TONEmulationMessage(
     @Contextual @SerialName(value = "normalizedHash")
     val normalizedHash: io.ton.walletkit.model.TONHex? = null,
 
-    @Contextual @SerialName(value = "source")
+    @SerialName(value = "source")
     val source: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "value")
