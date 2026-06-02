@@ -74,7 +74,7 @@ jobs:
       - name: Checkout kit monorepo
         uses: actions/checkout@v4
         with:
-          repository: ton-connect/kit
+          repository: ton-org/kit
           # TODO: bump to `main` once the kit-side TON-850 fixture lands.
           ref: feature/ton-850-schema-generator-tests
           path: kit

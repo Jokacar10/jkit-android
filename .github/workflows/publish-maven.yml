@@ -17,19 +17,43 @@ jobs:
 
       - name: Get latest kit release info
         id: kit-release
+        env:
+          # Draft releases are only visible to a token with push access to ton-org/kit,
+          # so this must be a PAT / app token with that access — the default GITHUB_TOKEN
+          # (scoped to this repo) cannot see drafts in another repo.
+          KIT_TOKEN: ${{ secrets.KIT_RELEASE_TOKEN }}
         run: |
-          RELEASE_INFO=$(curl -s https://api.github.com/repos/ton-connect/kit/releases/latest)
+          # The /releases list endpoint includes drafts (sorted by created_at, newest first),
+          # whereas /releases/latest skips drafts and prereleases. .[0] is the newest release
+          # of any kind — stable, prerelease, or draft.
+          RELEASES=$(curl -s \
+            -H "Authorization: Bearer $KIT_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/ton-org/kit/releases?per_page=100")
+          RELEASE_INFO=$(echo "$RELEASES" | jq '.[0]')
+          if [ "$RELEASE_INFO" = "null" ] || [ -z "$RELEASE_INFO" ]; then
+            echo "::error::No release found in ton-org/kit (check KIT_RELEASE_TOKEN has access)."
+            exit 1
+          fi
           TAG=$(echo "$RELEASE_INFO" | jq -r '.tag_name')
-          ANDROID_BRIDGE_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name | contains("walletkit-android-bridge")) | select(.name | endswith(".tgz")) | .browser_download_url')
+          IS_DRAFT=$(echo "$RELEASE_INFO" | jq -r '.draft')
+          # Draft asset browser_download_url is not directly downloadable; use the asset API
+          # URL (.url) with an octet-stream Accept header + auth instead.
+          ANDROID_BRIDGE_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name | contains("walletkit-android-bridge")) | select(.name | endswith(".tgz")) | .url')
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "android_bridge_url=$ANDROID_BRIDGE_URL" >> $GITHUB_OUTPUT
-          echo "📦 Using kit release: $TAG"
-          echo "📦 Android bridge URL: $ANDROID_BRIDGE_URL"
+          echo "📦 Using kit release: $TAG (draft=$IS_DRAFT)"
+          echo "📦 Android bridge asset URL: $ANDROID_BRIDGE_URL"
 
       - name: Download and extract Android bridge bundle
+        env:
+          KIT_TOKEN: ${{ secrets.KIT_RELEASE_TOKEN }}
         run: |
           mkdir -p dist-android
-          curl -sL "${{ steps.kit-release.outputs.android_bridge_url }}" -o android-bridge.tgz
+          curl -sL \
+            -H "Authorization: Bearer $KIT_TOKEN" \
+            -H "Accept: application/octet-stream" \
+            "${{ steps.kit-release.outputs.android_bridge_url }}" -o android-bridge.tgz
           tar -xzf android-bridge.tgz
           cp package/dist/* dist-android/
           rm -rf package android-bridge.tgz
