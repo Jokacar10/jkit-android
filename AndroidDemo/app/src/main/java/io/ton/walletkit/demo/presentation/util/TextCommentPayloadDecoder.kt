@@ -24,10 +24,9 @@ package io.ton.walletkit.demo.presentation.util
 import android.util.Base64
 
 /**
- * Minimal BoC parser that decodes a TonConnect text-comment payload to its string.
- * Mirrors the wallet-kit JS `decodeTextCommentPayload` (and the iOS TextCommentPayloadDecoder):
- * parse the root cell, require a 32-bit op == 0, then read the UTF-8 tail (chained through the
- * first ref for long comments). Returns null when the payload isn't a plain text comment.
+ * Minimal BoC parser that decodes a TonConnect text-comment payload to its string: parse the root
+ * cell, require a 32-bit op == 0, then read the UTF-8 tail (chained through the first ref for long
+ * comments). Returns null when the payload isn't a plain text comment.
  *
  * Only the BoC features a TonConnect text comment uses are supported (standard magic,
  * non-exotic cells, root index 0, optional ref chain carrying the comment tail).

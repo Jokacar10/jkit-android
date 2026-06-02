@@ -47,10 +47,10 @@ import io.ton.walletkit.demo.presentation.ui.sheet.components.shouldShowMoneyFlo
 import io.ton.walletkit.demo.presentation.util.TestTags
 
 /**
- * dApp sign-message (sign-only) approval sheet. Mirrors the iOS WalletSignMessageRequestView:
- * the wallet signs but does NOT broadcast — the dApp relays the resulting BoC. Same anatomy as
- * the transaction sheet (paired logos header, read-only wallet row, entry cards, optional money
- * flow + preview error, hold-to-sign), under a "The dApp can submit" section and sign-message copy.
+ * dApp sign-message (sign-only) approval sheet: the wallet signs but does NOT broadcast — the dApp
+ * relays the resulting BoC. Same anatomy as the transaction sheet (paired logos header, read-only
+ * wallet row, entry cards, optional money flow + preview error, hold-to-sign), under a "The dApp
+ * can submit" section and sign-message copy.
  */
 @Composable
 fun SignMessageRequestSheet(

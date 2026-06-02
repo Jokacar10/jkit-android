@@ -47,10 +47,10 @@ import io.ton.walletkit.demo.presentation.ui.sheet.components.shouldShowMoneyFlo
 import io.ton.walletkit.demo.presentation.util.TestTags
 
 /**
- * dApp send-transaction approval sheet. Mirrors the iOS WalletTransactionRequestView: paired
- * logos + "Send transaction from [domain]?" header, read-only wallet row, a "You will sign"
- * section listing each structured item (or raw message) as an entry card, an optional money-flow
- * card from the emulation preview, a preview-error card, then hold-to-sign + disclaimer.
+ * dApp send-transaction approval sheet: paired logos + "Send transaction from [domain]?" header,
+ * read-only wallet row, a "You will sign" section listing each structured item (or raw message) as
+ * an entry card, an optional money-flow card from the emulation preview, a preview-error card, then
+ * hold-to-sign + disclaimer.
  */
 @Composable
 fun TransactionRequestSheet(

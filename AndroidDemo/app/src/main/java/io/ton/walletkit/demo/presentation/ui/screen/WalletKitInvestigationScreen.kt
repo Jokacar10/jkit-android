@@ -48,10 +48,9 @@ import io.ton.walletkit.demo.presentation.ui.dialog.UrlPromptDialog
 import io.ton.walletkit.demo.presentation.util.QrScanner
 
 /**
- * Developer "Wallet Kit Investigation" screen, mirroring the iOS WalletKitInvestigationView:
- * a list of debug tools reached from the wallet-home gear icon. Currently one entry — Tonconnect,
- * which pushes a page with a "Connect to dApp" action that pastes a TonConnect link to connect
- * the active wallet. Navigation is in-place (internal state) to match the demo's HomeSubScreen model.
+ * Developer "Wallet Kit Investigation" screen: a list of debug tools reached from the wallet-home
+ * gear icon. Currently one entry — Tonconnect, which opens a page with "Connect to dApp" (paste a
+ * link) and "Scan QR code" actions to connect the active wallet.
  */
 @Composable
 fun WalletKitInvestigationScreen(

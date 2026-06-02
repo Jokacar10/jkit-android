@@ -305,8 +305,8 @@ internal fun TonConnectSheetDisclaimer(
 }
 
 /**
- * Small inline pill, mirroring iOS `TONBadge(style: .gray, uppercase: false)` — used to tag
- * transaction entries (State init, Extra currencies, Attach/Forward amounts, Response dest, …).
+ * Small inline grey pill used to tag transaction entries (State init, Extra currencies,
+ * Attach/Forward amounts, Response dest, …).
  */
 @Composable
 internal fun TonBadge(
