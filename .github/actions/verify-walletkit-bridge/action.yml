@@ -1,8 +1,8 @@
 name: Verify WalletKit bridge bundle
 description: >
-  Verify that the committed WalletKit JS bridge bundle matches the ton-org/kit release
-  pinned by WALLETKIT_BRIDGE_TAG in gradle.properties, by comparing sha256 of the runtime
-  files against that release's walletkit-android-bridge.checksums.json. Fails on any mismatch.
+  Verify that the committed WalletKit JS bridge bundle matches the ton-org/kit release pinned by
+  WALLETKIT_BRIDGE_TAG in gradle.properties, by comparing sha256 of the runtime files against that
+  release's walletkit-android-bridge.checksums.json. Fails on any mismatch.
 
 inputs:
   repo:
@@ -14,9 +14,6 @@ inputs:
   assets-dir:
     description: Path to the committed WalletKit WebView assets
     default: TONWalletKit-Android/impl/src/main/assets/walletkit
-  token:
-    description: GitHub token used for the API call (raises rate limits; github.token is fine for a public repo)
-    default: ""
 
 runs:
   using: composite
@@ -33,29 +30,18 @@ runs:
         fi
         echo "Pinned bridge tag: $TAG"
 
-        AUTH=()
-        if [ -n "${{ inputs.token }}" ]; then AUTH=(-H "Authorization: Bearer ${{ inputs.token }}"); fi
-
-        # Pinned tags must point at a *published* release (drafts are not reachable by tag).
-        REL=$(curl -fsSL "${AUTH[@]}" -H "Accept: application/vnd.github+json" \
-          "https://api.github.com/repos/${{ inputs.repo }}/releases/tags/$TAG") || {
-          echo "::error::No published ${{ inputs.repo }} release found for tag $TAG"
-          exit 1
-        }
-
-        CHECKSUMS_URL=$(echo "$REL" | jq -r '.assets[] | select(.name=="walletkit-android-bridge.checksums.json") | .browser_download_url')
-        if [ -z "$CHECKSUMS_URL" ] || [ "$CHECKSUMS_URL" = "null" ]; then
-          echo "::error::Release $TAG has no walletkit-android-bridge.checksums.json asset"
+        # The tag must point at a *published* release (drafts have no public asset URL).
+        URL="https://github.com/${{ inputs.repo }}/releases/download/$TAG/walletkit-android-bridge.checksums.json"
+        if ! curl -fsSL "$URL" -o /tmp/bridge.checksums.json; then
+          echo "::error::Could not download checksums for $TAG from $URL (is it a published release?)"
           exit 1
         fi
-        curl -fsSL "${AUTH[@]}" "$CHECKSUMS_URL" -o /tmp/bridge.checksums.json
         echo "Release $TAG checksums:"
         cat /tmp/bridge.checksums.json
 
         # Runtime files only (sourcemaps are intentionally not verified).
-        FILES="walletkit-android-bridge.mjs inject.mjs index.html"
         FAIL=0
-        for f in $FILES; do
+        for f in walletkit-android-bridge.mjs inject.mjs index.html; do
           want=$(jq -r --arg f "$f" '.[$f] // empty' /tmp/bridge.checksums.json)
           local_path="${{ inputs.assets-dir }}/$f"
           if [ -z "$want" ]; then

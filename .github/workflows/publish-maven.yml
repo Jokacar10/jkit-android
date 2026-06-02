@@ -19,8 +19,6 @@ jobs:
       # pinned kit release so a stale/hand-edited bundle can never reach Maven Central.
       - name: Verify bridge bundle matches WALLETKIT_BRIDGE_TAG
         uses: ./.github/actions/verify-walletkit-bridge
-        with:
-          token: ${{ github.token }}
 
       - name: Populate dist-android from committed assets
         run: |

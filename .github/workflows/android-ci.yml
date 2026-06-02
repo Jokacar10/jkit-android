@@ -530,8 +530,6 @@ jobs:
 
       - name: Verify bridge bundle matches WALLETKIT_BRIDGE_TAG
         uses: ./.github/actions/verify-walletkit-bridge
-        with:
-          token: ${{ github.token }}
 
   # Distribute demo app to Firebase App Distribution on push to main.
   distribute-demo:
