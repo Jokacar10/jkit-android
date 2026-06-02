@@ -34,8 +34,7 @@ import kotlinx.serialization.Transient
 /**
  * Configuration for TONWalletKit initialization.
  *
- * Mirrors the shared TON Wallet Kit configuration contract for cross-platform consistency.
- * Follows iOS SDK's structure with NetworkConfiguration for per-network settings.
+ * Uses NetworkConfiguration for per-network settings.
  *
  * @property networkConfigurations Set of network-specific configurations (each with either apiClientConfiguration OR apiClient)
  * @property deviceInfo Device and app information (optional, auto-detected if not provided)
@@ -81,10 +80,9 @@ data class TONWalletKitConfiguration(
         get() = networkConfigurations.first().network
 
     /**
-     * Custom API clients keyed by the network they serve. Only includes networks that have
-     * a custom [TONAPIClient] (not `apiClientConfiguration`). The network association lives
-     * on the configuration, not on the client — matches iOS, where `TONAPIClient` does not
-     * expose `network`.
+     * Extracts all custom API clients from network configurations, paired with the network
+     * they serve. Only includes networks that have a custom [TONAPIClient] (not
+     * `apiClientConfiguration`). The map is keyed by each configuration's declared network.
      */
     val apiClients: Map<TONNetwork, TONAPIClient>
         get() = networkConfigurations
@@ -284,8 +282,6 @@ data class TONWalletKitConfiguration(
 
 /**
  * Types of data that can be signed.
- *
- * Mirrors the shared TON Wallet Kit specification.
  */
 @Serializable
 enum class SignDataType {

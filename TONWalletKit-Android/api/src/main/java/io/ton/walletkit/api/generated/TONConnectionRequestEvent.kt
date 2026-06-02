@@ -29,7 +29,6 @@
 package io.ton.walletkit.api.generated
 
 import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -68,9 +67,9 @@ data class TONConnectionRequestEvent(
     val preview: TONConnectionRequestEventPreview,
 
     @SerialName(value = "from")
-    val from: kotlin.String? = null,
+    var from: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "walletAddress")
+    @SerialName(value = "walletAddress")
     val walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     /* Wallet identifier associated with the event */

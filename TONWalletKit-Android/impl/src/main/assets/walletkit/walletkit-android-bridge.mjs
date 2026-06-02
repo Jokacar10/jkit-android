@@ -29696,6 +29696,18 @@ var init_Signer = __esmMin((() => {
 		}
 	};
 }));
+//#endregion
+//#region ../walletkit/dist/esm/utils/withTimeout.js
+var withTimeout;
+var init_withTimeout = __esmMin((() => {
+	withTimeout = (promise, timeoutMs) => {
+		let timeoutId;
+		const timeout = new Promise((_, reject) => {
+			timeoutId = setTimeout(() => reject(/* @__PURE__ */ new Error(`Execution timed out - ${timeoutMs}ms`)), timeoutMs);
+		});
+		return Promise.race([Promise.resolve(promise).finally(() => clearTimeout(timeoutId)), timeout]);
+	};
+}));
 var init_cell = __esmMin((() => {
 	require_dist$1();
 }));
@@ -31283,6 +31295,7 @@ var init_utils$2 = __esmMin((() => {
 	init_Signer();
 	init_address$1();
 	init_base64();
+	init_withTimeout();
 	init_cell();
 	init_delay();
 	init_getDefaultWalletConfig();
@@ -33921,10 +33934,11 @@ var init_StakingManager = __esmMin((() => {
 				log$17.debug("Received staking quote", quote);
 				return quote;
 			} catch (error) {
-				throw this.createError("Failed to get staking quote", StakingErrorCode.InvalidParams, {
+				log$17.error("Failed to get staking quote", {
 					error,
 					params
 				});
+				throw error;
 			}
 		}
 		/**
@@ -33937,10 +33951,11 @@ var init_StakingManager = __esmMin((() => {
 			try {
 				return await this.getProvider(providerId).buildStakeTransaction(params);
 			} catch (error) {
-				throw this.createError("Failed to build staking transaction", StakingErrorCode.InvalidParams, {
+				log$17.error("Failed to build staking transaction", {
 					error,
 					params
 				});
+				throw error;
 			}
 		}
 		/**
@@ -33958,11 +33973,12 @@ var init_StakingManager = __esmMin((() => {
 			try {
 				return await this.getProvider(providerId).getStakedBalance(userAddress, network);
 			} catch (error) {
-				throw this.createError("Failed to get staking balance", StakingErrorCode.InvalidParams, {
+				log$17.error("Failed to get staking balance", {
 					error,
 					userAddress,
 					network
 				});
+				throw error;
 			}
 		}
 		/**
@@ -33978,10 +33994,11 @@ var init_StakingManager = __esmMin((() => {
 			try {
 				return await this.getProvider(providerId).getStakingProviderInfo(network);
 			} catch (error) {
-				throw this.createError("Failed to get staking info", StakingErrorCode.InvalidParams, {
+				log$17.error("Failed to get staking info", {
 					error,
 					network
 				});
+				throw error;
 			}
 		}
 		/**
@@ -33997,10 +34014,11 @@ var init_StakingManager = __esmMin((() => {
 			try {
 				return this.getProvider(providerId).getStakingProviderMetadata(network);
 			} catch (error) {
-				throw this.createError("Failed to get staking metadata", StakingErrorCode.InvalidParams, {
+				log$17.error("Failed to get staking metadata", {
 					error,
 					network
 				});
+				throw error;
 			}
 		}
 		createError(message, code, details) {
@@ -39142,6 +39160,7 @@ var esm_exports = /* @__PURE__ */ __exportAll({
 	toAddressBook: () => toAddressBook$1,
 	toEvent: () => toEvent,
 	validateTransactionMessage: () => validateTransactionMessage,
+	withTimeout: () => withTimeout,
 	wrapWalletInterface: () => wrapWalletInterface
 });
 var init_esm = __esmMin((() => {
@@ -39187,6 +39206,7 @@ var init_esm = __esmMin((() => {
 	init_base64();
 	init_mnemonic();
 	init_sign$1();
+	init_withTimeout();
 	init_validation();
 	init_getDefaultWalletConfig();
 	init_Signer();
@@ -39471,6 +39491,23 @@ function bridgeRequest(method, params) {
 		});
 	});
 }
+/**
+* Reconstructs a native callback that crossed the bridge as a WrappedFunctionRef into a callable.
+* The function itself can't be serialized, so the returned wrapper forwards its arguments through
+* the async `callByReference` reverse-RPC method. Returns undefined when there's no reference.
+* Wrappers are memoized under window.wrapped_funcs (keyed by reference id), not on global scope.
+*/
+function unwrapRef(ref) {
+	if (!ref?.__wrappedFn) return;
+	const refId = ref.__wrappedFn;
+	const registry = window;
+	registry.wrapped_funcs ??= {};
+	registry.wrapped_funcs[refId] ??= (...args) => bridgeRequest("callByReference", {
+		refId,
+		args
+	});
+	return registry.wrapped_funcs[refId];
+}
 function handleNativeResponse(id, resultJson, errorJson) {
 	const entry = pendingRequests.get(id);
 	if (!entry) {
@@ -39650,6 +39687,7 @@ async function initTonWalletKit(config, deps) {
 	}
 	if (isBridgeAvailable()) for (const nativeNetwork of bridgeRequestSyncTyped("api.getNetworks", {})) networksConfig[nativeNetwork.chainId] = { apiClient: new AndroidAPIClientAdapter(nativeNetwork) };
 	const kitOptions = { networks: networksConfig };
+	kitOptions.fetchManifest = unwrapRef(config?.fetchManifest);
 	const devOptions = {};
 	if (config?.disableNetworkSend) devOptions.disableNetworkSend = true;
 	if (Object.keys(devOptions).length > 0) kitOptions.dev = devOptions;
@@ -44904,6 +44942,7 @@ var OmnistonSwapProvider = class extends SwapProvider {
 	apiUrl;
 	defaultSlippageBps;
 	quoteTimeoutMs;
+	buildTimeoutMs;
 	referrerAddress;
 	referrerFeeBps;
 	flexibleReferrerFee;
@@ -44919,6 +44958,7 @@ var OmnistonSwapProvider = class extends SwapProvider {
 		this.apiUrl = config?.apiUrl ?? "wss://omni-ws.ston.fi";
 		this.defaultSlippageBps = config?.defaultSlippageBps ?? 100;
 		this.quoteTimeoutMs = config?.quoteTimeoutMs ?? 1e4;
+		this.buildTimeoutMs = config?.buildTimeoutMs ?? 1e4;
 		this.referrerAddress = config?.referrerAddress ? import_dist$1.Address.parse(config?.referrerAddress).toString({ bounceable: true }) : void 0;
 		this.referrerFeeBps = config?.referrerFeeBps;
 		this.flexibleReferrerFee = config?.flexibleReferrerFee ?? false;
@@ -45044,7 +45084,7 @@ var OmnistonSwapProvider = class extends SwapProvider {
 				refundAddress: omnistonUserAddress,
 				useRecommendedSlippage: true
 			};
-			const messages = (await this.omniston.buildTransfer(transactionRequest))?.ton?.messages;
+			const messages = (await withTimeout(this.omniston.buildTransfer(transactionRequest), this.buildTimeoutMs))?.ton?.messages;
 			if (!messages || messages.length === 0) throw new SwapError("Failed to build transaction: no messages returned", SwapErrorCode.BuildTxFailed);
 			const transaction = {
 				fromAddress: params.userAddress,

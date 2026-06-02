@@ -40,6 +40,7 @@ import kotlinx.serialization.Serializable
  * @param apiUrl Optional URL for the Omniston API
  * @param defaultSlippageBps Default slippage tolerance in basis points (1 bp = 0.01%)
  * @param quoteTimeoutMs Timeout for quote requests in milliseconds
+ * @param buildTimeoutMs Timeout for build-transaction requests in milliseconds. Guards against indefinite hangs when network connectivity is lost between getting a quote and signing — `buildTransfer` would otherwise wait without surfacing an error.
  * @param providerId Identifier for the provider
  * @param metadata
  */
@@ -69,6 +70,10 @@ data class TONOmnistonSwapProviderConfig(
     /* Timeout for quote requests in milliseconds */
     @SerialName(value = "quoteTimeoutMs")
     val quoteTimeoutMs: kotlin.Int? = null,
+
+    /* Timeout for build-transaction requests in milliseconds. Guards against indefinite hangs when network connectivity is lost between getting a quote and signing — `buildTransfer` would otherwise wait without surfacing an error. */
+    @SerialName(value = "buildTimeoutMs")
+    val buildTimeoutMs: kotlin.Int? = null,
 
     /* Identifier for the provider */
     @SerialName(value = "providerId")

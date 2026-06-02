@@ -35,7 +35,14 @@ import io.ton.walletkit.model.TONTokenAmount
 import io.ton.walletkit.model.TONUserFriendlyAddress
 
 /**
- * Interface for custom API client implementations. Mirrors iOS `TONAPIClient` protocol.
+ * Interface for custom API client implementations.
+ *
+ * Implement this interface to provide custom TON blockchain API access. Covers the three
+ * responsibilities a wallet kit needs from a user-supplied client: send signed BOCs, run
+ * contract get methods, and read masterchain info. Network identity is established at
+ * registration time via
+ * [io.ton.walletkit.config.TONWalletKitConfiguration.NetworkConfiguration], not on the
+ * client itself.
  */
 interface TONAPIClient {
     fun network(): TONNetwork

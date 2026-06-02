@@ -36,7 +36,12 @@ import io.ton.walletkit.model.TONBase64
 import io.ton.walletkit.model.TONTokenAmount
 import io.ton.walletkit.model.TONUserFriendlyAddress
 
-/** Android counterpart of iOS `JSTONAPIClient` — routes through the WebView bridge. */
+/**
+ * [TONAPIClient] backed by the JS-side `ApiClient` bound to a specific wallet.
+ *
+ * Every method delegates to the engine, which routes through the WebView bridge to
+ * the wallet's underlying JS client (custom or built-in).
+ */
 internal class BridgedJSAPIClient(
     private val walletId: String,
     private val engine: WalletKitEngine,
