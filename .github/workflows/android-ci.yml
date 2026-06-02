@@ -92,9 +92,8 @@ jobs:
 
       - name: Run unit tests
         working-directory: TONWalletKit-Android
-        # GeneratedModelsSnapshotTest (:api) self-skips without WALLETKIT_PATH; the kit-side
-        # generator fixtures it needs were never merged to main (kit PR #364 closed), so it is
-        # not run in CI here — matching iOS, which only runs codegen checks locally.
+        # GeneratedModelsSnapshotTest (:api) self-skips without WALLETKIT_PATH — codegen drift
+        # is checked locally, not in CI.
         run: ./gradlew :api:testDebugUnitTest :impl:testDebugUnitTest
 
       - name: Build SDK (Release)
@@ -481,11 +480,8 @@ jobs:
           path: all-results/
           retention-days: 7
 
-  # Final gate: the committed WalletKit bridge bundle must match the pinned kit release tag.
-  # Runs only after the SDK/demo build and the full E2E suite have passed, so a feature branch
-  # carrying a custom bridge .mjs (built from another kit branch) is still validated end-to-end
-  # before this tag-alignment check blocks the merge. On non-PR pushes E2E is skipped, which
-  # e2e-summary reports as success, so this gate still runs on merge to main.
+  # Final gate: committed bridge bundle must match a build of the pinned kit tag. Runs after the
+  # build + E2E so a feature branch's bridge is validated before this check can block the merge.
   verify-bridge:
     name: Verify WalletKit Bridge
     runs-on: ubuntu-latest

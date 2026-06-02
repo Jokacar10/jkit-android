@@ -38,8 +38,7 @@ runs:
         ref: ${{ steps.tag.outputs.tag }}
         path: .kit-bridge
 
-    # Match the toolchain kit's own release build uses (release.yml: pnpm + Node 24), so the
-    # bundle is reproduced byte-for-byte.
+    # Match kit's release.yml toolchain (pnpm + Node 24) so the bundle reproduces byte-for-byte.
     - name: Set up pnpm
       uses: pnpm/action-setup@v4
       with:
