@@ -64,7 +64,7 @@ data class TONStakingProviderMetadata(
     @SerialName(value = "receiveToken")
     val receiveToken: TONStakingTokenInfo? = null,
 
-    @Contextual @SerialName(value = "contractAddress")
+    @SerialName(value = "contractAddress")
     val contractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
 ) {

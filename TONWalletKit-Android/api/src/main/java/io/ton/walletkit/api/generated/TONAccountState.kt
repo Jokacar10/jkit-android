@@ -49,7 +49,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TONAccountState(
 
-    @Contextual @SerialName(value = "address")
+    @SerialName(value = "address")
     val address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @Contextual @SerialName(value = "status")

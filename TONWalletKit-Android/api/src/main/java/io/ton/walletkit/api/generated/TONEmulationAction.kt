@@ -100,7 +100,7 @@ data class TONEmulationAction(
 
     /* Addresses of accounts involved in this action */
     @SerialName(value = "accounts")
-    val accounts: kotlin.collections.List<@Contextual io.ton.walletkit.model.TONUserFriendlyAddress>,
+    val accounts: kotlin.collections.List<io.ton.walletkit.model.TONUserFriendlyAddress>,
 
     /* Action-specific detail fields keyed by name */
     @Contextual @SerialName(value = "details")
