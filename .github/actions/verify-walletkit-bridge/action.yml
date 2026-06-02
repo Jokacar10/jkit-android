@@ -1,12 +1,13 @@
 name: Verify WalletKit bridge bundle
 description: >
-  Verify that the committed WalletKit JS bridge bundle matches the ton-org/kit release pinned by
-  WALLETKIT_BRIDGE_TAG in gradle.properties, by comparing sha256 of the runtime files against that
-  release's walletkit-android-bridge.checksums.json. Fails on any mismatch.
+  Build the WalletKit Android bridge from the pinned kit tag (WALLETKIT_BRIDGE_TAG in
+  gradle.properties) and verify the committed bundle matches it byte-for-byte. The bridge is
+  treated as a pinned dependency: you bump the tag, rebuild, and commit by hand — this guards
+  that the committed bundle is exactly what building that tag produces.
 
 inputs:
   repo:
-    description: kit repository that publishes the bridge releases
+    description: kit monorepo that contains the bridge source
     default: ton-org/kit
   gradle-properties:
     description: Path to gradle.properties holding WALLETKIT_BRIDGE_TAG
@@ -18,48 +19,80 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Compare committed bridge bundle against pinned release
+    - name: Resolve pinned bridge tag
+      id: tag
       shell: bash
       run: |
-        set -euo pipefail
-
         TAG=$(grep -E '^WALLETKIT_BRIDGE_TAG=' "${{ inputs.gradle-properties }}" | cut -d= -f2 | tr -d '[:space:]')
         if [ -z "$TAG" ]; then
           echo "::error::WALLETKIT_BRIDGE_TAG is not set in ${{ inputs.gradle-properties }}"
           exit 1
         fi
+        echo "tag=$TAG" >> "$GITHUB_OUTPUT"
         echo "Pinned bridge tag: $TAG"
 
-        # The tag must point at a *published* release (drafts have no public asset URL).
-        URL="https://github.com/${{ inputs.repo }}/releases/download/$TAG/walletkit-android-bridge.checksums.json"
-        if ! curl -fsSL "$URL" -o /tmp/bridge.checksums.json; then
-          echo "::error::Could not download checksums for $TAG from $URL (is it a published release?)"
+    - name: Checkout kit @ pinned tag
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.repo }}
+        ref: ${{ steps.tag.outputs.tag }}
+        path: .kit-bridge
+
+    # Match the toolchain kit's own release build uses (release.yml: pnpm + Node 24), so the
+    # bundle is reproduced byte-for-byte.
+    - name: Set up pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        package_json_file: .kit-bridge/package.json
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: pnpm
+        cache-dependency-path: .kit-bridge/pnpm-lock.yaml
+
+    - name: Build the bridge from source
+      shell: bash
+      working-directory: .kit-bridge
+      run: |
+        set -euo pipefail
+        pnpm install --frozen-lockfile
+        pnpm exec turbo run build --filter=walletkit-android-bridge
+
+    - name: Verify committed bundle matches the build
+      shell: bash
+      run: |
+        set -euo pipefail
+        TAG="${{ steps.tag.outputs.tag }}"
+        BUILT=.kit-bridge/packages/walletkit-android-bridge/dist
+        if [ ! -d "$BUILT" ]; then
+          echo "::error::build did not produce $BUILT"
           exit 1
         fi
-        echo "Release $TAG checksums:"
-        cat /tmp/bridge.checksums.json
 
         # Runtime files only (sourcemaps are intentionally not verified).
         FAIL=0
         for f in walletkit-android-bridge.mjs inject.mjs index.html; do
-          want=$(jq -r --arg f "$f" '.[$f] // empty' /tmp/bridge.checksums.json)
-          local_path="${{ inputs.assets-dir }}/$f"
-          if [ -z "$want" ]; then
-            echo "::error::$f is missing from the release checksums.json"; FAIL=1; continue
+          built_path="$BUILT/$f"
+          committed_path="${{ inputs.assets-dir }}/$f"
+          if [ ! -f "$built_path" ]; then
+            echo "::error::$f was not produced by the build"; FAIL=1; continue
           fi
-          if [ ! -f "$local_path" ]; then
-            echo "::error::$f is missing from committed assets ($local_path)"; FAIL=1; continue
+          if [ ! -f "$committed_path" ]; then
+            echo "::error::$f is missing from committed assets ($committed_path)"; FAIL=1; continue
           fi
-          got=$(sha256sum "$local_path" | awk '{print $1}')
-          if [ "$want" != "$got" ]; then
-            echo "::error::$f sha256 mismatch — release($TAG)=$want committed=$got"; FAIL=1
+          if diff -q "$built_path" "$committed_path" >/dev/null; then
+            echo "✓ $f matches the build of $TAG"
           else
-            echo "✓ $f matches ($got)"
+            echo "::error::$f differs from a fresh build of $TAG:"
+            diff -u "$committed_path" "$built_path" | head -40 || true
+            FAIL=1
           fi
         done
 
         if [ "$FAIL" -ne 0 ]; then
-          echo "::error::Committed WalletKit bridge bundle does not match $TAG. Refresh the files under ${{ inputs.assets-dir }} from that release, or update WALLETKIT_BRIDGE_TAG."
+          echo "::error::Committed WalletKit bridge bundle does not match a build of $TAG. Bump WALLETKIT_BRIDGE_TAG and rebuild + recommit the bundle (or fix the drift)."
           exit 1
         fi
-        echo "✅ Committed WalletKit bridge bundle matches $TAG"
+        echo "✅ Committed bridge bundle matches a fresh build of $TAG"
