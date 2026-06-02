@@ -84,16 +84,14 @@ fun WalletHomeAssetRow(
             color = TonTheme.colors.textPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
         )
-
-        Box(modifier = Modifier.weight(1f))
 
         TonText(
             text = item.formattedAmount,
             style = TonTheme.typography.bodySemibold,
             color = TonTheme.colors.textPrimary,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
         )
     }
 }

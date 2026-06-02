@@ -151,6 +151,25 @@
     <string name="transaction_request_comment_label">Comment:</string>
     <string name="transaction_request_payload_label">Payload:</string>
     <string name="transaction_request_unknown_dapp">Unknown dApp</string>
+    <!-- Transaction request (redesigned sheet) -->
+    <string name="transaction_request_title_leading">Send transaction from </string>
+    <string name="transaction_request_title_trailing">?</string>
+    <string name="transaction_request_subtitle">A dApp wants to send a transaction from your wallet.</string>
+    <string name="transaction_request_section_sign">You will sign</string>
+    <string name="transaction_request_money_flow">Money flow</string>
+    <string name="transaction_request_no_transfers">This transaction doesn\'t involve any token transfers</string>
+    <string name="transaction_request_no_messages">No outgoing messages in this request</string>
+    <string name="transaction_request_error_prefix">Error:</string>
+    <string name="transaction_request_action_hold">Hold to sign</string>
+    <string name="transaction_request_disclaimer">This transaction will be irreversible. Only approve if you trust the requesting dApp and understand the transaction details.</string>
+
+    <!-- Sign message request (redesigned sheet) -->
+    <string name="sign_message_request_title_leading">Sign message for </string>
+    <string name="sign_message_request_title_trailing">?</string>
+    <string name="sign_message_request_subtitle">A dApp wants you to sign a transaction without broadcasting it.</string>
+    <string name="sign_message_request_section">The dApp can submit</string>
+    <string name="sign_message_request_action_hold">Hold to sign</string>
+    <string name="sign_message_request_disclaimer">This will sign a transaction that the dApp can submit later. Only approve if you trust the requesting dApp.</string>
 
     <!-- Transaction detail -->
     <string name="transaction_detail_status_label">Status</string>
@@ -162,6 +181,13 @@
     <string name="transaction_detail_logical_time_label">Logical Time</string>
     <string name="transaction_detail_block_label">Block</string>
     <string name="transaction_detail_view_explorer">View on Blockchain Explorer</string>
+
+    <!-- Wallet Kit Investigation (developer debug screen) -->
+    <string name="investigation_title">Wallet Kit Investigation</string>
+    <string name="investigation_tonconnect">Tonconnect</string>
+    <string name="investigation_connect_to_dapp">Connect to dApp</string>
+    <string name="investigation_scan_qr">Scan QR code</string>
+    <string name="investigation_scan_failed">Could not scan QR code</string>
 
     <!-- URL prompt dialog -->
     <string name="url_prompt_title">Handle TON Connect URL</string>

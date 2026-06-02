@@ -22,10 +22,8 @@
 package io.ton.walletkit.demo.presentation.ui.sheet
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -33,7 +31,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import io.ton.walletkit.demo.R
 import io.ton.walletkit.demo.designsystem.components.button.TonHoldToSignButton
 import io.ton.walletkit.demo.designsystem.components.text.TonText
@@ -43,6 +40,7 @@ import io.ton.walletkit.demo.presentation.model.WalletSummary
 import io.ton.walletkit.demo.presentation.ui.preview.PreviewData
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetDisclaimer
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetHeader
+import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetScaffold
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetSection
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectWalletPicker
 import io.ton.walletkit.demo.presentation.util.TestTags
@@ -57,12 +55,16 @@ fun SignDataSheet(
     val clipboardManager = LocalClipboardManager.current
     val displayContent = request.preview?.takeIf { it.isNotBlank() } ?: request.payloadContent
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
-            .testTag(TestTags.SIGN_DATA_REQUEST_SHEET),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
+    TonConnectSheetScaffold(
+        testTag = TestTags.SIGN_DATA_REQUEST_SHEET,
+        footer = {
+            TonConnectSheetDisclaimer(text = stringResource(R.string.sign_request_disclaimer))
+            TonHoldToSignButton(
+                text = stringResource(R.string.sign_request_action_hold),
+                onComplete = onApprove,
+                modifier = Modifier.testTag(TestTags.SIGN_DATA_APPROVE_BUTTON),
+            )
+        },
     ) {
         TonConnectSheetHeader(
             titleLeading = stringResource(R.string.sign_request_title_leading),
@@ -105,14 +107,6 @@ fun SignDataSheet(
                 )
             }
         }
-
-        TonHoldToSignButton(
-            text = stringResource(R.string.sign_request_action_hold),
-            onComplete = onApprove,
-            modifier = Modifier.testTag(TestTags.SIGN_DATA_APPROVE_BUTTON),
-        )
-
-        TonConnectSheetDisclaimer(text = stringResource(R.string.sign_request_disclaimer))
     }
 }
 

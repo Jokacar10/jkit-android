@@ -20,6 +20,7 @@ datastorePreferences = "1.2.0"
 securityCrypto = "1.1.0"
 biometric = "1.2.0-alpha05"
 coil = "3.3.0"
+playServicesCodeScanner = "16.1.0"
 hilt = "2.57.2"
 # Testing
 junit = "4.13.2"
@@ -57,6 +58,7 @@ androidxBiometric = { module = "androidx.biometric:biometric", version.ref = "bi
 leakcanaryAndroid = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 coilCompose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coilNetwork = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
+playServicesCodeScanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "playServicesCodeScanner" }
 hiltAndroid = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hiltCompiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 # Testing

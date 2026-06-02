@@ -21,109 +21,91 @@
  */
 package io.ton.walletkit.demo.presentation.ui.sheet
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import io.ton.walletkit.api.generated.TONResult
+import io.ton.walletkit.demo.R
+import io.ton.walletkit.demo.designsystem.components.button.TonHoldToSignButton
 import io.ton.walletkit.demo.presentation.model.SignMessageRequestUi
-import io.ton.walletkit.demo.presentation.util.abbreviated
-import java.math.BigDecimal
-import java.math.RoundingMode
+import io.ton.walletkit.demo.presentation.model.WalletSummary
+import io.ton.walletkit.demo.presentation.ui.sheet.components.MoneyFlowContent
+import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetDisclaimer
+import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetHeader
+import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetScaffold
+import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetSection
+import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectWalletPicker
+import io.ton.walletkit.demo.presentation.ui.sheet.components.TransactionEntries
+import io.ton.walletkit.demo.presentation.ui.sheet.components.TransactionPreviewError
+import io.ton.walletkit.demo.presentation.ui.sheet.components.shouldShowMoneyFlow
+import io.ton.walletkit.demo.presentation.util.TestTags
 
 /**
- * Bottom sheet for a sign-message (sign-only) request. The wallet will sign the
- * transaction but will NOT broadcast it — the dApp relays the resulting BoC.
+ * dApp sign-message (sign-only) approval sheet: the wallet signs but does NOT broadcast — the dApp
+ * relays the resulting BoC. Same anatomy as the transaction sheet (paired logos header, read-only
+ * wallet row, entry cards, optional money flow + preview error) scrolling above a pinned footer
+ * (disclaimer + hold-to-sign button), under a "The dApp can submit" section and sign-message copy.
  */
 @Composable
 fun SignMessageRequestSheet(
     request: SignMessageRequestUi,
     onApprove: () -> Unit,
     onReject: () -> Unit,
+    wallet: WalletSummary? = null,
 ) {
-    Column(
-        modifier = Modifier.padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+    val event = request.signMessageRequest?.event
+    val txRequest = event?.request
+    val preview = event?.preview?.`data`
+    val moneyFlow = preview?.moneyFlow
+
+    TonConnectSheetScaffold(
+        testTag = TestTags.SIGN_MESSAGE_REQUEST_SHEET,
+        footer = {
+            TonConnectSheetDisclaimer(text = stringResource(R.string.sign_message_request_disclaimer))
+            TonHoldToSignButton(
+                text = stringResource(R.string.sign_message_request_action_hold),
+                onComplete = onApprove,
+                modifier = Modifier.testTag(TestTags.SIGN_MESSAGE_APPROVE_BUTTON),
+            )
+        },
     ) {
-        Text("Sign message request", style = MaterialTheme.typography.titleLarge)
-        Text(
-            "From wallet: ${request.walletAddress.abbreviated()}",
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Text(
-            "Requested by: ${request.dAppName.ifBlank { "Unknown dApp" }}",
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Text(
-            "Approving will sign the transaction without broadcasting it. The dApp relays the result.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        TonConnectSheetHeader(
+            titleLeading = stringResource(R.string.sign_message_request_title_leading),
+            titleAccent = signMessageDAppDomain(event?.dAppInfo?.url, request.dAppName),
+            titleTrailing = stringResource(R.string.sign_message_request_title_trailing),
+            subtitle = stringResource(R.string.sign_message_request_subtitle),
+            onClose = onReject,
+            dAppIconUrl = event?.dAppInfo?.iconUrl,
+            modifier = Modifier.testTag(TestTags.SIGN_MESSAGE_REQUEST_TITLE),
+            closeButtonModifier = Modifier.testTag(TestTags.SIGN_MESSAGE_REJECT_BUTTON),
         )
 
-        if (request.messages.isNotEmpty()) {
-            Column(
-                modifier = Modifier
-                    .heightIn(max = 400.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                request.messages.forEach { message ->
-                    Surface(shape = RoundedCornerShape(12.dp), tonalElevation = 2.dp) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                            ) {
-                                Text("To", style = MaterialTheme.typography.labelMedium)
-                                Text(
-                                    message.to.abbreviated(),
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                                )
-                            }
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                            ) {
-                                Text("Amount", style = MaterialTheme.typography.labelMedium)
-                                Text(
-                                    "${formatNanoToTon(message.amount)} TON",
-                                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                                )
-                            }
-                        }
-                    }
-                }
+        wallet?.let {
+            TonConnectWalletPicker(wallets = listOf(it), selected = it, onSelect = {})
+        }
+
+        if (txRequest != null) {
+            TonConnectSheetSection(label = stringResource(R.string.sign_message_request_section)) {
+                TransactionEntries(txRequest)
             }
         }
 
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            TextButton(onClick = onReject, modifier = Modifier.weight(1f)) { Text("Reject") }
-            Button(onClick = onApprove, modifier = Modifier.weight(1f)) { Text("Sign") }
+        if (moneyFlow != null && preview.result == TONResult.success && shouldShowMoneyFlow(moneyFlow)) {
+            TonConnectSheetSection(label = stringResource(R.string.transaction_request_money_flow)) {
+                MoneyFlowContent(moneyFlow)
+            }
+        }
+
+        if (preview?.result == TONResult.failure) {
+            TransactionPreviewError(preview.error?.message ?: stringResource(R.string.wallet_error_unknown))
         }
     }
 }
 
-private fun formatNanoToTon(nanotons: String): String = try {
-    BigDecimal(nanotons)
-        .divide(BigDecimal("1000000000"), 9, RoundingMode.DOWN)
-        .stripTrailingZeros()
-        .toPlainString()
-} catch (_: Exception) {
-    nanotons
+/** dApp host for the title accent; falls back to the raw url then the dApp name. */
+private fun signMessageDAppDomain(url: String?, fallbackName: String?): String {
+    val host = url?.let { runCatching { Uri.parse(it).host }.getOrNull() }
+    return host ?: url ?: fallbackName ?: ""
 }

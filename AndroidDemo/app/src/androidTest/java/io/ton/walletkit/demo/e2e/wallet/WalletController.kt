@@ -54,9 +54,10 @@ class WalletController(composeTestRule: ComposeTestRule? = null) {
         const val PIN_LENGTH = 4
         const val DEFAULT_PIN = "1234"
 
-        // Sign-data approve uses TonHoldToSignButton (DEFAULT_HOLD_DURATION_MS = 700ms). Press
-        // for noticeably longer so the test isn't racy with the fill animation completing.
-        const val SIGN_DATA_HOLD_DURATION_MS = 1_200L
+        // Transaction and sign-data approve both use TonHoldToSignButton (DEFAULT_HOLD_DURATION_MS
+        // = 700ms). Press for noticeably longer so the test isn't racy with the fill animation
+        // completing.
+        const val HOLD_TO_SIGN_DURATION_MS = 1_200L
     }
 
     private lateinit var composeTestRule: ComposeTestRule
@@ -655,10 +656,15 @@ class WalletController(composeTestRule: ComposeTestRule? = null) {
                 .fetchSemanticsNodes().isNotEmpty()
         }
 
-        Log.d("WalletController", "approveTransaction: clicking approve button")
-        // Click approve button
-        composeTestRule.onNodeWithTag(TestTags.TRANSACTION_APPROVE_BUTTON)
-            .performClick()
+        Log.d("WalletController", "approveTransaction: holding hold-to-sign button")
+        // The redesigned sheet uses a hold-to-sign button — `onComplete` fires only after a
+        // sustained ~700ms press. Split the touch into down/up with a real sleep between so the
+        // device's frame loop drives the fill animation to completion before release (see
+        // approveSignData for the full rationale).
+        val node = composeTestRule.onNodeWithTag(TestTags.TRANSACTION_APPROVE_BUTTON)
+        node.performTouchInput { down(center) }
+        Thread.sleep(HOLD_TO_SIGN_DURATION_MS)
+        node.performTouchInput { up() }
 
         Log.d("WalletController", "approveTransaction: waiting for idle")
         composeTestRule.waitForIdle()
@@ -703,7 +709,7 @@ class WalletController(composeTestRule: ComposeTestRule? = null) {
 
         val node = composeTestRule.onNodeWithTag(TestTags.SIGN_DATA_APPROVE_BUTTON)
         node.performTouchInput { down(center) }
-        Thread.sleep(SIGN_DATA_HOLD_DURATION_MS)
+        Thread.sleep(HOLD_TO_SIGN_DURATION_MS)
         node.performTouchInput { up() }
         composeTestRule.waitForIdle()
     }

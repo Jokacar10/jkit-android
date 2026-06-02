@@ -27,6 +27,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,7 +36,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -59,6 +63,46 @@ import io.ton.walletkit.demo.designsystem.theme.SmoothCornerShape
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 import io.ton.walletkit.demo.presentation.model.WalletSummary
 import io.ton.walletkit.demo.presentation.util.abbreviated
+
+/**
+ * Layout shared by every TonConnect request sheet: [content] scrolls vertically while [footer]
+ * (the disclaimer + action button) stays pinned at the bottom and never scrolls out of view.
+ * The sheet wraps its content height when short and caps to the available height when tall.
+ *
+ * [content] is laid out in a [Column] with 20.dp spacing; [footer] in a [Column] with 16.dp
+ * spacing — place the disclaimer above the button there so the button sits at the very bottom.
+ */
+@Composable
+internal fun TonConnectSheetScaffold(
+    modifier: Modifier = Modifier,
+    testTag: String? = null,
+    footer: @Composable ColumnScope.() -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .then(if (testTag != null) Modifier.testTag(testTag) else Modifier),
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(weight = 1f, fill = false)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp)
+                .padding(top = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            content = content,
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(top = 16.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            content = footer,
+        )
+    }
+}
 
 /**
  * Top section of every TonConnect sheet: paired dApp+wallet circles, title with the
@@ -301,6 +345,26 @@ internal fun TonConnectSheetDisclaimer(
         color = TonTheme.colors.textTertiary,
         textAlign = TextAlign.Center,
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
+    )
+}
+
+/**
+ * Small inline grey pill used to tag transaction entries (State init, Extra currencies,
+ * Attach/Forward amounts, Response dest, …).
+ */
+@Composable
+internal fun TonBadge(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    TonText(
+        text = text,
+        style = TonTheme.typography.footnoteSemibold,
+        color = TonTheme.colors.textSecondary,
+        modifier = modifier
+            .clip(SmoothCornerShape(6.dp))
+            .background(TonTheme.colors.bgFillTertiary)
+            .padding(horizontal = 6.dp, vertical = 2.dp),
     )
 }
 

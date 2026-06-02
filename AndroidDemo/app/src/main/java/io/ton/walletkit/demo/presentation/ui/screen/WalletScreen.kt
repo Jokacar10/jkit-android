@@ -187,6 +187,7 @@ private sealed interface HomeSubScreen {
     data object None : HomeSubScreen
     data object AllAssets : HomeSubScreen
     data object AllNFTs : HomeSubScreen
+    data object Investigation : HomeSubScreen
 }
 
 private fun nftPreviewFrom(nft: TONNFT): WalletHomeNFTPreview {
@@ -297,6 +298,8 @@ fun WalletScreen(
                     request = sheet.request,
                     onApprove = { actions.onApproveTransaction(sheet.request) },
                     onReject = { actions.onRejectTransaction(sheet.request) },
+                    wallet = state.wallets.firstOrNull { it.address == sheet.request.walletAddress }
+                        ?: activeWallet,
                 )
 
                 is SheetState.SignData -> SignDataSheet(
@@ -311,6 +314,8 @@ fun WalletScreen(
                     request = sheet.request,
                     onApprove = { actions.onApproveSignMessage(sheet.request) },
                     onReject = { actions.onRejectSignMessage(sheet.request) },
+                    wallet = state.wallets.firstOrNull { it.address == sheet.request.walletAddress }
+                        ?: activeWallet,
                 )
 
                 is SheetState.WalletDetails -> WalletDetailsSheet(
@@ -450,6 +455,12 @@ fun WalletScreen(
                     onBack = { subScreen = HomeSubScreen.None },
                 )
             }
+            HomeSubScreen.Investigation -> {
+                WalletKitInvestigationScreen(
+                    onBack = { subScreen = HomeSubScreen.None },
+                    onConnect = actions::onHandleUrl,
+                )
+            }
             HomeSubScreen.None -> Unit
         }
         // Drain the rest of the composable to render only the sub-screen + its modals.
@@ -478,7 +489,7 @@ fun WalletScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { showWalletsSheet = true }) {
+                    IconButton(onClick = { subScreen = HomeSubScreen.Investigation }) {
                         TonIconImage(
                             icon = TonIcon.Settings24,
                             size = 24.dp,
