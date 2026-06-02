@@ -49,8 +49,10 @@ object TextCommentPayloadDecoder {
 
         var cursor = 6
         if (bytes.size < cursor + 3 * sizeBytes + offBytes) return null
-        val cells = readUInt(bytes, cursor, sizeBytes); cursor += sizeBytes
-        val roots = readUInt(bytes, cursor, sizeBytes); cursor += sizeBytes
+        val cells = readUInt(bytes, cursor, sizeBytes)
+        cursor += sizeBytes
+        val roots = readUInt(bytes, cursor, sizeBytes)
+        cursor += sizeBytes
         cursor += sizeBytes // absent
         cursor += offBytes // tot_cells_size
 

@@ -165,6 +165,10 @@ dependencies {
     implementation(libs.coilCompose)
     implementation(libs.coilNetwork)
 
+    // GMS Code Scanner — fully-managed QR scanner UI (runs in Google Play services,
+    // no CAMERA permission needed in the app). Used by the dev Investigation screen.
+    implementation(libs.playServicesCodeScanner)
+
     // Hilt dependency injection
     implementation(libs.hiltAndroid)
     ksp(libs.hiltCompiler)

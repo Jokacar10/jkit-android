@@ -21,6 +21,7 @@
  */
 package io.ton.walletkit.demo.presentation.ui.screen
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.ton.walletkit.demo.R
@@ -43,6 +45,7 @@ import io.ton.walletkit.demo.designsystem.components.text.TonText
 import io.ton.walletkit.demo.designsystem.theme.SmoothCornerShape
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 import io.ton.walletkit.demo.presentation.ui.dialog.UrlPromptDialog
+import io.ton.walletkit.demo.presentation.util.QrScanner
 
 /**
  * Developer "Wallet Kit Investigation" screen, mirroring the iOS WalletKitInvestigationView:
@@ -95,6 +98,8 @@ private fun WalletKitTonconnectScreen(
     modifier: Modifier = Modifier,
 ) {
     var showPrompt by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val scanFailedMessage = stringResource(R.string.investigation_scan_failed)
 
     Column(
         modifier = modifier
@@ -111,6 +116,18 @@ private fun WalletKitTonconnectScreen(
             InvestigationRow(
                 title = stringResource(R.string.investigation_connect_to_dapp),
                 onClick = { showPrompt = true },
+            )
+            InvestigationRow(
+                title = stringResource(R.string.investigation_scan_qr),
+                onClick = {
+                    QrScanner.scan(
+                        context = context,
+                        onResult = onConnect,
+                        onError = {
+                            Toast.makeText(context, scanFailedMessage, Toast.LENGTH_SHORT).show()
+                        },
+                    )
+                },
             )
         }
     }

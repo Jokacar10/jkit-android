@@ -218,8 +218,7 @@ private fun PayloadRow(label: String, value: String) {
 }
 
 /** Whether the money-flow card should be shown (preview succeeded and there's flow to show). */
-internal fun shouldShowMoneyFlow(moneyFlow: TONTransactionTraceMoneyFlow): Boolean =
-    moneyFlow.ourTransfers.isNotEmpty() || moneyFlow.outputs != "0" || moneyFlow.inputs != "0"
+internal fun shouldShowMoneyFlow(moneyFlow: TONTransactionTraceMoneyFlow): Boolean = moneyFlow.ourTransfers.isNotEmpty() || moneyFlow.outputs != "0" || moneyFlow.inputs != "0"
 
 @Composable
 internal fun MoneyFlowContent(moneyFlow: TONTransactionTraceMoneyFlow) {
@@ -299,12 +298,10 @@ private fun assetName(transfer: TONTransactionTraceMoneyFlowItem): String = when
 
 private fun tonAmount(nano: String): String = "${TonFormatter.formatNanoTon(nano)} TON"
 
-private fun shortAddress(address: String): String =
-    if (address.length > ADDRESS_TRUNCATION * 2) {
-        "${address.take(ADDRESS_TRUNCATION)}...${address.takeLast(ADDRESS_TRUNCATION)}"
-    } else {
-        address
-    }
+private fun shortAddress(address: String): String = if (address.length > ADDRESS_TRUNCATION * 2) {
+    "${address.take(ADDRESS_TRUNCATION)}...${address.takeLast(ADDRESS_TRUNCATION)}"
+} else {
+    address
+}
 
-private fun truncate(value: String, max: Int): String =
-    if (value.length > max) value.take(max) + "..." else value
+private fun truncate(value: String, max: Int): String = if (value.length > max) value.take(max) + "..." else value

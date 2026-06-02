@@ -186,6 +186,8 @@
     <string name="investigation_title">Wallet Kit Investigation</string>
     <string name="investigation_tonconnect">Tonconnect</string>
     <string name="investigation_connect_to_dapp">Connect to dApp</string>
+    <string name="investigation_scan_qr">Scan QR code</string>
+    <string name="investigation_scan_failed">Could not scan QR code</string>
 
     <!-- URL prompt dialog -->
     <string name="url_prompt_title">Handle TON Connect URL</string>
