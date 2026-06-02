@@ -23,8 +23,6 @@ package io.ton.walletkit.demo.presentation.ui.sheet
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +43,7 @@ import io.ton.walletkit.demo.presentation.ui.preview.PreviewData
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectPermissionRow
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetDisclaimer
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetHeader
+import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetScaffold
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetSection
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectWalletPicker
 import io.ton.walletkit.demo.presentation.util.TestTags
@@ -58,12 +57,18 @@ fun ConnectRequestSheet(
 ) {
     var selectedWallet by remember { mutableStateOf(wallets.firstOrNull()) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
-            .testTag(TestTags.CONNECT_REQUEST_SHEET),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
+    TonConnectSheetScaffold(
+        testTag = TestTags.CONNECT_REQUEST_SHEET,
+        footer = {
+            TonConnectSheetDisclaimer(text = stringResource(R.string.connect_request_disclaimer))
+            TonButton(
+                text = stringResource(R.string.connect_request_action),
+                onClick = { selectedWallet?.let { w -> onApprove(request, w) } },
+                enabled = selectedWallet != null,
+                config = TonButtonConfig.Primary,
+                modifier = Modifier.testTag(TestTags.CONNECT_APPROVE_BUTTON),
+            )
+        },
     ) {
         TonConnectSheetHeader(
             titleLeading = stringResource(R.string.connect_request_title_leading),
@@ -94,16 +99,6 @@ fun ConnectRequestSheet(
                 }
             }
         }
-
-        TonButton(
-            text = stringResource(R.string.connect_request_action),
-            onClick = { selectedWallet?.let { w -> onApprove(request, w) } },
-            enabled = selectedWallet != null,
-            config = TonButtonConfig.Primary,
-            modifier = Modifier.testTag(TestTags.CONNECT_APPROVE_BUTTON),
-        )
-
-        TonConnectSheetDisclaimer(text = stringResource(R.string.connect_request_disclaimer))
     }
 }
 

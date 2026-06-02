@@ -22,15 +22,10 @@
 package io.ton.walletkit.demo.presentation.ui.sheet
 
 import android.net.Uri
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import io.ton.walletkit.api.generated.TONResult
 import io.ton.walletkit.demo.R
 import io.ton.walletkit.demo.designsystem.components.button.TonHoldToSignButton
@@ -39,6 +34,7 @@ import io.ton.walletkit.demo.presentation.model.WalletSummary
 import io.ton.walletkit.demo.presentation.ui.sheet.components.MoneyFlowContent
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetDisclaimer
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetHeader
+import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetScaffold
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetSection
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectWalletPicker
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TransactionEntries
@@ -49,8 +45,8 @@ import io.ton.walletkit.demo.presentation.util.TestTags
 /**
  * dApp sign-message (sign-only) approval sheet: the wallet signs but does NOT broadcast — the dApp
  * relays the resulting BoC. Same anatomy as the transaction sheet (paired logos header, read-only
- * wallet row, entry cards, optional money flow + preview error, hold-to-sign), under a "The dApp
- * can submit" section and sign-message copy.
+ * wallet row, entry cards, optional money flow + preview error) scrolling above a pinned footer
+ * (disclaimer + hold-to-sign button), under a "The dApp can submit" section and sign-message copy.
  */
 @Composable
 fun SignMessageRequestSheet(
@@ -64,12 +60,16 @@ fun SignMessageRequestSheet(
     val preview = event?.preview?.`data`
     val moneyFlow = preview?.moneyFlow
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
-            .testTag(TestTags.SIGN_MESSAGE_REQUEST_SHEET),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
+    TonConnectSheetScaffold(
+        testTag = TestTags.SIGN_MESSAGE_REQUEST_SHEET,
+        footer = {
+            TonConnectSheetDisclaimer(text = stringResource(R.string.sign_message_request_disclaimer))
+            TonHoldToSignButton(
+                text = stringResource(R.string.sign_message_request_action_hold),
+                onComplete = onApprove,
+                modifier = Modifier.testTag(TestTags.SIGN_MESSAGE_APPROVE_BUTTON),
+            )
+        },
     ) {
         TonConnectSheetHeader(
             titleLeading = stringResource(R.string.sign_message_request_title_leading),
@@ -101,14 +101,6 @@ fun SignMessageRequestSheet(
         if (preview?.result == TONResult.failure) {
             TransactionPreviewError(preview.error?.message ?: stringResource(R.string.wallet_error_unknown))
         }
-
-        TonHoldToSignButton(
-            text = stringResource(R.string.sign_message_request_action_hold),
-            onComplete = onApprove,
-            modifier = Modifier.testTag(TestTags.SIGN_MESSAGE_APPROVE_BUTTON),
-        )
-
-        TonConnectSheetDisclaimer(text = stringResource(R.string.sign_message_request_disclaimer))
     }
 }
 
