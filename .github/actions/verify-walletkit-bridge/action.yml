@@ -1,0 +1,79 @@
+name: Verify WalletKit bridge bundle
+description: >
+  Verify that the committed WalletKit JS bridge bundle matches the ton-org/kit release
+  pinned by WALLETKIT_BRIDGE_TAG in gradle.properties, by comparing sha256 of the runtime
+  files against that release's walletkit-android-bridge.checksums.json. Fails on any mismatch.
+
+inputs:
+  repo:
+    description: kit repository that publishes the bridge releases
+    default: ton-org/kit
+  gradle-properties:
+    description: Path to gradle.properties holding WALLETKIT_BRIDGE_TAG
+    default: TONWalletKit-Android/gradle.properties
+  assets-dir:
+    description: Path to the committed WalletKit WebView assets
+    default: TONWalletKit-Android/impl/src/main/assets/walletkit
+  token:
+    description: GitHub token used for the API call (raises rate limits; github.token is fine for a public repo)
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Compare committed bridge bundle against pinned release
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        TAG=$(grep -E '^WALLETKIT_BRIDGE_TAG=' "${{ inputs.gradle-properties }}" | cut -d= -f2 | tr -d '[:space:]')
+        if [ -z "$TAG" ]; then
+          echo "::error::WALLETKIT_BRIDGE_TAG is not set in ${{ inputs.gradle-properties }}"
+          exit 1
+        fi
+        echo "Pinned bridge tag: $TAG"
+
+        AUTH=()
+        if [ -n "${{ inputs.token }}" ]; then AUTH=(-H "Authorization: Bearer ${{ inputs.token }}"); fi
+
+        # Pinned tags must point at a *published* release (drafts are not reachable by tag).
+        REL=$(curl -fsSL "${AUTH[@]}" -H "Accept: application/vnd.github+json" \
+          "https://api.github.com/repos/${{ inputs.repo }}/releases/tags/$TAG") || {
+          echo "::error::No published ${{ inputs.repo }} release found for tag $TAG"
+          exit 1
+        }
+
+        CHECKSUMS_URL=$(echo "$REL" | jq -r '.assets[] | select(.name=="walletkit-android-bridge.checksums.json") | .browser_download_url')
+        if [ -z "$CHECKSUMS_URL" ] || [ "$CHECKSUMS_URL" = "null" ]; then
+          echo "::error::Release $TAG has no walletkit-android-bridge.checksums.json asset"
+          exit 1
+        fi
+        curl -fsSL "${AUTH[@]}" "$CHECKSUMS_URL" -o /tmp/bridge.checksums.json
+        echo "Release $TAG checksums:"
+        cat /tmp/bridge.checksums.json
+
+        # Runtime files only (sourcemaps are intentionally not verified).
+        FILES="walletkit-android-bridge.mjs inject.mjs index.html"
+        FAIL=0
+        for f in $FILES; do
+          want=$(jq -r --arg f "$f" '.[$f] // empty' /tmp/bridge.checksums.json)
+          local_path="${{ inputs.assets-dir }}/$f"
+          if [ -z "$want" ]; then
+            echo "::error::$f is missing from the release checksums.json"; FAIL=1; continue
+          fi
+          if [ ! -f "$local_path" ]; then
+            echo "::error::$f is missing from committed assets ($local_path)"; FAIL=1; continue
+          fi
+          got=$(sha256sum "$local_path" | awk '{print $1}')
+          if [ "$want" != "$got" ]; then
+            echo "::error::$f sha256 mismatch — release($TAG)=$want committed=$got"; FAIL=1
+          else
+            echo "✓ $f matches ($got)"
+          fi
+        done
+
+        if [ "$FAIL" -ne 0 ]; then
+          echo "::error::Committed WalletKit bridge bundle does not match $TAG. Refresh the files under ${{ inputs.assets-dir }} from that release, or update WALLETKIT_BRIDGE_TAG."
+          exit 1
+        fi
+        echo "✅ Committed WalletKit bridge bundle matches $TAG"

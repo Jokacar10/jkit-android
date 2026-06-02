@@ -23563,7 +23563,7 @@ var init_codes = __esmMin((() => {
 }));
 //#endregion
 //#region ../walletkit/dist/esm/errors/WalletKitError.js
-var WalletKitError, BridgeError, SessionError, EventStoreError, StorageError;
+var WalletKitError, BridgeError$1, SessionError, EventStoreError, StorageError;
 var init_WalletKitError = __esmMin((() => {
 	init_codes();
 	WalletKitError = class WalletKitError extends Error {
@@ -23619,7 +23619,7 @@ var init_WalletKitError = __esmMin((() => {
 			};
 		}
 	};
-	BridgeError = class extends WalletKitError {
+	BridgeError$1 = class extends WalletKitError {
 		constructor(message, originalError, context) {
 			super(ERROR_CODES.BRIDGE_NOT_INITIALIZED, message, originalError, context);
 			this.name = "BridgeError";
@@ -39043,7 +39043,7 @@ var esm_exports = /* @__PURE__ */ __exportAll({
 	Base64ToHex: () => Base64ToHex,
 	Base64ToUint8Array: () => Base64ToUint8Array,
 	BigIntToBase64: () => BigIntToBase64,
-	BridgeError: () => BridgeError,
+	BridgeError: () => BridgeError$1,
 	BridgeManager: () => BridgeManager,
 	CallForSuccess: () => CallForSuccess,
 	ConnectHandler: () => ConnectHandler,
@@ -39360,130 +39360,6 @@ var AndroidTONConnectSessionsManager = class {
 	}
 };
 //#endregion
-//#region src/adapters/AndroidAPIClientAdapter.ts
-/**
-* Android native API client adapter.
-* Uses Android's JavascriptInterface methods for API calls.
-* Similar to SwiftAPIClientAdapter for iOS.
-*/
-var AndroidAPIClientAdapter = class {
-	constructor(network) {
-		const androidWindow = window;
-		if (!androidWindow.WalletKitNative) throw new Error("WalletKitNative bridge not available");
-		this.androidBridge = androidWindow.WalletKitNative;
-		this.network = network;
-	}
-	getNetwork() {
-		return this.network;
-	}
-	/**
-	* Check if native API clients are available.
-	*/
-	static isAvailable() {
-		return typeof window.WalletKitNative?.apiGetNetworks === "function";
-	}
-	/**
-	* Get all networks that have native API clients configured.
-	*/
-	static getAvailableNetworks() {
-		const androidWindow = window;
-		if (!androidWindow.WalletKitNative?.apiGetNetworks) return [];
-		try {
-			const networksJson = androidWindow.WalletKitNative.apiGetNetworks();
-			return JSON.parse(networksJson);
-		} catch (err) {
-			error("[AndroidAPIClientAdapter] Failed to get available networks:", err);
-			return [];
-		}
-	}
-	async sendBoc(boc) {
-		try {
-			const networkJson = JSON.stringify(this.network);
-			return this.androidBridge.apiSendBoc(networkJson, boc);
-		} catch (err) {
-			error("[AndroidAPIClientAdapter] sendBoc failed:", err);
-			throw err;
-		}
-	}
-	async runGetMethod(address, method, stack, seqno) {
-		try {
-			const networkJson = JSON.stringify(this.network);
-			const stackJson = stack ? JSON.stringify(stack) : null;
-			const seqnoArg = seqno ?? -1;
-			const resultJson = this.androidBridge.apiRunGetMethod(networkJson, address, method, stackJson, seqnoArg);
-			return JSON.parse(resultJson);
-		} catch (err) {
-			error("[AndroidAPIClientAdapter] runGetMethod failed:", err);
-			throw err;
-		}
-	}
-	async nftItemsByAddress(_request) {
-		throw new Error("nftItemsByAddress is not implemented yet");
-	}
-	async nftItemsByOwner(_request) {
-		throw new Error("nftItemsByOwner is not implemented yet");
-	}
-	async fetchEmulation(_messageBoc, _ignoreSignature) {
-		throw new Error("fetchEmulation is not implemented yet");
-	}
-	async getAccountState(_address, _seqno) {
-		throw new Error("getAccountState is not implemented yet");
-	}
-	async getAccountStates(_addresses) {
-		throw new Error("getAccountStates is not implemented yet");
-	}
-	async getBalance(address, seqno) {
-		try {
-			const networkJson = JSON.stringify(this.network);
-			const seqnoArg = seqno ?? -1;
-			return this.androidBridge.apiGetBalance(networkJson, address, seqnoArg);
-		} catch (err) {
-			error("[AndroidAPIClientAdapter] getBalance failed:", err);
-			throw err;
-		}
-	}
-	async getAccountTransactions(_request) {
-		throw new Error("getAccountTransactions is not implemented yet");
-	}
-	async getTransactionsByHash(_request) {
-		throw new Error("getTransactionsByHash is not implemented yet");
-	}
-	async getPendingTransactions(_request) {
-		throw new Error("getPendingTransactions is not implemented yet");
-	}
-	async getTrace(_request) {
-		throw new Error("getTrace is not implemented yet");
-	}
-	async getPendingTrace(_request) {
-		throw new Error("getPendingTrace is not implemented yet");
-	}
-	async resolveDnsWallet(_domain) {
-		throw new Error("resolveDnsWallet is not implemented yet");
-	}
-	async backResolveDnsWallet(_address) {
-		throw new Error("backResolveDnsWallet is not implemented yet");
-	}
-	async jettonsByAddress(_request) {
-		throw new Error("jettonsByAddress is not implemented yet");
-	}
-	async jettonsByOwnerAddress(_request) {
-		throw new Error("jettonsByOwnerAddress is not implemented yet");
-	}
-	async getEvents(_request) {
-		throw new Error("getEvents is not implemented yet");
-	}
-	async getMasterchainInfo() {
-		try {
-			const networkJson = JSON.stringify(this.network);
-			const resultJson = this.androidBridge.apiGetMasterchainInfo(networkJson);
-			return JSON.parse(resultJson);
-		} catch (err) {
-			error("[AndroidAPIClientAdapter] getMasterchainInfo failed:", err);
-			throw err;
-		}
-	}
-};
-//#endregion
 //#region src/utils/serialization.ts
 /**
 * Copyright (c) TonTech.
@@ -39561,10 +39437,44 @@ function installPortHandshake() {
 //#region src/transport/nativeBridge.ts
 init_dist();
 var pendingRequests = /* @__PURE__ */ new Map();
+/** Structured failure for every bridge call. Distinguishes wire-level vs. host vs. decode. */
+var BridgeError = class extends Error {
+	constructor(kind, method, options) {
+		super(`[bridge:${kind}] ${method}${options?.raw ? ` raw=${truncate(options.raw)}` : ""}`);
+		this.kind = kind;
+		this.method = method;
+		this.name = "BridgeError";
+		if (options?.cause !== void 0) this.cause = options.cause;
+	}
+};
+function truncate(s, max = 200) {
+	return s.length <= max ? s : `${s.slice(0, max)}…(${s.length} chars)`;
+}
+/** Sync host call via @JavascriptInterface — returns the raw string the host produced. */
 function bridgeRequestSync(method, params) {
 	const native = window.WalletKitNative;
-	if (!native || typeof native.adapterCallSync !== "function") throw new Error("WalletKitNative.adapterCallSync not available");
-	return native.adapterCallSync(method, JSON.stringify(params));
+	if (!native || typeof native.adapterCallSync !== "function") throw new BridgeError("bridge_unavailable", method);
+	try {
+		return native.adapterCallSync(method, JSON.stringify(params, bigIntReplacer));
+	} catch (cause) {
+		throw new BridgeError("native_threw", method, { cause });
+	}
+}
+/** Sync host call with JSON-parsed return. Optional [decode] runs after parse. */
+function bridgeRequestSyncTyped(method, params, decode) {
+	const raw = bridgeRequestSync(method, params);
+	try {
+		const parsed = JSON.parse(raw);
+		return decode ? decode(parsed) : parsed;
+	} catch (cause) {
+		throw new BridgeError("decode_failed", method, {
+			cause,
+			raw
+		});
+	}
+}
+function isBridgeAvailable() {
+	return typeof window.WalletKitNative?.adapterCallSync === "function";
 }
 function bridgeRequest(method, params) {
 	const id = v7();
@@ -39632,6 +39542,122 @@ function postToNative(payload) {
 	sendToNative(JSON.stringify(payload, bigIntReplacer));
 }
 //#endregion
+//#region src/adapters/AndroidAPIClientAdapter.ts
+/**
+* Android native API client adapter — TS counterpart to the Kotlin `TONAPIClient`.
+*
+* Every method dispatches through the single sync bridge entry point
+* (`window.WalletKitNative.adapterCallSync`) under the `api.*` namespace. The adapter
+* only constructs the params object and picks whether the response is a raw string or
+* a JSON-encoded value — JSON marshalling and error wrapping live in [bridgeRequestSync].
+*
+* Methods iOS's `SwiftAPIClientAdapter` throws on (the ones the Swift host doesn't
+* delegate either) are thrown here too — keeps the two adapters at parity until the
+* host implements them. Bridge-availability checks belong to the bootstrap layer, not here.
+*/
+var AndroidAPIClientAdapter = class {
+	constructor(network) {
+		this.network = network;
+		this.chainId = network.chainId;
+	}
+	getNetwork() {
+		return this.network;
+	}
+	async sendBoc(boc) {
+		return bridgeRequestSync("api.sendBoc", {
+			chainId: this.chainId,
+			boc
+		});
+	}
+	async runGetMethod(address, method, stack, seqno) {
+		return bridgeRequestSyncTyped("api.runGetMethod", {
+			chainId: this.chainId,
+			address,
+			method,
+			stack,
+			seqno
+		});
+	}
+	async getMasterchainInfo() {
+		return bridgeRequestSyncTyped("api.getMasterchainInfo", { chainId: this.chainId });
+	}
+	async nftItemsByAddress(request) {
+		return bridgeRequestSyncTyped("api.nftItemsByAddress", {
+			chainId: this.chainId,
+			request
+		});
+	}
+	async nftItemsByOwner(request) {
+		return bridgeRequestSyncTyped("api.nftItemsByOwner", {
+			chainId: this.chainId,
+			request
+		});
+	}
+	async fetchEmulation(messageBoc, ignoreSignature) {
+		return bridgeRequestSyncTyped("api.fetchEmulation", {
+			chainId: this.chainId,
+			messageBoc,
+			ignoreSignature
+		});
+	}
+	async getAccountState(address, seqno) {
+		return bridgeRequestSyncTyped("api.getAccountState", {
+			chainId: this.chainId,
+			address,
+			seqno
+		});
+	}
+	async getAccountStates(addresses) {
+		return bridgeRequestSyncTyped("api.getAccountStates", {
+			chainId: this.chainId,
+			addresses
+		});
+	}
+	async getBalance(address, seqno) {
+		return bridgeRequestSync("api.getBalance", {
+			chainId: this.chainId,
+			address,
+			seqno
+		});
+	}
+	async resolveDnsWallet(domain) {
+		return bridgeRequestSync("api.resolveDnsWallet", {
+			chainId: this.chainId,
+			domain
+		}) || void 0;
+	}
+	async backResolveDnsWallet(address) {
+		return bridgeRequestSync("api.backResolveDnsWallet", {
+			chainId: this.chainId,
+			address
+		}) || void 0;
+	}
+	async getAccountTransactions(_request) {
+		throw new Error("getAccountTransactions is not implemented yet");
+	}
+	async getTransactionsByHash(_request) {
+		throw new Error("getTransactionsByHash is not implemented yet");
+	}
+	async getPendingTransactions(_request) {
+		throw new Error("getPendingTransactions is not implemented yet");
+	}
+	async getTrace(_request) {
+		throw new Error("getTrace is not implemented yet");
+	}
+	async getPendingTrace(_request) {
+		throw new Error("getPendingTrace is not implemented yet");
+	}
+	async jettonsByAddress(_request) {
+		throw new Error("jettonsByAddress is not implemented yet");
+	}
+	async jettonsByOwnerAddress(_request) {
+		throw new Error("jettonsByOwnerAddress is not implemented yet");
+	}
+	async getEvents(_request) {
+		throw new Error("getEvents is not implemented yet");
+	}
+};
+//#endregion
 //#region src/core/initialization.ts
 init_JSBridgeInjector();
 /**
@@ -39659,10 +39685,7 @@ async function initTonWalletKit(config, deps) {
 		else apiClient = netConfig.apiClientConfiguration;
 		networksConfig[netConfig.network.chainId] = { apiClient };
 	}
-	if (AndroidAPIClientAdapter.isAvailable()) {
-		const availableNetworks = AndroidAPIClientAdapter.getAvailableNetworks();
-		for (const nativeNetwork of availableNetworks) networksConfig[nativeNetwork.chainId] = { apiClient: new AndroidAPIClientAdapter(nativeNetwork) };
-	}
+	if (isBridgeAvailable()) for (const nativeNetwork of bridgeRequestSyncTyped("api.getNetworks", {})) networksConfig[nativeNetwork.chainId] = { apiClient: new AndroidAPIClientAdapter(nativeNetwork) };
 	const kitOptions = { networks: networksConfig };
 	kitOptions.fetchManifest = unwrapRef(config?.fetchManifest);
 	const devOptions = {};
@@ -40085,6 +40108,9 @@ async function getWalletById(args) {
 }
 async function getWalletAddress(args) {
 	return wallet(args.walletId, "getAddress");
+}
+async function getWalletNetwork(args) {
+	return wallet(args.walletId, "getNetwork");
 }
 async function removeWallet(args) {
 	return kit("removeWallet", args.walletId);
@@ -40836,8 +40862,7 @@ var TonStakersStakingProvider = class TonStakersStakingProvider extends StakingP
 //#region src/api/staking.ts
 /**
 * JS-side proxy that implements [StakingProviderInterface] by forwarding every call to a
-* Kotlin-implemented `ITONStakingProvider` via reverse-RPC. Mirrors the streaming
-* `ProxyStreamingProvider` pattern.
+* Kotlin-implemented `ITONStakingProvider` via reverse-RPC.
 *
 * `getStakingProviderMetadata` and `getSupportedNetworks` are synchronous per the interface
 * contract, so both values are passed in at registration and cached on this instance.
@@ -40896,8 +40921,18 @@ async function registerStakingProvider(args) {
 	if (!provider) throw new Error(`Staking provider not found: ${args.providerId}`);
 	(await getKit()).staking.registerProvider(provider);
 }
+async function removeStakingProvider(args) {
+	const instance = await getKit();
+	instance.staking.removeProvider(instance.staking.getProvider(args.providerId));
+}
 async function setDefaultStakingProvider(args) {
 	(await getKit()).staking.setDefaultProvider(args.providerId);
+}
+async function getRegisteredStakingProviders() {
+	return { providerIds: (await getKit()).staking.getProviders().map((provider) => provider.providerId) };
+}
+async function hasStakingProvider(args) {
+	return { result: (await getKit()).staking.hasProvider(args.providerId) };
 }
 async function getStakingQuote(args) {
 	const { providerId, ...params } = args;
@@ -40915,6 +40950,9 @@ async function getStakingProviderInfo(args) {
 }
 async function getStakingProviderMetadata(args) {
 	return (await getKit()).staking.getStakingProviderMetadata(args.network, args.providerId);
+}
+async function getStakingProviderSupportedNetworks(args) {
+	return { networks: (await getKit()).staking.getProvider(args.providerId).getSupportedNetworks() };
 }
 /**
 * Tell the JS staking manager that a Kotlin-implemented provider is available.
@@ -45416,11 +45454,21 @@ async function createDeDustSwapProvider(args) {
 async function registerSwapProvider(args) {
 	(await getSwap()).registerProvider(get(args.providerId));
 }
+async function removeSwapProvider(args) {
+	const swap = await getSwap();
+	swap.removeProvider(swap.getProvider(args.providerId));
+}
 async function setDefaultSwapProvider(args) {
 	(await getSwap()).setDefaultProvider(args.providerId);
 }
 async function getRegisteredSwapProviders() {
 	return { providerIds: (await getSwap()).getProviders().map((provider) => provider.providerId) };
+}
+async function getSwapProviderMetadata(args) {
+	return (await getSwap()).getProvider(args.providerId).getMetadata();
+}
+async function getSwapProviderSupportedNetworks(args) {
+	return { networks: (await getSwap()).getProvider(args.providerId).getSupportedNetworks() };
 }
 async function hasSwapProvider(args) {
 	return { result: (await getSwap()).hasProvider(args.providerId) };
@@ -45446,6 +45494,41 @@ async function registerKotlinSwapProvider(args) {
 	(await getSwap()).registerProvider(provider);
 }
 //#endregion
+//#region src/api/walletClient.ts
+async function walletClientSendBoc(args) {
+	return { result: await (await getWallet(args.walletId)).client.sendBoc(args.boc) };
+}
+async function walletClientRunGetMethod(args) {
+	return (await getWallet(args.walletId)).client.runGetMethod(args.address, args.method, args.stack, args.seqno);
+}
+async function walletClientGetBalance(args) {
+	return { result: await (await getWallet(args.walletId)).client.getBalance(args.address, args.seqno) };
+}
+async function walletClientGetMasterchainInfo(args) {
+	return (await getWallet(args.walletId)).client.getMasterchainInfo();
+}
+async function walletClientNftItemsByAddress(args) {
+	return (await getWallet(args.walletId)).client.nftItemsByAddress(args.request);
+}
+async function walletClientNftItemsByOwner(args) {
+	return (await getWallet(args.walletId)).client.nftItemsByOwner(args.request);
+}
+async function walletClientFetchEmulation(args) {
+	return (await getWallet(args.walletId)).client.fetchEmulation(args.messageBoc, args.ignoreSignature);
+}
+async function walletClientAccountState(args) {
+	return (await getWallet(args.walletId)).client.getAccountState(args.address, args.seqno);
+}
+async function walletClientAccountStates(args) {
+	return (await getWallet(args.walletId)).client.getAccountStates(args.addresses);
+}
+async function walletClientResolveDnsWallet(args) {
+	return { result: await (await getWallet(args.walletId)).client.resolveDnsWallet(args.domain) ?? null };
+}
+async function walletClientBackResolveDnsWallet(args) {
+	return { result: await (await getWallet(args.walletId)).client.backResolveDnsWallet(args.address) ?? null };
+}
+//#endregion
 //#region src/api/index.ts
 var api = {
 	init,
@@ -45464,6 +45547,7 @@ var api = {
 	getWallets,
 	getWallet: getWalletById,
 	getWalletAddress,
+	getWalletNetwork,
 	removeWallet,
 	getBalance,
 	getRecentTransactions,
@@ -45513,22 +45597,40 @@ var api = {
 	kotlinProviderDispatch,
 	createTonStakersStakingProvider,
 	registerStakingProvider,
+	removeStakingProvider,
 	setDefaultStakingProvider,
+	getRegisteredStakingProviders,
+	hasStakingProvider,
 	getStakingQuote,
 	buildStakeTransaction,
 	getStakedBalance,
 	getStakingProviderInfo,
 	getStakingProviderMetadata,
+	getStakingProviderSupportedNetworks,
 	registerKotlinStakingProvider,
 	createOmnistonSwapProvider,
 	createDeDustSwapProvider,
 	registerSwapProvider,
+	removeSwapProvider,
 	setDefaultSwapProvider,
 	getRegisteredSwapProviders,
+	getSwapProviderMetadata,
+	getSwapProviderSupportedNetworks,
 	hasSwapProvider,
 	getSwapQuote,
 	buildSwapTransaction,
-	registerKotlinSwapProvider
+	registerKotlinSwapProvider,
+	walletClientSendBoc,
+	walletClientRunGetMethod,
+	walletClientGetBalance,
+	walletClientGetMasterchainInfo,
+	walletClientNftItemsByAddress,
+	walletClientNftItemsByOwner,
+	walletClientFetchEmulation,
+	walletClientAccountState,
+	walletClientAccountStates,
+	walletClientResolveDnsWallet,
+	walletClientBackResolveDnsWallet
 };
 //#endregion
 //#region src/bridge.ts
