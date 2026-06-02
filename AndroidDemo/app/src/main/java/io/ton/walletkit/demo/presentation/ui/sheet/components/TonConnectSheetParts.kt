@@ -305,6 +305,26 @@ internal fun TonConnectSheetDisclaimer(
 }
 
 /**
+ * Small inline pill, mirroring iOS `TONBadge(style: .gray, uppercase: false)` — used to tag
+ * transaction entries (State init, Extra currencies, Attach/Forward amounts, Response dest, …).
+ */
+@Composable
+internal fun TonBadge(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    TonText(
+        text = text,
+        style = TonTheme.typography.footnoteSemibold,
+        color = TonTheme.colors.textSecondary,
+        modifier = modifier
+            .clip(SmoothCornerShape(6.dp))
+            .background(TonTheme.colors.bgFillTertiary)
+            .padding(horizontal = 6.dp, vertical = 2.dp),
+    )
+}
+
+/**
  * Single-line key/value row used for permissions inside the section card.
  */
 @Composable

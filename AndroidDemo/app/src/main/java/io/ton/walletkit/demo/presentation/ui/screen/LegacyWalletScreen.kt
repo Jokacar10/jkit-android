@@ -187,6 +187,8 @@ fun LegacyWalletScreen(
                     request = sheet.request,
                     onApprove = { actions.onApproveTransaction(sheet.request) },
                     onReject = { actions.onRejectTransaction(sheet.request) },
+                    wallet = state.wallets.firstOrNull { it.address == sheet.request.walletAddress }
+                        ?: activeWallet,
                 )
 
                 is SheetState.SignData -> SignDataSheet(
@@ -201,6 +203,8 @@ fun LegacyWalletScreen(
                     request = sheet.request,
                     onApprove = { actions.onApproveSignMessage(sheet.request) },
                     onReject = { actions.onRejectSignMessage(sheet.request) },
+                    wallet = state.wallets.firstOrNull { it.address == sheet.request.walletAddress }
+                        ?: activeWallet,
                 )
 
                 is SheetState.WalletDetails -> WalletDetailsSheet(
