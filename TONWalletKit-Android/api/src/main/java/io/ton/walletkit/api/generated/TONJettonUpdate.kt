@@ -50,13 +50,13 @@ data class TONJettonUpdate(
     @Contextual @SerialName(value = "status")
     val status: TONStreamingUpdateStatus,
 
-    @Contextual @SerialName(value = "masterAddress")
+    @SerialName(value = "masterAddress")
     val masterAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
-    @Contextual @SerialName(value = "walletAddress")
+    @SerialName(value = "walletAddress")
     val walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
-    @Contextual @SerialName(value = "ownerAddress")
+    @SerialName(value = "ownerAddress")
     val ownerAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "rawBalance")

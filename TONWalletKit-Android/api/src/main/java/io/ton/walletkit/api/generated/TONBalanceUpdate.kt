@@ -47,7 +47,7 @@ data class TONBalanceUpdate(
     @Contextual @SerialName(value = "status")
     val status: TONStreamingUpdateStatus,
 
-    @Contextual @SerialName(value = "address")
+    @SerialName(value = "address")
     val address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "rawBalance")
