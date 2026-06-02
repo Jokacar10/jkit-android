@@ -21,10 +21,17 @@
  */
 package io.ton.walletkit.client
 
+import io.ton.walletkit.api.generated.TONAccountState
+import io.ton.walletkit.api.generated.TONEmulationResult
 import io.ton.walletkit.api.generated.TONGetMethodResult
 import io.ton.walletkit.api.generated.TONMasterchainInfo
+import io.ton.walletkit.api.generated.TONNFTsRequest
+import io.ton.walletkit.api.generated.TONNFTsResponse
+import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONRawStackItem
+import io.ton.walletkit.api.generated.TONUserNFTsRequest
 import io.ton.walletkit.model.TONBase64
+import io.ton.walletkit.model.TONTokenAmount
 import io.ton.walletkit.model.TONUserFriendlyAddress
 
 /**
@@ -38,37 +45,43 @@ import io.ton.walletkit.model.TONUserFriendlyAddress
  * client itself.
  */
 interface TONAPIClient {
-    /**
-     * Send a signed BOC (Bag of Cells) to the network.
-     *
-     * @param boc The base64-encoded BOC to send
-     * @return The transaction hash or message ID
-     * @throws Exception if the send fails
-     */
+    fun network(): TONNetwork
+
     suspend fun sendBoc(boc: TONBase64): String
 
-    /**
-     * Run a get method on a smart contract.
-     *
-     * @param address The contract address
-     * @param method The method name to call
-     * @param stack Optional stack items to pass as arguments
-     * @param seqno Optional seqno for historical state queries
-     * @return The get method result including gas used, exit code, and stack
-     * @throws Exception if the call fails
-     */
     suspend fun runGetMethod(
         address: TONUserFriendlyAddress,
         method: String,
         stack: List<TONRawStackItem>? = null,
-        seqno: Int? = null,
+        seqno: UInt? = null,
     ): TONGetMethodResult
 
-    /**
-     * Get the latest masterchain block info.
-     *
-     * @return The masterchain info including seqno, shard, workchain, and hashes
-     * @throws Exception if the query fails
-     */
+    suspend fun getBalance(
+        address: TONUserFriendlyAddress,
+        seqno: UInt? = null,
+    ): TONTokenAmount
+
     suspend fun getMasterchainInfo(): TONMasterchainInfo
+
+    suspend fun nftItemsByAddress(request: TONNFTsRequest): TONNFTsResponse
+
+    suspend fun nftItemsByOwner(request: TONUserNFTsRequest): TONNFTsResponse
+
+    suspend fun fetchEmulation(
+        messageBoc: TONBase64,
+        ignoreSignature: Boolean = false,
+    ): TONEmulationResult
+
+    suspend fun accountState(
+        address: TONUserFriendlyAddress,
+        seqno: UInt? = null,
+    ): TONAccountState
+
+    suspend fun accountStates(
+        addresses: List<TONUserFriendlyAddress>,
+    ): Map<TONUserFriendlyAddress, TONAccountState>
+
+    suspend fun resolveDnsWallet(domain: String): String?
+
+    suspend fun backResolveDnsWallet(address: TONUserFriendlyAddress): String?
 }
