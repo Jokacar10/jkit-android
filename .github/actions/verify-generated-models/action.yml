@@ -55,10 +55,11 @@ runs:
       with:
         package_json_file: .kit-models/package.json
 
+    # Node 24 to match kit's release.yml toolchain — kit pins pnpm 11, which needs Node >= 22.13.
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 24
         cache: pnpm
         cache-dependency-path: .kit-models/pnpm-lock.yaml
 
@@ -67,7 +68,7 @@ runs:
       run: |
         set -euo pipefail
         # jq is required by generate-api-models.sh; python3 is preinstalled on ubuntu runners.
-        command -v jq >/dev/null || sudo apt-get update -qq && sudo apt-get install -y -qq jq
+        if ! command -v jq >/dev/null; then sudo apt-get update -qq && sudo apt-get install -y -qq jq; fi
         npm install -g @openapi-contrib/json-schema-to-openapi-schema
         # openapi-generator-cli as a pinned jar + a wrapper on PATH (matches local toolchain).
         VERSION="${{ inputs.openapi-generator-version }}"
