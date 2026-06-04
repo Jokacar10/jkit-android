@@ -41,10 +41,10 @@ import kotlinx.serialization.Serializable
 data class TONSignDataRequestEventPreview(
 
     @SerialName(value = "data")
-    val `data`: TONSignDataPreview,
+    var `data`: TONSignDataPreview,
 
     @SerialName(value = "dAppInfo")
-    val dAppInfo: TONDAppInfo? = null,
+    var dAppInfo: TONDAppInfo? = null,
 
 ) {
 

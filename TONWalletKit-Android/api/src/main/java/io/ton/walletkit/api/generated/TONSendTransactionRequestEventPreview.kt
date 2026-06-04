@@ -40,7 +40,7 @@ import kotlinx.serialization.Serializable
 data class TONSendTransactionRequestEventPreview(
 
     @SerialName(value = "data")
-    val `data`: TONTransactionEmulatedPreview? = null,
+    var `data`: TONTransactionEmulatedPreview? = null,
 
 ) {
 

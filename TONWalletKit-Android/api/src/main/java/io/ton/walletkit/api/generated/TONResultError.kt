@@ -44,15 +44,15 @@ data class TONResultError(
 
     /* Error code representing the type of error */
     @SerialName(value = "code")
-    val code: kotlin.Int? = null,
+    var code: kotlin.Int? = null,
 
     /* Human-readable error message */
     @SerialName(value = "message")
-    val message: kotlin.String? = null,
+    var message: kotlin.String? = null,
 
     /* Additional error data */
     @Contextual @SerialName(value = "data")
-    val `data`: kotlinx.serialization.json.JsonElement? = null,
+    var `data`: kotlinx.serialization.json.JsonElement? = null,
 
 ) {
 

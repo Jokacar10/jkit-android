@@ -49,27 +49,27 @@ data class TONProofMessage(
 
     /* Workchain ID of the wallet address */
     @SerialName(value = "workchain")
-    val workchain: kotlin.Int,
+    var workchain: kotlin.Int,
 
     @Contextual @SerialName(value = "addressHash")
-    val addressHash: io.ton.walletkit.model.TONHex,
+    var addressHash: io.ton.walletkit.model.TONHex,
 
     /* Unix timestamp when the proof was created */
     @SerialName(value = "timestamp")
-    val timestamp: kotlin.Int,
+    var timestamp: kotlin.Int,
 
     @SerialName(value = "domain")
-    val domain: TONProofMessageDomain,
+    var domain: TONProofMessageDomain,
 
     /* Payload string to be signed */
     @SerialName(value = "payload")
-    val payload: kotlin.String,
+    var payload: kotlin.String,
 
     @Contextual @SerialName(value = "stateInit")
-    val stateInit: io.ton.walletkit.model.TONBase64,
+    var stateInit: io.ton.walletkit.model.TONBase64,
 
     @Contextual @SerialName(value = "signature")
-    val signature: io.ton.walletkit.model.TONHex? = null,
+    var signature: io.ton.walletkit.model.TONHex? = null,
 
 ) {
 

@@ -1,0 +1,111 @@
+name: Verify generated API models
+description: >
+  Regenerate the Kotlin API models from the pinned kit tag (WALLETKIT_BRIDGE_TAG in
+  gradle.properties) and verify the committed models match byte-for-byte. The generated
+  models are treated as a pinned artifact: you bump the tag, regenerate, run spotless, and
+  commit by hand — this guards that the committed models are exactly what generating that
+  tag (plus the committed templates + spotless formatting) produces. No fixtures: it
+  validates the real, shipped models under api/src/main.
+
+inputs:
+  repo:
+    description: kit monorepo that contains the walletkit OpenAPI source
+    default: ton-org/kit
+  gradle-properties:
+    description: Path to gradle.properties holding WALLETKIT_BRIDGE_TAG
+    default: TONWalletKit-Android/gradle.properties
+  models-dir:
+    description: Path to the committed generated models
+    default: TONWalletKit-Android/api/src/main/java/io/ton/walletkit/api/generated
+  openapi-generator-version:
+    description: openapi-generator-cli version the models were generated with
+    default: "7.17.0"
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve pinned tag
+      id: tag
+      shell: bash
+      run: |
+        TAG=$(grep -E '^WALLETKIT_BRIDGE_TAG=' "${{ inputs.gradle-properties }}" | cut -d= -f2 | tr -d '[:space:]')
+        if [ -z "$TAG" ]; then
+          echo "::error::WALLETKIT_BRIDGE_TAG is not set in ${{ inputs.gradle-properties }}"
+          exit 1
+        fi
+        echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+        echo "Pinned tag: $TAG"
+
+    - name: Checkout kit @ pinned tag
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.repo }}
+        ref: ${{ steps.tag.outputs.tag }}
+        path: .kit-models
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        cache: 'gradle'
+
+    - name: Set up pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        package_json_file: .kit-models/package.json
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: pnpm
+        cache-dependency-path: .kit-models/pnpm-lock.yaml
+
+    - name: Install codegen tooling (openapi-generator + json-schema-to-openapi-schema)
+      shell: bash
+      run: |
+        set -euo pipefail
+        # jq is required by generate-api-models.sh; python3 is preinstalled on ubuntu runners.
+        command -v jq >/dev/null || sudo apt-get update -qq && sudo apt-get install -y -qq jq
+        npm install -g @openapi-contrib/json-schema-to-openapi-schema
+        # openapi-generator-cli as a pinned jar + a wrapper on PATH (matches local toolchain).
+        VERSION="${{ inputs.openapi-generator-version }}"
+        jar_url="https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/${VERSION}/openapi-generator-cli-${VERSION}.jar"
+        sudo mkdir -p /opt/openapi-generator
+        sudo curl -fsSL "$jar_url" -o /opt/openapi-generator/openapi-generator-cli.jar
+        printf '#!/usr/bin/env bash\nexec java -jar /opt/openapi-generator/openapi-generator-cli.jar "$@"\n' | sudo tee /usr/local/bin/openapi-generator >/dev/null
+        sudo chmod +x /usr/local/bin/openapi-generator
+        openapi-generator version
+
+    - name: Grant execute permission for gradlew
+      shell: bash
+      working-directory: TONWalletKit-Android
+      run: chmod +x gradlew
+
+    - name: Regenerate models from the pinned tag
+      shell: bash
+      run: |
+        set -euo pipefail
+        ./Scripts/generate-api/generate-api-models.sh "$GITHUB_WORKSPACE/.kit-models/packages/walletkit"
+
+    - name: Apply spotless formatting (same pass devs commit)
+      shell: bash
+      working-directory: TONWalletKit-Android
+      run: ./gradlew :api:spotlessApply
+
+    - name: Verify committed models match the regeneration
+      shell: bash
+      run: |
+        set -euo pipefail
+        TAG="${{ steps.tag.outputs.tag }}"
+        if git diff --quiet -- "${{ inputs.models-dir }}"; then
+          echo "✅ Committed API models match a fresh generation of $TAG."
+        else
+          echo "::error::Committed API models differ from generating walletkit @ $TAG (+ templates + spotless)."
+          echo "::error::Bump WALLETKIT_BRIDGE_TAG and/or run: ./Scripts/generate-api/generate-api-models.sh <kit>/packages/walletkit && ./gradlew :api:spotlessApply, then commit the result."
+          echo "----- drift -----"
+          git --no-pager diff --stat -- "${{ inputs.models-dir }}"
+          git --no-pager diff -- "${{ inputs.models-dir }}" | head -200
+          exit 1
+        fi

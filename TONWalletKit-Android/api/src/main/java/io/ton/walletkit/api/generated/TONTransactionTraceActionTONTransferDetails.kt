@@ -46,25 +46,25 @@ import kotlinx.serialization.Serializable
 data class TONTransactionTraceActionTONTransferDetails(
 
     @SerialName(value = "source")
-    val source: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var source: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "destination")
-    val destination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var destination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "value")
-    val `value`: kotlin.String? = null,
+    var `value`: kotlin.String? = null,
 
     /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
     @SerialName(value = "valueExtraCurrencies")
-    val valueExtraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+    var valueExtraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
 
     /* Optional comment for the transfer */
     @SerialName(value = "comment")
-    val comment: kotlin.String? = null,
+    var comment: kotlin.String? = null,
 
     /* Indicates if the payload or comment was encrypted. */
     @SerialName(value = "isEncrypted")
-    val isEncrypted: kotlin.Boolean? = null,
+    var isEncrypted: kotlin.Boolean? = null,
 
 ) {
 

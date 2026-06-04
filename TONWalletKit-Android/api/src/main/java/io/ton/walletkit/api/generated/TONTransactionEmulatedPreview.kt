@@ -44,16 +44,16 @@ import kotlinx.serialization.Serializable
 data class TONTransactionEmulatedPreview(
 
     @Contextual @SerialName(value = "result")
-    val result: TONResult,
+    var result: TONResult,
 
     @SerialName(value = "error")
-    val error: TONResultError? = null,
+    var error: TONResultError? = null,
 
     @SerialName(value = "trace")
-    val trace: TONTransactionEmulatedTrace? = null,
+    var trace: TONTransactionEmulatedTrace? = null,
 
     @SerialName(value = "moneyFlow")
-    val moneyFlow: TONTransactionTraceMoneyFlow? = null,
+    var moneyFlow: TONTransactionTraceMoneyFlow? = null,
 
 ) {
 

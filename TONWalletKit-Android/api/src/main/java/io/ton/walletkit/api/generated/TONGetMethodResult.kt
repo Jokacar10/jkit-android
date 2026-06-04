@@ -42,13 +42,13 @@ import kotlinx.serialization.Serializable
 data class TONGetMethodResult(
 
     @SerialName(value = "gasUsed")
-    val gasUsed: kotlin.Double,
+    var gasUsed: kotlin.Double,
 
     @SerialName(value = "stack")
-    val stack: kotlin.collections.List<TONRawStackItem>,
+    var stack: kotlin.collections.List<TONRawStackItem>,
 
     @SerialName(value = "exitCode")
-    val exitCode: kotlin.Double,
+    var exitCode: kotlin.Double,
 
 ) {
 

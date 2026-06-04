@@ -45,21 +45,21 @@ data class TONTokenInfo(
 
     /* Display name of the token */
     @SerialName(value = "name")
-    val name: kotlin.String? = null,
+    var name: kotlin.String? = null,
 
     /* Human-readable description of the token */
     @SerialName(value = "description")
-    val description: kotlin.String? = null,
+    var description: kotlin.String? = null,
 
     @SerialName(value = "image")
-    val image: TONTokenImage? = null,
+    var image: TONTokenImage? = null,
 
     @SerialName(value = "animation")
-    val animation: TONTokenAnimation? = null,
+    var animation: TONTokenAnimation? = null,
 
     /* Ticker symbol of the token (e.g., \"TON\", \"USDT\") */
     @SerialName(value = "symbol")
-    val symbol: kotlin.String? = null,
+    var symbol: kotlin.String? = null,
 
 ) {
 

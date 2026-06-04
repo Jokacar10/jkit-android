@@ -46,21 +46,21 @@ import kotlinx.serialization.Serializable
 data class TONPreparedSignData(
 
     @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     /* Unix timestamp when the sign request was created */
     @SerialName(value = "timestamp")
-    val timestamp: kotlin.Double,
+    var timestamp: kotlin.Double,
 
     /* Domain requesting the signature (e.g., \"example.com\") */
     @SerialName(value = "domain")
-    val domain: kotlin.String,
+    var domain: kotlin.String,
 
     @SerialName(value = "payload")
-    val payload: TONSignDataPayload,
+    var payload: TONSignDataPayload,
 
     @Contextual @SerialName(value = "hash")
-    val hash: io.ton.walletkit.model.TONHex,
+    var hash: io.ton.walletkit.model.TONHex,
 
 ) {
 

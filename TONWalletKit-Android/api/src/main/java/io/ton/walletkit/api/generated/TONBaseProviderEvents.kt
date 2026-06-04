@@ -41,10 +41,10 @@ import kotlinx.serialization.Serializable
 data class TONBaseProviderEvents(
 
     @SerialName(value = "provider:registered")
-    val providerRegistered: TONBaseProviderUpdate,
+    var providerRegistered: TONBaseProviderUpdate,
 
     @SerialName(value = "provider:default-changed")
-    val providerDefaultChanged: TONBaseProviderUpdate,
+    var providerDefaultChanged: TONBaseProviderUpdate,
 
 ) {
 

@@ -48,24 +48,24 @@ data class TONStakingProviderMetadata(
 
     /* Human-readable provider name (e.g. \"Tonstakers\") */
     @SerialName(value = "name")
-    val name: kotlin.String,
+    var name: kotlin.String,
 
     /* Supported unstake modes for this provider */
     @SerialName(value = "supportedUnstakeModes")
-    val supportedUnstakeModes: kotlin.collections.List<@Contextual TONUnstakeMode>,
+    var supportedUnstakeModes: kotlin.collections.List<@Contextual TONUnstakeMode>,
 
     /* Whether provider supports reversed quote format (e.g., passing TON instead of tsTON for unstake) */
     @SerialName(value = "supportsReversedQuote")
-    val supportsReversedQuote: kotlin.Boolean,
+    var supportsReversedQuote: kotlin.Boolean,
 
     @SerialName(value = "stakeToken")
-    val stakeToken: TONStakingTokenInfo,
+    var stakeToken: TONStakingTokenInfo,
 
     @SerialName(value = "receiveToken")
-    val receiveToken: TONStakingTokenInfo? = null,
+    var receiveToken: TONStakingTokenInfo? = null,
 
     @SerialName(value = "contractAddress")
-    val contractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var contractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
 ) {
 

@@ -43,15 +43,15 @@ data class TONEmulationBlockRef(
 
     /* Workchain identifier */
     @SerialName(value = "workchain")
-    val workchain: kotlin.Int,
+    var workchain: kotlin.Int,
 
     /* Shard identifier */
     @SerialName(value = "shard")
-    val shard: kotlin.String,
+    var shard: kotlin.String,
 
     /* Block sequence number */
     @SerialName(value = "seqno")
-    val seqno: kotlin.Int,
+    var seqno: kotlin.Int,
 
 ) {
 

@@ -49,38 +49,38 @@ data class TONOmnistonSwapProviderConfig(
 
     /* The address of the referrer */
     @SerialName(value = "referrerAddress")
-    val referrerAddress: kotlin.String? = null,
+    var referrerAddress: kotlin.String? = null,
 
     /* Referrer fee in basis points (1 bp = 0.01%) */
     @SerialName(value = "referrerFeeBps")
-    val referrerFeeBps: kotlin.Int? = null,
+    var referrerFeeBps: kotlin.Int? = null,
 
     /* Whether a flexible referrer fee is allowed */
     @SerialName(value = "flexibleReferrerFee")
-    val flexibleReferrerFee: kotlin.Boolean? = null,
+    var flexibleReferrerFee: kotlin.Boolean? = null,
 
     /* Optional URL for the Omniston API */
     @SerialName(value = "apiUrl")
-    val apiUrl: kotlin.String? = null,
+    var apiUrl: kotlin.String? = null,
 
     /* Default slippage tolerance in basis points (1 bp = 0.01%) */
     @SerialName(value = "defaultSlippageBps")
-    val defaultSlippageBps: kotlin.Int? = null,
+    var defaultSlippageBps: kotlin.Int? = null,
 
     /* Timeout for quote requests in milliseconds */
     @SerialName(value = "quoteTimeoutMs")
-    val quoteTimeoutMs: kotlin.Int? = null,
+    var quoteTimeoutMs: kotlin.Int? = null,
 
     /* Timeout for build-transaction requests in milliseconds. Guards against indefinite hangs when network connectivity is lost between getting a quote and signing — `buildTransfer` would otherwise wait without surfacing an error. */
     @SerialName(value = "buildTimeoutMs")
-    val buildTimeoutMs: kotlin.Int? = null,
+    var buildTimeoutMs: kotlin.Int? = null,
 
     /* Identifier for the provider */
     @SerialName(value = "providerId")
-    val providerId: kotlin.String? = null,
+    var providerId: kotlin.String? = null,
 
     @SerialName(value = "metadata")
-    val metadata: TONSwapProviderMetadataOverride? = null,
+    var metadata: TONSwapProviderMetadataOverride? = null,
 
 ) {
 

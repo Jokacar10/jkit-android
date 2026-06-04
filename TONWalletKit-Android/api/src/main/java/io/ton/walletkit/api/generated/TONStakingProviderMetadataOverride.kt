@@ -47,22 +47,22 @@ import kotlinx.serialization.Serializable
 data class TONStakingProviderMetadataOverride(
 
     @SerialName(value = "name")
-    val name: kotlin.String? = null,
+    var name: kotlin.String? = null,
 
     @SerialName(value = "stakeToken")
-    val stakeToken: TONStakingTokenInfo? = null,
+    var stakeToken: TONStakingTokenInfo? = null,
 
     @SerialName(value = "receiveToken")
-    val receiveToken: TONStakingTokenInfo? = null,
+    var receiveToken: TONStakingTokenInfo? = null,
 
     @SerialName(value = "contractAddress")
-    val contractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var contractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "supportedUnstakeModes")
-    val supportedUnstakeModes: kotlin.collections.List<@Contextual TONUnstakeMode>? = null,
+    var supportedUnstakeModes: kotlin.collections.List<@Contextual TONUnstakeMode>? = null,
 
     @SerialName(value = "supportsReversedQuote")
-    val supportsReversedQuote: kotlin.Boolean? = null,
+    var supportsReversedQuote: kotlin.Boolean? = null,
 
 ) {
 

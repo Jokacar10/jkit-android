@@ -42,13 +42,13 @@ import kotlinx.serialization.Serializable
 data class TONStreamingEvents(
 
     @SerialName(value = "streaming:balance-update")
-    val streamingBalanceUpdate: TONBalanceUpdate,
+    var streamingBalanceUpdate: TONBalanceUpdate,
 
     @SerialName(value = "streaming:transactions")
-    val streamingTransactions: TONTransactionsUpdate,
+    var streamingTransactions: TONTransactionsUpdate,
 
     @SerialName(value = "streaming:jettons-update")
-    val streamingJettonsUpdate: TONJettonUpdate,
+    var streamingJettonsUpdate: TONJettonUpdate,
 
 ) {
 

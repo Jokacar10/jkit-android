@@ -44,18 +44,18 @@ data class TONStakingProviderInfo(
 
     /* Annual Percentage Yield in basis points (100 = 1%) */
     @SerialName(value = "apy")
-    val apy: kotlin.Double,
+    var apy: kotlin.Double,
 
     @SerialName(value = "rawInstantUnstakeAvailable")
-    val rawInstantUnstakeAvailable: kotlin.String? = null,
+    var rawInstantUnstakeAvailable: kotlin.String? = null,
 
     /* Amount available for instant unstake */
     @SerialName(value = "instantUnstakeAvailable")
-    val instantUnstakeAvailable: kotlin.String? = null,
+    var instantUnstakeAvailable: kotlin.String? = null,
 
     /* Exchange rate between stakeToken and receiveToken (e.g. 1 TON = 0.95 tsTON). Undefined when there is no receiveToken (direct/custodial staking). */
     @SerialName(value = "exchangeRate")
-    val exchangeRate: kotlin.String? = null,
+    var exchangeRate: kotlin.String? = null,
 
 ) {
 

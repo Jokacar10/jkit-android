@@ -45,16 +45,16 @@ import kotlinx.serialization.Serializable
 data class TONConnectionApprovalProof(
 
     @Contextual @SerialName(value = "signature")
-    val signature: io.ton.walletkit.model.TONBase64,
+    var signature: io.ton.walletkit.model.TONBase64,
 
     @SerialName(value = "timestamp")
-    val timestamp: kotlin.Double,
+    var timestamp: kotlin.Double,
 
     @SerialName(value = "domain")
-    val domain: TONConnectionApprovalProofDomain,
+    var domain: TONConnectionApprovalProofDomain,
 
     @SerialName(value = "payload")
-    val payload: kotlin.String,
+    var payload: kotlin.String,
 
 ) {
 

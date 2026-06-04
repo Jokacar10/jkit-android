@@ -54,52 +54,52 @@ data class TONEmulationComputePhase(
 
     /* Whether the compute phase was skipped */
     @SerialName(value = "isSkipped")
-    val isSkipped: kotlin.Boolean,
+    var isSkipped: kotlin.Boolean,
 
     /* Whether the TVM execution succeeded */
     @SerialName(value = "isSuccess")
-    val isSuccess: kotlin.Boolean,
+    var isSuccess: kotlin.Boolean,
 
     /* Whether the message state was used during compute */
     @SerialName(value = "isMsgStateUsed")
-    val isMsgStateUsed: kotlin.Boolean,
+    var isMsgStateUsed: kotlin.Boolean,
 
     /* Whether the account was activated during compute */
     @SerialName(value = "isAccountActivated")
-    val isAccountActivated: kotlin.Boolean,
+    var isAccountActivated: kotlin.Boolean,
 
     @SerialName(value = "gasFees")
-    val gasFees: kotlin.String,
+    var gasFees: kotlin.String,
 
     /* Total gas consumed */
     @SerialName(value = "gasUsed")
-    val gasUsed: kotlin.String,
+    var gasUsed: kotlin.String,
 
     /* Gas limit for this execution */
     @SerialName(value = "gasLimit")
-    val gasLimit: kotlin.String,
+    var gasLimit: kotlin.String,
 
     /* Compute execution mode */
     @SerialName(value = "mode")
-    val mode: kotlin.Int,
+    var mode: kotlin.Int,
 
     /* TVM exit code */
     @SerialName(value = "exitCode")
-    val exitCode: kotlin.Int,
+    var exitCode: kotlin.Int,
 
     /* Number of TVM steps executed */
     @SerialName(value = "vmSteps")
-    val vmSteps: kotlin.Int,
+    var vmSteps: kotlin.Int,
 
     /* Gas credit, if any */
     @SerialName(value = "gasCredit")
-    val gasCredit: kotlin.String? = null,
+    var gasCredit: kotlin.String? = null,
 
     @Contextual @SerialName(value = "vmInitStateHash")
-    val vmInitStateHash: io.ton.walletkit.model.TONHex? = null,
+    var vmInitStateHash: io.ton.walletkit.model.TONHex? = null,
 
     @Contextual @SerialName(value = "vmFinalStateHash")
-    val vmFinalStateHash: io.ton.walletkit.model.TONHex? = null,
+    var vmFinalStateHash: io.ton.walletkit.model.TONHex? = null,
 
 ) {
 
