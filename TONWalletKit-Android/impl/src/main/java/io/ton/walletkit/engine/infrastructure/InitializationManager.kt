@@ -235,6 +235,11 @@ internal class InitializationManager(
                             resolveSignDataTypes(configuration, featuresToUse).forEach { add(it) }
                         }
                     }
+                    if (featuresToUse.any { it is TONWalletKitConfiguration.EmbeddedRequestFeature }) {
+                        addJsonObject {
+                            put(JsonConstants.KEY_NAME, JsonConstants.FEATURE_EMBEDDED_REQUEST)
+                        }
+                    }
                 }
             }
 

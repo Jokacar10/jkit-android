@@ -89,13 +89,22 @@ sealed class TONStreamingUpdate {
 
             val jsonElement = when (value) {
                 is Balance ->
-                    jsonEncoder.json.encodeToJsonElement(serializer<TONBalanceUpdate>(), value.value)
+                    JsonObject(
+                        jsonEncoder.json.encodeToJsonElement(serializer<TONBalanceUpdate>(), value.value).jsonObject +
+                            (DISCRIMINATOR_FIELD to JsonPrimitive("balance")),
+                    )
 
                 is Transactions ->
-                    jsonEncoder.json.encodeToJsonElement(serializer<TONTransactionsUpdate>(), value.value)
+                    JsonObject(
+                        jsonEncoder.json.encodeToJsonElement(serializer<TONTransactionsUpdate>(), value.value).jsonObject +
+                            (DISCRIMINATOR_FIELD to JsonPrimitive("transactions")),
+                    )
 
                 is Jettons ->
-                    jsonEncoder.json.encodeToJsonElement(serializer<TONJettonUpdate>(), value.value)
+                    JsonObject(
+                        jsonEncoder.json.encodeToJsonElement(serializer<TONJettonUpdate>(), value.value).jsonObject +
+                            (DISCRIMINATOR_FIELD to JsonPrimitive("jettons")),
+                    )
             }
             jsonEncoder.encodeJsonElement(jsonElement)
         }
