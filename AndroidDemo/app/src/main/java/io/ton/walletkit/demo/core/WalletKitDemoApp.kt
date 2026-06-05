@@ -301,8 +301,6 @@ object TONWalletKitHelper {
                     TONWalletKitConfiguration.SignDataFeature(
                         types = listOf(SignDataType.TEXT, SignDataType.BINARY, SignDataType.CELL),
                     ),
-                    // Advertise EmbeddedRequest so requests folded into the connect link (`e=` param)
-                    // are decoded and surfaced as a follow-up request after the connect is approved.
                     TONWalletKitConfiguration.EmbeddedRequestFeature,
                 ),
                 storageType = TONWalletKitStorageType.Encrypted,
