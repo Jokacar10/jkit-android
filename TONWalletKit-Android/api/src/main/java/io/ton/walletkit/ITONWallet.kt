@@ -24,6 +24,8 @@ package io.ton.walletkit
 import io.ton.walletkit.api.generated.*
 import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.model.TONBalance
+import io.ton.walletkit.model.TONBase64
+import io.ton.walletkit.model.TONHex
 import io.ton.walletkit.model.TONUserFriendlyAddress
 
 /**
@@ -43,10 +45,22 @@ interface ITONWallet {
     /** API client backing this wallet — exposes per-wallet network and RPC. */
     val client: TONAPIClient
 
+    /** Network this wallet is connected to. */
+    val network: TONNetwork
+
     /**
      * Get wallet balance.
      */
     suspend fun balance(): TONBalance
+
+    /** Get this wallet's public key (hex). */
+    suspend fun publicKey(): TONHex
+
+    /** Sign a set of messages as a sign-message bundle, returning the signed internal BoC (used by gasless relay flows). */
+    suspend fun signMessage(
+        messages: List<TONTransactionRequestMessage>,
+        validUntil: Double? = null,
+    ): TONBase64
 
     /**
      * Create a TON transfer transaction.

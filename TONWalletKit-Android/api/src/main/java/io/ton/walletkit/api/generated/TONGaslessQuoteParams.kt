@@ -29,33 +29,39 @@
 package io.ton.walletkit.api.generated
 
 import io.ton.walletkit.model.TONUserFriendlyAddress
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Parameters to quote a gasless transaction.  The relayer wraps the caller's messages with fee-collection logic and returns a new set of messages that the wallet should sign via `signMessage`.
  *
- *
- * @param quote
- * @param userAddress
- * @param destinationAddress
- * @param slippageBps Slippage tolerance in basis points (1 bp = 0.01%)
- * @param deadline Transaction deadline in unix timestamp
- * @param providerOptions Provider-specific options
+ * @param network
+ * @param walletAddress
+ * @param walletPublicKey
+ * @param messages Messages that the caller wants to include in the transaction
+ * @param feeAsset
  */
 @Serializable
-data class TONSwapParams<TProviderOptions>(
-    @SerialName("quote")
-    val quote: TONSwapQuote,
-    @SerialName("userAddress")
-    val userAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
-    @SerialName("destinationAddress")
-    val destinationAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
-    @SerialName("slippageBps")
-    val slippageBps: kotlin.Int? = null,
-    @SerialName("deadline")
-    val deadline: kotlin.Int? = null,
-    @SerialName("providerOptions")
-    val providerOptions: TProviderOptions? = null,
+data class TONGaslessQuoteParams(
+
+    @SerialName(value = "network")
+    val network: TONNetwork,
+
+    @SerialName(value = "walletAddress")
+    val walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+
+    @Contextual @SerialName(value = "walletPublicKey")
+    val walletPublicKey: io.ton.walletkit.model.TONHex,
+
+    /* Messages that the caller wants to include in the transaction */
+    @SerialName(value = "messages")
+    val messages: kotlin.collections.List<TONTransactionRequestMessage>,
+
+    @SerialName(value = "feeAsset")
+    val feeAsset: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+
 ) {
+
     companion object
 }

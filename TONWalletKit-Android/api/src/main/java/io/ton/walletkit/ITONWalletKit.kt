@@ -29,10 +29,13 @@ import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSignatureDomain
+import io.ton.walletkit.api.generated.TONTonApiGaslessProviderConfig
 import io.ton.walletkit.api.generated.TONTonApiStreamingProviderConfig
 import io.ton.walletkit.api.generated.TONTonCenterStreamingProviderConfig
 import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.config.TONWalletKitConfiguration
+import io.ton.walletkit.gasless.ITONGaslessManager
+import io.ton.walletkit.gasless.TONGaslessProvider
 import io.ton.walletkit.internal.TONWalletKitFactory
 import io.ton.walletkit.listener.TONBridgeEventsHandler
 import io.ton.walletkit.model.KeyPair
@@ -200,6 +203,16 @@ interface ITONWalletKit {
      * Get the swap manager for registering providers and executing swaps.
      */
     suspend fun swap(): ITONSwapManager
+
+    // ── Gasless ──
+
+    /**
+     * Create a TonAPI gasless provider. Register the returned handle with [gasless] before quoting.
+     */
+    suspend fun tonApiGaslessProvider(config: TONTonApiGaslessProviderConfig? = null): TONGaslessProvider
+
+    /** Get the gasless manager for registering providers and relaying gasless transactions. */
+    suspend fun gasless(): ITONGaslessManager
 
     // ── Staking ──
 

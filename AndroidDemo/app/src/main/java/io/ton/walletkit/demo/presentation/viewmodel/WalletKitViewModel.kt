@@ -939,8 +939,15 @@ class WalletKitViewModel @Inject constructor(
         }
     }
 
-    fun sendLocalTransaction(walletAddress: String, recipient: String, amount: String, comment: String = "") {
-        walletOperationsViewModel.sendLocalTransaction(walletAddress, recipient, amount, comment)
+    fun sendLocalTransaction(
+        walletAddress: String,
+        recipient: String,
+        amount: String,
+        comment: String = "",
+        currency: SendCurrency = SendCurrency.TON,
+        gasless: Boolean = false,
+    ) {
+        walletOperationsViewModel.sendLocalTransaction(walletAddress, recipient, amount, comment, currency, gasless)
     }
 
     fun toggleWalletSwitcher() {

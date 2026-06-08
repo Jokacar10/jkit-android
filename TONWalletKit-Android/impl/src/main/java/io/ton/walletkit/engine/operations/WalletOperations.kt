@@ -24,6 +24,7 @@ package io.ton.walletkit.engine.operations
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONSignatureDomain
+import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import io.ton.walletkit.engine.infrastructure.callTyped
 import io.ton.walletkit.engine.infrastructure.callTypedOrNull
@@ -32,6 +33,7 @@ import io.ton.walletkit.engine.operations.requests.CreateAdapterRequest
 import io.ton.walletkit.engine.operations.requests.CreateSignerFromCustomRequest
 import io.ton.walletkit.engine.operations.requests.CreateSignerFromMnemonicRequest
 import io.ton.walletkit.engine.operations.requests.CreateSignerFromSecretKeyRequest
+import io.ton.walletkit.engine.operations.requests.GetSignedSignMessageRequest
 import io.ton.walletkit.engine.operations.requests.WalletIdRequest
 import io.ton.walletkit.engine.operations.responses.AdapterInfoResponse
 import io.ton.walletkit.engine.operations.responses.AddWalletResponse
@@ -98,6 +100,20 @@ internal suspend fun BridgeRpcClient.getWalletAddress(walletId: String): String 
 
 internal suspend fun BridgeRpcClient.getWalletNetwork(walletId: String): TONNetwork =
     callTyped(BridgeMethodConstants.METHOD_GET_WALLET_NETWORK, WalletIdRequest(walletId = walletId))
+
+internal suspend fun BridgeRpcClient.getWalletPublicKey(walletId: String): String =
+    callTyped(BridgeMethodConstants.METHOD_GET_WALLET_PUBLIC_KEY, WalletIdRequest(walletId = walletId))
+
+internal suspend fun BridgeRpcClient.getSignedSignMessage(
+    walletId: String,
+    request: TONTransactionRequest,
+): String = callTyped(
+    BridgeMethodConstants.METHOD_GET_SIGNED_SIGN_MESSAGE,
+    GetSignedSignMessageRequest(
+        walletId = walletId,
+        request = json.encodeToJsonElement(TONTransactionRequest.serializer(), request),
+    ),
+)
 
 internal suspend fun BridgeRpcClient.removeWallet(walletId: String) {
     send(BridgeMethodConstants.METHOD_REMOVE_WALLET, WalletIdRequest(walletId = walletId))

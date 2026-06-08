@@ -28,34 +28,35 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONUserFriendlyAddress
+import io.ton.walletkit.model.TONBase64
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Response from a gasless send. Extends `SendTransactionResponse` (`boc`, `normalizedBoc`, `normalizedHash` of the broadcasted external-in message) with the signed internal-message BoC produced by `wallet.signMessage` for the relayer to wrap.
  *
- *
- * @param quote
- * @param userAddress
- * @param destinationAddress
- * @param slippageBps Slippage tolerance in basis points (1 bp = 0.01%)
- * @param deadline Transaction deadline in unix timestamp
- * @param providerOptions Provider-specific options
+ * @param boc
+ * @param normalizedBoc
+ * @param normalizedHash
+ * @param internalBoc
  */
 @Serializable
-data class TONSwapParams<TProviderOptions>(
-    @SerialName("quote")
-    val quote: TONSwapQuote,
-    @SerialName("userAddress")
-    val userAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
-    @SerialName("destinationAddress")
-    val destinationAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
-    @SerialName("slippageBps")
-    val slippageBps: kotlin.Int? = null,
-    @SerialName("deadline")
-    val deadline: kotlin.Int? = null,
-    @SerialName("providerOptions")
-    val providerOptions: TProviderOptions? = null,
+data class TONGaslessSendResponse(
+
+    @Contextual @SerialName(value = "boc")
+    val boc: io.ton.walletkit.model.TONBase64,
+
+    @Contextual @SerialName(value = "normalizedBoc")
+    val normalizedBoc: io.ton.walletkit.model.TONBase64,
+
+    @Contextual @SerialName(value = "normalizedHash")
+    val normalizedHash: io.ton.walletkit.model.TONHex,
+
+    @Contextual @SerialName(value = "internalBoc")
+    val internalBoc: io.ton.walletkit.model.TONBase64,
+
 ) {
+
     companion object
 }

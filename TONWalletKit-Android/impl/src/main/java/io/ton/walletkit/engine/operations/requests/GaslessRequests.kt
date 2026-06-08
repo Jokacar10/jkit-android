@@ -19,43 +19,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-@file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport",
-)
+package io.ton.walletkit.engine.operations.requests
 
-package io.ton.walletkit.api.generated
-
-import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 /**
+ * Internal bridge request models for gasless operations.
  *
- *
- * @param quote
- * @param userAddress
- * @param destinationAddress
- * @param slippageBps Slippage tolerance in basis points (1 bp = 0.01%)
- * @param deadline Transaction deadline in unix timestamp
- * @param providerOptions Provider-specific options
+ * @suppress Internal bridge communication only.
  */
+
 @Serializable
-data class TONSwapParams<TProviderOptions>(
-    @SerialName("quote")
-    val quote: TONSwapQuote,
-    @SerialName("userAddress")
-    val userAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
-    @SerialName("destinationAddress")
-    val destinationAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
-    @SerialName("slippageBps")
-    val slippageBps: kotlin.Int? = null,
-    @SerialName("deadline")
-    val deadline: kotlin.Int? = null,
-    @SerialName("providerOptions")
-    val providerOptions: TProviderOptions? = null,
-) {
-    companion object
-}
+internal data class CreateTonApiGaslessProviderRequest(
+    val config: JsonElement? = null,
+)
+
+@Serializable
+internal data class RegisterGaslessProviderRequest(
+    val providerId: String,
+)
+
+@Serializable
+internal data class SetDefaultGaslessProviderRequest(
+    val providerId: String,
+)
+
+@Serializable
+internal data class HasGaslessProviderRequest(
+    val providerId: String,
+)
+
+@Serializable
+internal data class GetGaslessMetadataRequest(
+    val providerId: String? = null,
+)
+
+@Serializable
+internal data class GetGaslessConfigRequest(
+    val network: JsonElement? = null,
+    val providerId: String? = null,
+)
+
+@Serializable
+internal data class GetGaslessQuoteRequest(
+    val params: JsonElement,
+    val providerId: String? = null,
+)
+
+@Serializable
+internal data class GaslessSendTransactionRequest(
+    val params: JsonElement,
+    val providerId: String? = null,
+)

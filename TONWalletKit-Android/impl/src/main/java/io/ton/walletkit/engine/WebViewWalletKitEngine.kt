@@ -29,6 +29,8 @@ import io.ton.walletkit.api.generated.TONConnectionRequestEvent
 import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONEmbeddedRequestEvent
 import io.ton.walletkit.api.generated.TONEmulationResult
+import io.ton.walletkit.api.generated.TONGaslessQuoteParams
+import io.ton.walletkit.api.generated.TONGaslessSendParams
 import io.ton.walletkit.api.generated.TONGetMethodResult
 import io.ton.walletkit.api.generated.TONJettonsResponse
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
@@ -58,6 +60,7 @@ import io.ton.walletkit.api.generated.TONStakingQuoteParams
 import io.ton.walletkit.api.generated.TONSwapParams
 import io.ton.walletkit.api.generated.TONSwapQuote
 import io.ton.walletkit.api.generated.TONSwapQuoteParams
+import io.ton.walletkit.api.generated.TONTonApiGaslessProviderConfig
 import io.ton.walletkit.api.generated.TONTonStakersChainConfig
 import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
 import io.ton.walletkit.api.generated.TONTransactionPreviewOptions
@@ -87,6 +90,7 @@ import io.ton.walletkit.engine.operations.createOmnistonSwapProvider
 import io.ton.walletkit.engine.operations.createSignerFromCustom
 import io.ton.walletkit.engine.operations.createSignerFromMnemonic
 import io.ton.walletkit.engine.operations.createSignerFromSecretKey
+import io.ton.walletkit.engine.operations.createTonApiGaslessProvider
 import io.ton.walletkit.engine.operations.createTonMnemonic
 import io.ton.walletkit.engine.operations.createTonStakersStakingProvider
 import io.ton.walletkit.engine.operations.createTransferJettonTransaction
@@ -96,14 +100,20 @@ import io.ton.walletkit.engine.operations.createTransferNftTransaction
 import io.ton.walletkit.engine.operations.createTransferTonTransaction
 import io.ton.walletkit.engine.operations.createWalletAdapter
 import io.ton.walletkit.engine.operations.disconnectSession
+import io.ton.walletkit.engine.operations.gaslessSendTransaction
 import io.ton.walletkit.engine.operations.getBalance
+import io.ton.walletkit.engine.operations.getGaslessConfig
+import io.ton.walletkit.engine.operations.getGaslessMetadata
+import io.ton.walletkit.engine.operations.getGaslessQuote
 import io.ton.walletkit.engine.operations.getJettonBalance
 import io.ton.walletkit.engine.operations.getJettonWalletAddress
 import io.ton.walletkit.engine.operations.getJettons
 import io.ton.walletkit.engine.operations.getNft
 import io.ton.walletkit.engine.operations.getNfts
+import io.ton.walletkit.engine.operations.getRegisteredGaslessProviders
 import io.ton.walletkit.engine.operations.getRegisteredStakingProviders
 import io.ton.walletkit.engine.operations.getRegisteredSwapProviders
+import io.ton.walletkit.engine.operations.getSignedSignMessage
 import io.ton.walletkit.engine.operations.getStakedBalance
 import io.ton.walletkit.engine.operations.getStakingProviderInfo
 import io.ton.walletkit.engine.operations.getStakingProviderMetadata
@@ -116,14 +126,17 @@ import io.ton.walletkit.engine.operations.getTransactionPreview
 import io.ton.walletkit.engine.operations.getWallet
 import io.ton.walletkit.engine.operations.getWalletAddress
 import io.ton.walletkit.engine.operations.getWalletNetwork
+import io.ton.walletkit.engine.operations.getWalletPublicKey
 import io.ton.walletkit.engine.operations.getWallets
 import io.ton.walletkit.engine.operations.handleNewTransaction
 import io.ton.walletkit.engine.operations.handleTonConnectRequest
 import io.ton.walletkit.engine.operations.handleTonConnectUrl
+import io.ton.walletkit.engine.operations.hasGaslessProvider
 import io.ton.walletkit.engine.operations.hasStakingProvider
 import io.ton.walletkit.engine.operations.hasSwapProvider
 import io.ton.walletkit.engine.operations.listSessions
 import io.ton.walletkit.engine.operations.mnemonicToKeyPair
+import io.ton.walletkit.engine.operations.registerGaslessProvider
 import io.ton.walletkit.engine.operations.registerStakingProvider
 import io.ton.walletkit.engine.operations.registerSwapProvider
 import io.ton.walletkit.engine.operations.rejectConnect
@@ -136,6 +149,7 @@ import io.ton.walletkit.engine.operations.removeWallet
 import io.ton.walletkit.engine.operations.responses.AddWalletResponse
 import io.ton.walletkit.engine.operations.responses.SignerInfoResponse
 import io.ton.walletkit.engine.operations.sendTransaction
+import io.ton.walletkit.engine.operations.setDefaultGaslessProvider
 import io.ton.walletkit.engine.operations.setDefaultStakingProvider
 import io.ton.walletkit.engine.operations.setDefaultSwapProvider
 import io.ton.walletkit.engine.operations.sign
@@ -548,6 +562,11 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun getJettonWalletAddress(walletId: String, jettonAddress: String): String =
         rpcClient.getJettonWalletAddress(walletId, jettonAddress)
 
+    override suspend fun getWalletPublicKey(walletId: String): String = rpcClient.getWalletPublicKey(walletId)
+
+    override suspend fun getSignedSignMessage(walletId: String, request: TONTransactionRequest): String =
+        rpcClient.getSignedSignMessage(walletId, request)
+
     override suspend fun createOmnistonSwapProvider(config: TONOmnistonSwapProviderConfig?): String =
         rpcClient.createOmnistonSwapProvider(config)
 
@@ -602,6 +621,29 @@ internal class WebViewWalletKitEngine private constructor(
 
     override suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): TONTransactionRequest =
         rpcClient.buildSwapTransaction(params)
+
+    override suspend fun createTonApiGaslessProvider(config: TONTonApiGaslessProviderConfig?): String =
+        rpcClient.createTonApiGaslessProvider(config)
+
+    override suspend fun registerGaslessProvider(providerId: String) = rpcClient.registerGaslessProvider(providerId)
+
+    override suspend fun setDefaultGaslessProvider(providerId: String) =
+        rpcClient.setDefaultGaslessProvider(providerId)
+
+    override suspend fun getRegisteredGaslessProviders(): List<String> = rpcClient.getRegisteredGaslessProviders()
+
+    override suspend fun hasGaslessProvider(providerId: String): Boolean = rpcClient.hasGaslessProvider(providerId)
+
+    override suspend fun getGaslessMetadata(providerId: String?) = rpcClient.getGaslessMetadata(providerId)
+
+    override suspend fun getGaslessConfig(network: TONNetwork?, providerId: String?) =
+        rpcClient.getGaslessConfig(network, providerId)
+
+    override suspend fun getGaslessQuote(params: TONGaslessQuoteParams, providerId: String?) =
+        rpcClient.getGaslessQuote(params, providerId)
+
+    override suspend fun gaslessSendTransaction(params: TONGaslessSendParams, providerId: String?) =
+        rpcClient.gaslessSendTransaction(params, providerId)
 
     override suspend fun createTonStakersStakingProvider(chainConfig: Map<String, TONTonStakersChainConfig>?): String =
         rpcClient.createTonStakersStakingProvider(chainConfig)

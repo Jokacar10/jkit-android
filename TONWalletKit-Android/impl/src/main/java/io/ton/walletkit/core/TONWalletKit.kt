@@ -32,6 +32,7 @@ import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSignatureDomain
+import io.ton.walletkit.api.generated.TONTonApiGaslessProviderConfig
 import io.ton.walletkit.api.generated.TONTonApiStreamingProviderConfig
 import io.ton.walletkit.api.generated.TONTonCenterStreamingProviderConfig
 import io.ton.walletkit.api.generated.TONTransactionRequest
@@ -42,6 +43,9 @@ import io.ton.walletkit.core.streaming.TONStreamingManager
 import io.ton.walletkit.core.streaming.TONStreamingProviderImpl
 import io.ton.walletkit.engine.WalletKitEngine
 import io.ton.walletkit.engine.WebViewWalletKitEngine
+import io.ton.walletkit.gasless.ITONGaslessManager
+import io.ton.walletkit.gasless.TONGaslessManager
+import io.ton.walletkit.gasless.TONGaslessProvider
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.util.WalletKitUtils
 import io.ton.walletkit.listener.TONBridgeEventsHandler
@@ -125,6 +129,8 @@ internal class TONWalletKit private constructor(
 ) : ITONWalletKit {
 
     private val swapManager: ITONSwapManager = TONSwapManager(engine)
+
+    private val gaslessManager: ITONGaslessManager = TONGaslessManager(engine)
 
     companion object {
         /**
@@ -478,6 +484,14 @@ internal class TONWalletKit private constructor(
     }
 
     override suspend fun swap(): ITONSwapManager = swapManager
+
+    override suspend fun tonApiGaslessProvider(config: TONTonApiGaslessProviderConfig?): TONGaslessProvider {
+        checkNotDestroyed()
+        val providerId = engine.createTonApiGaslessProvider(config)
+        return TONGaslessProvider(providerId)
+    }
+
+    override suspend fun gasless(): ITONGaslessManager = gaslessManager
 
     override fun staking(): ITONStakingManager {
         checkNotDestroyed()

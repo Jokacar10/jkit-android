@@ -30,6 +30,7 @@ import io.ton.walletkit.demo.presentation.model.SignDataRequestUi
 import io.ton.walletkit.demo.presentation.model.SignMessageRequestUi
 import io.ton.walletkit.demo.presentation.model.TransactionRequestUi
 import io.ton.walletkit.demo.presentation.model.WalletSummary
+import io.ton.walletkit.demo.presentation.viewmodel.SendCurrency
 
 /**
  * Interface defining all wallet-related actions.
@@ -69,7 +70,14 @@ interface WalletActions {
     fun onRejectSignMessage(request: SignMessageRequestUi)
     fun onConfirmSignerApproval()
     fun onCancelSignerApproval()
-    fun onSendTransaction(walletAddress: String, recipient: String, amount: String, comment: String)
+    fun onSendTransaction(
+        walletAddress: String,
+        recipient: String,
+        amount: String,
+        comment: String,
+        currency: SendCurrency,
+        gasless: Boolean,
+    )
     fun onRefreshTransactions(address: String)
     fun onTransactionClick(transactionHash: String, walletAddress: String)
     fun onHandleUrl(url: String)

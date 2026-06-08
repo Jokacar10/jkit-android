@@ -26,6 +26,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ton.walletkit.ITONWallet
 import io.ton.walletkit.ITONWalletKit
+import io.ton.walletkit.api.generated.TONGaslessQuoteParams
+import io.ton.walletkit.api.generated.TONGaslessSendParams
+import io.ton.walletkit.api.generated.TONJettonsTransferRequest
 import io.ton.walletkit.api.generated.TONTransferRequest
 import io.ton.walletkit.demo.presentation.util.TonFormatter
 import io.ton.walletkit.model.TONUserFriendlyAddress
@@ -33,6 +36,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+
+/** Asset the Send sheet can transfer. */
+enum class SendCurrency(val label: String) {
+    TON("TON"),
+    USDT("USDT"),
+}
 
 /**
  * ViewModel for wallet operations like switching wallets and sending local transactions.
@@ -93,6 +103,8 @@ class WalletOperationsViewModel(
         recipient: String,
         amount: String,
         comment: String = "",
+        currency: SendCurrency = SendCurrency.TON,
+        gasless: Boolean = false,
     ) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isSendingTransaction = true, error = null)
@@ -106,32 +118,31 @@ class WalletOperationsViewModel(
                 return@launch
             }
 
-            // Convert TON to nanoTON
-            val amountInNano = try {
-                TonFormatter.tonToNano(amount)
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    isSendingTransaction = false,
-                    error = "Invalid amount: ${e.message}",
-                )
-                return@launch
-            }
-
             runCatching {
-                // Step 1: Create transaction request
-                val request = TONTransferRequest(
-                    recipientAddress = TONUserFriendlyAddress(recipient),
-                    transferAmount = amountInNano,
-                    comment = comment.takeIf { it.isNotBlank() },
-                )
-                val transactionRequest = wallet.transferTONTransaction(request)
-
-                // Step 2: Send the transaction directly
-                wallet.send(transactionRequest)
+                when {
+                    currency == SendCurrency.TON -> {
+                        val request = TONTransferRequest(
+                            recipientAddress = TONUserFriendlyAddress(recipient),
+                            transferAmount = TonFormatter.tonToNano(amount),
+                            comment = comment.takeIf { it.isNotBlank() },
+                        )
+                        wallet.send(wallet.transferTONTransaction(request))
+                    }
+                    gasless -> sendUsdtGasless(wallet, recipient, amount)
+                    else -> {
+                        val request = TONJettonsTransferRequest(
+                            jettonAddress = TONUserFriendlyAddress(USDT_MASTER),
+                            transferAmount = toUsdtRawUnits(amount),
+                            recipientAddress = TONUserFriendlyAddress(recipient),
+                            comment = comment.takeIf { it.isNotBlank() },
+                        )
+                        wallet.send(wallet.transferJettonTransaction(request))
+                    }
+                }
             }.onSuccess {
                 _state.value = _state.value.copy(
                     isSendingTransaction = false,
-                    successMessage = "Transaction initiated",
+                    successMessage = if (gasless) "Sent gasless — relayer covered the gas" else "Transaction initiated",
                 )
                 onTransactionInitiated(walletAddress)
                 Log.d(TAG, "Local transaction initiated from $walletAddress")
@@ -145,6 +156,43 @@ class WalletOperationsViewModel(
         }
     }
 
+    /** Send USDT via a relayer that covers the TON gas and charges a USDT fee: quote → sign → relay. */
+    private suspend fun sendUsdtGasless(wallet: ITONWallet, recipient: String, amount: String) {
+        val gaslessManager = walletKit().gasless()
+        val provider = walletKit().tonApiGaslessProvider()
+        if (!gaslessManager.hasProvider(provider)) {
+            gaslessManager.registerProvider(provider)
+            gaslessManager.setDefaultProvider(provider)
+        }
+
+        val transfer = wallet.transferJettonTransaction(
+            TONJettonsTransferRequest(
+                jettonAddress = TONUserFriendlyAddress(USDT_MASTER),
+                transferAmount = toUsdtRawUnits(amount),
+                recipientAddress = TONUserFriendlyAddress(recipient),
+            ),
+        )
+        val quote = gaslessManager.getQuote(
+            TONGaslessQuoteParams(
+                network = wallet.network,
+                walletAddress = wallet.address,
+                walletPublicKey = wallet.publicKey(),
+                messages = transfer.messages,
+                feeAsset = TONUserFriendlyAddress(USDT_MASTER),
+            ),
+        )
+        val internalBoc = wallet.signMessage(messages = quote.messages, validUntil = quote.validUntil)
+        gaslessManager.sendTransaction(
+            TONGaslessSendParams(
+                network = wallet.network,
+                walletPublicKey = wallet.publicKey(),
+                internalBoc = internalBoc,
+            ),
+        )
+    }
+
+    private fun toUsdtRawUnits(amount: String): String = BigDecimal(amount).movePointRight(USDT_DECIMALS).toBigInteger().toString()
+
     /**
      * Clear error or success message.
      */
@@ -154,5 +202,9 @@ class WalletOperationsViewModel(
 
     companion object {
         private const val TAG = "WalletOperationsVM"
+
+        /** Mainnet USDT (jUSDT) jetton master — the asset sent and the gasless fee asset. */
+        private const val USDT_MASTER = "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs"
+        private const val USDT_DECIMALS = 6
     }
 }

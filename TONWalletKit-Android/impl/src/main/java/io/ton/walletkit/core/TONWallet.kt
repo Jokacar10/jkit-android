@@ -29,6 +29,8 @@ import io.ton.walletkit.engine.WalletKitEngine
 import io.ton.walletkit.engine.model.WalletAccount
 import io.ton.walletkit.model.KeyPair
 import io.ton.walletkit.model.TONBalance
+import io.ton.walletkit.model.TONBase64
+import io.ton.walletkit.model.TONHex
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import io.ton.walletkit.session.TONConnectSession
 import kotlinx.serialization.json.Json
@@ -60,7 +62,7 @@ import kotlinx.serialization.json.Json
 internal class TONWallet internal constructor(
     override val id: String,
     override val address: TONUserFriendlyAddress,
-    private val network: TONNetwork,
+    override val network: TONNetwork,
     private val engine: WalletKitEngine,
     private val account: WalletAccount,
 ) : ITONWallet {
@@ -223,6 +225,16 @@ internal class TONWallet internal constructor(
      */
     override suspend fun transferJettonTransaction(request: TONJettonsTransferRequest): TONTransactionRequest =
         engine.createTransferJettonTransaction(id, request)
+
+    override suspend fun publicKey(): TONHex = TONHex(engine.getWalletPublicKey(id))
+
+    override suspend fun signMessage(
+        messages: List<TONTransactionRequestMessage>,
+        validUntil: Double?,
+    ): TONBase64 {
+        val request = TONTransactionRequest(messages = messages, validUntil = validUntil, network = network)
+        return TONBase64(engine.getSignedSignMessage(id, request))
+    }
 
     /**
      * Get jettons owned by this wallet.

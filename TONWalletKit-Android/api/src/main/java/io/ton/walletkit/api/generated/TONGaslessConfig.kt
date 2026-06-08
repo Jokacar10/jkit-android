@@ -33,29 +33,22 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
+ * Provider-level configuration for a gasless relayer on a given network.  Bundles every piece of provider state a consumer needs to drive a gasless transfer end-to-end:  - `relayAddress` — where the relayer wants residual TON (e.g. jetton-transfer    `responseDestination`) returned to.  - `supportedAssets` — what the relayer accepts as fee payment.
  *
- *
- * @param quote
- * @param userAddress
- * @param destinationAddress
- * @param slippageBps Slippage tolerance in basis points (1 bp = 0.01%)
- * @param deadline Transaction deadline in unix timestamp
- * @param providerOptions Provider-specific options
+ * @param relayAddress
+ * @param supportedAssets Assets the relayer accepts as fee payment.
  */
 @Serializable
-data class TONSwapParams<TProviderOptions>(
-    @SerialName("quote")
-    val quote: TONSwapQuote,
-    @SerialName("userAddress")
-    val userAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
-    @SerialName("destinationAddress")
-    val destinationAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
-    @SerialName("slippageBps")
-    val slippageBps: kotlin.Int? = null,
-    @SerialName("deadline")
-    val deadline: kotlin.Int? = null,
-    @SerialName("providerOptions")
-    val providerOptions: TProviderOptions? = null,
+data class TONGaslessConfig(
+
+    @SerialName(value = "relayAddress")
+    val relayAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+
+    /* Assets the relayer accepts as fee payment. */
+    @SerialName(value = "supportedAssets")
+    val supportedAssets: kotlin.collections.List<TONGaslessSupportedAsset>,
+
 ) {
+
     companion object
 }

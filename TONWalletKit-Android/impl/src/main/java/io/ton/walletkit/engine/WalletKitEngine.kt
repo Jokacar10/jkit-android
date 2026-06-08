@@ -27,6 +27,12 @@ import io.ton.walletkit.api.generated.TONConnectionRequestEvent
 import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONEmbeddedRequestEvent
 import io.ton.walletkit.api.generated.TONEmulationResult
+import io.ton.walletkit.api.generated.TONGaslessConfig
+import io.ton.walletkit.api.generated.TONGaslessProviderMetadata
+import io.ton.walletkit.api.generated.TONGaslessQuote
+import io.ton.walletkit.api.generated.TONGaslessQuoteParams
+import io.ton.walletkit.api.generated.TONGaslessSendParams
+import io.ton.walletkit.api.generated.TONGaslessSendResponse
 import io.ton.walletkit.api.generated.TONGetMethodResult
 import io.ton.walletkit.api.generated.TONJettonsResponse
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
@@ -56,6 +62,7 @@ import io.ton.walletkit.api.generated.TONStakingQuoteParams
 import io.ton.walletkit.api.generated.TONSwapParams
 import io.ton.walletkit.api.generated.TONSwapQuote
 import io.ton.walletkit.api.generated.TONSwapQuoteParams
+import io.ton.walletkit.api.generated.TONTonApiGaslessProviderConfig
 import io.ton.walletkit.api.generated.TONTonStakersChainConfig
 import io.ton.walletkit.api.generated.TONTransactionEmulatedPreview
 import io.ton.walletkit.api.generated.TONTransactionPreviewOptions
@@ -539,6 +546,11 @@ internal interface WalletKitEngine : RequestHandler {
      */
     suspend fun getJettonWalletAddress(walletId: String, jettonAddress: String): String
 
+    suspend fun getWalletPublicKey(walletId: String): String
+
+    /** Sign a transaction request as a sign-message bundle, returning the signed internal BoC (base64). */
+    suspend fun getSignedSignMessage(walletId: String, request: TONTransactionRequest): String
+
     // ── Swap ──
 
     suspend fun createOmnistonSwapProvider(config: TONOmnistonSwapProviderConfig?): String
@@ -579,6 +591,26 @@ internal interface WalletKitEngine : RequestHandler {
     suspend fun getSwapQuote(params: TONSwapQuoteParams<JsonElement>, providerId: String?): TONSwapQuote
 
     suspend fun buildSwapTransaction(params: TONSwapParams<JsonElement>): TONTransactionRequest
+
+    // ── Gasless ──
+
+    suspend fun createTonApiGaslessProvider(config: TONTonApiGaslessProviderConfig?): String
+
+    suspend fun registerGaslessProvider(providerId: String)
+
+    suspend fun setDefaultGaslessProvider(providerId: String)
+
+    suspend fun getRegisteredGaslessProviders(): List<String>
+
+    suspend fun hasGaslessProvider(providerId: String): Boolean
+
+    suspend fun getGaslessMetadata(providerId: String?): TONGaslessProviderMetadata
+
+    suspend fun getGaslessConfig(network: TONNetwork?, providerId: String?): TONGaslessConfig
+
+    suspend fun getGaslessQuote(params: TONGaslessQuoteParams, providerId: String?): TONGaslessQuote
+
+    suspend fun gaslessSendTransaction(params: TONGaslessSendParams, providerId: String?): TONGaslessSendResponse
 
     // ── Staking ──
 
