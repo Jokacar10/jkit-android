@@ -111,6 +111,7 @@ import io.ton.walletkit.demo.presentation.ui.sheet.TransactionRequestSheet
 import io.ton.walletkit.demo.presentation.ui.sheet.TransferJettonSheet
 import io.ton.walletkit.demo.presentation.ui.sheet.WalletDetailsSheet
 import io.ton.walletkit.demo.presentation.ui.sheet.WalletsBottomSheet
+import io.ton.walletkit.demo.presentation.util.JettonFormatters
 import io.ton.walletkit.demo.presentation.viewmodel.NFTsListViewModel
 import io.ton.walletkit.demo.presentation.viewmodel.SwapViewModel
 
@@ -168,7 +169,12 @@ private fun buildAssetList(
     )
     val items = mutableListOf(tonItem)
     jettons.take(maxAssets - 1).forEach { jetton ->
-        val amount = trimFraction(jetton.balance, maxFractionDigits)
+        // jetton.balance is raw (smallest units); format with the token's decimals for display.
+        val amount = JettonFormatters.formatBalance(
+            jetton.balance,
+            jetton.jetton.decimalsNumber ?: 9,
+            maxDecimals = maxFractionDigits,
+        )
         val icon = jetton.imageUrl?.takeIf { it.isNotBlank() }
             ?.let { WalletHomeAssetIcon.Url(it) }
             ?: WalletHomeAssetIcon.Placeholder(jetton.symbol)

@@ -21,6 +21,8 @@
  */
 package io.ton.walletkit.demo.presentation.util
 
+import io.ton.walletkit.model.TONTokenAmount
+import io.ton.walletkit.model.TONTokenAmountFormatter
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -37,19 +39,20 @@ object JettonFormatters {
      * @param maxDecimals Maximum decimals to display (default: 4)
      * @return Formatted balance string
      */
-    fun formatBalance(balance: String, decimals: Int, maxDecimals: Int = 4): String = try {
-        val balanceBigInt = BigDecimal(balance)
-        val divisor = BigDecimal.TEN.pow(decimals)
-        val formattedValue = balanceBigInt.divide(divisor, decimals, RoundingMode.DOWN)
-
-        // Limit displayed decimals
-        val displayDecimals = minOf(decimals, maxDecimals)
-        val scaledValue = formattedValue.setScale(displayDecimals, RoundingMode.DOWN)
-
-        // Remove trailing zeros
-        scaledValue.stripTrailingZeros().toPlainString()
-    } catch (e: Exception) {
-        balance
+    fun formatBalance(balance: String, decimals: Int, maxDecimals: Int = 4): String {
+        // SDK formatter for the raw→decimal conversion, then cap fraction digits to [maxDecimals].
+        val nano = TONTokenAmount.parseOrNull(balance) ?: return balance
+        val formatted = TONTokenAmountFormatter()
+            .apply { nanoUnitDecimalsNumber = decimals }
+            .string(nano) ?: return balance
+        return try {
+            BigDecimal(formatted)
+                .setScale(minOf(decimals, maxDecimals), RoundingMode.DOWN)
+                .stripTrailingZeros()
+                .toPlainString()
+        } catch (e: Exception) {
+            formatted
+        }
     }
 
     /**
