@@ -143,16 +143,6 @@ private fun trimFraction(value: String?, maxFractionDigits: Int): String {
     return truncated
 }
 
-private fun splitBalance(rawBalance: String?, maxFractionDigits: Int): Pair<String, String> {
-    val trimmed = trimFraction(rawBalance, maxFractionDigits)
-    val dotIndex = trimmed.indexOf('.')
-    return if (dotIndex < 0) {
-        trimmed to ""
-    } else {
-        trimmed.substring(0, dotIndex) to trimmed.substring(dotIndex)
-    }
-}
-
 private fun buildAssetList(
     rawBalance: String?,
     jettons: List<JettonSummary>,
@@ -165,6 +155,7 @@ private fun buildAssetList(
         name = "Toncoin",
         symbol = "TON",
         formattedAmount = "$tonAmount TON",
+        amountValue = rawBalance?.toDoubleOrNull() ?: 0.0,
         icon = WalletHomeAssetIcon.Ton,
     )
     val items = mutableListOf(tonItem)
@@ -183,6 +174,7 @@ private fun buildAssetList(
             name = jetton.name,
             symbol = jetton.symbol,
             formattedAmount = "$amount ${jetton.symbol}",
+            amountValue = amount.toDoubleOrNull() ?: 0.0,
             icon = icon,
         )
     }
@@ -412,8 +404,8 @@ fun WalletScreen(
     LaunchedEffect(nftsViewModel) {
         nftsViewModel?.loadNFTs()
     }
-    val (totalInteger, totalFraction) = remember(activeWallet?.balance) {
-        splitBalance(activeWallet?.balance, MAX_FRACTION_DIGITS)
+    val totalBalance = remember(activeWallet?.balance) {
+        activeWallet?.balance?.toDoubleOrNull() ?: 0.0
     }
     val assetItems = remember(activeWallet?.balance, state.jettons) {
         buildAssetList(activeWallet?.balance, state.jettons, MAX_FRACTION_DIGITS, MAX_ASSETS)
@@ -520,8 +512,9 @@ fun WalletScreen(
             }
 
             WalletHomeContent(
-                totalBalanceInteger = totalInteger,
-                totalBalanceFraction = totalFraction,
+                totalBalance = totalBalance,
+                balanceSuffix = " TON",
+                balanceMaxFractionDigits = MAX_FRACTION_DIGITS,
                 assets = assetItems,
                 nfts = nftPreviews,
                 hasMoreAssets = hasMoreAssets,
