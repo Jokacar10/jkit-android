@@ -38,7 +38,9 @@ import kotlinx.serialization.Serializable
  * @param chains Per-chain settings keyed by `Network#chainId`.
  * @param providerId Provider id. Defaults to `tonapi`.
  * @param sendRetries Number of send retries on transient errors. Defaults to 5.
- * @param sendRetryDelayMs Delay between send retries in ms. Defaults to 2000.
+ * @param sendRetryDelayMs Delay between send retries in ms. Defaults to 1000.
+ * @param quoteRetries Number of quote retries on transient errors (5xx / network). Defaults to 5.
+ * @param quoteRetryDelayMs Fixed delay between quote retries in ms. Defaults to 1000.
  * @param configCacheTtlMs TTL for the in-memory `/v2/gasless/config` cache (ms). Defaults to 5 minutes. Set to `0` to disable caching.
  */
 @Serializable
@@ -54,15 +56,23 @@ data class TONTonApiGaslessProviderConfig(
 
     /* Number of send retries on transient errors. Defaults to 5. */
     @SerialName(value = "sendRetries")
-    val sendRetries: kotlin.Double? = null,
+    val sendRetries: kotlin.Int? = null,
 
-    /* Delay between send retries in ms. Defaults to 2000. */
+    /* Delay between send retries in ms. Defaults to 1000. */
     @SerialName(value = "sendRetryDelayMs")
-    val sendRetryDelayMs: kotlin.Double? = null,
+    val sendRetryDelayMs: kotlin.Int? = null,
+
+    /* Number of quote retries on transient errors (5xx / network). Defaults to 5. */
+    @SerialName(value = "quoteRetries")
+    val quoteRetries: kotlin.Int? = null,
+
+    /* Fixed delay between quote retries in ms. Defaults to 1000. */
+    @SerialName(value = "quoteRetryDelayMs")
+    val quoteRetryDelayMs: kotlin.Int? = null,
 
     /* TTL for the in-memory `/v2/gasless/config` cache (ms). Defaults to 5 minutes. Set to `0` to disable caching. */
     @SerialName(value = "configCacheTtlMs")
-    val configCacheTtlMs: kotlin.Double? = null,
+    val configCacheTtlMs: kotlin.Int? = null,
 
 ) {
 

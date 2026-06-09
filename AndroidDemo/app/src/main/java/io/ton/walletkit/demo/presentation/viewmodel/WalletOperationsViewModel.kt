@@ -85,19 +85,7 @@ class WalletOperationsViewModel(
         }
     }
 
-    /**
-     * Send a local transaction (TON transfer).
-     * This creates a transaction request that will trigger the approval flow.
-     *
-     * This uses the standard JS WalletKit API:
-     * 1. wallet.createTransferTonTransaction(params) - creates transaction content
-     * 2. kit.handleNewTransaction(wallet, transaction) - triggers approval flow
-     *
-     * @param walletAddress The sender wallet address
-     * @param recipient The recipient address
-     * @param amount The amount in TON (will be converted to nanoTON)
-     * @param comment Optional comment for the transaction
-     */
+    /** Build and send a transfer: TON, USDT, or gasless USDT (relayer covers the gas). */
     fun sendLocalTransaction(
         walletAddress: String,
         recipient: String,
@@ -165,11 +153,13 @@ class WalletOperationsViewModel(
             gaslessManager.setDefaultProvider(provider)
         }
 
+        val config = gaslessManager.getConfig(network = wallet.network)
         val transfer = wallet.transferJettonTransaction(
             TONJettonsTransferRequest(
                 jettonAddress = TONUserFriendlyAddress(USDT_MASTER),
                 transferAmount = toUsdtRawUnits(amount),
                 recipientAddress = TONUserFriendlyAddress(recipient),
+                responseDestination = config.relayAddress,
             ),
         )
         val quote = gaslessManager.getQuote(
