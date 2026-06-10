@@ -41,11 +41,7 @@ import io.ton.walletkit.demo.designsystem.icons.TonIconImage
 import io.ton.walletkit.demo.designsystem.theme.SmoothCornerShape
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 
-// Wallet "action" button — vertical icon (24px) over short caption.
-// Spec: padding (top 7, bottom 8, h 24), gap 2, rounded-12, label SF Pro Medium 11 (Caption 2 Medium).
-// Primary: bg = accent blue, text/icon = white.
-// Secondary: bg = 10% accent blue, text/icon = brand.
-enum class TonActionButtonStyle { Primary, Secondary }
+enum class TonActionButtonStyle { Primary, Secondary, Tertiary }
 
 @Composable
 fun TonActionButton(
@@ -55,27 +51,42 @@ fun TonActionButton(
     modifier: Modifier = Modifier,
     style: TonActionButtonStyle = TonActionButtonStyle.Primary,
 ) {
-    val (background: Color, foreground: Color) = when (style) {
-        TonActionButtonStyle.Primary -> TonTheme.colors.bgBrand to TonTheme.colors.textOnBrand
-        TonActionButtonStyle.Secondary -> TonTheme.colors.bgBrandFillSubtle to TonTheme.colors.textBrand
+    val background: Color
+    val iconColor: Color
+    val labelColor: Color
+    when (style) {
+        TonActionButtonStyle.Primary -> {
+            background = TonTheme.colors.bgBrand
+            iconColor = TonTheme.colors.textOnBrand
+            labelColor = TonTheme.colors.textOnBrand
+        }
+        TonActionButtonStyle.Secondary -> {
+            background = TonTheme.colors.bgBrandFillSubtle
+            iconColor = TonTheme.colors.textBrand
+            labelColor = TonTheme.colors.textBrand
+        }
+        TonActionButtonStyle.Tertiary -> {
+            background = TonTheme.colors.bgSecondary
+            iconColor = TonTheme.colors.textBrand
+            labelColor = TonTheme.colors.textPrimary
+        }
     }
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(SmoothCornerShape(12.dp))
+            .clip(SmoothCornerShape(20.dp))
             .background(background)
             .clickable(onClick = onClick)
-            .padding(horizontal = 24.dp)
-            .padding(top = 7.dp, bottom = 8.dp),
+            .padding(vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        TonIconImage(icon = icon, size = 24.dp, tint = foreground)
+        TonIconImage(icon = icon, size = 24.dp, tint = iconColor)
         TonText(
             text = title,
-            style = TonTheme.typography.caption2Medium,
-            color = foreground,
+            style = TonTheme.typography.subheadline2Medium,
+            color = labelColor,
         )
     }
 }

@@ -37,24 +37,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.ton.walletkit.demo.designsystem.components.text.TonText
+import io.ton.walletkit.demo.designsystem.icons.TonIcon
+import io.ton.walletkit.demo.designsystem.icons.TonIconImage
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 
-// Body content of the new home screen — mirrors iOS `WalletHomeView.body`. Stateless;
-// renders [balance, actions, assets, NFTs] in a vertical scroll.
-//
-// MAX_ASSETS = 3 visible (TON + 2 jettons), `hasMoreAssets` shows the "Show All" link.
-// MAX_NFTS = 5 carousel cards.
 @Composable
 fun WalletHomeContent(
     totalBalanceInteger: String,
     totalBalanceFraction: String,
+    truncatedAddress: String,
+    onCopyAddress: () -> Unit,
     assets: List<WalletHomeAssetItem>,
     nfts: List<WalletHomeNFTPreview>,
-    hasMoreAssets: Boolean,
-    hasMoreNFTs: Boolean,
-    onDeposit: () -> Unit,
     onSend: () -> Unit,
-    onReceive: () -> Unit,
+    onSwap: () -> Unit,
+    onStake: () -> Unit,
     onShowAllAssets: () -> Unit,
     onShowAllNFTs: () -> Unit,
     onNFTTap: (WalletHomeNFTPreview) -> Unit,
@@ -72,6 +69,8 @@ fun WalletHomeContent(
         WalletHomeBalance(
             totalBalanceInteger = totalBalanceInteger,
             totalBalanceFraction = totalBalanceFraction,
+            truncatedAddress = truncatedAddress,
+            onCopyAddress = onCopyAddress,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
@@ -80,9 +79,9 @@ fun WalletHomeContent(
         )
 
         WalletHomeActionsRow(
-            onDeposit = onDeposit,
             onSend = onSend,
-            onReceive = onReceive,
+            onSwap = onSwap,
+            onStake = onStake,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
@@ -90,7 +89,6 @@ fun WalletHomeContent(
 
         AssetsSection(
             assets = assets,
-            hasMore = hasMoreAssets,
             onShowAll = onShowAllAssets,
             modifier = Modifier
                 .fillMaxWidth()
@@ -99,7 +97,6 @@ fun WalletHomeContent(
 
         NFTsSection(
             nfts = nfts,
-            hasMore = hasMoreNFTs,
             onShowAll = onShowAllNFTs,
             onNFTTap = onNFTTap,
         )
@@ -111,7 +108,6 @@ fun WalletHomeContent(
 @Composable
 private fun AssetsSection(
     assets: List<WalletHomeAssetItem>,
-    hasMore: Boolean,
     onShowAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -119,8 +115,8 @@ private fun AssetsSection(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        SectionHeader(title = "My assets", showAll = hasMore, onShowAll = onShowAll)
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        SectionHeader(title = "Assets", onShowAll = onShowAll)
+        Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
             assets.forEach { asset ->
                 WalletHomeAssetRow(item = asset)
             }
@@ -131,23 +127,18 @@ private fun AssetsSection(
 @Composable
 private fun NFTsSection(
     nfts: List<WalletHomeNFTPreview>,
-    hasMore: Boolean,
     onShowAll: () -> Unit,
     onNFTTap: (WalletHomeNFTPreview) -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         SectionHeader(
             title = "NFTs",
-            showAll = hasMore,
             onShowAll = onShowAll,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
         )
         if (nfts.isNotEmpty()) {
-            // iOS extends the carousel edge-to-edge with `padding(.horizontal, -16)
-            // .padding(.leading, 16)` — Compose equivalent: zero horizontal padding here,
-            // then [LazyRow.contentPadding] gives the leading 16dp inset for the first card.
             WalletHomeNFTsCarousel(
                 nfts = nfts,
                 onTap = onNFTTap,
@@ -160,27 +151,23 @@ private fun NFTsSection(
 @Composable
 private fun SectionHeader(
     title: String,
-    showAll: Boolean,
     onShowAll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.clickable(onClick = onShowAll),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         TonText(
             text = title,
             style = TonTheme.typography.title3Bold,
             color = TonTheme.colors.textPrimary,
         )
-        Box(modifier = Modifier.weight(1f))
-        if (showAll) {
-            TonText(
-                text = "Show All",
-                style = TonTheme.typography.body,
-                color = TonTheme.colors.textBrand,
-                modifier = Modifier.clickable(onClick = onShowAll),
-            )
-        }
+        TonIconImage(
+            icon = TonIcon.ChevronForwardSmall,
+            size = 20.dp,
+            tint = TonTheme.colors.textTertiary,
+        )
     }
 }

@@ -21,6 +21,7 @@
  */
 package io.ton.walletkit.demo.presentation.ui.components.wallet.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,20 +29,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.ton.walletkit.demo.designsystem.components.text.TonText
+import io.ton.walletkit.demo.designsystem.icons.TonIcon
+import io.ton.walletkit.demo.designsystem.icons.TonIconImage
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 import io.ton.walletkit.demo.presentation.dev.devToggleTaps
 import io.ton.walletkit.demo.presentation.util.TestTags
 
-// "Balance" label + price-style total ("123.456 TON"). Integer part renders in price64,
-// fraction (".456") and the trailing " TON" suffix render in price40 — same baseline
-// as iOS `lastTextBaseline` HStack.
 @Composable
 fun WalletHomeBalance(
     totalBalanceInteger: String,
     totalBalanceFraction: String,
+    truncatedAddress: String,
+    onCopyAddress: () -> Unit,
     modifier: Modifier = Modifier,
     onSecretTap: (() -> Unit)? = null,
 ) {
@@ -55,19 +56,8 @@ fun WalletHomeBalance(
             .then(gestureModifier)
             .testTag(TestTags.WALLET_BALANCE),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        TonText(
-            text = "Balance",
-            style = TonTheme.typography.title3RoundedRegular,
-            color = TonTheme.colors.textPrimary.copy(alpha = 0.6f),
-            textAlign = TextAlign.Center,
-        )
-        // [Modifier.alignByBaseline] is the Compose equivalent of iOS's
-        // `HStack(alignment: .lastTextBaseline)` — each Text's first baseline sits on
-        // the row's common baseline. Without it the 40sp glyphs (.456 / TON) appear
-        // visually lower than the 64sp integer because Row's default vertical
-        // alignment aligns bounding-box bottoms, not baselines.
         Row {
             TonText(
                 text = totalBalanceInteger,
@@ -80,7 +70,7 @@ fun WalletHomeBalance(
                 TonText(
                     text = totalBalanceFraction,
                     style = TonTheme.typography.price40,
-                    color = TonTheme.colors.textPrimary,
+                    color = TonTheme.colors.textSecondary,
                     maxLines = 1,
                     modifier = Modifier.alignByBaseline(),
                 )
@@ -88,9 +78,27 @@ fun WalletHomeBalance(
             TonText(
                 text = " TON",
                 style = TonTheme.typography.price40,
-                color = TonTheme.colors.textPrimary,
+                color = TonTheme.colors.textSecondary,
                 maxLines = 1,
                 modifier = Modifier.alignByBaseline(),
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            TonIconImage(icon = TonIcon.Ton, size = 16.dp)
+            TonText(
+                text = truncatedAddress,
+                style = TonTheme.typography.subheadline2,
+                color = TonTheme.colors.textSecondary,
+            )
+            TonIconImage(
+                icon = TonIcon.Copy,
+                size = 16.dp,
+                tint = TonTheme.colors.textSecondary,
+                modifier = Modifier.clickable(onClick = onCopyAddress),
             )
         }
     }
