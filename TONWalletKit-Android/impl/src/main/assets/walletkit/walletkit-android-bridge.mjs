@@ -39676,11 +39676,14 @@ async function initTonWalletKit(config, deps) {
 		if (type === "tonapi") apiClient = new ApiClientTonApi({
 			endpoint: netConfig.apiClientConfiguration?.url,
 			apiKey: netConfig.apiClientConfiguration?.key,
+			timeout: netConfig.apiClientConfiguration?.timeout,
 			network: netConfig.network
 		});
 		else if (type === "toncenter") apiClient = new ApiClientToncenter({
 			endpoint: netConfig.apiClientConfiguration?.url,
-			apiKey: netConfig.apiClientConfiguration?.key
+			apiKey: netConfig.apiClientConfiguration?.key,
+			timeout: netConfig.apiClientConfiguration?.timeout,
+			network: netConfig.network
 		});
 		else apiClient = netConfig.apiClientConfiguration;
 		networksConfig[netConfig.network.chainId] = { apiClient };

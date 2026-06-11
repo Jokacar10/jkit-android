@@ -193,6 +193,7 @@ internal class InitializationManager(
                             putJsonObject("apiClientConfiguration") {
                                 apiConfig.url?.takeIf { it.isNotBlank() }?.let { put("url", it) }
                                 apiConfig.key?.takeIf { it.isNotBlank() }?.let { put("key", it) }
+                                apiConfig.timeout?.let { put("timeout", it) }
                             }
                         }
                     }
