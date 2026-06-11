@@ -526,8 +526,10 @@ class WalletKitViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshWallets() {
-        _state.update { it.copy(isLoadingWallets = true) }
+    suspend fun refreshWallets(silent: Boolean = false) {
+        if (!silent) {
+            _state.update { it.copy(isLoadingWallets = true) }
+        }
         Log.d(
             LOG_TAG,
             "refreshWallets: start active=${state.value.activeWalletAddress} cached=${lifecycleManager.tonWallets.keys}",
@@ -573,7 +575,9 @@ class WalletKitViewModel @Inject constructor(
             val fallback = uiString(R.string.wallet_error_load_default)
             _state.update { it.copy(error = error.message ?: fallback) }
         }
-        _state.update { it.copy(isLoadingWallets = false) }
+        if (!silent) {
+            _state.update { it.copy(isLoadingWallets = false) }
+        }
         Log.d(
             LOG_TAG,
             "refreshWallets: done active=${_state.value.activeWalletAddress} wallets=${_state.value.wallets.map { it.address }}",
@@ -1558,7 +1562,7 @@ class WalletKitViewModel @Inject constructor(
         balanceRefreshJob = viewModelScope.launch {
             while (true) {
                 delay(BALANCE_REFRESH_MS)
-                refreshWallets()
+                refreshWallets(silent = true)
             }
         }
     }

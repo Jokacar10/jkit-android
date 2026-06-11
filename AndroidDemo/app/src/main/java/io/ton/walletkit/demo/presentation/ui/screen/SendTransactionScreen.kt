@@ -22,18 +22,10 @@
 package io.ton.walletkit.demo.presentation.ui.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,30 +34,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.ton.walletkit.demo.designsystem.components.button.TonButton
 import io.ton.walletkit.demo.designsystem.components.segmentedcontrol.TonSegmentedControl
 import io.ton.walletkit.demo.designsystem.components.text.TonText
 import io.ton.walletkit.demo.designsystem.components.toggle.TonSwitch
-import io.ton.walletkit.demo.designsystem.icons.TonIcon
-import io.ton.walletkit.demo.designsystem.icons.TonIconImage
 import io.ton.walletkit.demo.designsystem.theme.SmoothCornerShape
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 import io.ton.walletkit.demo.presentation.model.WalletSummary
+import io.ton.walletkit.demo.presentation.ui.sheet.components.SheetErrorBox
+import io.ton.walletkit.demo.presentation.ui.sheet.components.SheetHeader
+import io.ton.walletkit.demo.presentation.ui.sheet.components.SheetTextField
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetScaffold
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetSection
 import io.ton.walletkit.demo.presentation.util.abbreviated
 import io.ton.walletkit.demo.presentation.viewmodel.SendCurrency
 
-/**
- * Send sheet — design-system styled, matching the TonConnect transaction sheets. Picks the asset
- * (TON / USDT), and for USDT offers a gasless toggle that routes the send through the relayer so
- * the user pays the network fee in USDT instead of TON.
- */
 @Composable
 fun SendTransactionScreen(
     wallet: WalletSummary,
@@ -111,28 +96,8 @@ fun SendTransactionScreen(
             )
         },
     ) {
-        // Header
-        Box(modifier = Modifier.fillMaxWidth()) {
-            TonText(
-                text = "Send",
-                style = TonTheme.typography.title2,
-                color = TonTheme.colors.textPrimary,
-                modifier = Modifier.align(Alignment.Center),
-            )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(28.dp)
-                    .clip(CircleShape)
-                    .background(TonTheme.colors.bgSecondary)
-                    .clickable(role = Role.Button, onClick = onBack),
-                contentAlignment = Alignment.Center,
-            ) {
-                TonIconImage(icon = TonIcon.Close, size = 12.dp, tint = TonTheme.colors.textSecondary)
-            }
-        }
+        SheetHeader(title = "Send", onClose = onBack)
 
-        // Asset picker
         TonSegmentedControl(
             selection = currency,
             items = SendCurrency.entries,
@@ -144,7 +109,6 @@ fun SendTransactionScreen(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        // From
         TonConnectSheetSection(label = "From") {
             TonText(wallet.name, style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textPrimary)
             TonText(wallet.address.abbreviated(), style = TonTheme.typography.subheadline2, color = TonTheme.colors.textSecondary)
@@ -155,8 +119,7 @@ fun SendTransactionScreen(
             )
         }
 
-        // Recipient
-        SendField(
+        SheetTextField(
             value = recipient,
             onValueChange = { recipient = it },
             label = "Recipient",
@@ -165,8 +128,7 @@ fun SendTransactionScreen(
             supporting = if (!recipientValid) "Invalid TON address" else null,
         )
 
-        // Amount
-        SendField(
+        SheetTextField(
             value = amount,
             onValueChange = { amount = it },
             label = "Amount",
@@ -181,7 +143,6 @@ fun SendTransactionScreen(
             },
         )
 
-        // Gasless toggle (USDT only)
         if (currency == SendCurrency.USDT) {
             Row(
                 modifier = Modifier
@@ -202,8 +163,7 @@ fun SendTransactionScreen(
                 TonSwitch(checked = gasless, onCheckedChange = { gasless = it })
             }
         } else {
-            // Comment is only carried on regular (non-gasless) transfers.
-            SendField(
+            SheetTextField(
                 value = comment,
                 onValueChange = { comment = it },
                 label = "Comment (optional)",
@@ -211,73 +171,7 @@ fun SendTransactionScreen(
             )
         }
 
-        // Error
-        error?.let {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(SmoothCornerShape(12.dp))
-                    .background(TonTheme.colors.bgBrandSubtle)
-                    .padding(16.dp),
-            ) {
-                TonText(it, style = TonTheme.typography.subheadline2, color = TonTheme.colors.textError)
-            }
-        }
-    }
-}
-
-@Composable
-private fun SendField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    placeholder: String,
-    modifier: Modifier = Modifier,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    trailing: String? = null,
-    isError: Boolean = false,
-    supporting: String? = null,
-) {
-    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        TonText(label, style = TonTheme.typography.footnoteCaps, color = TonTheme.colors.textSecondary)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(SmoothCornerShape(12.dp))
-                .background(TonTheme.colors.bgSecondary)
-                .border(
-                    width = 1.dp,
-                    color = if (isError) TonTheme.colors.textError else Color.Transparent,
-                    shape = SmoothCornerShape(12.dp),
-                )
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(modifier = Modifier.weight(1f)) {
-                if (value.isEmpty()) {
-                    TonText(placeholder, style = TonTheme.typography.body, color = TonTheme.colors.textTertiary)
-                }
-                BasicTextField(
-                    value = value,
-                    onValueChange = onValueChange,
-                    textStyle = TonTheme.typography.body.style.copy(color = TonTheme.colors.textPrimary),
-                    cursorBrush = SolidColor(TonTheme.colors.bgBrand),
-                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-            trailing?.let {
-                TonText(it, style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textSecondary)
-            }
-        }
-        supporting?.let {
-            TonText(
-                it,
-                style = TonTheme.typography.caption2Medium,
-                color = if (isError) TonTheme.colors.textError else TonTheme.colors.textTertiary,
-            )
-        }
+        error?.let { SheetErrorBox(it) }
     }
 }
 
