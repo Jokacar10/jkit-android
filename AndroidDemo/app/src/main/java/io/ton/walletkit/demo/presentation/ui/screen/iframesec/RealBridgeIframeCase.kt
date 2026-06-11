@@ -40,6 +40,8 @@ import android.util.Base64
 enum class RealBridgeIframeCase {
     BASELINE_MAIN,
     SAME_ORIGIN_NAVIGATED,
+    SAME_ORIGIN_NESTED,
+    SAME_URL_IFRAME,
     CROSS_ORIGIN_DATA,
     SRCDOC,
     SANDBOXED,
@@ -49,6 +51,8 @@ enum class RealBridgeIframeCase {
         get() = when (this) {
             BASELINE_MAIN -> "Main"
             SAME_ORIGIN_NAVIGATED -> "Same-origin"
+            SAME_ORIGIN_NESTED -> "Nested SO"
+            SAME_URL_IFRAME -> "Same-URL"
             CROSS_ORIGIN_DATA -> "data:"
             SRCDOC -> "srcdoc"
             SANDBOXED -> "sandboxed"
@@ -59,6 +63,8 @@ enum class RealBridgeIframeCase {
         get() = when (this) {
             BASELINE_MAIN -> "Baseline — main dApp frame (legit)"
             SAME_ORIGIN_NAVIGATED -> "Same-host navigated iframe"
+            SAME_ORIGIN_NESTED -> "Nested same-host iframes — HIJACK"
+            SAME_URL_IFRAME -> "Same-URL iframe (identical to main, ?qa=1) — HIJACK"
             CROSS_ORIGIN_DATA -> "Cross-origin data: iframe — HIJACK"
             SRCDOC -> "srcdoc iframe — HIJACK"
             SANDBOXED -> "Sandboxed iframe — HIJACK"
@@ -73,6 +79,13 @@ enum class RealBridgeIframeCase {
             SAME_ORIGIN_NAVIGATED ->
                 "An iframe navigated to a path on the same host as the dApp. Its request is attributed " +
                     "to the dApp domain (webView.url) and authorized, though it never connected."
+            SAME_ORIGIN_NESTED ->
+                "A same-host iframe nested inside another same-host iframe (parent → A → B). The deepest " +
+                    "frame fires a real signData; it is still attributed to the dApp domain and authorized."
+            SAME_URL_IFRAME ->
+                "An iframe whose src is the EXACT same URL as the main frame " +
+                    "(https://tonconnect-sdk-demo-dapp.vercel.app/?qa=1) — an embedded copy of the dApp " +
+                    "itself. Same origin, so its real signData is attributed to the dApp domain and authorized."
             CROSS_ORIGIN_DATA ->
                 "Opaque-origin data: iframe sends a complete signData. On Android the bridge keys on " +
                     "webView.url, so it is attributed to the dApp domain and AUTHORIZED — the core hijack."
@@ -122,6 +135,57 @@ enum class RealBridgeIframeCase {
                   f.addEventListener('load',function(){
                     try{var d=f.contentWindow.document;var s=d.createElement('script');s.textContent=SRC;(d.body||d.documentElement).appendChild(s);}
                     catch(e){try{window.iframeSecLog.postMessage(JSON.stringify({frameLabel:'SAME-ORIGIN-IFRAME',action:'CANNOT INJECT (cross-origin?)',claimedOrigin:(location.origin||'null'),ts:Date.now()}));}catch(x){}}
+                  });
+                  __ifsecAdd(f);
+                })();
+                """.trimIndent()
+            }
+
+            SAME_ORIGIN_NESTED -> {
+                // INNER runs in the deepest (depth-2) same-host frame and auto-fires signData.
+                val inner = realSendScript("NESTED-IFRAME-B (depth 2, same host)", "Deepest same-host frame. Never connected.")
+                // BUILDER runs in the middle (depth-1) frame: it creates the depth-2 same-host
+                // iframe and injects INNER into it (same-origin chain, so contentWindow access works).
+                val builder = """
+                    (function(){
+                      var INNER=${jsString(inner)};
+                      var f2=document.createElement('iframe');
+                      ${frameStyle("f2")}
+                      f2.src=${jsString(SAME_ORIGIN_URL)};
+                      f2.addEventListener('load',function(){
+                        try{var d=f2.contentWindow.document;var s=d.createElement('script');s.textContent=INNER;(d.body||d.documentElement).appendChild(s);}catch(e){}
+                      });
+                      (document.body||document.documentElement).appendChild(f2);
+                    })();
+                """.trimIndent()
+                """
+                (function(){
+                  var BUILDER=${jsString(builder)};
+                  var f=document.createElement('iframe');
+                  ${frameStyle("f")}
+                  f.src=${jsString(SAME_ORIGIN_URL)};
+                  f.addEventListener('load',function(){
+                    try{var d=f.contentWindow.document;var s=d.createElement('script');s.textContent=BUILDER;(d.body||d.documentElement).appendChild(s);}
+                    catch(e){try{window.iframeSecLog.postMessage(JSON.stringify({frameLabel:'NESTED-SO',action:'CANNOT INJECT (cross-origin?)',claimedOrigin:(location.origin||'null'),ts:Date.now()}));}catch(x){}}
+                  });
+                  __ifsecAdd(f);
+                })();
+                """.trimIndent()
+            }
+
+            SAME_URL_IFRAME -> {
+                // iframe whose src is the exact same URL as the main frame (DAPP_URL, with ?qa=1).
+                // Same origin, so we inject the real-send script into it via contentWindow.
+                val script = realSendScript("SAME-URL-IFRAME", "Same URL as the main frame ($DAPP_URL). Never connected.")
+                """
+                (function(){
+                  var SRC=${jsString(script)};
+                  var f=document.createElement('iframe');
+                  ${frameStyle("f")}
+                  f.src=${jsString(DAPP_URL)};
+                  f.addEventListener('load',function(){
+                    try{var d=f.contentWindow.document;var s=d.createElement('script');s.textContent=SRC;(d.body||d.documentElement).appendChild(s);}
+                    catch(e){try{window.iframeSecLog.postMessage(JSON.stringify({frameLabel:'SAME-URL-IFRAME',action:'CANNOT INJECT (cross-origin?)',claimedOrigin:(location.origin||'null'),ts:Date.now()}));}catch(x){}}
                   });
                   __ifsecAdd(f);
                 })();
