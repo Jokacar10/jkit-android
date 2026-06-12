@@ -22,8 +22,8 @@
 package io.ton.walletkit.demo.presentation.model
 
 import io.ton.walletkit.api.generated.TONJetton
-import java.math.BigDecimal
-import java.math.RoundingMode
+import io.ton.walletkit.model.TONTokenAmount
+import io.ton.walletkit.model.TONTokenAmountFormatter
 
 /**
  * UI-friendly jetton summary model for list display.
@@ -49,16 +49,11 @@ data class JettonSummary(
         get() = imageUrl ?: imageData
 
     companion object {
-        fun formatBalance(rawBalance: String, decimals: Int?, symbol: String): String = try {
-            val d = decimals ?: 9
-            val divisor = BigDecimal.TEN.pow(d)
-            val formatted = BigDecimal(rawBalance)
-                .divide(divisor, d, RoundingMode.DOWN)
-                .stripTrailingZeros()
-                .toPlainString()
-            "$formatted $symbol"
-        } catch (e: Exception) {
-            "$rawBalance $symbol (raw)"
+        fun formatBalance(rawBalance: String, decimals: Int?, symbol: String): String {
+            val amount = TONTokenAmount.parseOrNull(rawBalance)?.let { nano ->
+                TONTokenAmountFormatter().apply { nanoUnitDecimalsNumber = decimals ?: 9 }.string(nano)
+            } ?: return "$rawBalance $symbol (raw)"
+            return "$amount $symbol"
         }
 
         fun from(jetton: TONJetton): JettonSummary {
