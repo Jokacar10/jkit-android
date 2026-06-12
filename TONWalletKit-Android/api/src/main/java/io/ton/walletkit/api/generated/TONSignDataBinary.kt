@@ -42,7 +42,7 @@ import kotlinx.serialization.Serializable
 data class TONSignDataBinary(
 
     @Contextual @SerialName(value = "content")
-    val content: io.ton.walletkit.model.TONBase64,
+    var content: io.ton.walletkit.model.TONBase64,
 
 ) {
 

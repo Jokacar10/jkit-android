@@ -43,13 +43,13 @@ import kotlinx.serialization.Serializable
 data class TONNFTRawTransferRequest(
 
     @SerialName(value = "nftAddress")
-    val nftAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var nftAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "transferAmount")
-    val transferAmount: kotlin.String,
+    var transferAmount: kotlin.String,
 
     @SerialName(value = "message")
-    val message: TONNFTRawTransferRequestMessage,
+    var message: TONNFTRawTransferRequestMessage,
 
 ) {
 

@@ -61,71 +61,71 @@ import kotlinx.serialization.Serializable
 data class TONTransaction(
 
     @SerialName(value = "account")
-    val account: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var account: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @Contextual @SerialName(value = "hash")
-    val hash: io.ton.walletkit.model.TONHex,
+    var hash: io.ton.walletkit.model.TONHex,
 
     @SerialName(value = "logicalTime")
-    val logicalTime: kotlin.String,
+    var logicalTime: kotlin.String,
 
     /* Unix timestamp of the transaction */
     @SerialName(value = "now")
-    val now: kotlin.Double,
+    var now: kotlin.Double,
 
     /* Masterchain block sequence number */
     @SerialName(value = "mcBlockSeqno")
-    val mcBlockSeqno: kotlin.Int,
+    var mcBlockSeqno: kotlin.Int,
 
     @Contextual @SerialName(value = "traceExternalHash")
-    val traceExternalHash: io.ton.walletkit.model.TONHex,
+    var traceExternalHash: io.ton.walletkit.model.TONHex,
 
     /* The list of outgoing messages produced by the transaction */
     @SerialName(value = "outMessages")
-    val outMessages: kotlin.collections.List<TONTransactionMessage>,
+    var outMessages: kotlin.collections.List<TONTransactionMessage>,
 
     /* Emulated state of the transaction */
     @SerialName(value = "isEmulated")
-    val isEmulated: kotlin.Boolean,
+    var isEmulated: kotlin.Boolean,
 
     @SerialName(value = "accountStateBefore")
-    val accountStateBefore: TONTransactionAccountState? = null,
+    var accountStateBefore: TONTransactionAccountState? = null,
 
     @SerialName(value = "accountStateAfter")
-    val accountStateAfter: TONTransactionAccountState? = null,
+    var accountStateAfter: TONTransactionAccountState? = null,
 
     @SerialName(value = "description")
-    val description: TONTransactionDescription? = null,
+    var description: TONTransactionDescription? = null,
 
     /* ID of the trace */
     @SerialName(value = "traceId")
-    val traceId: kotlin.String? = null,
+    var traceId: kotlin.String? = null,
 
     /* The hash of the previous transaction */
     @SerialName(value = "previousTransactionHash")
-    val previousTransactionHash: kotlin.String? = null,
+    var previousTransactionHash: kotlin.String? = null,
 
     @SerialName(value = "previousTransactionLogicalTime")
-    val previousTransactionLogicalTime: kotlin.String? = null,
+    var previousTransactionLogicalTime: kotlin.String? = null,
 
     @Contextual @SerialName(value = "origStatus")
-    val origStatus: TONAccountStatus? = null,
+    var origStatus: TONAccountStatus? = null,
 
     @Contextual @SerialName(value = "endStatus")
-    val endStatus: TONAccountStatus? = null,
+    var endStatus: TONAccountStatus? = null,
 
     @SerialName(value = "totalFees")
-    val totalFees: kotlin.String? = null,
+    var totalFees: kotlin.String? = null,
 
     /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
     @SerialName(value = "totalFeesExtraCurrencies")
-    val totalFeesExtraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+    var totalFeesExtraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
 
     @SerialName(value = "blockRef")
-    val blockRef: TONTransactionBlockRef? = null,
+    var blockRef: TONTransactionBlockRef? = null,
 
     @SerialName(value = "inMessage")
-    val inMessage: TONTransactionMessage? = null,
+    var inMessage: TONTransactionMessage? = null,
 
 ) {
 

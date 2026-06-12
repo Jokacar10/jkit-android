@@ -286,7 +286,7 @@ class SwapOperationsTest : OperationsTestBase() {
             quote = swapQuoteModel(),
             userAddress = TONUserFriendlyAddress(USER_ADDRESS),
             destinationAddress = TONUserFriendlyAddress(USER_ADDRESS),
-            slippageBps = 100.0,
+            slippageBps = 100,
         )
         rpcClient.buildSwapTransaction(params)
 

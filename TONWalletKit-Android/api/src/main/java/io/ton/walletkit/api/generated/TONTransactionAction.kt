@@ -54,51 +54,51 @@ data class TONTransactionAction(
 
     /* The flag indicating whether the action phase succeeded */
     @SerialName(value = "isSuccess")
-    val isSuccess: kotlin.Boolean? = null,
+    var isSuccess: kotlin.Boolean? = null,
 
     /* The flag indicating whether the action phase was valid */
     @SerialName(value = "isValid")
-    val isValid: kotlin.Boolean? = null,
+    var isValid: kotlin.Boolean? = null,
 
     /* The flag indicating if the transaction had insufficient funds */
     @SerialName(value = "hasNoFunds")
-    val hasNoFunds: kotlin.Boolean? = null,
+    var hasNoFunds: kotlin.Boolean? = null,
 
     /* The status change applied to the account during the action phase */
     @SerialName(value = "statusChange")
-    val statusChange: kotlin.String? = null,
+    var statusChange: kotlin.String? = null,
 
     @SerialName(value = "totalForwardingFees")
-    val totalForwardingFees: kotlin.String? = null,
+    var totalForwardingFees: kotlin.String? = null,
 
     @SerialName(value = "totalActionFees")
-    val totalActionFees: kotlin.String? = null,
+    var totalActionFees: kotlin.String? = null,
 
     /* The result code returned from the action phase */
     @SerialName(value = "resultCode")
-    val resultCode: kotlin.Int? = null,
+    var resultCode: kotlin.Int? = null,
 
     /* The total number of actions processed */
     @SerialName(value = "totalActionsNumber")
-    val totalActionsNumber: kotlin.Int? = null,
+    var totalActionsNumber: kotlin.Int? = null,
 
     /* The number of special actions executed */
     @SerialName(value = "specActionsNumber")
-    val specActionsNumber: kotlin.Int? = null,
+    var specActionsNumber: kotlin.Int? = null,
 
     /* The number of skipped actions during execution */
     @SerialName(value = "skippedActionsNumber")
-    val skippedActionsNumber: kotlin.Int? = null,
+    var skippedActionsNumber: kotlin.Int? = null,
 
     /* The number of messages created in the action phase */
     @SerialName(value = "messagesCreatedNumber")
-    val messagesCreatedNumber: kotlin.Int? = null,
+    var messagesCreatedNumber: kotlin.Int? = null,
 
     @Contextual @SerialName(value = "actionListHash")
-    val actionListHash: io.ton.walletkit.model.TONHex? = null,
+    var actionListHash: io.ton.walletkit.model.TONHex? = null,
 
     @SerialName(value = "totalMessagesSize")
-    val totalMessagesSize: TONTransactionActionMessageSize? = null,
+    var totalMessagesSize: TONTransactionActionMessageSize? = null,
 
 ) {
 

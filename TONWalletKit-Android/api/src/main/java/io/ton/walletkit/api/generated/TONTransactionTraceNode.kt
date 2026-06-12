@@ -44,13 +44,13 @@ data class TONTransactionTraceNode(
 
     /* Child trace nodes representing spawned messages */
     @SerialName(value = "children")
-    val children: kotlin.collections.List<TONTransactionTraceNode>,
+    var children: kotlin.collections.List<TONTransactionTraceNode>,
 
     @Contextual @SerialName(value = "txHash")
-    val txHash: io.ton.walletkit.model.TONHex? = null,
+    var txHash: io.ton.walletkit.model.TONHex? = null,
 
     @Contextual @SerialName(value = "inMsgHash")
-    val inMsgHash: io.ton.walletkit.model.TONHex? = null,
+    var inMsgHash: io.ton.walletkit.model.TONHex? = null,
 
 ) {
 

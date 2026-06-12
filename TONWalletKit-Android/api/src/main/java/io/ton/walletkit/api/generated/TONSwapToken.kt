@@ -45,22 +45,22 @@ import kotlinx.serialization.Serializable
 data class TONSwapToken(
 
     @SerialName(value = "address")
-    val address: kotlin.String,
+    var address: kotlin.String,
 
     @SerialName(value = "decimals")
-    val decimals: kotlin.Double,
+    var decimals: kotlin.Double,
 
     @SerialName(value = "name")
-    val name: kotlin.String? = null,
+    var name: kotlin.String? = null,
 
     @SerialName(value = "symbol")
-    val symbol: kotlin.String? = null,
+    var symbol: kotlin.String? = null,
 
     @SerialName(value = "image")
-    val image: kotlin.String? = null,
+    var image: kotlin.String? = null,
 
     @SerialName(value = "chainId")
-    val chainId: kotlin.String? = null,
+    var chainId: kotlin.String? = null,
 
 ) {
 

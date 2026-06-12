@@ -56,55 +56,55 @@ import kotlinx.serialization.Serializable
 data class TONNFT(
 
     @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     /* Index of the item within its collection */
     @SerialName(value = "index")
-    val index: kotlin.String? = null,
+    var index: kotlin.String? = null,
 
     @SerialName(value = "info")
-    val info: TONTokenInfo? = null,
+    var info: TONTokenInfo? = null,
 
     /* Custom attributes/traits of the NFT (e.g., rarity, properties) */
     @SerialName(value = "attributes")
-    val attributes: kotlin.collections.List<TONNFTAttribute>? = null,
+    var attributes: kotlin.collections.List<TONNFTAttribute>? = null,
 
     @SerialName(value = "collection")
-    val collection: TONNFTCollection? = null,
+    var collection: TONNFTCollection? = null,
 
     @SerialName(value = "auctionContractAddress")
-    val auctionContractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var auctionContractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @Contextual @SerialName(value = "codeHash")
-    val codeHash: io.ton.walletkit.model.TONHex? = null,
+    var codeHash: io.ton.walletkit.model.TONHex? = null,
 
     @Contextual @SerialName(value = "dataHash")
-    val dataHash: io.ton.walletkit.model.TONHex? = null,
+    var dataHash: io.ton.walletkit.model.TONHex? = null,
 
     /* Whether the NFT contract has been initialized */
     @SerialName(value = "isInited")
-    val isInited: kotlin.Boolean? = null,
+    var isInited: kotlin.Boolean? = null,
 
     /* Whether the NFT is soulbound (non-transferable) */
     @SerialName(value = "isSoulbound")
-    val isSoulbound: kotlin.Boolean? = null,
+    var isSoulbound: kotlin.Boolean? = null,
 
     /* Whether the NFT is currently listed for sale */
     @SerialName(value = "isOnSale")
-    val isOnSale: kotlin.Boolean? = null,
+    var isOnSale: kotlin.Boolean? = null,
 
     @SerialName(value = "ownerAddress")
-    val ownerAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var ownerAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "realOwnerAddress")
-    val realOwnerAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var realOwnerAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "saleContractAddress")
-    val saleContractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var saleContractAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     /* Off-chain metadata of the NFT (key-value pairs) */
     @Contextual @SerialName(value = "extra")
-    val extra: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,
+    var extra: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,
 
 ) {
 

@@ -42,11 +42,11 @@ data class TONProofMessageDomain(
 
     /* Length of the domain value in bytes */
     @SerialName(value = "lengthBytes")
-    val lengthBytes: kotlin.Int,
+    var lengthBytes: kotlin.Int,
 
     /* Domain name string (e.g., \"example.com\") */
     @SerialName(value = "value")
-    val `value`: kotlin.String,
+    var `value`: kotlin.String,
 
 ) {
 

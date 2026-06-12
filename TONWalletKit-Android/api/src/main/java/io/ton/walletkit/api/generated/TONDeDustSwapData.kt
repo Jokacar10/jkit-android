@@ -42,10 +42,10 @@ import kotlinx.serialization.Serializable
 data class TONDeDustSwapData(
 
     @SerialName(value = "slippage_bps")
-    val slippageBps: kotlin.Double,
+    var slippageBps: kotlin.Double,
 
     @SerialName(value = "routes")
-    val routes: kotlin.collections.List<@Contextual kotlin.collections.List<TONDeDustRouteStep>>,
+    var routes: kotlin.collections.List<@Contextual kotlin.collections.List<TONDeDustRouteStep>>,
 
 ) {
 

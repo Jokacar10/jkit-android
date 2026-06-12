@@ -45,17 +45,17 @@ import kotlinx.serialization.Serializable
 data class TONBalanceUpdate(
 
     @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    var status: TONStreamingUpdateStatus,
 
     @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    var rawBalance: kotlin.String,
 
     /* The formatted balance */
     @SerialName(value = "balance")
-    val balance: kotlin.String,
+    var balance: kotlin.String,
     @SerialName("type")
     val type: kotlin.String = "balance",
 ) {

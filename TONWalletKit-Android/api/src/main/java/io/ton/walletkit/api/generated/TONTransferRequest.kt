@@ -49,27 +49,27 @@ import kotlinx.serialization.Serializable
 data class TONTransferRequest(
 
     @SerialName(value = "transferAmount")
-    val transferAmount: kotlin.String,
+    var transferAmount: kotlin.String,
 
     @SerialName(value = "recipientAddress")
-    val recipientAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var recipientAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "mode")
-    val mode: TONSendMode? = null,
+    var mode: TONSendMode? = null,
 
     /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
     @SerialName(value = "extraCurrency")
-    val extraCurrency: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+    var extraCurrency: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
 
     @Contextual @SerialName(value = "stateInit")
-    val stateInit: io.ton.walletkit.model.TONBase64? = null,
+    var stateInit: io.ton.walletkit.model.TONBase64? = null,
 
     @Contextual @SerialName(value = "payload")
-    val payload: io.ton.walletkit.model.TONBase64? = null,
+    var payload: io.ton.walletkit.model.TONBase64? = null,
 
     /* Human-readable text comment attached to the transfer */
     @SerialName(value = "comment")
-    val comment: kotlin.String? = null,
+    var comment: kotlin.String? = null,
 
 ) {
 

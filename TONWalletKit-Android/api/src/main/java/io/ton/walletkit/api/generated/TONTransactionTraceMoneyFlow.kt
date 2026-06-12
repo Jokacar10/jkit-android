@@ -45,21 +45,21 @@ import kotlinx.serialization.Serializable
 data class TONTransactionTraceMoneyFlow(
 
     @SerialName(value = "outputs")
-    val outputs: kotlin.String,
+    var outputs: kotlin.String,
 
     @SerialName(value = "inputs")
-    val inputs: kotlin.String,
+    var inputs: kotlin.String,
 
     /* List of all token transfers involved in the transaction */
     @SerialName(value = "allJettonTransfers")
-    val allJettonTransfers: kotlin.collections.List<TONTransactionTraceMoneyFlowItem>,
+    var allJettonTransfers: kotlin.collections.List<TONTransactionTraceMoneyFlowItem>,
 
     /* List of token transfers involving our address */
     @SerialName(value = "ourTransfers")
-    val ourTransfers: kotlin.collections.List<TONTransactionTraceMoneyFlowItem>,
+    var ourTransfers: kotlin.collections.List<TONTransactionTraceMoneyFlowItem>,
 
     @SerialName(value = "ourAddress")
-    val ourAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var ourAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
 ) {
 

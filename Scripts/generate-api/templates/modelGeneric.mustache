@@ -31,11 +31,11 @@ import io.ton.walletkit.model.TONUserFriendlyAddress
 {{^vendorExtensions.x-frozen}}
 {{#vendorExtensions.x-generic-type-ref}}
     @SerialName("{{{baseName}}}")
-    val {{{name}}}: {{{vendorExtensions.x-generic-type-ref}}}{{^required}}? = null{{/required}}{{^-last}},{{/-last}}
+    var {{{name}}}: {{{vendorExtensions.x-generic-type-ref}}}{{^required}}? = null{{/required}}{{^-last}},{{/-last}}
 {{/vendorExtensions.x-generic-type-ref}}
 {{^vendorExtensions.x-generic-type-ref}}
     @SerialName("{{{baseName}}}")
-    val {{{name}}}: {{{dataType}}}{{^required}}? = null{{/required}}{{^-last}},{{/-last}}
+    var {{{name}}}: {{{dataType}}}{{^required}}? = null{{/required}}{{^-last}},{{/-last}}
 {{/vendorExtensions.x-generic-type-ref}}
 {{/vendorExtensions.x-frozen}}
 {{/vars}}
