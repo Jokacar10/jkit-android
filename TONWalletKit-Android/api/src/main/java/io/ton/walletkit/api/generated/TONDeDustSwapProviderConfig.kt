@@ -50,42 +50,42 @@ data class TONDeDustSwapProviderConfig(
 
     /* The address of the referrer */
     @SerialName(value = "referralAddress")
-    val referralAddress: kotlin.String? = null,
+    var referralAddress: kotlin.String? = null,
 
     /* Referral fee in basis points (max 100 = 1%) */
     @SerialName(value = "referralFeeBps")
-    val referralFeeBps: kotlin.Int? = null,
+    var referralFeeBps: kotlin.Int? = null,
 
     /* Custom provider ID (defaults to 'dedust') */
     @SerialName(value = "providerId")
-    val providerId: kotlin.String? = null,
+    var providerId: kotlin.String? = null,
 
     /* Default slippage tolerance in basis points (1 bp = 0.01%) */
     @SerialName(value = "defaultSlippageBps")
-    val defaultSlippageBps: kotlin.Int? = null,
+    var defaultSlippageBps: kotlin.Int? = null,
 
     /* API base URL */
     @SerialName(value = "apiUrl")
-    val apiUrl: kotlin.String? = null,
+    var apiUrl: kotlin.String? = null,
 
     /* Only use verified pools */
     @SerialName(value = "onlyVerifiedPools")
-    val onlyVerifiedPools: kotlin.Boolean? = null,
+    var onlyVerifiedPools: kotlin.Boolean? = null,
 
     /* Maximum number of route splits */
     @SerialName(value = "maxSplits")
-    val maxSplits: kotlin.Int? = null,
+    var maxSplits: kotlin.Int? = null,
 
     /* Maximum route length (hops) */
     @SerialName(value = "maxLength")
-    val maxLength: kotlin.Int? = null,
+    var maxLength: kotlin.Int? = null,
 
     /* Minimum pool TVL in USD */
     @SerialName(value = "minPoolUsdTvl")
-    val minPoolUsdTvl: kotlin.String? = null,
+    var minPoolUsdTvl: kotlin.String? = null,
 
     @SerialName(value = "metadata")
-    val metadata: TONSwapProviderMetadataOverride? = null,
+    var metadata: TONSwapProviderMetadataOverride? = null,
 
 ) {
 

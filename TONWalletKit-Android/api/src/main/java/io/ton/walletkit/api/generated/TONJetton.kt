@@ -49,32 +49,32 @@ import kotlinx.serialization.Serializable
 data class TONJetton(
 
     @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "walletAddress")
-    val walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "balance")
-    val balance: kotlin.String,
+    var balance: kotlin.String,
 
     @SerialName(value = "info")
-    val info: TONTokenInfo,
+    var info: TONTokenInfo,
 
     /* Indicates if the jetton is verified */
     @SerialName(value = "isVerified")
-    val isVerified: kotlin.Boolean,
+    var isVerified: kotlin.Boolean,
 
     /* Current prices of the jetton in various currencies */
     @SerialName(value = "prices")
-    val prices: kotlin.collections.List<TONJettonPrice>,
+    var prices: kotlin.collections.List<TONJettonPrice>,
 
     /* The number of decimal places used by the token */
     @SerialName(value = "decimalsNumber")
-    val decimalsNumber: kotlin.Int? = null,
+    var decimalsNumber: kotlin.Int? = null,
 
     /* Additional arbitrary data related to the jetton */
     @Contextual @SerialName(value = "extra")
-    val extra: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,
+    var extra: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,
 
 ) {
 

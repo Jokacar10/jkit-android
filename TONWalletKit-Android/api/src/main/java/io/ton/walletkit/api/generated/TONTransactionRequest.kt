@@ -45,22 +45,22 @@ data class TONTransactionRequest(
 
     /* List of messages to include in the transaction */
     @SerialName(value = "messages")
-    val messages: kotlin.collections.List<TONTransactionRequestMessage>,
+    var messages: kotlin.collections.List<TONTransactionRequestMessage>,
 
     /* List of structured items (ton/jetton/nft) as an alternative to raw messages. When present, the wallet app is responsible for resolving items into messages. */
     @SerialName(value = "items")
-    val items: kotlin.collections.List<TONStructuredItem>? = null,
+    var items: kotlin.collections.List<TONStructuredItem>? = null,
 
     @SerialName(value = "network")
-    val network: TONNetwork? = null,
+    var network: TONNetwork? = null,
 
     /* Unix timestamp after which the transaction becomes invalid */
     @SerialName(value = "validUntil")
-    val validUntil: kotlin.Double? = null,
+    var validUntil: kotlin.Double? = null,
 
     /* Sender wallet address in received format(raw, user friendly) */
     @SerialName(value = "fromAddress")
-    val fromAddress: kotlin.String? = null,
+    var fromAddress: kotlin.String? = null,
 
 ) {
 

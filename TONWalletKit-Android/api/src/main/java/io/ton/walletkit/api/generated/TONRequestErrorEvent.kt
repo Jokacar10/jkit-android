@@ -44,14 +44,14 @@ data class TONRequestErrorEvent(
 
     /* Unique identifier for the request that resulted in an error */
     @SerialName(value = "id")
-    val id: kotlin.String,
+    var id: kotlin.String,
 
     @SerialName(value = "error")
-    val error: TONResultError,
+    var error: TONResultError,
 
     /* Additional data related to the error event */
     @Contextual @SerialName(value = "data")
-    val `data`: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>,
+    var `data`: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>,
 
 ) {
 

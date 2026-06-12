@@ -49,28 +49,28 @@ import kotlinx.serialization.Serializable
 data class TONNftTransferItem(
 
     @SerialName(value = "nftAddress")
-    val nftAddress: kotlin.String,
+    var nftAddress: kotlin.String,
 
     @SerialName(value = "newOwner")
-    val newOwner: kotlin.String,
+    var newOwner: kotlin.String,
 
     @SerialName(value = "attachAmount")
-    val attachAmount: kotlin.String? = null,
+    var attachAmount: kotlin.String? = null,
 
     @SerialName(value = "queryId")
-    val queryId: kotlin.String? = null,
+    var queryId: kotlin.String? = null,
 
     @SerialName(value = "responseDestination")
-    val responseDestination: kotlin.String? = null,
+    var responseDestination: kotlin.String? = null,
 
     @Contextual @SerialName(value = "customPayload")
-    val customPayload: io.ton.walletkit.model.TONBase64? = null,
+    var customPayload: io.ton.walletkit.model.TONBase64? = null,
 
     @SerialName(value = "forwardAmount")
-    val forwardAmount: kotlin.String? = null,
+    var forwardAmount: kotlin.String? = null,
 
     @Contextual @SerialName(value = "forwardPayload")
-    val forwardPayload: io.ton.walletkit.model.TONBase64? = null,
+    var forwardPayload: io.ton.walletkit.model.TONBase64? = null,
     @SerialName("type")
     val type: kotlin.String = "nft",
 ) {

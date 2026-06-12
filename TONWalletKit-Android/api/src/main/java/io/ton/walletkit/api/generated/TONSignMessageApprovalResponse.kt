@@ -42,7 +42,7 @@ import kotlinx.serialization.Serializable
 data class TONSignMessageApprovalResponse(
 
     @Contextual @SerialName(value = "internalBoc")
-    val internalBoc: io.ton.walletkit.model.TONBase64,
+    var internalBoc: io.ton.walletkit.model.TONBase64,
 
 ) {
 

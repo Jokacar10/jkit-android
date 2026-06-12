@@ -48,35 +48,35 @@ data class TONDeDustProviderOptions(
 
     /* The address of the referrer */
     @SerialName(value = "referralAddress")
-    val referralAddress: kotlin.String? = null,
+    var referralAddress: kotlin.String? = null,
 
     /* Referral fee in basis points (max 100 = 1%) */
     @SerialName(value = "referralFeeBps")
-    val referralFeeBps: kotlin.Int? = null,
+    var referralFeeBps: kotlin.Int? = null,
 
     /* Protocols to use for routing Available: 'dedust', 'dedust_v3', 'dedust_v3_memepad', 'stonfi_v1', 'stonfi_v2', 'tonco', 'memeslab', 'tonfun' */
     @SerialName(value = "protocols")
-    val protocols: kotlin.collections.List<kotlin.String>? = null,
+    var protocols: kotlin.collections.List<kotlin.String>? = null,
 
     /* Protocols to exclude from routing */
     @SerialName(value = "excludeProtocols")
-    val excludeProtocols: kotlin.collections.List<kotlin.String>? = null,
+    var excludeProtocols: kotlin.collections.List<kotlin.String>? = null,
 
     /* Only use verified pools */
     @SerialName(value = "onlyVerifiedPools")
-    val onlyVerifiedPools: kotlin.Boolean? = null,
+    var onlyVerifiedPools: kotlin.Boolean? = null,
 
     /* Maximum number of route splits */
     @SerialName(value = "maxSplits")
-    val maxSplits: kotlin.Int? = null,
+    var maxSplits: kotlin.Int? = null,
 
     /* Maximum route length (hops) */
     @SerialName(value = "maxLength")
-    val maxLength: kotlin.Int? = null,
+    var maxLength: kotlin.Int? = null,
 
     /* Exclude volatile pools */
     @SerialName(value = "excludeVolatilePools")
-    val excludeVolatilePools: kotlin.Boolean? = null,
+    var excludeVolatilePools: kotlin.Boolean? = null,
 
 ) {
 

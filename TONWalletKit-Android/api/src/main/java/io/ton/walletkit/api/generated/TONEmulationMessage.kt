@@ -58,61 +58,61 @@ import kotlinx.serialization.Serializable
 data class TONEmulationMessage(
 
     @Contextual @SerialName(value = "hash")
-    val hash: io.ton.walletkit.model.TONHex,
+    var hash: io.ton.walletkit.model.TONHex,
 
     @SerialName(value = "destination")
-    val destination: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var destination: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
     @SerialName(value = "valueExtraCurrencies")
-    val valueExtraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>,
+    var valueExtraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>,
 
     @SerialName(value = "messageContent")
-    val messageContent: TONEmulationMessageContent,
+    var messageContent: TONEmulationMessageContent,
 
     @Contextual @SerialName(value = "normalizedHash")
-    val normalizedHash: io.ton.walletkit.model.TONHex? = null,
+    var normalizedHash: io.ton.walletkit.model.TONHex? = null,
 
     @SerialName(value = "source")
-    val source: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var source: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "value")
-    val `value`: kotlin.String? = null,
+    var `value`: kotlin.String? = null,
 
     @SerialName(value = "fwdFee")
-    val fwdFee: kotlin.String? = null,
+    var fwdFee: kotlin.String? = null,
 
     @SerialName(value = "ihrFee")
-    val ihrFee: kotlin.String? = null,
+    var ihrFee: kotlin.String? = null,
 
     @SerialName(value = "createdLt")
-    val createdLt: kotlin.String? = null,
+    var createdLt: kotlin.String? = null,
 
     /* Unix timestamp when the message was created, or undefined for external inbound messages */
     @SerialName(value = "createdAt")
-    val createdAt: kotlin.Int? = null,
+    var createdAt: kotlin.Int? = null,
 
     @Contextual @SerialName(value = "opcode")
-    val opcode: io.ton.walletkit.model.TONHex? = null,
+    var opcode: io.ton.walletkit.model.TONHex? = null,
 
     /* Whether IHR delivery is disabled, or undefined for external inbound messages */
     @SerialName(value = "ihrDisabled")
-    val ihrDisabled: kotlin.Boolean? = null,
+    var ihrDisabled: kotlin.Boolean? = null,
 
     /* Whether the message requested a bounce on failure, or undefined for external inbound messages */
     @SerialName(value = "isBounce")
-    val isBounce: kotlin.Boolean? = null,
+    var isBounce: kotlin.Boolean? = null,
 
     /* Whether the message was bounced back, or undefined for external inbound messages */
     @SerialName(value = "isBounced")
-    val isBounced: kotlin.Boolean? = null,
+    var isBounced: kotlin.Boolean? = null,
 
     @SerialName(value = "importFee")
-    val importFee: kotlin.String? = null,
+    var importFee: kotlin.String? = null,
 
     /* Initial state (StateInit) attached to the message, if any */
     @Contextual @SerialName(value = "initState")
-    val initState: kotlinx.serialization.json.JsonElement? = null,
+    var initState: kotlinx.serialization.json.JsonElement? = null,
 
 ) {
 

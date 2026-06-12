@@ -42,10 +42,10 @@ import kotlinx.serialization.Serializable
 data class TONTransactionPreviewOptions(
 
     @Contextual @SerialName(value = "mode")
-    val mode: TONTransactionPreviewMode? = null,
+    var mode: TONTransactionPreviewMode? = null,
 
     @SerialName(value = "relayGas")
-    val relayGas: kotlin.Double? = null,
+    var relayGas: kotlin.Double? = null,
 
 ) {
 

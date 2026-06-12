@@ -42,11 +42,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TONStakeParams<TProviderOptions>(
     @SerialName("quote")
-    val quote: TONStakingQuote,
+    var quote: TONStakingQuote,
     @SerialName("userAddress")
-    val userAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var userAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
     @SerialName("providerOptions")
-    val providerOptions: TProviderOptions? = null,
+    var providerOptions: TProviderOptions? = null,
 ) {
     companion object
 }

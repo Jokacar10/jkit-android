@@ -44,22 +44,22 @@ import kotlinx.serialization.Serializable
 data class TONStakingBalance(
 
     @SerialName(value = "rawStakedBalance")
-    val rawStakedBalance: kotlin.String,
+    var rawStakedBalance: kotlin.String,
 
     /* Amount currently staked */
     @SerialName(value = "stakedBalance")
-    val stakedBalance: kotlin.String,
+    var stakedBalance: kotlin.String,
 
     @SerialName(value = "rawInstantUnstakeAvailable")
-    val rawInstantUnstakeAvailable: kotlin.String,
+    var rawInstantUnstakeAvailable: kotlin.String,
 
     /* Amount available for instant unstake */
     @SerialName(value = "instantUnstakeAvailable")
-    val instantUnstakeAvailable: kotlin.String,
+    var instantUnstakeAvailable: kotlin.String,
 
     /* Identifier of the staking provider */
     @SerialName(value = "providerId")
-    val providerId: kotlin.String,
+    var providerId: kotlin.String,
 
 ) {
 

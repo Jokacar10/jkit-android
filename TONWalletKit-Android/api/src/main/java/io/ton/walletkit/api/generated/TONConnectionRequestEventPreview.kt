@@ -43,14 +43,14 @@ data class TONConnectionRequestEventPreview(
 
     /* Permissions requested by the dApp */
     @SerialName(value = "permissions")
-    val permissions: kotlin.collections.List<TONConnectionRequestEventPreviewPermission>,
+    var permissions: kotlin.collections.List<TONConnectionRequestEventPreviewPermission>,
 
     @SerialName(value = "dAppInfo")
-    val dAppInfo: TONDAppInfo? = null,
+    var dAppInfo: TONDAppInfo? = null,
 
     /* Error code if manifest fetching failed */
     @SerialName(value = "manifestFetchErrorCode")
-    val manifestFetchErrorCode: kotlin.Int? = null,
+    var manifestFetchErrorCode: kotlin.Int? = null,
 
 ) {
 

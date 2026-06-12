@@ -46,19 +46,19 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TONStakingQuoteParams<TProviderOptions>(
     @SerialName("direction")
-    val direction: TONStakingQuoteDirection,
+    var direction: TONStakingQuoteDirection,
     @SerialName("amount")
-    val amount: kotlin.String,
+    var amount: kotlin.String,
     @SerialName("userAddress")
-    val userAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var userAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
     @SerialName("network")
-    val network: TONNetwork? = null,
+    var network: TONNetwork? = null,
     @SerialName("unstakeMode")
-    val unstakeMode: TONUnstakeMode? = null,
+    var unstakeMode: TONUnstakeMode? = null,
     @SerialName("isReversed")
-    val isReversed: kotlin.Boolean? = null,
+    var isReversed: kotlin.Boolean? = null,
     @SerialName("providerOptions")
-    val providerOptions: TProviderOptions? = null,
+    var providerOptions: TProviderOptions? = null,
 ) {
     companion object
 }

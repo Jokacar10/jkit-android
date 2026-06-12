@@ -42,11 +42,11 @@ data class TONTokenAnimation(
 
     /* URL to the animation file (e.g., GIF, MP4, Lottie) */
     @SerialName(value = "url")
-    val url: kotlin.String? = null,
+    var url: kotlin.String? = null,
 
     /* Optional Lottie animation data as a string */
     @SerialName(value = "lottie")
-    val lottie: kotlin.String? = null,
+    var lottie: kotlin.String? = null,
 
 ) {
 

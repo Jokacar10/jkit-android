@@ -47,28 +47,28 @@ import kotlinx.serialization.Serializable
 data class TONDeDustQuoteResponse(
 
     @SerialName(value = "in_amount")
-    val inAmount: kotlin.String,
+    var inAmount: kotlin.String,
 
     @SerialName(value = "out_amount")
-    val outAmount: kotlin.String,
+    var outAmount: kotlin.String,
 
     @SerialName(value = "swap_data")
-    val swapData: TONDeDustSwapData,
+    var swapData: TONDeDustSwapData,
 
     @SerialName(value = "swap_is_possible")
-    val swapIsPossible: kotlin.Boolean,
+    var swapIsPossible: kotlin.Boolean,
 
     @SerialName(value = "price_impact")
-    val priceImpact: kotlin.Double? = null,
+    var priceImpact: kotlin.Double? = null,
 
     @SerialName(value = "improvement")
-    val improvement: kotlin.String? = null,
+    var improvement: kotlin.String? = null,
 
     @SerialName(value = "in_minter_price")
-    val inMinterPrice: kotlin.String? = null,
+    var inMinterPrice: kotlin.String? = null,
 
     @SerialName(value = "out_minter_price")
-    val outMinterPrice: kotlin.String? = null,
+    var outMinterPrice: kotlin.String? = null,
 
 ) {
 

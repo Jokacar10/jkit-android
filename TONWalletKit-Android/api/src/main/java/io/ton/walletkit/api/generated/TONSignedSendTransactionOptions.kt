@@ -40,7 +40,7 @@ import kotlinx.serialization.Serializable
 data class TONSignedSendTransactionOptions(
 
     @SerialName(value = "fakeSignature")
-    val fakeSignature: kotlin.Boolean? = null,
+    var fakeSignature: kotlin.Boolean? = null,
 
 ) {
 
