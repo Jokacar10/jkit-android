@@ -68,18 +68,22 @@ open class TONTokenAmountFormatter {
         val fractionalPart = if (parts.size == 2) parts[1] else ""
 
         val integerValue = integerPart.toBigIntegerOrNull() ?: return null
-        var result = integerValue * BigInteger.TEN.pow(nanoUnitDecimalsNumber)
+        // Sign must come from the raw string: "-0".toBigInteger() is zero, so signum() can't see it
+        val negative = integerPart.startsWith("-")
+        var result = integerValue.abs() * BigInteger.TEN.pow(nanoUnitDecimalsNumber)
 
         if (fractionalPart.isNotEmpty()) {
+            if (fractionalPart.any { it !in '0'..'9' }) return null
             val normalized = if (fractionalPart.length > nanoUnitDecimalsNumber) {
                 fractionalPart.substring(0, nanoUnitDecimalsNumber)
             } else {
                 fractionalPart.padEnd(nanoUnitDecimalsNumber, '0')
             }
             val fractionValue = normalized.toBigIntegerOrNull() ?: return null
-            result = if (integerValue.signum() < 0) result - fractionValue else result + fractionValue
+            result += fractionValue
         }
 
+        if (negative) result = result.negate()
         return TONTokenAmount(result)
     }
 }
