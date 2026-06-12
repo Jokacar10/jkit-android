@@ -21,6 +21,7 @@
  */
 package io.ton.walletkit.demo.presentation
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -59,23 +60,41 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     private val viewModel: WalletKitViewModel by viewModels()
+    private val pendingDeepLink = mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DevPreferences.ensureLoaded(applicationContext)
+        pendingDeepLink.value = intent?.tonConnectDeepLink()
         setContent {
             TonTheme {
                 Surface(color = TonTheme.colors.bgPrimary) {
-                    AppNavigation(viewModel = viewModel)
+                    AppNavigation(
+                        viewModel = viewModel,
+                        deepLink = pendingDeepLink.value,
+                        onDeepLinkConsumed = { pendingDeepLink.value = null },
+                    )
                 }
             }
         }
     }
+
+    // launchMode=singleTask routes later deep links here instead of spawning a new instance.
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        intent.tonConnectDeepLink()?.let { pendingDeepLink.value = it }
+    }
 }
+
+/** A TON Connect deep link for this wallet arrives as `walletkit://...`; ignore anything else. */
+private fun Intent.tonConnectDeepLink(): String? = data?.takeIf { it.scheme == "walletkit" }?.toString()
 
 @Composable
 private fun AppNavigation(
     viewModel: WalletKitViewModel,
+    deepLink: String?,
+    onDeepLinkConsumed: () -> Unit,
 ) {
     val isPasswordSet by viewModel.isPasswordSet.collectAsState()
     val isUnlocked by viewModel.isUnlocked.collectAsState()
@@ -116,6 +135,14 @@ private fun AppNavigation(
                 val useLegacyMainScreen by DevPreferences.useLegacyMainScreen.collectAsState()
                 val createFlow by viewModel.createWalletFlow.collectAsState()
                 val walletsBootstrapped = state.walletsBootstrapped
+
+                // Drive a pending walletkit:// deep link once unlocked, bootstrapped, and a wallet exists.
+                LaunchedEffect(deepLink, walletsBootstrapped, hasWallet) {
+                    if (deepLink != null && walletsBootstrapped && hasWallet) {
+                        viewModel.handleTonConnectUrl(deepLink)
+                        onDeepLinkConsumed()
+                    }
+                }
 
                 LaunchedEffect(hasWallet, useLegacyMainScreen, walletsBootstrapped) {
                     if (!walletsBootstrapped) return@LaunchedEffect
