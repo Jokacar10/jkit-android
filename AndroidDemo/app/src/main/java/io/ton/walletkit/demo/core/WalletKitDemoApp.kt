@@ -302,6 +302,7 @@ object TONWalletKitHelper {
                     TONWalletKitConfiguration.SignDataFeature(
                         types = listOf(SignDataType.TEXT, SignDataType.BINARY, SignDataType.CELL),
                     ),
+                    TONWalletKitConfiguration.EmbeddedRequestFeature,
                 ),
                 storageType = TONWalletKitStorageType.Encrypted,
                 sessionManager = customSessionManager,

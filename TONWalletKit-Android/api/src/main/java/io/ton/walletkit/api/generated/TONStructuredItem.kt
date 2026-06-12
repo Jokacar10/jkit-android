@@ -89,13 +89,22 @@ sealed class TONStructuredItem {
 
             val jsonElement = when (value) {
                 is Ton ->
-                    jsonEncoder.json.encodeToJsonElement(serializer<TONTonTransferItem>(), value.value)
+                    JsonObject(
+                        jsonEncoder.json.encodeToJsonElement(serializer<TONTonTransferItem>(), value.value).jsonObject +
+                            (DISCRIMINATOR_FIELD to JsonPrimitive("ton")),
+                    )
 
                 is Jetton ->
-                    jsonEncoder.json.encodeToJsonElement(serializer<TONJettonTransferItem>(), value.value)
+                    JsonObject(
+                        jsonEncoder.json.encodeToJsonElement(serializer<TONJettonTransferItem>(), value.value).jsonObject +
+                            (DISCRIMINATOR_FIELD to JsonPrimitive("jetton")),
+                    )
 
                 is Nft ->
-                    jsonEncoder.json.encodeToJsonElement(serializer<TONNftTransferItem>(), value.value)
+                    JsonObject(
+                        jsonEncoder.json.encodeToJsonElement(serializer<TONNftTransferItem>(), value.value).jsonObject +
+                            (DISCRIMINATOR_FIELD to JsonPrimitive("nft")),
+                    )
             }
             jsonEncoder.encodeJsonElement(jsonElement)
         }

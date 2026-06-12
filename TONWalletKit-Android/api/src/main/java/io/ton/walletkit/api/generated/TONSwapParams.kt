@@ -51,9 +51,9 @@ data class TONSwapParams<TProviderOptions>(
     @SerialName("destinationAddress")
     var destinationAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
     @SerialName("slippageBps")
-    var slippageBps: kotlin.Int? = null,
+    val slippageBps: kotlin.Int? = null,
     @SerialName("deadline")
-    var deadline: kotlin.Int? = null,
+    val deadline: kotlin.Int? = null,
     @SerialName("providerOptions")
     var providerOptions: TProviderOptions? = null,
 ) {
