@@ -46,21 +46,21 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TONSwapQuoteParams<TProviderOptions>(
     @SerialName("amount")
-    val amount: kotlin.String,
+    var amount: kotlin.String,
     @SerialName("from")
-    val from: TONSwapToken,
+    var from: TONSwapToken,
     @SerialName("to")
-    val to: TONSwapToken,
+    var to: TONSwapToken,
     @SerialName("network")
-    val network: TONNetwork,
+    var network: TONNetwork,
     @SerialName("slippageBps")
-    val slippageBps: kotlin.Double? = null,
+    val slippageBps: kotlin.Int? = null,
     @SerialName("maxOutgoingMessages")
-    val maxOutgoingMessages: kotlin.Double? = null,
+    val maxOutgoingMessages: kotlin.Int? = null,
     @SerialName("providerOptions")
-    val providerOptions: TProviderOptions? = null,
+    var providerOptions: TProviderOptions? = null,
     @SerialName("isReverseSwap")
-    val isReverseSwap: kotlin.Boolean? = null,
+    var isReverseSwap: kotlin.Boolean? = null,
 ) {
     companion object
 }

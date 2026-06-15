@@ -43,10 +43,10 @@ data class TONTransactionId(
 
     /* Logical time of the transaction as a decimal string. Uniquely orders transactions within an account. */
     @SerialName(value = "lt")
-    val lt: kotlin.String,
+    var lt: kotlin.String,
 
     @Contextual @SerialName(value = "hash")
-    val hash: io.ton.walletkit.model.TONHex,
+    var hash: io.ton.walletkit.model.TONHex,
 
 ) {
 

@@ -42,15 +42,15 @@ import kotlinx.serialization.Serializable
 data class TONTonApiStreamingProviderConfig(
 
     @SerialName(value = "network")
-    val network: TONNetwork,
+    var network: TONNetwork,
 
     /* Full WebSocket URL for the streaming API. When set, it is used as-is (after http→wss normalization). When omitted, the default TonAPI host for the network is used with `/api/streaming/v2/ws`. */
     @SerialName(value = "endpoint")
-    val endpoint: kotlin.String? = null,
+    var endpoint: kotlin.String? = null,
 
     /* Optional bearer token for TonAPI (`token` query parameter on the WebSocket URL). */
     @SerialName(value = "apiKey")
-    val apiKey: kotlin.String? = null,
+    var apiKey: kotlin.String? = null,
 
 ) {
 

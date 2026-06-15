@@ -45,23 +45,23 @@ data class TONDAppInfo(
 
     /* Display name of the dApp */
     @SerialName(value = "name")
-    val name: kotlin.String? = null,
+    var name: kotlin.String? = null,
 
     /* Brief description of the dApp's purpose */
     @SerialName(value = "description")
-    val description: kotlin.String? = null,
+    var description: kotlin.String? = null,
 
     /* Main website URL of the dApp */
     @SerialName(value = "url")
-    val url: kotlin.String? = null,
+    var url: kotlin.String? = null,
 
     /* Icon/logo URL of the dApp */
     @SerialName(value = "iconUrl")
-    val iconUrl: kotlin.String? = null,
+    var iconUrl: kotlin.String? = null,
 
     /* Manifest URL of the dApp */
     @SerialName(value = "manifestUrl")
-    val manifestUrl: kotlin.String? = null,
+    var manifestUrl: kotlin.String? = null,
 
 ) {
 

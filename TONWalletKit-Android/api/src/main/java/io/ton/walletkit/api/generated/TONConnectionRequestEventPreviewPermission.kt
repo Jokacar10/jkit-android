@@ -43,15 +43,15 @@ data class TONConnectionRequestEventPreviewPermission(
 
     /* Identifier name of the permission */
     @SerialName(value = "name")
-    val name: kotlin.String? = null,
+    var name: kotlin.String? = null,
 
     /* Human-readable title of the permission */
     @SerialName(value = "title")
-    val title: kotlin.String? = null,
+    var title: kotlin.String? = null,
 
     /* Detailed description of what the permission allows */
     @SerialName(value = "description")
-    val description: kotlin.String? = null,
+    var description: kotlin.String? = null,
 
 ) {
 

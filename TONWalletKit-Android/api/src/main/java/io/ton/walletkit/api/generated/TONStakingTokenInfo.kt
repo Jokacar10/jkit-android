@@ -42,14 +42,14 @@ import kotlinx.serialization.Serializable
 data class TONStakingTokenInfo(
 
     @SerialName(value = "ticker")
-    val ticker: kotlin.String,
+    var ticker: kotlin.String,
 
     @SerialName(value = "decimals")
-    val decimals: kotlin.Int,
+    var decimals: kotlin.Int,
 
     /* 'ton' for native TON, otherwise contract address in friendly format */
     @SerialName(value = "address")
-    val address: kotlin.String,
+    var address: kotlin.String,
 
 ) {
 

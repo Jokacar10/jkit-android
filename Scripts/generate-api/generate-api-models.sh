@@ -11,10 +11,15 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 # Resolve walletkit path using the resolver script
 echo "Resolving walletkit path..."
 WALLETKIT_PATH=${1}
+# Second arg (optional) overrides where the generated .kt files are copied.
+# When unset, output goes to the committed models under api/src/main/java/.
+# GeneratedModelsSnapshotTest passes a build-dir path here so it can diff a
+# fresh generation against the committed models without overwriting them.
+DEST_DIR_OVERRIDE=${2}
 
 if [ -z "$WALLETKIT_PATH" ]; then
     echo "Error: Failed to resolve walletkit path"
-    echo "Usage: ./generate-api-models.sh <path-to-walletkit>"
+    echo "Usage: ./generate-api-models.sh <path-to-walletkit> [output-dir]"
     echo "Example: ./generate-api-models.sh /path/to/kit/packages/walletkit"
     exit 1
 fi
@@ -43,7 +48,7 @@ echo "OpenAPI spec path: $OPENAPI_SPEC"
 OUTPUT_DIR="${SCRIPT_DIR}/generated/openapi"
 CONFIG_FILE="${SCRIPT_DIR}/generate-api-models-config.json"
 TEMPLATES_DIR="${SCRIPT_DIR}/templates"
-DEST_DIR="${PROJECT_ROOT}/TONWalletKit-Android/api/src/main/java/io/ton/walletkit/api/generated"
+DEST_DIR="${DEST_DIR_OVERRIDE:-${PROJECT_ROOT}/TONWalletKit-Android/api/src/main/java/io/ton/walletkit/api/generated}"
 
 if [ -z "$OPENAPI_SPEC" ]; then
     echo "❌ Error: OpenAPI specification file is required"

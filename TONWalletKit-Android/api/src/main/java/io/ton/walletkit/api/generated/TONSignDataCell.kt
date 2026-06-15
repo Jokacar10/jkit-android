@@ -44,10 +44,10 @@ data class TONSignDataCell(
 
     /* Schema describing the cell structure for parsing */
     @SerialName(value = "schema")
-    val schema: kotlin.String,
+    var schema: kotlin.String,
 
     @Contextual @SerialName(value = "content")
-    val content: io.ton.walletkit.model.TONBase64,
+    var content: io.ton.walletkit.model.TONBase64,
 
 ) {
 

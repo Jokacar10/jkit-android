@@ -54,50 +54,50 @@ import kotlinx.serialization.Serializable
 data class TONConnectSession(
 
     @SerialName(value = "sessionId")
-    val sessionId: kotlin.String,
+    var sessionId: kotlin.String,
 
     @SerialName(value = "walletId")
-    val walletId: kotlin.String,
+    var walletId: kotlin.String,
 
     @SerialName(value = "walletAddress")
-    val walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "createdAt")
-    val createdAt: kotlin.String,
+    var createdAt: kotlin.String,
 
     @SerialName(value = "lastActivityAt")
-    val lastActivityAt: kotlin.String,
+    var lastActivityAt: kotlin.String,
 
     @SerialName(value = "privateKey")
-    val privateKey: kotlin.String,
+    var privateKey: kotlin.String,
 
     @SerialName(value = "publicKey")
-    val publicKey: kotlin.String,
+    var publicKey: kotlin.String,
 
     @SerialName(value = "domain")
-    val domain: kotlin.String,
+    var domain: kotlin.String,
 
     @SerialName(value = "schemaVersion")
-    val schemaVersion: kotlin.Double,
+    var schemaVersion: kotlin.Double,
 
     /* Display name of the dApp */
     @SerialName(value = "dAppName")
-    val dAppName: kotlin.String? = null,
+    var dAppName: kotlin.String? = null,
 
     /* Brief description of the dApp's purpose */
     @SerialName(value = "dAppDescription")
-    val dAppDescription: kotlin.String? = null,
+    var dAppDescription: kotlin.String? = null,
 
     /* Main website URL of the dApp */
     @SerialName(value = "dAppUrl")
-    val dAppUrl: kotlin.String? = null,
+    var dAppUrl: kotlin.String? = null,
 
     /* Icon/logo URL of the dApp */
     @SerialName(value = "dAppIconUrl")
-    val dAppIconUrl: kotlin.String? = null,
+    var dAppIconUrl: kotlin.String? = null,
 
     @SerialName(value = "isJsBridge")
-    val isJsBridge: kotlin.Boolean? = null,
+    var isJsBridge: kotlin.Boolean? = null,
 
 ) {
 

@@ -46,22 +46,22 @@ import kotlinx.serialization.Serializable
 data class TONTransactionTraceActionJettonTransfer(
 
     @SerialName(value = "asset")
-    val asset: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var asset: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "source")
-    val source: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var source: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "destination")
-    val destination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var destination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "sourceJettonWallet")
-    val sourceJettonWallet: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var sourceJettonWallet: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "destinationJettonWallet")
-    val destinationJettonWallet: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var destinationJettonWallet: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "amount")
-    val amount: kotlin.String? = null,
+    var amount: kotlin.String? = null,
 
 ) {
 

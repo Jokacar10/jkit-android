@@ -50,39 +50,39 @@ data class TONEmulationTransactionDescription(
 
     /* Transaction type (e.g. \"ord\", \"ticktock\", \"storage\") */
     @SerialName(value = "type")
-    val type: kotlin.String,
+    var type: kotlin.String,
 
     /* Whether the transaction was aborted */
     @SerialName(value = "isAborted")
-    val isAborted: kotlin.Boolean,
+    var isAborted: kotlin.Boolean,
 
     /* Whether the account was destroyed by this transaction */
     @SerialName(value = "isDestroyed")
-    val isDestroyed: kotlin.Boolean,
+    var isDestroyed: kotlin.Boolean,
 
     /* Whether the credit phase was executed before the storage phase */
     @SerialName(value = "isCreditFirst")
-    val isCreditFirst: kotlin.Boolean,
+    var isCreditFirst: kotlin.Boolean,
 
     /* Whether this was a tock transaction */
     @SerialName(value = "isTock")
-    val isTock: kotlin.Boolean,
+    var isTock: kotlin.Boolean,
 
     /* Whether a contract was installed in this transaction */
     @SerialName(value = "isInstalled")
-    val isInstalled: kotlin.Boolean,
+    var isInstalled: kotlin.Boolean,
 
     @SerialName(value = "storagePhase")
-    val storagePhase: TONEmulationStoragePhase,
+    var storagePhase: TONEmulationStoragePhase,
 
     @SerialName(value = "computePhase")
-    val computePhase: TONEmulationComputePhase,
+    var computePhase: TONEmulationComputePhase,
 
     @SerialName(value = "creditPhase")
-    val creditPhase: TONEmulationCreditPhase? = null,
+    var creditPhase: TONEmulationCreditPhase? = null,
 
     @SerialName(value = "actionPhase")
-    val actionPhase: TONEmulationActionPhase? = null,
+    var actionPhase: TONEmulationActionPhase? = null,
 
 ) {
 

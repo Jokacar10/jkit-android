@@ -46,8 +46,9 @@ import io.ton.walletkit.demo.designsystem.theme.TonTheme
 // MAX_NFTS = 5 carousel cards.
 @Composable
 fun WalletHomeContent(
-    totalBalanceInteger: String,
-    totalBalanceFraction: String,
+    totalBalance: Double,
+    balanceSuffix: String,
+    balanceMaxFractionDigits: Int,
     assets: List<WalletHomeAssetItem>,
     nfts: List<WalletHomeNFTPreview>,
     hasMoreAssets: Boolean,
@@ -70,8 +71,9 @@ fun WalletHomeContent(
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         WalletHomeBalance(
-            totalBalanceInteger = totalBalanceInteger,
-            totalBalanceFraction = totalBalanceFraction,
+            totalBalance = totalBalance,
+            balanceSuffix = balanceSuffix,
+            maxFractionDigits = balanceMaxFractionDigits,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)

@@ -61,10 +61,12 @@ data class WalletHomeAssetItem(
     val name: String,
     val symbol: String,
     val formattedAmount: String,
+    val amountValue: Double,
     val icon: WalletHomeAssetIcon,
 )
 
 private val IconSize = 48.dp
+private const val AMOUNT_FRACTION_DIGITS = 5
 
 @Composable
 fun WalletHomeAssetRow(
@@ -87,8 +89,9 @@ fun WalletHomeAssetRow(
             modifier = Modifier.weight(1f),
         )
 
+        val animatedAmount = rememberCountUp(item.amountValue)
         TonText(
-            text = item.formattedAmount,
+            text = "${formatCountUp(animatedAmount, AMOUNT_FRACTION_DIGITS)} ${item.symbol}",
             style = TonTheme.typography.bodySemibold,
             color = TonTheme.colors.textPrimary,
             maxLines = 1,

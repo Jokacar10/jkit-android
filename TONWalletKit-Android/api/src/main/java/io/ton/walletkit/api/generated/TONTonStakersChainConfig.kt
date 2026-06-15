@@ -42,10 +42,10 @@ data class TONTonStakersChainConfig(
 
     /* optional TonAPI key for APY requests only. If not provided, APY will be available, but if you're using TonAPI, it's recommended to provide the key. */
     @SerialName(value = "tonApiToken")
-    val tonApiToken: kotlin.String? = null,
+    var tonApiToken: kotlin.String? = null,
 
     @SerialName(value = "metadata")
-    val metadata: TONStakingProviderMetadataOverride? = null,
+    var metadata: TONStakingProviderMetadataOverride? = null,
 
 ) {
 

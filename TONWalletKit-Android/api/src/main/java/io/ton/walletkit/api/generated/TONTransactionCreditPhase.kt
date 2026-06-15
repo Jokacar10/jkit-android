@@ -40,7 +40,7 @@ import kotlinx.serialization.Serializable
 data class TONTransactionCreditPhase(
 
     @SerialName(value = "credit")
-    val credit: kotlin.String? = null,
+    var credit: kotlin.String? = null,
 
 ) {
 

@@ -26,7 +26,7 @@ import io.ton.walletkit.model.TONUserFriendlyAddress
 class {{classname}}(
 {{#allVars}}
 {{#vendorExtensions.x-own}}
-    {{#vendorExtensions.x-frozen}}private {{/vendorExtensions.x-frozen}}val {{{name}}}: {{{dataType}}}{{^required}}? = null{{/required}},
+    {{#vendorExtensions.x-frozen}}private val{{/vendorExtensions.x-frozen}}{{^vendorExtensions.x-frozen}}var{{/vendorExtensions.x-frozen}} {{{name}}}: {{{dataType}}}{{^required}}? = null{{/required}},
 {{/vendorExtensions.x-own}}
 {{^vendorExtensions.x-own}}
     {{{name}}}: {{{dataType}}}{{^required}}? = null{{/required}},

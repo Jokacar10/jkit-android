@@ -160,8 +160,8 @@ class SwapViewModel(
                         from = current.fromToken,
                         to = current.toToken,
                         network = TONNetwork.MAINNET,
-                        slippageBps = current.slippageBps.toDouble(),
-                        maxOutgoingMessages = 4.0,
+                        slippageBps = current.slippageBps,
+                        maxOutgoingMessages = 4,
                         isReverseSwap = current.isReverseSwap,
                     ),
                 )

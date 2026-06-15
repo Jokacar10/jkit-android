@@ -41,7 +41,7 @@ data class TONSignDataPreviewText(
 
     /* Text content to be signed */
     @SerialName(value = "content")
-    val content: kotlin.String,
+    var content: kotlin.String,
 
 ) {
 

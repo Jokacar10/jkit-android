@@ -53,50 +53,50 @@ import kotlinx.serialization.Serializable
 data class TONSwapQuote(
 
     @SerialName(value = "fromToken")
-    val fromToken: TONSwapToken,
+    var fromToken: TONSwapToken,
 
     @SerialName(value = "toToken")
-    val toToken: TONSwapToken,
+    var toToken: TONSwapToken,
 
     @SerialName(value = "rawFromAmount")
-    val rawFromAmount: kotlin.String,
+    var rawFromAmount: kotlin.String,
 
     @SerialName(value = "rawToAmount")
-    val rawToAmount: kotlin.String,
+    var rawToAmount: kotlin.String,
 
     /* Amount of tokens to sell */
     @SerialName(value = "fromAmount")
-    val fromAmount: kotlin.String,
+    var fromAmount: kotlin.String,
 
     /* Amount of tokens to buy */
     @SerialName(value = "toAmount")
-    val toAmount: kotlin.String,
+    var toAmount: kotlin.String,
 
     @SerialName(value = "rawMinReceived")
-    val rawMinReceived: kotlin.String,
+    var rawMinReceived: kotlin.String,
 
     /* Minimum amount of tokens to receive (after slippage) */
     @SerialName(value = "minReceived")
-    val minReceived: kotlin.String,
+    var minReceived: kotlin.String,
 
     @SerialName(value = "network")
-    val network: TONNetwork,
+    var network: TONNetwork,
 
     /* Identifier of the swap provider */
     @SerialName(value = "providerId")
-    val providerId: kotlin.String,
+    var providerId: kotlin.String,
 
     /* Price impact of the swap in basis points (100 = 1%) */
     @SerialName(value = "priceImpact")
-    val priceImpact: kotlin.Int? = null,
+    var priceImpact: kotlin.Int? = null,
 
     /* Unix timestamp in seconds when the quote expires */
     @SerialName(value = "expiresAt")
-    val expiresAt: kotlin.Int? = null,
+    var expiresAt: kotlin.Int? = null,
 
     /* Provider-specific metadata for the quote */
     @Contextual @SerialName(value = "metadata")
-    val metadata: kotlinx.serialization.json.JsonElement? = null,
+    var metadata: kotlinx.serialization.json.JsonElement? = null,
 
 ) {
 

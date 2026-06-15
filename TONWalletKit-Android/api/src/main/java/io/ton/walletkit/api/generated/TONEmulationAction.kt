@@ -56,59 +56,59 @@ import kotlinx.serialization.Serializable
 data class TONEmulationAction(
 
     @Contextual @SerialName(value = "actionId")
-    val actionId: io.ton.walletkit.model.TONHex,
+    var actionId: io.ton.walletkit.model.TONHex,
 
     @SerialName(value = "startLt")
-    val startLt: kotlin.String,
+    var startLt: kotlin.String,
 
     @SerialName(value = "endLt")
-    val endLt: kotlin.String,
+    var endLt: kotlin.String,
 
     /* Unix timestamp when the action started */
     @SerialName(value = "startUtime")
-    val startUtime: kotlin.Int,
+    var startUtime: kotlin.Int,
 
     /* Unix timestamp when the action ended */
     @SerialName(value = "endUtime")
-    val endUtime: kotlin.Int,
+    var endUtime: kotlin.Int,
 
     @SerialName(value = "traceEndLt")
-    val traceEndLt: kotlin.String,
+    var traceEndLt: kotlin.String,
 
     /* Unix timestamp when the trace ended */
     @SerialName(value = "traceEndUtime")
-    val traceEndUtime: kotlin.Int,
+    var traceEndUtime: kotlin.Int,
 
     /* Masterchain block sequence number when the trace ended */
     @SerialName(value = "traceMcSeqnoEnd")
-    val traceMcSeqnoEnd: kotlin.Int,
+    var traceMcSeqnoEnd: kotlin.Int,
 
     /* Hex-encoded hashes of transactions involved in this action */
     @SerialName(value = "transactions")
-    val transactions: kotlin.collections.List<@Contextual io.ton.walletkit.model.TONHex>,
+    var transactions: kotlin.collections.List<@Contextual io.ton.walletkit.model.TONHex>,
 
     /* Whether the action completed successfully */
     @SerialName(value = "isSuccess")
-    val isSuccess: kotlin.Boolean,
+    var isSuccess: kotlin.Boolean,
 
     /* Action type identifier (e.g. \"jetton_transfer\", \"ton_transfer\", \"jetton_swap\") */
     @SerialName(value = "type")
-    val type: kotlin.String,
+    var type: kotlin.String,
 
     @Contextual @SerialName(value = "traceExternalHash")
-    val traceExternalHash: io.ton.walletkit.model.TONHex,
+    var traceExternalHash: io.ton.walletkit.model.TONHex,
 
     /* Addresses of accounts involved in this action */
     @SerialName(value = "accounts")
-    val accounts: kotlin.collections.List<io.ton.walletkit.model.TONUserFriendlyAddress>,
+    var accounts: kotlin.collections.List<io.ton.walletkit.model.TONUserFriendlyAddress>,
 
     /* Action-specific detail fields keyed by name */
     @Contextual @SerialName(value = "details")
-    val details: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>,
+    var details: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>,
 
     /* Trace identifier this action belongs to */
     @SerialName(value = "traceId")
-    val traceId: kotlin.String? = null,
+    var traceId: kotlin.String? = null,
 
 ) {
 
