@@ -54,51 +54,51 @@ data class TONEmulationActionPhase(
 
     /* Whether the action phase succeeded */
     @SerialName(value = "isSuccess")
-    val isSuccess: kotlin.Boolean,
+    var isSuccess: kotlin.Boolean,
 
     /* Whether the action list was valid */
     @SerialName(value = "isValid")
-    val isValid: kotlin.Boolean,
+    var isValid: kotlin.Boolean,
 
     /* Whether the transaction failed due to insufficient funds */
     @SerialName(value = "hasNoFunds")
-    val hasNoFunds: kotlin.Boolean,
+    var hasNoFunds: kotlin.Boolean,
 
     /* Account status change applied during the action phase */
     @SerialName(value = "statusChange")
-    val statusChange: kotlin.String,
+    var statusChange: kotlin.String,
 
     /* Result code of the action phase */
     @SerialName(value = "resultCode")
-    val resultCode: kotlin.Int,
+    var resultCode: kotlin.Int,
 
     /* Total number of actions processed */
     @SerialName(value = "totalActions")
-    val totalActions: kotlin.Int,
+    var totalActions: kotlin.Int,
 
     /* Number of special actions executed */
     @SerialName(value = "specActions")
-    val specActions: kotlin.Int,
+    var specActions: kotlin.Int,
 
     /* Number of actions skipped */
     @SerialName(value = "skippedActions")
-    val skippedActions: kotlin.Int,
+    var skippedActions: kotlin.Int,
 
     /* Number of messages created */
     @SerialName(value = "msgsCreated")
-    val msgsCreated: kotlin.Int,
+    var msgsCreated: kotlin.Int,
 
     @SerialName(value = "totalMsgSize")
-    val totalMsgSize: TONEmulationActionMessageSize,
+    var totalMsgSize: TONEmulationActionMessageSize,
 
     @SerialName(value = "totalFwdFees")
-    val totalFwdFees: kotlin.String? = null,
+    var totalFwdFees: kotlin.String? = null,
 
     @SerialName(value = "totalActionFees")
-    val totalActionFees: kotlin.String? = null,
+    var totalActionFees: kotlin.String? = null,
 
     @Contextual @SerialName(value = "actionListHash")
-    val actionListHash: io.ton.walletkit.model.TONHex? = null,
+    var actionListHash: io.ton.walletkit.model.TONHex? = null,
 
 ) {
 

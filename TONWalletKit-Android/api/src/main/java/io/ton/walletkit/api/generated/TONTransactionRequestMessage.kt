@@ -48,23 +48,23 @@ data class TONTransactionRequestMessage(
 
     /* Recipient wallet address in format received from caller (raw, user friendly) */
     @SerialName(value = "address")
-    val address: kotlin.String,
+    var address: kotlin.String,
 
     @SerialName(value = "amount")
-    val amount: kotlin.String,
+    var amount: kotlin.String,
 
     @SerialName(value = "mode")
-    val mode: TONSendMode? = null,
+    var mode: TONSendMode? = null,
 
     /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
     @SerialName(value = "extraCurrency")
-    val extraCurrency: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+    var extraCurrency: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
 
     @Contextual @SerialName(value = "stateInit")
-    val stateInit: io.ton.walletkit.model.TONBase64? = null,
+    var stateInit: io.ton.walletkit.model.TONBase64? = null,
 
     @Contextual @SerialName(value = "payload")
-    val payload: io.ton.walletkit.model.TONBase64? = null,
+    var payload: io.ton.walletkit.model.TONBase64? = null,
 
 ) {
 

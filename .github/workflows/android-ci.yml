@@ -92,8 +92,8 @@ jobs:
 
       - name: Run unit tests
         working-directory: TONWalletKit-Android
-        # GeneratedModelsSnapshotTest (:api) self-skips without WALLETKIT_PATH — codegen drift
-        # is checked locally, not in CI.
+        # Generated-model drift is validated separately by the validate-models job, which
+        # regenerates from the pinned walletkit tag and diffs the committed models.
         run: ./gradlew :api:testDebugUnitTest :impl:testDebugUnitTest
 
       - name: Build SDK (Release)
@@ -479,6 +479,18 @@ jobs:
           name: e2e-all-results
           path: all-results/
           retention-days: 7
+
+  # Committed API models must match a regeneration from the pinned kit tag (+ templates +
+  # spotless). Independent, fast-feedback check — no fixtures, validates the real shipped models.
+  validate-models:
+    name: Validate Generated Models
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify generated models match WALLETKIT_BRIDGE_TAG
+        uses: ./.github/actions/verify-generated-models
 
   # Final gate: committed bridge bundle must match a build of the pinned kit tag. Runs after the
   # build + E2E so a feature branch's bridge is validated before this check can block the merge.

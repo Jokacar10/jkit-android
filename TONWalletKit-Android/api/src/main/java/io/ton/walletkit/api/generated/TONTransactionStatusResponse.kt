@@ -44,19 +44,19 @@ import kotlinx.serialization.Serializable
 data class TONTransactionStatusResponse(
 
     @Contextual @SerialName(value = "status")
-    val status: TONTransactionStatus,
+    var status: TONTransactionStatus,
 
     /* Total messages in the trace */
     @SerialName(value = "totalMessages")
-    val totalMessages: kotlin.Int,
+    var totalMessages: kotlin.Int,
 
     /* Messages still pending */
     @SerialName(value = "pendingMessages")
-    val pendingMessages: kotlin.Int,
+    var pendingMessages: kotlin.Int,
 
     /* Number of onchain messages (totalMessages - pendingMessages) */
     @SerialName(value = "onchainMessages")
-    val onchainMessages: kotlin.Int,
+    var onchainMessages: kotlin.Int,
 
 ) {
 

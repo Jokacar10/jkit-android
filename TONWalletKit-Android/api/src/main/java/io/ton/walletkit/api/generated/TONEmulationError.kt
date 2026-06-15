@@ -42,11 +42,11 @@ data class TONEmulationError(
 
     /* Numeric error code */
     @SerialName(value = "code")
-    val code: kotlin.Int,
+    var code: kotlin.Int,
 
     /* Human-readable error message */
     @SerialName(value = "message")
-    val message: kotlin.String,
+    var message: kotlin.String,
 
 ) {
 

@@ -42,10 +42,10 @@ data class TONDisconnectionEventPreview(
 
     /* Human-readable reason for the disconnection */
     @SerialName(value = "reason")
-    val reason: kotlin.String? = null,
+    var reason: kotlin.String? = null,
 
     @SerialName(value = "dAppInfo")
-    val dAppInfo: TONDAppInfo? = null,
+    var dAppInfo: TONDAppInfo? = null,
 
 ) {
 

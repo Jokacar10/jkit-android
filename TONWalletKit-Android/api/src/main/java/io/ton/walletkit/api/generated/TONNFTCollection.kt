@@ -50,35 +50,35 @@ import kotlinx.serialization.Serializable
 data class TONNFTCollection(
 
     @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     /* The name of the NFT collection */
     @SerialName(value = "name")
-    val name: kotlin.String? = null,
+    var name: kotlin.String? = null,
 
     @SerialName(value = "image")
-    val image: TONTokenImage? = null,
+    var image: TONTokenImage? = null,
 
     /* A brief description of the NFT collection */
     @SerialName(value = "description")
-    val description: kotlin.String? = null,
+    var description: kotlin.String? = null,
 
     /* The index value for the next item to be minted in the collection */
     @SerialName(value = "nextItemIndex")
-    val nextItemIndex: kotlin.String? = null,
+    var nextItemIndex: kotlin.String? = null,
 
     @Contextual @SerialName(value = "codeHash")
-    val codeHash: io.ton.walletkit.model.TONHex? = null,
+    var codeHash: io.ton.walletkit.model.TONHex? = null,
 
     @Contextual @SerialName(value = "dataHash")
-    val dataHash: io.ton.walletkit.model.TONHex? = null,
+    var dataHash: io.ton.walletkit.model.TONHex? = null,
 
     @SerialName(value = "ownerAddress")
-    val ownerAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var ownerAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     /* Additional arbitrary data related to the NFT collection */
     @Contextual @SerialName(value = "extra")
-    val extra: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,
+    var extra: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,
 
 ) {
 

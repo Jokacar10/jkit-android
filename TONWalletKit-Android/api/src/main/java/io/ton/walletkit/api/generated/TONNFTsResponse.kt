@@ -43,11 +43,11 @@ data class TONNFTsResponse(
 
     /* List of NFTs */
     @SerialName(value = "nfts")
-    val nfts: kotlin.collections.List<TONNFT>,
+    var nfts: kotlin.collections.List<TONNFT>,
 
     /* Map of raw addresses to their metadata entries. */
     @Contextual @SerialName(value = "addressBook")
-    val addressBook: kotlin.collections.Map<kotlin.String, TONAddressBookEntry>? = null,
+    var addressBook: kotlin.collections.Map<kotlin.String, TONAddressBookEntry>? = null,
 
 ) {
 

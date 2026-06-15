@@ -41,10 +41,10 @@ import kotlinx.serialization.Serializable
 data class TONConnectionApprovalProofDomain(
 
     @SerialName(value = "lengthBytes")
-    val lengthBytes: kotlin.Int,
+    var lengthBytes: kotlin.Int,
 
     @SerialName(value = "value")
-    val `value`: kotlin.String,
+    var `value`: kotlin.String,
 
 ) {
 

@@ -56,54 +56,54 @@ data class TONTransactionTraceAction(
 
     /* List of transaction hashes involved in this action */
     @SerialName(value = "transactions")
-    val transactions: kotlin.collections.List<@Contextual io.ton.walletkit.model.TONHex>,
+    var transactions: kotlin.collections.List<@Contextual io.ton.walletkit.model.TONHex>,
 
     /* List of accounts involved in this action */
     @SerialName(value = "accounts")
-    val accounts: kotlin.collections.List<io.ton.walletkit.model.TONUserFriendlyAddress>,
+    var accounts: kotlin.collections.List<io.ton.walletkit.model.TONUserFriendlyAddress>,
 
     @SerialName(value = "details")
-    val details: TONTransactionTraceActionDetails,
+    var details: TONTransactionTraceActionDetails,
 
     /* Trace identifier */
     @SerialName(value = "traceId")
-    val traceId: kotlin.String? = null,
+    var traceId: kotlin.String? = null,
 
     /* Action identifier */
     @SerialName(value = "actionId")
-    val actionId: kotlin.String? = null,
+    var actionId: kotlin.String? = null,
 
     @SerialName(value = "startLt")
-    val startLt: kotlin.String? = null,
+    var startLt: kotlin.String? = null,
 
     @SerialName(value = "endLt")
-    val endLt: kotlin.String? = null,
+    var endLt: kotlin.String? = null,
 
     /* Unix time when the action started */
     @SerialName(value = "startUtime")
-    val startUtime: kotlin.Double? = null,
+    var startUtime: kotlin.Double? = null,
 
     /* Unix time when the action ended */
     @SerialName(value = "endUtime")
-    val endUtime: kotlin.Int? = null,
+    var endUtime: kotlin.Int? = null,
 
     @SerialName(value = "traceEndLt")
-    val traceEndLt: kotlin.String? = null,
+    var traceEndLt: kotlin.String? = null,
 
     /* Unix time when the trace ended */
     @SerialName(value = "traceEndUtime")
-    val traceEndUtime: kotlin.Int? = null,
+    var traceEndUtime: kotlin.Int? = null,
 
     /* Masterchain block sequence number when the trace ended */
     @SerialName(value = "traceMcSeqnoEnd")
-    val traceMcSeqnoEnd: kotlin.Double? = null,
+    var traceMcSeqnoEnd: kotlin.Double? = null,
 
     /* Indicates if the action was successful */
     @SerialName(value = "isSuccess")
-    val isSuccess: kotlin.Boolean? = null,
+    var isSuccess: kotlin.Boolean? = null,
 
     @Contextual @SerialName(value = "traceExternalHash")
-    val traceExternalHash: io.ton.walletkit.model.TONHex? = null,
+    var traceExternalHash: io.ton.walletkit.model.TONHex? = null,
 
 ) {
 

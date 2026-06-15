@@ -44,14 +44,14 @@ import kotlinx.serialization.Serializable
 data class TONEmulationMessageContent(
 
     @Contextual @SerialName(value = "hash")
-    val hash: io.ton.walletkit.model.TONHex? = null,
+    var hash: io.ton.walletkit.model.TONHex? = null,
 
     @Contextual @SerialName(value = "body")
-    val body: io.ton.walletkit.model.TONBase64? = null,
+    var body: io.ton.walletkit.model.TONBase64? = null,
 
     /* Structured decoded representation of the message body, if available */
     @Contextual @SerialName(value = "decoded")
-    val decoded: kotlinx.serialization.json.JsonElement? = null,
+    var decoded: kotlinx.serialization.json.JsonElement? = null,
 
 ) {
 

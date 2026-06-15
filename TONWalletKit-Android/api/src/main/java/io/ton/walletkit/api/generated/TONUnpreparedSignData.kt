@@ -43,14 +43,14 @@ import kotlinx.serialization.Serializable
 data class TONUnpreparedSignData(
 
     @SerialName(value = "payload")
-    val payload: TONSignDataPayload,
+    var payload: TONSignDataPayload,
 
     /* Requesting domain for the signature */
     @SerialName(value = "domain")
-    val domain: kotlin.String,
+    var domain: kotlin.String,
 
     @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
 ) {
 

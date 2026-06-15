@@ -42,13 +42,13 @@ import kotlinx.serialization.Serializable
 data class TONDeDustRouteStepStonfiExtraDetails(
 
     @SerialName(value = "router")
-    val router: kotlin.String,
+    var router: kotlin.String,
 
     @SerialName(value = "from_router_wallet")
-    val fromRouterWallet: kotlin.String,
+    var fromRouterWallet: kotlin.String,
 
     @SerialName(value = "to_router_wallet")
-    val toRouterWallet: kotlin.String,
+    var toRouterWallet: kotlin.String,
 
 ) {
 

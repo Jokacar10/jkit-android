@@ -42,11 +42,11 @@ data class TONEmulationActionMessageSize(
 
     /* Number of cells used */
     @SerialName(value = "cells")
-    val cells: kotlin.Int,
+    var cells: kotlin.Int,
 
     /* Number of bits used */
     @SerialName(value = "bits")
-    val bits: kotlin.Int,
+    var bits: kotlin.Int,
 
 ) {
 

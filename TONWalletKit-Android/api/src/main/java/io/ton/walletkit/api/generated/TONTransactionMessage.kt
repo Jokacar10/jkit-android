@@ -57,58 +57,58 @@ import kotlinx.serialization.Serializable
 data class TONTransactionMessage(
 
     @Contextual @SerialName(value = "hash")
-    val hash: io.ton.walletkit.model.TONHex,
+    var hash: io.ton.walletkit.model.TONHex,
 
     @Contextual @SerialName(value = "normalizedHash")
-    val normalizedHash: io.ton.walletkit.model.TONHex? = null,
+    var normalizedHash: io.ton.walletkit.model.TONHex? = null,
 
     @SerialName(value = "source")
-    val source: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var source: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "destination")
-    val destination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var destination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "value")
-    val `value`: kotlin.String? = null,
+    var `value`: kotlin.String? = null,
 
     /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
     @SerialName(value = "valueExtraCurrencies")
-    val valueExtraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+    var valueExtraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
 
     @SerialName(value = "fwdFee")
-    val fwdFee: kotlin.String? = null,
+    var fwdFee: kotlin.String? = null,
 
     @SerialName(value = "creationLogicalTime")
-    val creationLogicalTime: kotlin.String? = null,
+    var creationLogicalTime: kotlin.String? = null,
 
     /* The timestamp when the message was created */
     @SerialName(value = "createdAt")
-    val createdAt: kotlin.Double? = null,
+    var createdAt: kotlin.Double? = null,
 
     /* The opcode included in the message payload */
     @SerialName(value = "opcode")
-    val opcode: kotlin.String? = null,
+    var opcode: kotlin.String? = null,
 
     /* IHR(Immediate hypercube routing) enabled/disabled IHR is a method of message delivery in the TON Blockchain network, where messages are sent directly to the recipient’s shardchain. */
     @SerialName(value = "ihrDisabled")
-    val ihrDisabled: kotlin.Boolean? = null,
+    var ihrDisabled: kotlin.Boolean? = null,
 
     @SerialName(value = "ihrFee")
-    val ihrFee: kotlin.String? = null,
+    var ihrFee: kotlin.String? = null,
 
     /* The flag indicating if the message requested a bounce on failure */
     @SerialName(value = "isBounce")
-    val isBounce: kotlin.Boolean? = null,
+    var isBounce: kotlin.Boolean? = null,
 
     /* The flag indicating if the message was bounced back */
     @SerialName(value = "isBounced")
-    val isBounced: kotlin.Boolean? = null,
+    var isBounced: kotlin.Boolean? = null,
 
     @SerialName(value = "importFee")
-    val importFee: kotlin.String? = null,
+    var importFee: kotlin.String? = null,
 
     @SerialName(value = "messageContent")
-    val messageContent: TONTransactionMessageContent? = null,
+    var messageContent: TONTransactionMessageContent? = null,
 
 ) {
 

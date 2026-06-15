@@ -43,15 +43,15 @@ data class TONNFTAttribute(
 
     /* Category or type of the trait (e.g., \"Background\", \"Eyes\") */
     @SerialName(value = "traitType")
-    val traitType: kotlin.String? = null,
+    var traitType: kotlin.String? = null,
 
     /* How the attribute should be displayed (e.g., \"string\", \"number\", \"date\") */
     @SerialName(value = "displayType")
-    val displayType: kotlin.String? = null,
+    var displayType: kotlin.String? = null,
 
     /* Value of the attribute (e.g., \"Blue\", \"Rare\") */
     @SerialName(value = "value")
-    val `value`: kotlin.String? = null,
+    var `value`: kotlin.String? = null,
 
 ) {
 

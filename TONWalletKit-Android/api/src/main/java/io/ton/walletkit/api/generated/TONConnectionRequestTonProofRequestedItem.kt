@@ -40,7 +40,7 @@ import kotlinx.serialization.Serializable
 data class TONConnectionRequestTonProofRequestedItem(
 
     @SerialName(value = "payload")
-    val payload: kotlin.String,
+    var payload: kotlin.String,
 
 ) {
 

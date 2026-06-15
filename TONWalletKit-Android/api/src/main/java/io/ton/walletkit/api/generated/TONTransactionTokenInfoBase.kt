@@ -44,15 +44,15 @@ data class TONTransactionTokenInfoBase(
 
     /* Indicates if the token contract is valid */
     @SerialName(value = "isValid")
-    val isValid: kotlin.Boolean,
+    var isValid: kotlin.Boolean,
 
     /* Type of token */
     @SerialName(value = "type")
-    val type: kotlin.String,
+    var type: kotlin.String,
 
     /* Additional metadata for the token, such as image sizes, decimal precision, external links, and marketplaces */
     @Contextual @SerialName(value = "extra")
-    val extra: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>,
+    var extra: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>,
 
 ) {
 

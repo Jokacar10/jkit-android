@@ -44,14 +44,14 @@ data class TONAddressBookEntry(
 
     /* List of supported interfaces by the address */
     @SerialName(value = "interfaces")
-    val interfaces: kotlin.collections.List<kotlin.String>,
+    var interfaces: kotlin.collections.List<kotlin.String>,
 
     @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var address: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     /* The domain name associated with the address if available */
     @SerialName(value = "domain")
-    val domain: kotlin.String? = null,
+    var domain: kotlin.String? = null,
 
 ) {
 

@@ -50,35 +50,35 @@ import kotlinx.serialization.Serializable
 data class TONAccountState(
 
     @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @Contextual @SerialName(value = "status")
-    val status: TONAccountStatus,
+    var status: TONAccountStatus,
 
     @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    var rawBalance: kotlin.String,
 
     /* Balance formatted in TON (10^9 nanotons = 1 TON). */
     @SerialName(value = "balance")
-    val balance: kotlin.String,
+    var balance: kotlin.String,
 
     /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
     @SerialName(value = "extraCurrencies")
-    val extraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>,
+    var extraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>,
 
     /* Base64-encoded contract code BOC. Omitted if the contract is not deployed. */
     @SerialName(value = "code")
-    val code: kotlin.String? = null,
+    var code: kotlin.String? = null,
 
     /* Base64-encoded contract data BOC. Omitted if the contract is not deployed. */
     @SerialName(value = "data")
-    val `data`: kotlin.String? = null,
+    var `data`: kotlin.String? = null,
 
     @SerialName(value = "lastTransaction")
-    val lastTransaction: TONTransactionId? = null,
+    var lastTransaction: TONTransactionId? = null,
 
     @Contextual @SerialName(value = "frozenHash")
-    val frozenHash: io.ton.walletkit.model.TONHex? = null,
+    var frozenHash: io.ton.walletkit.model.TONHex? = null,
 
 ) {
 

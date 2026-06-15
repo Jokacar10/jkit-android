@@ -43,15 +43,15 @@ data class TONTransactionBlockRef(
 
     /* The workchain ID of the block */
     @SerialName(value = "workchain")
-    val workchain: kotlin.Int,
+    var workchain: kotlin.Int,
 
     /* The shard identifier of the block */
     @SerialName(value = "shard")
-    val shard: kotlin.String,
+    var shard: kotlin.String,
 
     /* The sequence number of the block */
     @SerialName(value = "seqno")
-    val seqno: kotlin.Int,
+    var seqno: kotlin.Int,
 
 ) {
 
