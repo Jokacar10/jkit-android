@@ -67,7 +67,7 @@ data class TONConnectionRequestEvent(
     var preview: TONConnectionRequestEventPreview,
 
     @SerialName(value = "from")
-    val from: kotlin.String? = null,
+    var from: kotlin.String? = null,
 
     @SerialName(value = "walletAddress")
     var walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,

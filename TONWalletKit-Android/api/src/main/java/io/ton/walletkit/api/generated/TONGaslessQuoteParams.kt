@@ -46,20 +46,20 @@ import kotlinx.serialization.Serializable
 data class TONGaslessQuoteParams(
 
     @SerialName(value = "network")
-    val network: TONNetwork,
+    var network: TONNetwork,
 
     @SerialName(value = "walletAddress")
-    val walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @Contextual @SerialName(value = "walletPublicKey")
-    val walletPublicKey: io.ton.walletkit.model.TONHex,
+    var walletPublicKey: io.ton.walletkit.model.TONHex,
 
     /* Messages that the caller wants to include in the transaction */
     @SerialName(value = "messages")
-    val messages: kotlin.collections.List<TONTransactionRequestMessage>,
+    var messages: kotlin.collections.List<TONTransactionRequestMessage>,
 
     @SerialName(value = "feeAsset")
-    val feeAsset: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var feeAsset: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
 ) {
 

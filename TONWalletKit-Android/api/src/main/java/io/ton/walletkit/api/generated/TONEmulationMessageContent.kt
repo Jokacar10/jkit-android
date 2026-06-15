@@ -46,7 +46,7 @@ data class TONEmulationMessageContent(
     @Contextual @SerialName(value = "hash")
     var hash: io.ton.walletkit.model.TONHex? = null,
 
-    @Contextual @SerialName(value = "body")
+    @SerialName(value = "body")
     var body: io.ton.walletkit.model.TONBase64? = null,
 
     /* Structured decoded representation of the message body, if available */

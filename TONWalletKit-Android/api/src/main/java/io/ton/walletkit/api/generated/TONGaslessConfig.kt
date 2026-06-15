@@ -42,11 +42,11 @@ import kotlinx.serialization.Serializable
 data class TONGaslessConfig(
 
     @SerialName(value = "relayAddress")
-    val relayAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var relayAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     /* Assets the relayer accepts as fee payment. */
     @SerialName(value = "supportedAssets")
-    val supportedAssets: kotlin.collections.List<TONGaslessSupportedAsset>,
+    var supportedAssets: kotlin.collections.List<TONGaslessSupportedAsset>,
 
 ) {
 

@@ -48,31 +48,31 @@ data class TONTonApiGaslessProviderConfig(
 
     /* Per-chain settings keyed by `Network#chainId`. */
     @Contextual @SerialName(value = "chains")
-    val chains: kotlin.collections.Map<kotlin.String, TONTonApiGaslessChainConfig>? = null,
+    var chains: kotlin.collections.Map<kotlin.String, TONTonApiGaslessChainConfig>? = null,
 
     /* Provider id. Defaults to `tonapi`. */
     @SerialName(value = "providerId")
-    val providerId: kotlin.String? = null,
+    var providerId: kotlin.String? = null,
 
     /* Number of send retries on transient errors. Defaults to 5. */
     @SerialName(value = "sendRetries")
-    val sendRetries: kotlin.Int? = null,
+    var sendRetries: kotlin.Int? = null,
 
     /* Delay between send retries in ms. Defaults to 1000. */
     @SerialName(value = "sendRetryDelayMs")
-    val sendRetryDelayMs: kotlin.Int? = null,
+    var sendRetryDelayMs: kotlin.Int? = null,
 
     /* Number of quote retries on transient errors (5xx / network). Defaults to 5. */
     @SerialName(value = "quoteRetries")
-    val quoteRetries: kotlin.Int? = null,
+    var quoteRetries: kotlin.Int? = null,
 
     /* Fixed delay between quote retries in ms. Defaults to 1000. */
     @SerialName(value = "quoteRetryDelayMs")
-    val quoteRetryDelayMs: kotlin.Int? = null,
+    var quoteRetryDelayMs: kotlin.Int? = null,
 
     /* TTL for the in-memory `/v2/gasless/config` cache (ms). Defaults to 5 minutes. Set to `0` to disable caching. */
     @SerialName(value = "configCacheTtlMs")
-    val configCacheTtlMs: kotlin.Int? = null,
+    var configCacheTtlMs: kotlin.Int? = null,
 
 ) {
 
