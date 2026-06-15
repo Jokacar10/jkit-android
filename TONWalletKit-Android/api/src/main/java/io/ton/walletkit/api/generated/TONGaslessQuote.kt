@@ -28,48 +28,38 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONBase64
-import kotlinx.serialization.Contextual
+import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Message structure used for TON Connect proof of ownership.
+ * Quote for a gasless transaction produced by `GaslessProvider.getQuote`.  Contains relayer-wrapped messages that should be passed to `wallet.signMessage` in place of the caller's original messages, together with the fee the relayer will deduct and the timestamp after which the bundle expires.
  *
- * @param workchain Workchain ID of the wallet address
- * @param addressHash
- * @param timestamp Unix timestamp when the proof was created
- * @param domain
- * @param payload Payload string to be signed
- * @param stateInit
- * @param signature
+ * @param network
+ * @param messages Relayer-wrapped messages ready to be signed
+ * @param fee
+ * @param validUntil Unix timestamp after which the bundle becomes invalid for relay
+ * @param from
  */
 @Serializable
-data class TONProofMessage(
+data class TONGaslessQuote(
 
-    /* Workchain ID of the wallet address */
-    @SerialName(value = "workchain")
-    var workchain: kotlin.Int,
+    @SerialName(value = "network")
+    var network: TONNetwork,
 
-    @Contextual @SerialName(value = "addressHash")
-    var addressHash: io.ton.walletkit.model.TONHex,
+    /* Relayer-wrapped messages ready to be signed */
+    @SerialName(value = "messages")
+    var messages: kotlin.collections.List<TONTransactionRequestMessage>,
 
-    /* Unix timestamp when the proof was created */
-    @SerialName(value = "timestamp")
-    var timestamp: kotlin.Int,
+    @SerialName(value = "fee")
+    var fee: kotlin.String,
 
-    @SerialName(value = "domain")
-    var domain: TONProofMessageDomain,
+    /* Unix timestamp after which the bundle becomes invalid for relay */
+    @SerialName(value = "validUntil")
+    var validUntil: kotlin.Double,
 
-    /* Payload string to be signed */
-    @SerialName(value = "payload")
-    var payload: kotlin.String,
-
-    @SerialName(value = "stateInit")
-    var stateInit: io.ton.walletkit.model.TONBase64,
-
-    @Contextual @SerialName(value = "signature")
-    var signature: io.ton.walletkit.model.TONHex? = null,
+    @SerialName(value = "from")
+    var from: io.ton.walletkit.model.TONUserFriendlyAddress,
 
 ) {
 

@@ -28,50 +28,50 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONBase64
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Message structure used for TON Connect proof of ownership.
+ * Discriminator for DeFi-style providers (swap quotes, staking, gasless relayers).
  *
- * @param workchain Workchain ID of the wallet address
- * @param addressHash
- * @param timestamp Unix timestamp when the proof was created
- * @param domain
- * @param payload Payload string to be signed
- * @param stateInit
- * @param signature
+ * Values: swap,staking,gasless
  */
 @Serializable
-data class TONProofMessage(
+enum class TONDefiProviderType(val value: kotlin.String) {
 
-    /* Workchain ID of the wallet address */
-    @SerialName(value = "workchain")
-    var workchain: kotlin.Int,
+    @SerialName(value = "swap")
+    swap("swap"),
 
-    @Contextual @SerialName(value = "addressHash")
-    var addressHash: io.ton.walletkit.model.TONHex,
+    @SerialName(value = "staking")
+    staking("staking"),
 
-    /* Unix timestamp when the proof was created */
-    @SerialName(value = "timestamp")
-    var timestamp: kotlin.Int,
+    @SerialName(value = "gasless")
+    gasless("gasless"),
+    ;
 
-    @SerialName(value = "domain")
-    var domain: TONProofMessageDomain,
+    /**
+     * Override [toString()] to avoid using the enum variable name as the value, and instead use
+     * the actual value defined in the API spec file.
+     *
+     * This solves a problem when the variable name and its value are different, and ensures that
+     * the client sends the correct enum values to the server always.
+     */
+    override fun toString(): kotlin.String = value
 
-    /* Payload string to be signed */
-    @SerialName(value = "payload")
-    var payload: kotlin.String,
+    companion object {
+        /**
+         * Converts the provided [data] to a [String] on success, null otherwise.
+         */
+        fun encode(data: kotlin.Any?): kotlin.String? = if (data is TONDefiProviderType) "$data" else null
 
-    @SerialName(value = "stateInit")
-    var stateInit: io.ton.walletkit.model.TONBase64,
-
-    @Contextual @SerialName(value = "signature")
-    var signature: io.ton.walletkit.model.TONHex? = null,
-
-) {
-
-    companion object
+        /**
+         * Returns a valid [TONDefiProviderType] for [data], null otherwise.
+         */
+        fun decode(data: kotlin.Any?): TONDefiProviderType? = data?.let {
+            val normalizedData = "$it".lowercase()
+            values().firstOrNull { value ->
+                it == value || normalizedData == "$value".lowercase()
+            }
+        }
+    }
 }

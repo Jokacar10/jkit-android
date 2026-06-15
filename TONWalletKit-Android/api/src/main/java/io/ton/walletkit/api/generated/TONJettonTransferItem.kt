@@ -29,7 +29,6 @@
 package io.ton.walletkit.api.generated
 
 import io.ton.walletkit.model.TONBase64
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -67,13 +66,13 @@ data class TONJettonTransferItem(
     @SerialName(value = "responseDestination")
     var responseDestination: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "customPayload")
+    @SerialName(value = "customPayload")
     var customPayload: io.ton.walletkit.model.TONBase64? = null,
 
     @SerialName(value = "forwardAmount")
     var forwardAmount: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "forwardPayload")
+    @SerialName(value = "forwardPayload")
     var forwardPayload: io.ton.walletkit.model.TONBase64? = null,
     @SerialName("type")
     val type: kotlin.String = "jetton",

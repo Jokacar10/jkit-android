@@ -28,48 +28,38 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONBase64
+import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Message structure used for TON Connect proof of ownership.
+ * Parameters to quote a gasless transaction.  The relayer wraps the caller's messages with fee-collection logic and returns a new set of messages that the wallet should sign via `signMessage`.
  *
- * @param workchain Workchain ID of the wallet address
- * @param addressHash
- * @param timestamp Unix timestamp when the proof was created
- * @param domain
- * @param payload Payload string to be signed
- * @param stateInit
- * @param signature
+ * @param network
+ * @param walletAddress
+ * @param walletPublicKey
+ * @param messages Messages that the caller wants to include in the transaction
+ * @param feeAsset
  */
 @Serializable
-data class TONProofMessage(
+data class TONGaslessQuoteParams(
 
-    /* Workchain ID of the wallet address */
-    @SerialName(value = "workchain")
-    var workchain: kotlin.Int,
+    @SerialName(value = "network")
+    var network: TONNetwork,
 
-    @Contextual @SerialName(value = "addressHash")
-    var addressHash: io.ton.walletkit.model.TONHex,
+    @SerialName(value = "walletAddress")
+    var walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
-    /* Unix timestamp when the proof was created */
-    @SerialName(value = "timestamp")
-    var timestamp: kotlin.Int,
+    @Contextual @SerialName(value = "walletPublicKey")
+    var walletPublicKey: io.ton.walletkit.model.TONHex,
 
-    @SerialName(value = "domain")
-    var domain: TONProofMessageDomain,
+    /* Messages that the caller wants to include in the transaction */
+    @SerialName(value = "messages")
+    var messages: kotlin.collections.List<TONTransactionRequestMessage>,
 
-    /* Payload string to be signed */
-    @SerialName(value = "payload")
-    var payload: kotlin.String,
-
-    @SerialName(value = "stateInit")
-    var stateInit: io.ton.walletkit.model.TONBase64,
-
-    @Contextual @SerialName(value = "signature")
-    var signature: io.ton.walletkit.model.TONHex? = null,
+    @SerialName(value = "feeAsset")
+    var feeAsset: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
 ) {
 
