@@ -45,20 +45,20 @@ import kotlinx.serialization.Serializable
 data class TONJettonsTransferRequest(
 
     @SerialName(value = "jettonAddress")
-    val jettonAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var jettonAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "transferAmount")
-    val transferAmount: kotlin.String,
+    var transferAmount: kotlin.String,
 
     @SerialName(value = "recipientAddress")
-    val recipientAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var recipientAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "responseDestination")
-    val responseDestination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var responseDestination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     /* Human-readable comment attached to the transfer */
     @SerialName(value = "comment")
-    val comment: kotlin.String? = null,
+    var comment: kotlin.String? = null,
 
 ) {
 

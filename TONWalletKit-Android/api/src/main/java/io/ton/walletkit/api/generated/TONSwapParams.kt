@@ -45,17 +45,17 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TONSwapParams<TProviderOptions>(
     @SerialName("quote")
-    val quote: TONSwapQuote,
+    var quote: TONSwapQuote,
     @SerialName("userAddress")
-    val userAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var userAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
     @SerialName("destinationAddress")
-    val destinationAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var destinationAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
     @SerialName("slippageBps")
-    val slippageBps: kotlin.Int? = null,
+    var slippageBps: kotlin.Int? = null,
     @SerialName("deadline")
-    val deadline: kotlin.Int? = null,
+    var deadline: kotlin.Int? = null,
     @SerialName("providerOptions")
-    val providerOptions: TProviderOptions? = null,
+    var providerOptions: TProviderOptions? = null,
 ) {
     companion object
 }

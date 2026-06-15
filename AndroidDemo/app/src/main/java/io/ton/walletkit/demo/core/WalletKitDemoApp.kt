@@ -289,6 +289,7 @@ object TONWalletKitHelper {
                     imageUrl = DEFAULT_MANIFEST_IMAGE_URL,
                     aboutUrl = DEFAULT_MANIFEST_ABOUT_URL,
                     universalLink = DEFAULT_MANIFEST_UNIVERSAL_LINK,
+                    deepLink = DEFAULT_MANIFEST_DEEP_LINK,
                     bridgeUrl = DEFAULT_BRIDGE_URL,
                     jsBridgeKey = DEFAULT_JS_BRIDGE_KEY,
                 ),
@@ -301,6 +302,7 @@ object TONWalletKitHelper {
                     TONWalletKitConfiguration.SignDataFeature(
                         types = listOf(SignDataType.TEXT, SignDataType.BINARY, SignDataType.CELL),
                     ),
+                    TONWalletKitConfiguration.EmbeddedRequestFeature,
                 ),
                 storageType = TONWalletKitStorageType.Encrypted,
                 sessionManager = customSessionManager,
@@ -348,6 +350,9 @@ object TONWalletKitHelper {
     private const val DEFAULT_MANIFEST_IMAGE_URL = "https://wallet.ton.org/icon.png"
     private const val DEFAULT_MANIFEST_ABOUT_URL = "https://wallet.ton.org"
     private const val DEFAULT_MANIFEST_UNIVERSAL_LINK = "https://wallet.ton.org/tc"
+
+    // Deep link this wallet handles (see AndroidManifest); lets dApps open requests directly here.
+    private const val DEFAULT_MANIFEST_DEEP_LINK = "walletkit://"
     private const val DEFAULT_BRIDGE_URL = "https://bridge.tonapi.io/bridge"
     private const val TAG = "TONWalletKitHelper"
 }

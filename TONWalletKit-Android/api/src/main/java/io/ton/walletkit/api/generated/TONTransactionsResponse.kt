@@ -42,11 +42,11 @@ import kotlinx.serialization.Serializable
 data class TONTransactionsResponse(
 
     @SerialName(value = "transactions")
-    val transactions: kotlin.collections.List<TONTransaction>,
+    var transactions: kotlin.collections.List<TONTransaction>,
 
     /* Map of raw addresses to their metadata entries. */
     @Contextual @SerialName(value = "addressBook")
-    val addressBook: kotlin.collections.Map<kotlin.String, TONAddressBookEntry>,
+    var addressBook: kotlin.collections.Map<kotlin.String, TONAddressBookEntry>,
 
 ) {
 

@@ -46,21 +46,21 @@ data class TONMasterchainInfo(
 
     /* Sequence number of the masterchain block */
     @SerialName(value = "seqno")
-    val seqno: kotlin.Int,
+    var seqno: kotlin.Int,
 
     /* Shard identifier of the block */
     @SerialName(value = "shard")
-    val shard: kotlin.String,
+    var shard: kotlin.String,
 
     /* Workchain ID of the block */
     @SerialName(value = "workchain")
-    val workchain: kotlin.Int,
+    var workchain: kotlin.Int,
 
     @Contextual @SerialName(value = "fileHash")
-    val fileHash: io.ton.walletkit.model.TONHex,
+    var fileHash: io.ton.walletkit.model.TONHex,
 
     @Contextual @SerialName(value = "rootHash")
-    val rootHash: io.ton.walletkit.model.TONHex,
+    var rootHash: io.ton.walletkit.model.TONHex,
 
 ) {
 

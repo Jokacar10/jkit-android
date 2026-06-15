@@ -43,15 +43,15 @@ data class TONOmnistonReferrerOptions(
 
     /* The address of the referrer */
     @SerialName(value = "referrerAddress")
-    val referrerAddress: kotlin.String? = null,
+    var referrerAddress: kotlin.String? = null,
 
     /* Referrer fee in basis points (1 bp = 0.01%) */
     @SerialName(value = "referrerFeeBps")
-    val referrerFeeBps: kotlin.Int? = null,
+    var referrerFeeBps: kotlin.Int? = null,
 
     /* Whether a flexible referrer fee is allowed */
     @SerialName(value = "flexibleReferrerFee")
-    val flexibleReferrerFee: kotlin.Boolean? = null,
+    var flexibleReferrerFee: kotlin.Boolean? = null,
 
 ) {
 

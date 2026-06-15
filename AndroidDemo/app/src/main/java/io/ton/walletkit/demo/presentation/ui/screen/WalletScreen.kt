@@ -119,6 +119,7 @@ import io.ton.walletkit.demo.presentation.ui.sheet.TransactionRequestSheet
 import io.ton.walletkit.demo.presentation.ui.sheet.TransferJettonSheet
 import io.ton.walletkit.demo.presentation.ui.sheet.WalletDetailsSheet
 import io.ton.walletkit.demo.presentation.ui.sheet.WalletsBottomSheet
+import io.ton.walletkit.demo.presentation.util.JettonFormatters
 import io.ton.walletkit.demo.presentation.util.QrScanner
 import io.ton.walletkit.demo.presentation.viewmodel.NFTsListViewModel
 import io.ton.walletkit.demo.presentation.viewmodel.SwapViewModel
@@ -151,16 +152,6 @@ private fun trimFraction(value: String?, maxFractionDigits: Int): String {
     return truncated
 }
 
-private fun splitBalance(rawBalance: String?, maxFractionDigits: Int): Pair<String, String> {
-    val trimmed = trimFraction(rawBalance, maxFractionDigits)
-    val dotIndex = trimmed.indexOf('.')
-    return if (dotIndex < 0) {
-        trimmed to ""
-    } else {
-        trimmed.substring(0, dotIndex) to trimmed.substring(dotIndex)
-    }
-}
-
 private fun buildAssetList(
     rawBalance: String?,
     jettons: List<JettonSummary>,
@@ -173,11 +164,17 @@ private fun buildAssetList(
         name = "Toncoin",
         symbol = "TON",
         formattedAmount = "$tonAmount TON",
+        amountValue = rawBalance?.toDoubleOrNull() ?: 0.0,
         icon = WalletHomeAssetIcon.Ton,
     )
     val items = mutableListOf(tonItem)
     jettons.take(maxAssets - 1).forEach { jetton ->
-        val amount = trimFraction(jetton.balance, maxFractionDigits)
+        // jetton.balance is raw (smallest units); format with the token's decimals for display.
+        val amount = JettonFormatters.formatBalance(
+            jetton.balance,
+            jetton.jetton.decimalsNumber ?: 9,
+            maxDecimals = maxFractionDigits,
+        )
         val icon = jetton.imageUrl?.takeIf { it.isNotBlank() }
             ?.let { WalletHomeAssetIcon.Url(it) }
             ?: WalletHomeAssetIcon.Placeholder(jetton.symbol)
@@ -186,6 +183,7 @@ private fun buildAssetList(
             name = jetton.name,
             symbol = jetton.symbol,
             formattedAmount = "$amount ${jetton.symbol}",
+            amountValue = amount.toDoubleOrNull() ?: 0.0,
             icon = icon,
         )
     }
@@ -406,8 +404,8 @@ fun WalletScreen(
     LaunchedEffect(nftsViewModel) {
         nftsViewModel?.loadNFTs()
     }
-    val (totalInteger, totalFraction) = remember(activeWallet?.balance) {
-        splitBalance(activeWallet?.balance, MAX_FRACTION_DIGITS)
+    val totalBalance = remember(activeWallet?.balance) {
+        activeWallet?.balance?.toDoubleOrNull() ?: 0.0
     }
     val assetItems = remember(activeWallet?.balance, state.jettons) {
         buildAssetList(activeWallet?.balance, state.jettons, MAX_FRACTION_DIGITS, MAX_ASSETS)
@@ -545,8 +543,9 @@ fun WalletScreen(
             }
 
             WalletHomeContent(
-                totalBalanceInteger = totalInteger,
-                totalBalanceFraction = totalFraction,
+                totalBalance = totalBalance,
+                balanceSuffix = " TON",
+                balanceMaxFractionDigits = MAX_FRACTION_DIGITS,
                 truncatedAddress = WalletHomeTopBar.shortAddress(homeAddress),
                 onCopyAddress = {
                     clipboard.setText(AnnotatedString(homeAddress))

@@ -41,11 +41,11 @@ import kotlinx.serialization.Serializable
 data class TONTransactionStoragePhase(
 
     @SerialName(value = "storageFeesCollected")
-    val storageFeesCollected: kotlin.String,
+    var storageFeesCollected: kotlin.String,
 
     /* The status change applied to the account during the storage phase */
     @SerialName(value = "statusChange")
-    val statusChange: kotlin.String? = null,
+    var statusChange: kotlin.String? = null,
 
 ) {
 

@@ -45,21 +45,21 @@ import kotlinx.serialization.Serializable
 data class TONGaslessQuote(
 
     @SerialName(value = "network")
-    val network: TONNetwork,
+    var network: TONNetwork,
 
     /* Relayer-wrapped messages ready to be signed */
     @SerialName(value = "messages")
-    val messages: kotlin.collections.List<TONTransactionRequestMessage>,
+    var messages: kotlin.collections.List<TONTransactionRequestMessage>,
 
     @SerialName(value = "fee")
-    val fee: kotlin.String,
+    var fee: kotlin.String,
 
     /* Unix timestamp after which the bundle becomes invalid for relay */
     @SerialName(value = "validUntil")
-    val validUntil: kotlin.Double,
+    var validUntil: kotlin.Double,
 
     @SerialName(value = "from")
-    val from: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var from: io.ton.walletkit.model.TONUserFriendlyAddress,
 
 ) {
 

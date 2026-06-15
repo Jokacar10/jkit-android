@@ -41,10 +41,10 @@ import kotlinx.serialization.Serializable
 data class TONBaseProviderUpdate(
 
     @SerialName(value = "providerId")
-    val providerId: kotlin.String,
+    var providerId: kotlin.String,
 
     @SerialName(value = "type")
-    val type: kotlin.String,
+    var type: kotlin.String,
 
 ) {
 

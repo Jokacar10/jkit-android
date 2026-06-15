@@ -52,46 +52,46 @@ data class TONTransactionTokenInfoJettonMasters(
 
     /* Indicates if the token contract is valid */
     @SerialName(value = "isValid")
-    val isValid: kotlin.Boolean,
+    var isValid: kotlin.Boolean,
 
     /* Type of token */
     @SerialName(value = "type")
-    val type: kotlin.String,
+    var type: kotlin.String,
 
     /* Additional metadata for the token, such as image sizes, decimal precision, external links, and marketplaces */
     @Contextual @SerialName(value = "extra")
-    val extra: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>,
+    var extra: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>,
 
     /* Display name of the Jetton */
     @SerialName(value = "name")
-    val name: kotlin.String,
+    var name: kotlin.String,
 
     /* Ticker symbol of the Jetton */
     @SerialName(value = "symbol")
-    val symbol: kotlin.String,
+    var symbol: kotlin.String,
 
     /* Human-readable description of the Jetton */
     @SerialName(value = "description")
-    val description: kotlin.String,
+    var description: kotlin.String,
 
     /* Number of decimal places for the Jetton amount */
     @SerialName(value = "decimalsCount")
-    val decimalsCount: kotlin.Int,
+    var decimalsCount: kotlin.Int,
 
     /* Social media links for the Jetton project */
     @SerialName(value = "social")
-    val social: kotlin.collections.List<kotlin.String>,
+    var social: kotlin.collections.List<kotlin.String>,
 
     /* Metadata URI for the Jetton */
     @SerialName(value = "uri")
-    val uri: kotlin.String,
+    var uri: kotlin.String,
 
     /* Official website URLs for the Jetton project */
     @SerialName(value = "websites")
-    val websites: kotlin.collections.List<kotlin.String>,
+    var websites: kotlin.collections.List<kotlin.String>,
 
     @SerialName(value = "image")
-    val image: TONTokenImage? = null,
+    var image: TONTokenImage? = null,
 
 ) {
 

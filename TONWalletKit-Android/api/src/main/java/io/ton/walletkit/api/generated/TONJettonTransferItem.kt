@@ -29,7 +29,6 @@
 package io.ton.walletkit.api.generated
 
 import io.ton.walletkit.model.TONBase64
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -50,31 +49,31 @@ import kotlinx.serialization.Serializable
 data class TONJettonTransferItem(
 
     @SerialName(value = "master")
-    val master: kotlin.String,
+    var master: kotlin.String,
 
     @SerialName(value = "destination")
-    val destination: kotlin.String,
+    var destination: kotlin.String,
 
     @SerialName(value = "amount")
-    val amount: kotlin.String,
+    var amount: kotlin.String,
 
     @SerialName(value = "attachAmount")
-    val attachAmount: kotlin.String? = null,
+    var attachAmount: kotlin.String? = null,
 
     @SerialName(value = "queryId")
-    val queryId: kotlin.String? = null,
+    var queryId: kotlin.String? = null,
 
     @SerialName(value = "responseDestination")
-    val responseDestination: kotlin.String? = null,
+    var responseDestination: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "customPayload")
-    val customPayload: io.ton.walletkit.model.TONBase64? = null,
+    @SerialName(value = "customPayload")
+    var customPayload: io.ton.walletkit.model.TONBase64? = null,
 
     @SerialName(value = "forwardAmount")
-    val forwardAmount: kotlin.String? = null,
+    var forwardAmount: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "forwardPayload")
-    val forwardPayload: io.ton.walletkit.model.TONBase64? = null,
+    @SerialName(value = "forwardPayload")
+    var forwardPayload: io.ton.walletkit.model.TONBase64? = null,
     @SerialName("type")
     val type: kotlin.String = "jetton",
 ) {

@@ -40,7 +40,7 @@ import kotlinx.serialization.Serializable
 data class TONEmulationCreditPhase(
 
     @SerialName(value = "credit")
-    val credit: kotlin.String,
+    var credit: kotlin.String,
 
 ) {
 

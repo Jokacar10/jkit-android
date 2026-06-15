@@ -45,13 +45,13 @@ data class TONSignDataPreviewCell(
 
     /* Schema describing the cell structure for parsing */
     @SerialName(value = "schema")
-    val schema: kotlin.String,
+    var schema: kotlin.String,
 
-    @Contextual @SerialName(value = "content")
-    val content: io.ton.walletkit.model.TONBase64,
+    @SerialName(value = "content")
+    var content: io.ton.walletkit.model.TONBase64,
 
     @Contextual @SerialName(value = "parsed")
-    val parsed: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,
+    var parsed: kotlin.collections.Map<kotlin.String, kotlinx.serialization.json.JsonElement>? = null,
 
 ) {
 

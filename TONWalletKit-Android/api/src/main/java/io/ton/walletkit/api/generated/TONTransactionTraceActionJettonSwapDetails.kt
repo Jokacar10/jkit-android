@@ -47,20 +47,20 @@ data class TONTransactionTraceActionJettonSwapDetails(
 
     /* Name of the decentralized exchange */
     @SerialName(value = "dex")
-    val dex: kotlin.String,
+    var dex: kotlin.String,
 
     /* Related peer swap operations (for multi-hop swaps) */
     @SerialName(value = "peerSwaps")
-    val peerSwaps: kotlin.collections.List<@Contextual kotlinx.serialization.json.JsonElement>,
+    var peerSwaps: kotlin.collections.List<@Contextual kotlinx.serialization.json.JsonElement>,
 
     @SerialName(value = "sender")
-    val sender: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var sender: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "dexIncomingTransfer")
-    val dexIncomingTransfer: TONTransactionTraceActionJettonTransfer? = null,
+    var dexIncomingTransfer: TONTransactionTraceActionJettonTransfer? = null,
 
     @SerialName(value = "dexOutgoingTransfer")
-    val dexOutgoingTransfer: TONTransactionTraceActionJettonTransfer? = null,
+    var dexOutgoingTransfer: TONTransactionTraceActionJettonTransfer? = null,
 
 ) {
 

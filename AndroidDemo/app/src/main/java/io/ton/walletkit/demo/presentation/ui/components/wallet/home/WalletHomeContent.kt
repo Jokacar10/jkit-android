@@ -43,8 +43,9 @@ import io.ton.walletkit.demo.designsystem.theme.TonTheme
 
 @Composable
 fun WalletHomeContent(
-    totalBalanceInteger: String,
-    totalBalanceFraction: String,
+    totalBalance: Double,
+    balanceSuffix: String,
+    balanceMaxFractionDigits: Int,
     truncatedAddress: String,
     onCopyAddress: () -> Unit,
     assets: List<WalletHomeAssetItem>,
@@ -67,8 +68,9 @@ fun WalletHomeContent(
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         WalletHomeBalance(
-            totalBalanceInteger = totalBalanceInteger,
-            totalBalanceFraction = totalBalanceFraction,
+            totalBalance = totalBalance,
+            balanceSuffix = balanceSuffix,
+            maxFractionDigits = balanceMaxFractionDigits,
             truncatedAddress = truncatedAddress,
             onCopyAddress = onCopyAddress,
             modifier = Modifier

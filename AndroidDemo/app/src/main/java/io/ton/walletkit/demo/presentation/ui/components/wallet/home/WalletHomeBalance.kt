@@ -39,13 +39,20 @@ import io.ton.walletkit.demo.presentation.util.TestTags
 
 @Composable
 fun WalletHomeBalance(
-    totalBalanceInteger: String,
-    totalBalanceFraction: String,
+    totalBalance: Double,
+    balanceSuffix: String,
+    maxFractionDigits: Int,
     truncatedAddress: String,
     onCopyAddress: () -> Unit,
     modifier: Modifier = Modifier,
     onSecretTap: (() -> Unit)? = null,
 ) {
+    val animated = rememberCountUp(totalBalance)
+    val formatted = formatCountUp(animated, maxFractionDigits)
+    val dotIndex = formatted.indexOf('.')
+    val integerPart = if (dotIndex < 0) formatted else formatted.substring(0, dotIndex)
+    val fractionPart = if (dotIndex < 0) "" else formatted.substring(dotIndex)
+
     val gestureModifier = if (onSecretTap != null) {
         Modifier.devToggleTaps(onTrigger = onSecretTap)
     } else {
@@ -60,15 +67,15 @@ fun WalletHomeBalance(
     ) {
         Row {
             TonText(
-                text = totalBalanceInteger,
+                text = integerPart,
                 style = TonTheme.typography.price64,
                 color = TonTheme.colors.textPrimary,
                 maxLines = 1,
                 modifier = Modifier.alignByBaseline(),
             )
-            if (totalBalanceFraction.isNotEmpty()) {
+            if (fractionPart.isNotEmpty()) {
                 TonText(
-                    text = totalBalanceFraction,
+                    text = fractionPart,
                     style = TonTheme.typography.price40,
                     color = TonTheme.colors.textSecondary,
                     maxLines = 1,
@@ -76,7 +83,7 @@ fun WalletHomeBalance(
                 )
             }
             TonText(
-                text = " TON",
+                text = balanceSuffix,
                 style = TonTheme.typography.price40,
                 color = TonTheme.colors.textSecondary,
                 maxLines = 1,

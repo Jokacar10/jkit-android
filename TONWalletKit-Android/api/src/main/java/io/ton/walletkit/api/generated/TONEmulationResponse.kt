@@ -51,37 +51,37 @@ data class TONEmulationResponse(
 
     /* Masterchain block sequence number used during emulation */
     @SerialName(value = "mcBlockSeqno")
-    val mcBlockSeqno: kotlin.Int,
+    var mcBlockSeqno: kotlin.Int,
 
     @SerialName(value = "trace")
-    val trace: TONEmulationTraceNode,
+    var trace: TONEmulationTraceNode,
 
     /* Map of transaction hashes to transaction details */
     @Contextual @SerialName(value = "transactions")
-    val transactions: kotlin.collections.Map<kotlin.String, TONEmulationTransaction>,
+    var transactions: kotlin.collections.Map<kotlin.String, TONEmulationTransaction>,
 
     /* High-level actions extracted from the trace */
     @SerialName(value = "actions")
-    val actions: kotlin.collections.List<TONEmulationAction>,
+    var actions: kotlin.collections.List<TONEmulationAction>,
 
     @Contextual @SerialName(value = "randSeed")
-    val randSeed: io.ton.walletkit.model.TONHex,
+    var randSeed: io.ton.walletkit.model.TONHex,
 
     /* Whether the trace is incomplete due to limits or errors */
     @SerialName(value = "isIncomplete")
-    val isIncomplete: kotlin.Boolean,
+    var isIncomplete: kotlin.Boolean,
 
     /* Map of code cell hashes to their BOC base64 representations */
     @Contextual @SerialName(value = "codeCells")
-    val codeCells: kotlin.collections.Map<kotlin.String, io.ton.walletkit.model.TONBase64>,
+    var codeCells: kotlin.collections.Map<kotlin.String, io.ton.walletkit.model.TONBase64>,
 
     /* Map of data cell hashes to their BOC base64 representations */
     @Contextual @SerialName(value = "dataCells")
-    val dataCells: kotlin.collections.Map<kotlin.String, io.ton.walletkit.model.TONBase64>,
+    var dataCells: kotlin.collections.Map<kotlin.String, io.ton.walletkit.model.TONBase64>,
 
     /* Address book mapping raw addresses to human-readable metadata */
     @Contextual @SerialName(value = "addressBook")
-    val addressBook: kotlin.collections.Map<kotlin.String, TONEmulationAddressBookEntry>,
+    var addressBook: kotlin.collections.Map<kotlin.String, TONEmulationAddressBookEntry>,
 
 ) {
 

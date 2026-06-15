@@ -46,19 +46,19 @@ import kotlinx.serialization.Serializable
 data class TONTransactionTraceMoneyFlowItem(
 
     @Contextual @SerialName(value = "assetType")
-    val assetType: TONAssetType,
+    var assetType: TONAssetType,
 
     @SerialName(value = "amount")
-    val amount: kotlin.String,
+    var amount: kotlin.String,
 
     @SerialName(value = "tokenAddress")
-    val tokenAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var tokenAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "fromAddress")
-    val fromAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var fromAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     @SerialName(value = "toAddress")
-    val toAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var toAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
 ) {
 

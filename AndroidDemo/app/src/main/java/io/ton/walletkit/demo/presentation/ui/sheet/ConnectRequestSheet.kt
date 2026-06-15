@@ -56,6 +56,9 @@ fun ConnectRequestSheet(
     onReject: (ConnectRequestUi) -> Unit,
 ) {
     var selectedWallet by remember { mutableStateOf(wallets.firstOrNull()) }
+    // Approving an embedded request can take a few seconds; show a loader and lock the button so it
+    // doesn't look frozen and can't be tapped twice. Keyed on `request` to reset per request.
+    var approving by remember(request) { mutableStateOf(false) }
 
     TonConnectSheetScaffold(
         testTag = TestTags.CONNECT_REQUEST_SHEET,
@@ -63,9 +66,14 @@ fun ConnectRequestSheet(
             TonConnectSheetDisclaimer(text = stringResource(R.string.connect_request_disclaimer))
             TonButton(
                 text = stringResource(R.string.connect_request_action),
-                onClick = { selectedWallet?.let { w -> onApprove(request, w) } },
-                enabled = selectedWallet != null,
-                config = TonButtonConfig.Primary,
+                onClick = {
+                    selectedWallet?.let { w ->
+                        approving = true
+                        onApprove(request, w)
+                    }
+                },
+                enabled = selectedWallet != null && !approving,
+                config = TonButtonConfig.Primary.isLoading(approving),
                 modifier = Modifier.testTag(TestTags.CONNECT_APPROVE_BUTTON),
             )
         },

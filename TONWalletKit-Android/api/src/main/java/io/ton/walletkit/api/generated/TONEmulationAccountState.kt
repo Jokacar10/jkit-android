@@ -47,26 +47,26 @@ import kotlinx.serialization.Serializable
 data class TONEmulationAccountState(
 
     @SerialName(value = "balance")
-    val balance: kotlin.String,
+    var balance: kotlin.String,
 
     @Contextual @SerialName(value = "accountStatus")
-    val accountStatus: TONAccountStatus,
+    var accountStatus: TONAccountStatus,
 
     @Contextual @SerialName(value = "hash")
-    val hash: io.ton.walletkit.model.TONHex? = null,
+    var hash: io.ton.walletkit.model.TONHex? = null,
 
     /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
     @SerialName(value = "extraCurrencies")
-    val extraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+    var extraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
 
     @Contextual @SerialName(value = "frozenHash")
-    val frozenHash: io.ton.walletkit.model.TONHex? = null,
+    var frozenHash: io.ton.walletkit.model.TONHex? = null,
 
     @Contextual @SerialName(value = "dataHash")
-    val dataHash: io.ton.walletkit.model.TONHex? = null,
+    var dataHash: io.ton.walletkit.model.TONHex? = null,
 
     @Contextual @SerialName(value = "codeHash")
-    val codeHash: io.ton.walletkit.model.TONHex? = null,
+    var codeHash: io.ton.walletkit.model.TONHex? = null,
 
 ) {
 

@@ -42,10 +42,10 @@ import kotlinx.serialization.Serializable
 data class TONManifestFetchResult(
 
     @Contextual @SerialName(value = "manifest")
-    val manifest: kotlinx.serialization.json.JsonElement?,
+    var manifest: kotlinx.serialization.json.JsonElement?,
 
     @Contextual @SerialName(value = "manifestFetchErrorCode")
-    val manifestFetchErrorCode: TONConnectEventErrorCodes? = null,
+    var manifestFetchErrorCode: TONConnectEventErrorCodes? = null,
 
 ) {
 

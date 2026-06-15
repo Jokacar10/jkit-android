@@ -50,39 +50,39 @@ data class TONTransactionDescription(
 
     /* The transaction type (e.g., tick-tock, ord, split-prepare) */
     @SerialName(value = "type")
-    val type: kotlin.String,
+    var type: kotlin.String,
 
     /* The flag indicating if the transaction was aborted */
     @SerialName(value = "isAborted")
-    val isAborted: kotlin.Boolean,
+    var isAborted: kotlin.Boolean,
 
     /* The flag indicating if the account was destroyed */
     @SerialName(value = "isDestroyed")
-    val isDestroyed: kotlin.Boolean,
+    var isDestroyed: kotlin.Boolean,
 
     /* The flag indicating if the credit phase was executed first */
     @SerialName(value = "isCreditFirst")
-    val isCreditFirst: kotlin.Boolean,
+    var isCreditFirst: kotlin.Boolean,
 
     /* The flag indicating if this was a tock transaction */
     @SerialName(value = "isTock")
-    val isTock: kotlin.Boolean,
+    var isTock: kotlin.Boolean,
 
     /* The flag indicating if the contract was installed */
     @SerialName(value = "isInstalled")
-    val isInstalled: kotlin.Boolean,
+    var isInstalled: kotlin.Boolean,
 
     @SerialName(value = "storagePhase")
-    val storagePhase: TONTransactionStoragePhase? = null,
+    var storagePhase: TONTransactionStoragePhase? = null,
 
     @SerialName(value = "creditPhase")
-    val creditPhase: TONTransactionCreditPhase? = null,
+    var creditPhase: TONTransactionCreditPhase? = null,
 
     @SerialName(value = "computePhase")
-    val computePhase: TONTransactionComputePhase? = null,
+    var computePhase: TONTransactionComputePhase? = null,
 
     @SerialName(value = "action")
-    val action: TONTransactionAction? = null,
+    var action: TONTransactionAction? = null,
 
 ) {
 

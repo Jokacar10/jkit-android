@@ -42,11 +42,11 @@ data class TONPagination(
 
     /* Maximum number of items to return */
     @SerialName(value = "limit")
-    val limit: kotlin.Int? = null,
+    var limit: kotlin.Int? = null,
 
     /* Number of items to skip before starting to collect the result set */
     @SerialName(value = "offset")
-    val offset: kotlin.Int? = null,
+    var offset: kotlin.Int? = null,
 
 ) {
 

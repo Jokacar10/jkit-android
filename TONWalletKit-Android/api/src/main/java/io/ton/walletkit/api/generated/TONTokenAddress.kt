@@ -40,7 +40,7 @@ import kotlinx.serialization.Serializable
 data class TONTokenAddress(
 
     @SerialName(value = "_placeholder")
-    val placeholder: kotlin.String? = null,
+    var placeholder: kotlin.String? = null,
 
 ) {
 

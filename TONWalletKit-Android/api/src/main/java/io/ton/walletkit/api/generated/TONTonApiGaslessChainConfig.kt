@@ -42,11 +42,11 @@ data class TONTonApiGaslessChainConfig(
 
     /* TonAPI REST endpoint override for this chain (defaults to TonAPI's per-network host). */
     @SerialName(value = "endpoint")
-    val endpoint: kotlin.String? = null,
+    var endpoint: kotlin.String? = null,
 
     /* Bearer token used for this chain's TonAPI calls. */
     @SerialName(value = "apiKey")
-    val apiKey: kotlin.String? = null,
+    var apiKey: kotlin.String? = null,
 
 ) {
 

@@ -42,10 +42,10 @@ import kotlinx.serialization.Serializable
 data class TONSendMode(
 
     @SerialName(value = "flags")
-    val flags: kotlin.collections.List<@Contextual TONSendModeFlag>,
+    var flags: kotlin.collections.List<@Contextual TONSendModeFlag>,
 
     @Contextual @SerialName(value = "base")
-    val base: TONSendModeBase? = null,
+    var base: TONSendModeBase? = null,
 
 ) {
 

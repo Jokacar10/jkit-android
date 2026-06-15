@@ -246,6 +246,11 @@ internal object JsonConstants {
     const val FEATURE_SIGN_DATA = "SignData"
 
     /**
+     * Feature name for EmbeddedRequest capability (request folded into the connect link `e=` param).
+     */
+    const val FEATURE_EMBEDDED_REQUEST = "EmbeddedRequest"
+
+    /**
      * JSON key for max messages in SendTransaction feature.
      */
     const val KEY_MAX_MESSAGES = "maxMessages"

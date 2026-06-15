@@ -41,7 +41,7 @@ data class TONNetwork(
 
     /* Chain ID of the network (e.g., \"-239\" for mainnet, \"-3\" for testnet) */
     @SerialName(value = "chainId")
-    val chainId: kotlin.String,
+    var chainId: kotlin.String,
 
 ) {
 

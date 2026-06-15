@@ -47,25 +47,25 @@ import kotlinx.serialization.Serializable
 data class TONTransactionsUpdate(
 
     @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    var status: TONStreamingUpdateStatus,
 
     @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     /* The array of transactions */
     @SerialName(value = "transactions")
-    val transactions: kotlin.collections.List<TONTransaction>,
+    var transactions: kotlin.collections.List<TONTransaction>,
 
     @Contextual @SerialName(value = "traceHash")
-    val traceHash: io.ton.walletkit.model.TONHex,
+    var traceHash: io.ton.walletkit.model.TONHex,
 
     /* Map of raw addresses to their metadata entries. */
     @Contextual @SerialName(value = "addressBook")
-    val addressBook: kotlin.collections.Map<kotlin.String, TONAddressBookEntry>? = null,
+    var addressBook: kotlin.collections.Map<kotlin.String, TONAddressBookEntry>? = null,
 
     /* Metadata about addresses, including indexing and associated token info. */
     @Contextual @SerialName(value = "metadata")
-    val metadata: kotlin.collections.Map<kotlin.String, TONTransactionAddressMetadataEntry>? = null,
+    var metadata: kotlin.collections.Map<kotlin.String, TONTransactionAddressMetadataEntry>? = null,
     @SerialName("type")
     val type: kotlin.String = "transactions",
 ) {

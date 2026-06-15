@@ -49,35 +49,35 @@ import kotlinx.serialization.Serializable
 data class TONStakingQuote(
 
     @Contextual @SerialName(value = "direction")
-    val direction: TONStakingQuoteDirection,
+    var direction: TONStakingQuoteDirection,
 
     @SerialName(value = "rawAmountIn")
-    val rawAmountIn: kotlin.String,
+    var rawAmountIn: kotlin.String,
 
     @SerialName(value = "rawAmountOut")
-    val rawAmountOut: kotlin.String,
+    var rawAmountOut: kotlin.String,
 
     /* Formatted amount of tokens being provided */
     @SerialName(value = "amountIn")
-    val amountIn: kotlin.String,
+    var amountIn: kotlin.String,
 
     /* Formatted estimated amount of tokens to be received */
     @SerialName(value = "amountOut")
-    val amountOut: kotlin.String,
+    var amountOut: kotlin.String,
 
     @SerialName(value = "network")
-    val network: TONNetwork,
+    var network: TONNetwork,
 
     /* Identifier of the staking provider */
     @SerialName(value = "providerId")
-    val providerId: kotlin.String,
+    var providerId: kotlin.String,
 
     @Contextual @SerialName(value = "unstakeMode")
-    val unstakeMode: TONUnstakeMode? = null,
+    var unstakeMode: TONUnstakeMode? = null,
 
     /* Provider-specific metadata for the quote */
     @Contextual @SerialName(value = "metadata")
-    val metadata: kotlinx.serialization.json.JsonElement? = null,
+    var metadata: kotlinx.serialization.json.JsonElement? = null,
 
 ) {
 

@@ -40,7 +40,7 @@ import kotlinx.serialization.Serializable
 data class TONConnectionApprovalResponse(
 
     @SerialName(value = "proof")
-    val proof: TONConnectionApprovalProof? = null,
+    var proof: TONConnectionApprovalProof? = null,
 
 ) {
 

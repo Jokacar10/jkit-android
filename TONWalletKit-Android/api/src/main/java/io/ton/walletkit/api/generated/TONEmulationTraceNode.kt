@@ -43,14 +43,14 @@ import kotlinx.serialization.Serializable
 data class TONEmulationTraceNode(
 
     @Contextual @SerialName(value = "txHash")
-    val txHash: io.ton.walletkit.model.TONHex,
+    var txHash: io.ton.walletkit.model.TONHex,
 
     /* Child nodes representing spawned messages */
     @SerialName(value = "children")
-    val children: kotlin.collections.List<TONEmulationTraceNode>,
+    var children: kotlin.collections.List<TONEmulationTraceNode>,
 
     @Contextual @SerialName(value = "inMsgHash")
-    val inMsgHash: io.ton.walletkit.model.TONHex? = null,
+    var inMsgHash: io.ton.walletkit.model.TONHex? = null,
 
 ) {
 

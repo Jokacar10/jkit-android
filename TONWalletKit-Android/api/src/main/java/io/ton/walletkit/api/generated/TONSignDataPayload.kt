@@ -42,14 +42,14 @@ import kotlinx.serialization.Serializable
 data class TONSignDataPayload(
 
     @SerialName(value = "data")
-    val `data`: TONSignData,
+    var `data`: TONSignData,
 
     @SerialName(value = "network")
-    val network: TONNetwork? = null,
+    var network: TONNetwork? = null,
 
     /* Optional sender address in received format (raw, user friendly) */
     @SerialName(value = "fromAddress")
-    val fromAddress: kotlin.String? = null,
+    var fromAddress: kotlin.String? = null,
 
 ) {
 

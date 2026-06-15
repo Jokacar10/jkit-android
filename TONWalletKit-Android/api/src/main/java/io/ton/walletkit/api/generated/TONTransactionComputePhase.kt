@@ -54,49 +54,49 @@ data class TONTransactionComputePhase(
 
     /* The flag indicating if the compute phase was skipped */
     @SerialName(value = "isSkipped")
-    val isSkipped: kotlin.Boolean? = null,
+    var isSkipped: kotlin.Boolean? = null,
 
     /* The success state of the compute phase */
     @SerialName(value = "isSuccess")
-    val isSuccess: kotlin.Boolean? = null,
+    var isSuccess: kotlin.Boolean? = null,
 
     /* The flag indicating if message state was used */
     @SerialName(value = "isMessageStateUsed")
-    val isMessageStateUsed: kotlin.Boolean? = null,
+    var isMessageStateUsed: kotlin.Boolean? = null,
 
     /* The flag indicating if the account was activated during compute */
     @SerialName(value = "isAccountActivated")
-    val isAccountActivated: kotlin.Boolean? = null,
+    var isAccountActivated: kotlin.Boolean? = null,
 
     @SerialName(value = "gasFees")
-    val gasFees: kotlin.String? = null,
+    var gasFees: kotlin.String? = null,
 
     @SerialName(value = "gasUsed")
-    val gasUsed: kotlin.String? = null,
+    var gasUsed: kotlin.String? = null,
 
     @SerialName(value = "gasLimit")
-    val gasLimit: kotlin.String? = null,
+    var gasLimit: kotlin.String? = null,
 
     @SerialName(value = "gasCredit")
-    val gasCredit: kotlin.String? = null,
+    var gasCredit: kotlin.String? = null,
 
     /* The compute execution mode */
     @SerialName(value = "mode")
-    val mode: kotlin.Int? = null,
+    var mode: kotlin.Int? = null,
 
     /* The exit code returned from the VM */
     @SerialName(value = "exitCode")
-    val exitCode: kotlin.Int? = null,
+    var exitCode: kotlin.Int? = null,
 
     /* The number of steps executed by the VM */
     @SerialName(value = "vmStepsNumber")
-    val vmStepsNumber: kotlin.Int? = null,
+    var vmStepsNumber: kotlin.Int? = null,
 
     @Contextual @SerialName(value = "vmInitStateHash")
-    val vmInitStateHash: io.ton.walletkit.model.TONHex? = null,
+    var vmInitStateHash: io.ton.walletkit.model.TONHex? = null,
 
     @Contextual @SerialName(value = "vmFinalStateHash")
-    val vmFinalStateHash: io.ton.walletkit.model.TONHex? = null,
+    var vmFinalStateHash: io.ton.walletkit.model.TONHex? = null,
 
 ) {
 

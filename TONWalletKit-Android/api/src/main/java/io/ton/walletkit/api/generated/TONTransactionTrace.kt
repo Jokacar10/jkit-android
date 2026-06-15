@@ -47,25 +47,25 @@ data class TONTransactionTrace(
 
     /* Masterchain block sequence number where emulation was performed */
     @SerialName(value = "mcBlockSeqno")
-    val mcBlockSeqno: kotlin.Int,
+    var mcBlockSeqno: kotlin.Int,
 
     @SerialName(value = "trace")
-    val trace: TONTransactionTraceNode,
+    var trace: TONTransactionTraceNode,
 
     /* Map of transaction hashes to transaction details */
     @Contextual @SerialName(value = "transactions")
-    val transactions: kotlin.collections.Map<kotlin.String, TONTransaction>,
+    var transactions: kotlin.collections.Map<kotlin.String, TONTransaction>,
 
     /* List of high-level actions extracted from the trace */
     @SerialName(value = "actions")
-    val actions: kotlin.collections.List<TONTransactionTraceAction>,
+    var actions: kotlin.collections.List<TONTransactionTraceAction>,
 
     @Contextual @SerialName(value = "randSeed")
-    val randSeed: io.ton.walletkit.model.TONHex,
+    var randSeed: io.ton.walletkit.model.TONHex,
 
     /* Whether the trace is incomplete due to limits or errors */
     @SerialName(value = "isIncomplete")
-    val isIncomplete: kotlin.Boolean,
+    var isIncomplete: kotlin.Boolean,
 
 ) {
 
