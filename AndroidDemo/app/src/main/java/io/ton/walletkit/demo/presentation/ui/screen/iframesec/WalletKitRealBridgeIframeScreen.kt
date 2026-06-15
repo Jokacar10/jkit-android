@@ -27,9 +27,11 @@ import android.annotation.SuppressLint
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -56,7 +58,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
@@ -67,6 +72,9 @@ import io.ton.walletkit.demo.presentation.ui.screen.SubScreenTopBar
 import io.ton.walletkit.event.TONWalletKitEvent
 import io.ton.walletkit.extensions.injectTonConnect
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * Iframe-security matrix against the REAL WalletKit bridge. Loads the demo dApp with
@@ -274,4 +282,79 @@ private fun eventPayload(event: TONWalletKitEvent): String = when (event) {
     is TONWalletKitEvent.SendTransactionRequest -> "tabId=${event.request.event.tabId ?: "nil"}"
     is TONWalletKitEvent.SignMessageRequest -> "tabId=${event.request.event.tabId ?: "nil"}"
     else -> ""
+}
+
+private val timeFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
+
+@Composable
+private fun LogRow(entry: IframeSecLogEntry) {
+    val claimedMatches = entry.claimedOrigin == entry.actualOrigin
+    val badgeColor = when {
+        entry.isNative -> Color(0xFF2D7DF6)
+        claimedMatches -> Color(0xFF2EA043)
+        else -> Color(0xFFE5484D)
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(6.dp))
+            .background(if (entry.isNative) Color(0x142D7DF6) else TonTheme.colors.bgPrimary)
+            .border(0.5.dp, Color(0x33808080), RoundedCornerShape(6.dp))
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(3.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(badgeColor.copy(alpha = 0.18f))
+                    .padding(horizontal = 6.dp, vertical = 2.dp),
+            ) {
+                Text(entry.frameLabel, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = badgeColor)
+            }
+            Text(
+                text = "  ${entry.action}",
+                fontSize = 11.sp,
+                fontFamily = FontFamily.Monospace,
+                color = TonTheme.colors.textPrimary,
+                modifier = Modifier.weight(1f),
+            )
+            if (!entry.isMainFrame && !entry.isNative) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(Color(0x33FF9800))
+                        .padding(horizontal = 4.dp, vertical = 1.dp),
+                ) {
+                    Text("iframe", fontSize = 9.sp, color = Color(0xFFE08600))
+                }
+            }
+            Text(
+                text = timeFormat.format(Date(entry.timestamp)),
+                fontSize = 10.sp,
+                fontFamily = FontFamily.Monospace,
+                color = TonTheme.colors.textTertiary,
+            )
+        }
+        OriginRow("real:", entry.actualOrigin, TonTheme.colors.textPrimary)
+        if (!entry.isNative) {
+            OriginRow("claimed:", entry.claimedOrigin, if (claimedMatches) TonTheme.colors.textPrimary else Color(0xFFE5484D))
+        }
+        if (entry.payload.isNotEmpty()) {
+            Text(
+                text = entry.payload,
+                fontSize = 10.sp,
+                fontFamily = FontFamily.Monospace,
+                color = TonTheme.colors.textSecondary,
+            )
+        }
+    }
+}
+
+@Composable
+private fun OriginRow(title: String, value: String, color: Color) {
+    Row {
+        Text(title, fontSize = 10.sp, color = TonTheme.colors.textTertiary)
+        Text("  $value", fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = color)
+    }
 }

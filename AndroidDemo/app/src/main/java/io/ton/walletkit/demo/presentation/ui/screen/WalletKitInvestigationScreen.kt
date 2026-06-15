@@ -53,12 +53,11 @@ import io.ton.walletkit.demo.designsystem.theme.SmoothCornerShape
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
 import io.ton.walletkit.demo.presentation.ui.dialog.UrlPromptDialog
 import io.ton.walletkit.demo.presentation.ui.screen.iframesec.RealBridgeIframeCase
-import io.ton.walletkit.demo.presentation.ui.screen.iframesec.WalletKitIframeSecurityScreen
 import io.ton.walletkit.demo.presentation.ui.screen.iframesec.WalletKitRealBridgeIframeScreen
 import io.ton.walletkit.demo.presentation.util.QrScanner
 import io.ton.walletkit.extensions.injectTonConnect
 
-private enum class InvestigationPage { Tonconnect, DappWebView, IframeMatrix, RealBridge }
+private enum class InvestigationPage { Tonconnect, DappWebView, RealBridge }
 
 /**
  * Developer "Wallet Kit Investigation" screen: a list of debug tools reached from the wallet-home
@@ -83,11 +82,6 @@ fun WalletKitInvestigationScreen(
         InvestigationPage.DappWebView -> {
             BackHandler { page = null }
             DappWebViewScreen(onBack = { page = null }, walletKit = walletKit, modifier = modifier)
-            return
-        }
-        InvestigationPage.IframeMatrix -> {
-            BackHandler { page = null }
-            WalletKitIframeSecurityScreen(onBack = { page = null }, modifier = modifier)
             return
         }
         InvestigationPage.RealBridge -> {
@@ -115,7 +109,6 @@ fun WalletKitInvestigationScreen(
                 onClick = { page = InvestigationPage.Tonconnect },
             )
             InvestigationRow(title = "dApp WebView", onClick = { page = InvestigationPage.DappWebView })
-            InvestigationRow(title = "Iframe Security Matrix", onClick = { page = InvestigationPage.IframeMatrix })
             InvestigationRow(
                 title = "Iframe Security — Real dApp Bridge",
                 onClick = { page = InvestigationPage.RealBridge },
