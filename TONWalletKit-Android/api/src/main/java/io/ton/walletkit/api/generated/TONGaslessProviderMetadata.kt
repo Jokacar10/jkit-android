@@ -42,13 +42,13 @@ import kotlinx.serialization.Serializable
 data class TONGaslessProviderMetadata(
 
     @SerialName(value = "name")
-    val name: kotlin.String,
+    var name: kotlin.String,
 
     @SerialName(value = "logo")
-    val logo: kotlin.String? = null,
+    var logo: kotlin.String? = null,
 
     @SerialName(value = "url")
-    val url: kotlin.String? = null,
+    var url: kotlin.String? = null,
 
 ) {
 

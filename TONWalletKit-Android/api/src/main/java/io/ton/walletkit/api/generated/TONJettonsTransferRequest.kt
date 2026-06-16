@@ -54,7 +54,7 @@ data class TONJettonsTransferRequest(
     var recipientAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "responseDestination")
-    val responseDestination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var responseDestination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     /* Human-readable comment attached to the transfer */
     @SerialName(value = "comment")

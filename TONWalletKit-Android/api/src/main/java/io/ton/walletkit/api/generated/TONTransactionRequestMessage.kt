@@ -29,7 +29,6 @@
 package io.ton.walletkit.api.generated
 
 import io.ton.walletkit.model.TONBase64
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -60,10 +59,10 @@ data class TONTransactionRequestMessage(
     @SerialName(value = "extraCurrency")
     var extraCurrency: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
 
-    @Contextual @SerialName(value = "stateInit")
+    @SerialName(value = "stateInit")
     var stateInit: io.ton.walletkit.model.TONBase64? = null,
 
-    @Contextual @SerialName(value = "payload")
+    @SerialName(value = "payload")
     var payload: io.ton.walletkit.model.TONBase64? = null,
 
 ) {

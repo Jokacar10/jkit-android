@@ -44,13 +44,13 @@ import kotlinx.serialization.Serializable
 data class TONGaslessSendParams(
 
     @SerialName(value = "network")
-    val network: TONNetwork,
+    var network: TONNetwork,
 
     @Contextual @SerialName(value = "walletPublicKey")
-    val walletPublicKey: io.ton.walletkit.model.TONHex,
+    var walletPublicKey: io.ton.walletkit.model.TONHex,
 
     @SerialName(value = "internalBoc")
-    val internalBoc: io.ton.walletkit.model.TONBase64,
+    var internalBoc: io.ton.walletkit.model.TONBase64,
 
 ) {
 

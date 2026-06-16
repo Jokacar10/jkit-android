@@ -45,16 +45,16 @@ import kotlinx.serialization.Serializable
 data class TONGaslessSendResponse(
 
     @SerialName(value = "boc")
-    val boc: io.ton.walletkit.model.TONBase64,
+    var boc: io.ton.walletkit.model.TONBase64,
 
     @SerialName(value = "normalizedBoc")
-    val normalizedBoc: io.ton.walletkit.model.TONBase64,
+    var normalizedBoc: io.ton.walletkit.model.TONBase64,
 
     @Contextual @SerialName(value = "normalizedHash")
-    val normalizedHash: io.ton.walletkit.model.TONHex,
+    var normalizedHash: io.ton.walletkit.model.TONHex,
 
     @SerialName(value = "internalBoc")
-    val internalBoc: io.ton.walletkit.model.TONBase64,
+    var internalBoc: io.ton.walletkit.model.TONBase64,
 
 ) {
 

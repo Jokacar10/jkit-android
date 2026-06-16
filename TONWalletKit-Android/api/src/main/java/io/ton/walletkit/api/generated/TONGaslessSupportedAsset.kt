@@ -41,7 +41,7 @@ import kotlinx.serialization.Serializable
 data class TONGaslessSupportedAsset(
 
     @SerialName(value = "address")
-    val address: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
 ) {
 

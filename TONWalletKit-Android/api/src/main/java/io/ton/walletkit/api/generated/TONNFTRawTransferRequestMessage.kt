@@ -30,7 +30,6 @@ package io.ton.walletkit.api.generated
 
 import io.ton.walletkit.model.TONBase64
 import io.ton.walletkit.model.TONUserFriendlyAddress
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -59,10 +58,10 @@ data class TONNFTRawTransferRequestMessage(
     @SerialName(value = "responseDestination")
     var responseDestination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
-    @Contextual @SerialName(value = "customPayload")
+    @SerialName(value = "customPayload")
     var customPayload: io.ton.walletkit.model.TONBase64? = null,
 
-    @Contextual @SerialName(value = "forwardPayload")
+    @SerialName(value = "forwardPayload")
     var forwardPayload: io.ton.walletkit.model.TONBase64? = null,
 
 ) {

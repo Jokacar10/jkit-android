@@ -65,7 +65,7 @@ data class TONProofMessage(
     @SerialName(value = "payload")
     var payload: kotlin.String,
 
-    @Contextual @SerialName(value = "stateInit")
+    @SerialName(value = "stateInit")
     var stateInit: io.ton.walletkit.model.TONBase64,
 
     @Contextual @SerialName(value = "signature")
