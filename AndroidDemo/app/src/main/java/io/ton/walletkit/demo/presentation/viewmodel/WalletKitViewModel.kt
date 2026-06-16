@@ -84,6 +84,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.math.BigInteger
 import javax.inject.Inject
 import kotlin.collections.ArrayDeque
 import kotlin.collections.firstOrNull
@@ -1404,31 +1405,54 @@ class WalletKitViewModel @Inject constructor(
 
         Log.d(LOG_TAG, "Transaction request - walletAddress: $walletAddress, dAppName: ${dAppInfo?.name}")
 
-        val messages = txRequest.messages.map { msg ->
-            TransactionMessageUi(
-                to = msg.address,
-                amount = msg.amount,
-                comment = null,
-                payload = msg.payload?.value,
-                stateInit = msg.stateInit?.value,
+        viewModelScope.launch {
+            val wallet = lifecycleManager.tonWallets[walletAddress]
+            if (wallet != null) {
+                try {
+                    val balance = wallet.balance()
+                    val totalAmount = txRequest.messages.sumOf { msg ->
+                        msg.amount.toBigIntegerOrNull() ?: BigInteger.ZERO
+                    }
+                    Log.d(LOG_TAG, "Balance check: balance=${balance.value}, totalAmount=$totalAmount")
+
+                    if (balance.value.toBigInteger() < totalAmount) {
+                        Log.d(LOG_TAG, "Insufficient balance - auto-rejecting transaction")
+                        withContext(NonCancellable) {
+                            request.reject("Insufficient balance", BAD_REQUEST_ERROR_CODE)
+                        }
+                        return@launch
+                    }
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "Failed to check balance, proceeding with transaction UI", e)
+                }
+            }
+
+            val messages = txRequest.messages.map { msg ->
+                TransactionMessageUi(
+                    to = msg.address,
+                    amount = msg.amount,
+                    comment = null,
+                    payload = msg.payload?.value,
+                    stateInit = msg.stateInit?.value,
+                )
+            }
+
+            val uiRequest = TransactionRequestUi(
+                id = request.hashCode().toString(),
+                walletAddress = walletAddress,
+                dAppName = dAppInfo?.name ?: fallbackDAppName,
+                validUntil = txRequest.validUntil?.toLong(),
+                messages = messages,
+                preview = null,
+                raw = JSONObject(),
+                transactionRequest = request,
             )
+
+            Log.d(LOG_TAG, "Setting sheet to Transaction state with ${messages.size} messages")
+            uiCoordinator.setSheet(SheetState.Transaction(uiRequest))
+            val eventDAppName = dAppInfo?.name ?: fallbackDAppName
+            eventLogger.log(R.string.wallet_event_transaction_request, eventDAppName)
         }
-
-        val uiRequest = TransactionRequestUi(
-            id = request.hashCode().toString(),
-            walletAddress = walletAddress,
-            dAppName = dAppInfo?.name ?: fallbackDAppName,
-            validUntil = txRequest.validUntil?.toLong(),
-            messages = messages,
-            preview = null,
-            raw = JSONObject(),
-            transactionRequest = request,
-        )
-
-        Log.d(LOG_TAG, "Setting sheet to Transaction state with ${messages.size} messages")
-        uiCoordinator.setSheet(SheetState.Transaction(uiRequest))
-        val eventDAppName = dAppInfo?.name ?: fallbackDAppName
-        eventLogger.log(R.string.wallet_event_transaction_request, eventDAppName)
     }
 
     private fun onSignMessageRequest(request: TONWalletSignMessageRequest) {
