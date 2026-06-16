@@ -38,6 +38,7 @@ import kotlinx.serialization.Serializable
  * @param jettonAddress
  * @param transferAmount
  * @param recipientAddress
+ * @param responseDestination
  * @param comment Human-readable comment attached to the transfer
  */
 @Serializable
@@ -51,6 +52,9 @@ data class TONJettonsTransferRequest(
 
     @SerialName(value = "recipientAddress")
     val recipientAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+
+    @SerialName(value = "responseDestination")
+    val responseDestination: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     /* Human-readable comment attached to the transfer */
     @SerialName(value = "comment")

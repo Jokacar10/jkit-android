@@ -29,7 +29,6 @@
 package io.ton.walletkit.api.generated
 
 import io.ton.walletkit.model.TONBase64
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -41,7 +40,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TONSignMessageApprovalResponse(
 
-    @Contextual @SerialName(value = "internalBoc")
+    @SerialName(value = "internalBoc")
     val internalBoc: io.ton.walletkit.model.TONBase64,
 
 ) {

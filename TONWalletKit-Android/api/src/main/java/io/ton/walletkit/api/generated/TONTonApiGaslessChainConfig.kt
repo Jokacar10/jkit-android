@@ -28,42 +28,25 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONBase64
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Individual message within a transaction request.
+ * Per-chain TonAPI gasless settings.
  *
- * @param address Recipient wallet address in format received from caller (raw, user friendly)
- * @param amount
- * @param mode
- * @param extraCurrency Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages.
- * @param stateInit
- * @param payload
+ * @param endpoint TonAPI REST endpoint override for this chain (defaults to TonAPI's per-network host).
+ * @param apiKey Bearer token used for this chain's TonAPI calls.
  */
 @Serializable
-data class TONTransactionRequestMessage(
+data class TONTonApiGaslessChainConfig(
 
-    /* Recipient wallet address in format received from caller (raw, user friendly) */
-    @SerialName(value = "address")
-    val address: kotlin.String,
+    /* TonAPI REST endpoint override for this chain (defaults to TonAPI's per-network host). */
+    @SerialName(value = "endpoint")
+    val endpoint: kotlin.String? = null,
 
-    @SerialName(value = "amount")
-    val amount: kotlin.String,
-
-    @SerialName(value = "mode")
-    val mode: TONSendMode? = null,
-
-    /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
-    @SerialName(value = "extraCurrency")
-    val extraCurrency: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
-
-    @SerialName(value = "stateInit")
-    val stateInit: io.ton.walletkit.model.TONBase64? = null,
-
-    @SerialName(value = "payload")
-    val payload: io.ton.walletkit.model.TONBase64? = null,
+    /* Bearer token used for this chain's TonAPI calls. */
+    @SerialName(value = "apiKey")
+    val apiKey: kotlin.String? = null,
 
 ) {
 

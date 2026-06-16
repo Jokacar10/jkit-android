@@ -28,42 +28,38 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONBase64
+import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Individual message within a transaction request.
+ * Quote for a gasless transaction produced by `GaslessProvider.getQuote`.  Contains relayer-wrapped messages that should be passed to `wallet.signMessage` in place of the caller's original messages, together with the fee the relayer will deduct and the timestamp after which the bundle expires.
  *
- * @param address Recipient wallet address in format received from caller (raw, user friendly)
- * @param amount
- * @param mode
- * @param extraCurrency Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages.
- * @param stateInit
- * @param payload
+ * @param network
+ * @param messages Relayer-wrapped messages ready to be signed
+ * @param fee
+ * @param validUntil Unix timestamp after which the bundle becomes invalid for relay
+ * @param from
  */
 @Serializable
-data class TONTransactionRequestMessage(
+data class TONGaslessQuote(
 
-    /* Recipient wallet address in format received from caller (raw, user friendly) */
-    @SerialName(value = "address")
-    val address: kotlin.String,
+    @SerialName(value = "network")
+    val network: TONNetwork,
 
-    @SerialName(value = "amount")
-    val amount: kotlin.String,
+    /* Relayer-wrapped messages ready to be signed */
+    @SerialName(value = "messages")
+    val messages: kotlin.collections.List<TONTransactionRequestMessage>,
 
-    @SerialName(value = "mode")
-    val mode: TONSendMode? = null,
+    @SerialName(value = "fee")
+    val fee: kotlin.String,
 
-    /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
-    @SerialName(value = "extraCurrency")
-    val extraCurrency: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+    /* Unix timestamp after which the bundle becomes invalid for relay */
+    @SerialName(value = "validUntil")
+    val validUntil: kotlin.Double,
 
-    @SerialName(value = "stateInit")
-    val stateInit: io.ton.walletkit.model.TONBase64? = null,
-
-    @SerialName(value = "payload")
-    val payload: io.ton.walletkit.model.TONBase64? = null,
+    @SerialName(value = "from")
+    val from: io.ton.walletkit.model.TONUserFriendlyAddress,
 
 ) {
 

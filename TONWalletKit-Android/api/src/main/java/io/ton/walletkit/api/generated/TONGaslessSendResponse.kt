@@ -29,41 +29,32 @@
 package io.ton.walletkit.api.generated
 
 import io.ton.walletkit.model.TONBase64
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Individual message within a transaction request.
+ * Response from a gasless send. Extends `SendTransactionResponse` (`boc`, `normalizedBoc`, `normalizedHash` of the broadcasted external-in message) with the signed internal-message BoC produced by `wallet.signMessage` for the relayer to wrap.
  *
- * @param address Recipient wallet address in format received from caller (raw, user friendly)
- * @param amount
- * @param mode
- * @param extraCurrency Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages.
- * @param stateInit
- * @param payload
+ * @param boc
+ * @param normalizedBoc
+ * @param normalizedHash
+ * @param internalBoc
  */
 @Serializable
-data class TONTransactionRequestMessage(
+data class TONGaslessSendResponse(
 
-    /* Recipient wallet address in format received from caller (raw, user friendly) */
-    @SerialName(value = "address")
-    val address: kotlin.String,
+    @SerialName(value = "boc")
+    val boc: io.ton.walletkit.model.TONBase64,
 
-    @SerialName(value = "amount")
-    val amount: kotlin.String,
+    @SerialName(value = "normalizedBoc")
+    val normalizedBoc: io.ton.walletkit.model.TONBase64,
 
-    @SerialName(value = "mode")
-    val mode: TONSendMode? = null,
+    @Contextual @SerialName(value = "normalizedHash")
+    val normalizedHash: io.ton.walletkit.model.TONHex,
 
-    /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
-    @SerialName(value = "extraCurrency")
-    val extraCurrency: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
-
-    @SerialName(value = "stateInit")
-    val stateInit: io.ton.walletkit.model.TONBase64? = null,
-
-    @SerialName(value = "payload")
-    val payload: io.ton.walletkit.model.TONBase64? = null,
+    @SerialName(value = "internalBoc")
+    val internalBoc: io.ton.walletkit.model.TONBase64,
 
 ) {
 

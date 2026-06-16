@@ -47,7 +47,7 @@ data class TONTransactionMessageContent(
     @SerialName(value = "hash")
     val hash: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "body")
+    @SerialName(value = "body")
     val body: io.ton.walletkit.model.TONBase64? = null,
 
     /* The decoded metadata from the initial state body */

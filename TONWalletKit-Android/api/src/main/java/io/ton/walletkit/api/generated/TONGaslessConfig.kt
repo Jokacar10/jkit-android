@@ -28,42 +28,25 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONBase64
+import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Individual message within a transaction request.
+ * Provider-level configuration for a gasless relayer on a given network.  Bundles every piece of provider state a consumer needs to drive a gasless transfer end-to-end:  - `relayAddress` — where the relayer wants residual TON (e.g. jetton-transfer    `responseDestination`) returned to.  - `supportedAssets` — what the relayer accepts as fee payment.
  *
- * @param address Recipient wallet address in format received from caller (raw, user friendly)
- * @param amount
- * @param mode
- * @param extraCurrency Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages.
- * @param stateInit
- * @param payload
+ * @param relayAddress
+ * @param supportedAssets Assets the relayer accepts as fee payment.
  */
 @Serializable
-data class TONTransactionRequestMessage(
+data class TONGaslessConfig(
 
-    /* Recipient wallet address in format received from caller (raw, user friendly) */
-    @SerialName(value = "address")
-    val address: kotlin.String,
+    @SerialName(value = "relayAddress")
+    val relayAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
-    @SerialName(value = "amount")
-    val amount: kotlin.String,
-
-    @SerialName(value = "mode")
-    val mode: TONSendMode? = null,
-
-    /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
-    @SerialName(value = "extraCurrency")
-    val extraCurrency: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
-
-    @SerialName(value = "stateInit")
-    val stateInit: io.ton.walletkit.model.TONBase64? = null,
-
-    @SerialName(value = "payload")
-    val payload: io.ton.walletkit.model.TONBase64? = null,
+    /* Assets the relayer accepts as fee payment. */
+    @SerialName(value = "supportedAssets")
+    val supportedAssets: kotlin.collections.List<TONGaslessSupportedAsset>,
 
 ) {
 

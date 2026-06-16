@@ -47,7 +47,7 @@ data class TONSignDataPreviewCell(
     @SerialName(value = "schema")
     val schema: kotlin.String,
 
-    @Contextual @SerialName(value = "content")
+    @SerialName(value = "content")
     val content: io.ton.walletkit.model.TONBase64,
 
     @Contextual @SerialName(value = "parsed")
