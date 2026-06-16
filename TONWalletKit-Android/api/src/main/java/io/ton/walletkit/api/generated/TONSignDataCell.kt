@@ -29,7 +29,6 @@
 package io.ton.walletkit.api.generated
 
 import io.ton.walletkit.model.TONBase64
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -46,7 +45,7 @@ data class TONSignDataCell(
     @SerialName(value = "schema")
     var schema: kotlin.String,
 
-    @Contextual @SerialName(value = "content")
+    @SerialName(value = "content")
     var content: io.ton.walletkit.model.TONBase64,
 
 ) {

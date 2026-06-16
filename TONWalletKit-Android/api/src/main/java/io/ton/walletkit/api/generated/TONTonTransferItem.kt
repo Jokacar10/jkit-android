@@ -29,7 +29,6 @@
 package io.ton.walletkit.api.generated
 
 import io.ton.walletkit.model.TONBase64
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -51,10 +50,10 @@ data class TONTonTransferItem(
     @SerialName(value = "amount")
     var amount: kotlin.String,
 
-    @Contextual @SerialName(value = "payload")
+    @SerialName(value = "payload")
     var payload: io.ton.walletkit.model.TONBase64? = null,
 
-    @Contextual @SerialName(value = "stateInit")
+    @SerialName(value = "stateInit")
     var stateInit: io.ton.walletkit.model.TONBase64? = null,
 
     /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */

@@ -28,48 +28,27 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONBase64
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Message structure used for TON Connect proof of ownership.
+ * Static metadata for a gasless provider.
  *
- * @param workchain Workchain ID of the wallet address
- * @param addressHash
- * @param timestamp Unix timestamp when the proof was created
- * @param domain
- * @param payload Payload string to be signed
- * @param stateInit
- * @param signature
+ * @param name
+ * @param logo
+ * @param url
  */
 @Serializable
-data class TONProofMessage(
+data class TONGaslessProviderMetadata(
 
-    /* Workchain ID of the wallet address */
-    @SerialName(value = "workchain")
-    var workchain: kotlin.Int,
+    @SerialName(value = "name")
+    var name: kotlin.String,
 
-    @Contextual @SerialName(value = "addressHash")
-    var addressHash: io.ton.walletkit.model.TONHex,
+    @SerialName(value = "logo")
+    var logo: kotlin.String? = null,
 
-    /* Unix timestamp when the proof was created */
-    @SerialName(value = "timestamp")
-    var timestamp: kotlin.Int,
-
-    @SerialName(value = "domain")
-    var domain: TONProofMessageDomain,
-
-    /* Payload string to be signed */
-    @SerialName(value = "payload")
-    var payload: kotlin.String,
-
-    @SerialName(value = "stateInit")
-    var stateInit: io.ton.walletkit.model.TONBase64,
-
-    @Contextual @SerialName(value = "signature")
-    var signature: io.ton.walletkit.model.TONHex? = null,
+    @SerialName(value = "url")
+    var url: kotlin.String? = null,
 
 ) {
 

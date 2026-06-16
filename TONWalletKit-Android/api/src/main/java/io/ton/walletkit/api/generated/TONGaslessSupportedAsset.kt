@@ -28,48 +28,20 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONBase64
-import kotlinx.serialization.Contextual
+import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Message structure used for TON Connect proof of ownership.
+ * An asset the relayer accepts as fee payment.  Address shape is currently always a jetton master (TonAPI's only supported mode), but the type is intentionally generic so future relayers can advertise NFT items or other assets without re-shaping the model.
  *
- * @param workchain Workchain ID of the wallet address
- * @param addressHash
- * @param timestamp Unix timestamp when the proof was created
- * @param domain
- * @param payload Payload string to be signed
- * @param stateInit
- * @param signature
+ * @param address
  */
 @Serializable
-data class TONProofMessage(
+data class TONGaslessSupportedAsset(
 
-    /* Workchain ID of the wallet address */
-    @SerialName(value = "workchain")
-    var workchain: kotlin.Int,
-
-    @Contextual @SerialName(value = "addressHash")
-    var addressHash: io.ton.walletkit.model.TONHex,
-
-    /* Unix timestamp when the proof was created */
-    @SerialName(value = "timestamp")
-    var timestamp: kotlin.Int,
-
-    @SerialName(value = "domain")
-    var domain: TONProofMessageDomain,
-
-    /* Payload string to be signed */
-    @SerialName(value = "payload")
-    var payload: kotlin.String,
-
-    @SerialName(value = "stateInit")
-    var stateInit: io.ton.walletkit.model.TONBase64,
-
-    @Contextual @SerialName(value = "signature")
-    var signature: io.ton.walletkit.model.TONHex? = null,
+    @SerialName(value = "address")
+    var address: io.ton.walletkit.model.TONUserFriendlyAddress,
 
 ) {
 

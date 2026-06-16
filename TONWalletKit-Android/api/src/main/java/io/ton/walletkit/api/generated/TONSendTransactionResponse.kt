@@ -43,10 +43,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TONSendTransactionResponse(
 
-    @Contextual @SerialName(value = "boc")
+    @SerialName(value = "boc")
     var boc: io.ton.walletkit.model.TONBase64,
 
-    @Contextual @SerialName(value = "normalizedBoc")
+    @SerialName(value = "normalizedBoc")
     var normalizedBoc: io.ton.walletkit.model.TONBase64,
 
     @Contextual @SerialName(value = "normalizedHash")

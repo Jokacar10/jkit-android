@@ -145,11 +145,15 @@ data class TONWalletKitConfiguration(
      *
      * @property url API endpoint URL (optional, uses default if not provided)
      * @property key API key for authentication
+     * @property timeout Per-request timeout in milliseconds for the built-in API client (optional;
+     * the SDK default applies when not set). Only honoured for the `TONCENTER` / `TONAPI` client
+     * types; the `DEFAULT` type uses the SDK's built-in default.
      */
     @Serializable
     data class APIClientConfiguration(
         val url: String? = null,
         val key: String,
+        val timeout: Long? = null,
     )
 
     /**

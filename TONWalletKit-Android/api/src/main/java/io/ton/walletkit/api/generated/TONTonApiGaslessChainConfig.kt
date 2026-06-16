@@ -28,48 +28,25 @@
 
 package io.ton.walletkit.api.generated
 
-import io.ton.walletkit.model.TONBase64
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Message structure used for TON Connect proof of ownership.
+ * Per-chain TonAPI gasless settings.
  *
- * @param workchain Workchain ID of the wallet address
- * @param addressHash
- * @param timestamp Unix timestamp when the proof was created
- * @param domain
- * @param payload Payload string to be signed
- * @param stateInit
- * @param signature
+ * @param endpoint TonAPI REST endpoint override for this chain (defaults to TonAPI's per-network host).
+ * @param apiKey Bearer token used for this chain's TonAPI calls.
  */
 @Serializable
-data class TONProofMessage(
+data class TONTonApiGaslessChainConfig(
 
-    /* Workchain ID of the wallet address */
-    @SerialName(value = "workchain")
-    var workchain: kotlin.Int,
+    /* TonAPI REST endpoint override for this chain (defaults to TonAPI's per-network host). */
+    @SerialName(value = "endpoint")
+    var endpoint: kotlin.String? = null,
 
-    @Contextual @SerialName(value = "addressHash")
-    var addressHash: io.ton.walletkit.model.TONHex,
-
-    /* Unix timestamp when the proof was created */
-    @SerialName(value = "timestamp")
-    var timestamp: kotlin.Int,
-
-    @SerialName(value = "domain")
-    var domain: TONProofMessageDomain,
-
-    /* Payload string to be signed */
-    @SerialName(value = "payload")
-    var payload: kotlin.String,
-
-    @SerialName(value = "stateInit")
-    var stateInit: io.ton.walletkit.model.TONBase64,
-
-    @Contextual @SerialName(value = "signature")
-    var signature: io.ton.walletkit.model.TONHex? = null,
+    /* Bearer token used for this chain's TonAPI calls. */
+    @SerialName(value = "apiKey")
+    var apiKey: kotlin.String? = null,
 
 ) {
 
