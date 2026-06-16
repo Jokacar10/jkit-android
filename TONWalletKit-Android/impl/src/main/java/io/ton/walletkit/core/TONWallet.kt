@@ -53,21 +53,18 @@ import kotlinx.serialization.json.Json
  * wallet.connect("tc://...")
  * wallet.remove()
  * ```
- *
- * @property id Unique wallet identifier (opaque hash from bridge)
- * @property address Wallet address in user-friendly format
  */
 internal class TONWallet internal constructor(
-    override val id: String,
-    override val address: TONUserFriendlyAddress,
-    override val network: TONNetwork,
+    private val id: String,
+    private val address: TONUserFriendlyAddress,
+    private val network: TONNetwork,
     private val engine: WalletKitEngine,
     private val account: WalletAccount,
 ) : ITONWallet {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    override val client: TONAPIClient = BridgedJSAPIClient(
+    private val apiClient: TONAPIClient = BridgedJSAPIClient(
         walletId = id,
         engine = engine,
         network = network,
@@ -185,10 +182,7 @@ internal class TONWallet internal constructor(
      * @return NFT details
      * @throws WalletKitBridgeException if NFT retrieval fails
      */
-    override suspend fun nft(address: TONUserFriendlyAddress): TONNFT {
-        return engine.getNft(address.value)
-            ?: throw WalletKitBridgeException("NFT not found: ${address.value}")
-    }
+    override suspend fun nft(address: TONUserFriendlyAddress): TONNFT? = engine.getNft(address.value)
 
     /**
      * Get balance of a specific jetton.
@@ -224,13 +218,15 @@ internal class TONWallet internal constructor(
     override suspend fun transferJettonTransaction(request: TONJettonsTransferRequest): TONTransactionRequest =
         engine.createTransferJettonTransaction(id, request)
 
-    // ── Adapter surface (inherited from TONWalletAdapter via ITONWallet) ──
+    // ── Adapter surface (inherited from ITONWalletAdapter via ITONWallet) ──
 
     override fun identifier(): String = id
 
     override suspend fun publicKey(): TONHex = TONHex(engine.getWalletPublicKey(id))
 
     override fun network(): TONNetwork = network
+
+    override fun client(): TONAPIClient = apiClient
 
     override fun address(testnet: Boolean): TONUserFriendlyAddress = address
 
@@ -256,24 +252,9 @@ internal class TONWallet internal constructor(
         fakeSignature: Boolean?,
     ): TONHex = TONHex(engine.getSignedTonProof(id, input, fakeSignature))
 
-    override suspend fun signMessage(
-        messages: List<TONTransactionRequestMessage>,
-        validUntil: Double?,
-    ): TONBase64 {
-        val request = TONTransactionRequest(messages = messages, validUntil = validUntil, network = network)
-        return TONBase64(engine.getSignedSignMessage(id, request))
-    }
-
-    /**
-     * Get jettons owned by this wallet.
-     *
-     * @param request Request with pagination
-     * @return Response with jettons and address book
-     * @throws WalletKitBridgeException if jetton retrieval fails
-     */
-    override suspend fun jettons(request: TONJettonsRequest): TONJettonsResponse {
-        val limit = request.pagination?.limit ?: 100
-        val offset = request.pagination?.offset ?: 0
+    override suspend fun jettons(request: TONJettonsRequest?): TONJettonsResponse {
+        val limit = request?.pagination?.limit ?: 100
+        val offset = request?.pagination?.offset ?: 0
         return engine.getJettons(id, limit, offset)
     }
 

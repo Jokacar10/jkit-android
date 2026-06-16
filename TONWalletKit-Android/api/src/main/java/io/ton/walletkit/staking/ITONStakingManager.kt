@@ -43,10 +43,10 @@ interface ITONStakingManager {
      * built-in TonStakers provider returned from `ITONWalletKit.tonStakersStakingProvider`, and
      * any user-defined conformer.
      */
-    suspend fun register(provider: ITONStakingProvider<*, *>)
+    suspend fun registerProvider(provider: ITONStakingProvider<*, *>)
 
     /** Unregister [provider]; no-op if it isn't currently registered. */
-    suspend fun remove(provider: ITONStakingProvider<*, *>)
+    suspend fun removeProvider(provider: ITONStakingProvider<*, *>)
 
     /** Set the default provider used when no identifier is passed to query methods. */
     suspend fun setDefaultProvider(identifier: TONStakingProviderIdentifier<*, *>)

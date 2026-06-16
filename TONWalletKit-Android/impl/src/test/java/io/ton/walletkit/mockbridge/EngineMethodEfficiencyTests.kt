@@ -29,8 +29,8 @@ import io.ton.walletkit.listener.TONBridgeEventsHandler
 import io.ton.walletkit.mockbridge.infra.DefaultMockScenario
 import io.ton.walletkit.mockbridge.infra.MockBridgeTestBase
 import io.ton.walletkit.mockbridge.infra.MockScenario
+import io.ton.walletkit.model.ITONWalletAdapter
 import io.ton.walletkit.model.TONHex
-import io.ton.walletkit.model.TONWalletAdapter
 import io.ton.walletkit.model.WalletSignerInfo
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -93,7 +93,7 @@ class EngineMethodEfficiencyTests : MockBridgeTestBase() {
             network: TONNetwork?,
             workchain: Int,
             walletId: Long,
-        ): TONWalletAdapter {
+        ): ITONWalletAdapter {
             createAdapterCount.incrementAndGet()
             return super.handleCreateAdapter(signerId, publicKey, version, network, workchain, walletId)
         }

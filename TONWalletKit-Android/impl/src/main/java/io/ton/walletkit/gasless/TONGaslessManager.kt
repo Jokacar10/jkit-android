@@ -52,7 +52,7 @@ internal class TONGaslessManager(
     override suspend fun provider(identifier: TONGaslessProviderIdentifier): ITONGaslessProvider =
         BuiltInGaslessProvider(identifier, engine)
 
-    override suspend fun getMetadata(identifier: TONGaslessProviderIdentifier?): TONGaslessProviderMetadata =
+    override suspend fun metadata(identifier: TONGaslessProviderIdentifier?): TONGaslessProviderMetadata =
         engine.getGaslessMetadata(identifier?.name)
 
     override suspend fun getConfig(

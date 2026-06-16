@@ -83,7 +83,7 @@ fun StakingSheet(
 
     LaunchedEffect(wallet.address) {
         isLoadingWallet = true
-        tonWallet = walletKit.getWallets().firstOrNull { it.address.value == wallet.address }
+        tonWallet = walletKit.getWallets().firstOrNull { it.address().value == wallet.address }
         isLoadingWallet = false
     }
 

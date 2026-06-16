@@ -185,10 +185,10 @@ import io.ton.walletkit.internal.constants.WebViewConstants
 import io.ton.walletkit.internal.util.Logger
 import io.ton.walletkit.internal.util.WalletKitUtils
 import io.ton.walletkit.listener.TONBridgeEventsHandler
+import io.ton.walletkit.model.ITONWalletAdapter
 import io.ton.walletkit.model.KeyPair
 import io.ton.walletkit.model.TONHex
 import io.ton.walletkit.model.TONUserFriendlyAddress
-import io.ton.walletkit.model.TONWalletAdapter
 import io.ton.walletkit.model.WalletSigner
 import io.ton.walletkit.model.WalletSignerInfo
 import io.ton.walletkit.request.TONWalletConnectionRequest
@@ -341,7 +341,7 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun createTonMnemonic(wordCount: Int): List<String> =
         rpcClient.createTonMnemonic(wordCount)
 
-    override suspend fun addWallet(adapter: TONWalletAdapter): WalletAccount {
+    override suspend fun addWallet(adapter: ITONWalletAdapter): WalletAccount {
         // BridgeWalletAdapter wraps a JS-side adapter; route through its stable adapterId so we don't
         // re-register in AdapterManager or create a duplicate proxy in JS.
         val adapterId = if (adapter is BridgeWalletAdapter) adapter.adapterId else adapterManager.registerAdapter(adapter)
@@ -371,7 +371,7 @@ internal class WebViewWalletKitEngine private constructor(
         workchain: Int,
         walletId: Long,
         domain: TONSignatureDomain?,
-    ): TONWalletAdapter {
+    ): ITONWalletAdapter {
         val resolvedNetwork = network ?: TONNetwork(chainId = "-239")
         val response = rpcClient.createWalletAdapter(version, signerId, resolvedNetwork, workchain, walletId, domain)
         val adapterId = response.adapterId?.takeIf { it.isNotEmpty() }

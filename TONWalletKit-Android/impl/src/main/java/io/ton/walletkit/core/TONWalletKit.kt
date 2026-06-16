@@ -51,8 +51,8 @@ import io.ton.walletkit.gasless.tonapi.TONApiGaslessProviderIdentifier
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.util.WalletKitUtils
 import io.ton.walletkit.listener.TONBridgeEventsHandler
+import io.ton.walletkit.model.ITONWalletAdapter
 import io.ton.walletkit.model.KeyPair
-import io.ton.walletkit.model.TONWalletAdapter
 import io.ton.walletkit.model.WalletSigner
 import io.ton.walletkit.model.WalletSignerInfo
 import io.ton.walletkit.request.TONWalletConnectionRequest
@@ -195,7 +195,7 @@ internal class TONWalletKit private constructor(
     ): ITONStreamingProvider {
         checkNotDestroyed()
         val result = engine.callBridgeMethod(BridgeMethodConstants.METHOD_CREATE_TON_CENTER_STREAMING_PROVIDER, config)
-        return TONStreamingProviderImpl(engine = engine, network = config.network, id = result.optString("providerId"))
+        return TONStreamingProviderImpl(engine = engine, network = config.network, identifier = result.optString("providerId"))
     }
 
     override suspend fun createStreamingProvider(
@@ -203,7 +203,7 @@ internal class TONWalletKit private constructor(
     ): ITONStreamingProvider {
         checkNotDestroyed()
         val result = engine.callBridgeMethod(BridgeMethodConstants.METHOD_CREATE_TON_API_STREAMING_PROVIDER, config)
-        return TONStreamingProviderImpl(engine = engine, network = config.network, id = result.optString("providerId"))
+        return TONStreamingProviderImpl(engine = engine, network = config.network, identifier = result.optString("providerId"))
     }
 
     override fun streaming(): ITONStreamingManager {
@@ -262,7 +262,7 @@ internal class TONWalletKit private constructor(
         workchain: Int,
         walletId: Long,
         domain: TONSignatureDomain?,
-    ): TONWalletAdapter {
+    ): ITONWalletAdapter {
         checkNotDestroyed()
         return engine.createAdapter(
             signerId = signer.signerId,
@@ -281,7 +281,7 @@ internal class TONWalletKit private constructor(
         workchain: Int,
         walletId: Long,
         domain: TONSignatureDomain?,
-    ): TONWalletAdapter {
+    ): ITONWalletAdapter {
         checkNotDestroyed()
         return engine.createAdapter(
             signerId = signer.signerId,
@@ -296,7 +296,7 @@ internal class TONWalletKit private constructor(
 
     // ── Add wallet ──
 
-    override suspend fun addWallet(adapter: TONWalletAdapter): ITONWallet {
+    override suspend fun addWallet(adapter: ITONWalletAdapter): ITONWallet {
         checkNotDestroyed()
 
         val account = engine.addWallet(adapter)
@@ -418,8 +418,7 @@ internal class TONWalletKit private constructor(
      */
     override suspend fun handleNewTransaction(wallet: ITONWallet, transactionContent: TONTransactionRequest) {
         checkNotDestroyed()
-        val addr = wallet.address?.value ?: throw IllegalArgumentException("Wallet address is null")
-        engine.handleNewTransaction(addr, transactionContent)
+        engine.handleNewTransaction(wallet.address().value, transactionContent)
     }
 
     /**

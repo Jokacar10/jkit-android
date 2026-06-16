@@ -73,12 +73,12 @@ class WalletLifecycleManager(
         val wallets = kit.getWallets()
         tonWallets.clear()
         wallets.forEach { wallet ->
-            wallet.address?.value?.let { tonWallets[it] = wallet }
+            wallet.address().value?.let { tonWallets[it] = wallet }
         }
 
         val metadataCorrections = mutableListOf<String>()
         for (wallet in wallets) {
-            val address = wallet.address?.value ?: continue
+            val address = wallet.address().value ?: continue
             tonWallets[address] = wallet
             if (walletMetadata[address] == null) {
                 val storedRecord = storage.loadWallet(address)
@@ -120,17 +120,17 @@ class WalletLifecycleManager(
         } else {
             tonWallets.clear()
             freshWallets.forEach { wallet ->
-                wallet.address?.value?.let { tonWallets[it] = wallet }
+                wallet.address().value?.let { tonWallets[it] = wallet }
             }
             freshWallets
         }
 
-        val knownAddresses = wallets.map { it.address.value }.toSet()
+        val knownAddresses = wallets.map { it.address().value }.toSet()
         walletMetadata.keys.retainAll(knownAddresses)
 
         val result = mutableListOf<WalletSummary>()
         for (wallet in wallets) {
-            val address = wallet.address.value
+            val address = wallet.address().value
             val metadata = ensureMetadataForAddress(address)
 
             val balance = runCatching { wallet.balance() }

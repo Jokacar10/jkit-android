@@ -67,7 +67,7 @@ class SessionsViewModel(
             _state.value = _state.value.copy(isLoading = true, error = null)
 
             runCatching {
-                val walletAddresses = getAllWallets().map { it.address.value }.toSet()
+                val walletAddresses = getAllWallets().map { it.address().value }.toSet()
                 val manager = TONWalletKitHelper.sessionManager
                 if (manager == null) {
                     Log.d(TAG, "Custom session manager not enabled; returning empty session list")

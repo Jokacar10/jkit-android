@@ -48,12 +48,12 @@ class TransactionHistoryViewModel(
     val transactions: StateFlow<List<TONTransaction>> = _transactions.asStateFlow()
 
     init {
-        Log.d(TAG, "Created for wallet: ${wallet.address.value}")
+        Log.d(TAG, "Created for wallet: ${wallet.address().value}")
     }
 
     override fun onCleared() {
         super.onCleared()
-        Log.d(TAG, "Cleared for wallet: ${wallet.address.value}")
+        Log.d(TAG, "Cleared for wallet: ${wallet.address().value}")
     }
 
     sealed class TransactionState {
@@ -71,7 +71,7 @@ class TransactionHistoryViewModel(
     fun loadTransactions(limit: Int = DEFAULT_LIMIT) {
         viewModelScope.launch {
             try {
-                val walletAddress = wallet.address.value
+                val walletAddress = wallet.address().value
 
                 _state.value = TransactionState.Loading
 
@@ -129,7 +129,7 @@ class TransactionHistoryViewModel(
      */
     fun clearCache() {
         viewModelScope.launch {
-            val walletAddress = wallet.address.value
+            val walletAddress = wallet.address().value
             transactionCache.clear(walletAddress)
             _transactions.value = emptyList()
             _state.value = TransactionState.Initial

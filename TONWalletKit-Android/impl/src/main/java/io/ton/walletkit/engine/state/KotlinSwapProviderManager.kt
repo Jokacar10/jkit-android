@@ -40,7 +40,7 @@ internal class KotlinSwapProviderManager :
     override val tag: String = "KotlinSwapProviderManager"
 
     suspend fun quote(providerId: String, params: TONSwapQuoteParams<JsonElement>): TONSwapQuote =
-        require(providerId).quote(params)
+        require(providerId).getQuote(params)
 
     suspend fun buildSwapTransaction(providerId: String, params: TONSwapParams<JsonElement>): TONTransactionRequest =
         require(providerId).buildSwapTransaction(params)

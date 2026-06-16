@@ -28,12 +28,13 @@ import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONPreparedSignData
 import io.ton.walletkit.api.generated.TONProofMessage
 import io.ton.walletkit.api.generated.TONTransactionRequest
+import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.config.TONWalletKitConfiguration
 import io.ton.walletkit.engine.model.WalletAccount
+import io.ton.walletkit.model.ITONWalletAdapter
 import io.ton.walletkit.model.TONBase64
 import io.ton.walletkit.model.TONHex
 import io.ton.walletkit.model.TONUserFriendlyAddress
-import io.ton.walletkit.model.TONWalletAdapter
 import io.ton.walletkit.model.WalletSignerInfo
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -88,14 +89,15 @@ interface MockScenario {
         network: TONNetwork?,
         workchain: Int,
         walletId: Long,
-    ): TONWalletAdapter {
+    ): ITONWalletAdapter {
         val adapterId = "adapter-$version-${signerId.hashCode().toString(16)}"
         val resolvedNetwork = network ?: TONNetwork.TESTNET
         val address = TONUserFriendlyAddress("EQDTest${signerId.hashCode().toString(16).padStart(40, '0')}")
-        return object : TONWalletAdapter {
+        return object : ITONWalletAdapter {
             override fun identifier() = adapterId
             override suspend fun publicKey() = publicKey
             override fun network() = resolvedNetwork
+            override fun client(): TONAPIClient = throw NotImplementedError()
             override fun address(testnet: Boolean) = address
             override suspend fun stateInit() = TONBase64("")
             override suspend fun signedSendTransaction(input: TONTransactionRequest, fakeSignature: Boolean?) = TONBase64("")

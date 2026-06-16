@@ -63,12 +63,12 @@ class JettonsListViewModel(
     private var loadJob: Job? = null
 
     init {
-        Log.d(TAG, "Created for wallet: ${wallet.address.value}")
+        Log.d(TAG, "Created for wallet: ${wallet.address().value}")
     }
 
     override fun onCleared() {
         super.onCleared()
-        Log.d(TAG, "Cleared for wallet: ${wallet.address.value}")
+        Log.d(TAG, "Cleared for wallet: ${wallet.address().value}")
         loadJob?.cancel()
     }
 
@@ -89,7 +89,7 @@ class JettonsListViewModel(
             return
         }
 
-        Log.d(TAG, "Starting loadJettons for wallet: ${wallet.address.value}")
+        Log.d(TAG, "Starting loadJettons for wallet: ${wallet.address().value}")
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
             try {

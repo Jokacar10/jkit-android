@@ -29,7 +29,7 @@ import io.ton.walletkit.api.generated.TONTransactionsUpdate
 import kotlinx.coroutines.flow.Flow
 
 interface ITONStreamingProvider {
-    val id: String
+    val identifier: String
     val type: TONProviderType get() = TONProviderType.Streaming
     val network: TONNetwork
 

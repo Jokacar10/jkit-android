@@ -33,7 +33,7 @@ import io.ton.walletkit.core.TONWalletKit
 import io.ton.walletkit.engine.WalletKitEngine
 import io.ton.walletkit.event.TONWalletKitEvent
 import io.ton.walletkit.listener.TONBridgeEventsHandler
-import io.ton.walletkit.model.TONWalletAdapter
+import io.ton.walletkit.model.ITONWalletAdapter
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.add
 import java.util.concurrent.CopyOnWriteArrayList
@@ -147,8 +147,8 @@ internal object TestWalletKitFactory {
         }
 
         // Setup addWallet
-        coEvery { mockEngine.addWallet(any<TONWalletAdapter>()) } answers {
-            val adapter = firstArg<TONWalletAdapter>()
+        coEvery { mockEngine.addWallet(any<ITONWalletAdapter>()) } answers {
+            val adapter = firstArg<ITONWalletAdapter>()
             scenario.handleAddWallet(adapter.identifier())
         }
 
