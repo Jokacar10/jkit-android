@@ -25,13 +25,14 @@ import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONPreparedSignData
 import io.ton.walletkit.api.generated.TONProofMessage
 import io.ton.walletkit.api.generated.TONTransactionRequest
+import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.util.Logger
+import io.ton.walletkit.model.ITONWalletAdapter
 import io.ton.walletkit.model.TONBase64
 import io.ton.walletkit.model.TONHex
 import io.ton.walletkit.model.TONUserFriendlyAddress
-import io.ton.walletkit.model.TONWalletAdapter
 import io.ton.walletkit.model.WalletAdapterInfo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -49,13 +50,15 @@ internal class BridgeWalletAdapter(
     private val cachedNetwork: TONNetwork,
     private val cachedAddress: TONUserFriendlyAddress,
     private val rpcClient: BridgeRpcClient,
-) : TONWalletAdapter {
+) : ITONWalletAdapter {
 
     override fun identifier(): String = adapterId
 
     override suspend fun publicKey(): TONHex = cachedPublicKey
 
     override fun network(): TONNetwork = cachedNetwork
+
+    override fun client(): TONAPIClient = throw UnsupportedOperationException("BridgeWalletAdapter delegates to JS engine")
 
     override fun address(testnet: Boolean): TONUserFriendlyAddress = cachedAddress
 

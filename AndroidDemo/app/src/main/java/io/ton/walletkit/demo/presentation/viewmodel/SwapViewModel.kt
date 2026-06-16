@@ -196,7 +196,7 @@ class SwapViewModel(
                 val transactionRequest = manager.buildSwapTransaction(
                     TONSwapParams<JsonElement>(
                         quote = quote,
-                        userAddress = wallet.address,
+                        userAddress = wallet.address(),
                     ),
                 )
                 wallet.send(transactionRequest)

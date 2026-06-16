@@ -78,9 +78,9 @@ import io.ton.walletkit.engine.state.KotlinStakingProviderManager
 import io.ton.walletkit.engine.state.KotlinStreamingProviderManager
 import io.ton.walletkit.engine.state.KotlinSwapProviderManager
 import io.ton.walletkit.listener.TONBridgeEventsHandler
+import io.ton.walletkit.model.ITONWalletAdapter
 import io.ton.walletkit.model.KeyPair
 import io.ton.walletkit.model.TONHex
-import io.ton.walletkit.model.TONWalletAdapter
 import io.ton.walletkit.model.WalletSigner
 import io.ton.walletkit.model.WalletSignerInfo
 import io.ton.walletkit.request.RequestHandler
@@ -192,9 +192,9 @@ internal interface WalletKitEngine : RequestHandler {
         workchain: Int = 0,
         walletId: Long = 2147483409L,
         domain: TONSignatureDomain? = null,
-    ): TONWalletAdapter
+    ): ITONWalletAdapter
 
-    suspend fun addWallet(adapter: TONWalletAdapter): WalletAccount
+    suspend fun addWallet(adapter: ITONWalletAdapter): WalletAccount
 
     suspend fun getWallets(): List<WalletAccount>
 

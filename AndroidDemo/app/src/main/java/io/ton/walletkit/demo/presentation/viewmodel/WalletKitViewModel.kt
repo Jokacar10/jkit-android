@@ -429,7 +429,7 @@ class WalletKitViewModel @Inject constructor(
         }
 
         if (logSwitch) {
-            val walletName = lifecycleManager.walletMetadata[address]?.name ?: wallet.address?.value ?: address
+            val walletName = lifecycleManager.walletMetadata[address]?.name ?: wallet.address().value ?: address
             eventLogger.log(R.string.wallet_event_switched_wallet, walletName)
         }
     }
@@ -717,7 +717,7 @@ class WalletKitViewModel @Inject constructor(
                 val newWallet = result.getOrNull()
 
                 var newAddress: String? = null
-                newWallet?.address?.let { address ->
+                newWallet?.address()?.let { address ->
                     newAddress = address.value
                     lifecycleManager.tonWallets[address.value] = newWallet
 
@@ -801,7 +801,7 @@ class WalletKitViewModel @Inject constructor(
 
             if (result.isSuccess) {
                 val (newWallet, generatedMnemonic) = result.getOrThrow()
-                val newAddress = newWallet.address.value
+                val newAddress = newWallet.address().value
                 lifecycleManager.tonWallets[newAddress] = newWallet
                 lifecycleManager.walletMetadata[newAddress] = pendingMetadata
 
@@ -1172,7 +1172,7 @@ class WalletKitViewModel @Inject constructor(
     fun removeWallet(address: String) {
         viewModelScope.launch {
             // SDK keys wallets by walletId; our cache maps address → ITONWallet.
-            val walletId = lifecycleManager.tonWallets[address]?.id
+            val walletId = lifecycleManager.tonWallets[address]?.identifier()
             if (walletId == null) {
                 _state.update { it.copy(error = uiString(R.string.wallet_error_wallet_not_found)) }
                 return@launch
@@ -1834,7 +1834,7 @@ class WalletKitViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val kit = getKit()
-                val allWalletIds = lifecycleManager.tonWallets.values.map { it.id }
+                val allWalletIds = lifecycleManager.tonWallets.values.map { it.identifier() }
                 allWalletIds.forEach { walletId ->
                     runCatching { kit.removeWallet(walletId) }.onFailure {
                         Log.w(LOG_TAG, "Failed to remove wallet during reset", it)

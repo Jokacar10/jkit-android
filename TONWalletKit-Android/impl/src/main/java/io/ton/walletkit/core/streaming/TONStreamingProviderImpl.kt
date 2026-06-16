@@ -43,7 +43,7 @@ import kotlinx.serialization.json.put
 internal class TONStreamingProviderImpl(
     private val engine: WalletKitEngine,
     override val network: TONNetwork,
-    override val id: String,
+    override val identifier: String,
 ) : ITONStreamingProvider {
 
     override suspend fun connect() {

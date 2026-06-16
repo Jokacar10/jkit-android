@@ -29,6 +29,7 @@ import io.ton.walletkit.ITONWalletKit
 import io.ton.walletkit.api.generated.TONGaslessQuoteParams
 import io.ton.walletkit.api.generated.TONGaslessSendParams
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
+import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.api.generated.TONTransferRequest
 import io.ton.walletkit.demo.presentation.util.TonFormatter
 import io.ton.walletkit.model.TONUserFriendlyAddress
@@ -153,7 +154,7 @@ class WalletOperationsViewModel(
             gaslessManager.setDefaultProvider(provider.identifier)
         }
 
-        val config = gaslessManager.getConfig(network = wallet.network)
+        val config = gaslessManager.getConfig(network = wallet.network())
         val transfer = wallet.transferJettonTransaction(
             TONJettonsTransferRequest(
                 jettonAddress = TONUserFriendlyAddress(USDT_MASTER),
@@ -164,17 +165,19 @@ class WalletOperationsViewModel(
         )
         val quote = gaslessManager.getQuote(
             TONGaslessQuoteParams(
-                network = wallet.network,
-                walletAddress = wallet.address,
+                network = wallet.network(),
+                walletAddress = wallet.address(),
                 walletPublicKey = wallet.publicKey(),
                 messages = transfer.messages,
                 feeAsset = TONUserFriendlyAddress(USDT_MASTER),
             ),
         )
-        val internalBoc = wallet.signMessage(messages = quote.messages, validUntil = quote.validUntil)
+        val internalBoc = wallet.signedSignMessage(
+            TONTransactionRequest(messages = quote.messages, validUntil = quote.validUntil, network = wallet.network()),
+        )
         gaslessManager.sendTransaction(
             TONGaslessSendParams(
-                network = wallet.network,
+                network = wallet.network(),
                 walletPublicKey = wallet.publicKey(),
                 internalBoc = internalBoc,
             ),

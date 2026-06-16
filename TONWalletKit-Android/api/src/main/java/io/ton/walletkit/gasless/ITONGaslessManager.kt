@@ -63,7 +63,7 @@ interface ITONGaslessManager {
     suspend fun provider(identifier: TONGaslessProviderIdentifier): ITONGaslessProvider?
 
     /** Static metadata (display name, logo, url) for [identifier], or the default provider. */
-    suspend fun getMetadata(identifier: TONGaslessProviderIdentifier? = null): TONGaslessProviderMetadata
+    suspend fun metadata(identifier: TONGaslessProviderIdentifier? = null): TONGaslessProviderMetadata
 
     /**
      * Fetch the relayer's config — the relay address and the assets it accepts as fee payment.

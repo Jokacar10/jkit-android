@@ -51,7 +51,7 @@ interface ITONSwapProvider<TQuoteOptions, TSwapOptions> {
     suspend fun supportedNetworks(): List<TONNetwork>
 
     /** Get a quote from this provider. */
-    suspend fun quote(params: TONSwapQuoteParams<TQuoteOptions>): TONSwapQuote
+    suspend fun getQuote(params: TONSwapQuoteParams<TQuoteOptions>): TONSwapQuote
 
     /** Build a swap transaction using this provider. */
     suspend fun buildSwapTransaction(params: TONSwapParams<TSwapOptions>): TONTransactionRequest

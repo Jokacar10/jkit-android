@@ -38,7 +38,7 @@ class WalletManagementTest {
 
     private fun createMockWallet(addressString: String): ITONWallet {
         return mockk<ITONWallet>(relaxed = true) {
-            every { this@mockk.address } returns TONUserFriendlyAddress(addressString)
+            every { this@mockk.address(any()) } returns TONUserFriendlyAddress(addressString)
         }
     }
 
@@ -53,7 +53,7 @@ class WalletManagementTest {
         val wallet = mockKit.getWallet(address.value)
 
         assertNotNull(wallet)
-        assertEquals(address, wallet?.address)
+        assertEquals(address, wallet?.address())
         coVerify(exactly = 1) { mockKit.getWallet(address.value) }
     }
 
@@ -161,8 +161,8 @@ class WalletManagementTest {
         val wallets = mockKit.getWallets()
 
         assertEquals(2, wallets.size)
-        assertEquals(expectedWallets[0].address, wallets[0].address)
-        assertEquals(expectedWallets[1].address, wallets[1].address)
+        assertEquals(expectedWallets[0].address(), wallets[0].address())
+        assertEquals(expectedWallets[1].address(), wallets[1].address())
     }
 
     @Test
@@ -188,7 +188,7 @@ class WalletManagementTest {
         // Verify wallet2 still exists
         val existingWallet = mockKit.getWallet(address2.value)
         assertNotNull(existingWallet)
-        assertEquals(address2, existingWallet?.address)
+        assertEquals(address2, existingWallet?.address())
 
         // Verify removeWallet was called with correct address
         coVerify(exactly = 1) { mockKit.removeWallet(address1.value) }
