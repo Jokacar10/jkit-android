@@ -34,7 +34,7 @@ interface TONWalletAdapter {
     /** Stable unique wallet identifier. */
     fun identifier(): String
 
-    fun publicKey(): TONHex
+    suspend fun publicKey(): TONHex
 
     fun network(): TONNetwork
 

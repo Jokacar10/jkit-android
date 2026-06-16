@@ -38,8 +38,6 @@ import kotlinx.serialization.json.Json
 /**
  * Represents a TON wallet with balance and state management.
  *
- * Mirrors the canonical TON Wallet contract interface for cross-platform consistency.
- *
  * Use [TONWallet.add] to create a new wallet from mnemonic data.
  *
  * Example:
@@ -226,7 +224,37 @@ internal class TONWallet internal constructor(
     override suspend fun transferJettonTransaction(request: TONJettonsTransferRequest): TONTransactionRequest =
         engine.createTransferJettonTransaction(id, request)
 
+    // ── Adapter surface (inherited from TONWalletAdapter via ITONWallet) ──
+
+    override fun identifier(): String = id
+
     override suspend fun publicKey(): TONHex = TONHex(engine.getWalletPublicKey(id))
+
+    override fun network(): TONNetwork = network
+
+    override fun address(testnet: Boolean): TONUserFriendlyAddress = address
+
+    override suspend fun stateInit(): TONBase64 = TONBase64(engine.getWalletStateInit(id))
+
+    override suspend fun signedSendTransaction(
+        input: TONTransactionRequest,
+        fakeSignature: Boolean?,
+    ): TONBase64 = TONBase64(engine.getSignedSendTransaction(id, input, fakeSignature))
+
+    override suspend fun signedSignMessage(
+        input: TONTransactionRequest,
+        fakeSignature: Boolean?,
+    ): TONBase64 = TONBase64(engine.getSignedSignMessage(id, input))
+
+    override suspend fun signedSignData(
+        input: TONPreparedSignData,
+        fakeSignature: Boolean?,
+    ): TONHex = TONHex(engine.getSignedSignData(id, input, fakeSignature))
+
+    override suspend fun signedTonProof(
+        input: TONProofMessage,
+        fakeSignature: Boolean?,
+    ): TONHex = TONHex(engine.getSignedTonProof(id, input, fakeSignature))
 
     override suspend fun signMessage(
         messages: List<TONTransactionRequestMessage>,
@@ -252,20 +280,6 @@ internal class TONWallet internal constructor(
     // ========================================================================
     // Additional methods (not in ITONWallet interface)
     // ========================================================================
-
-    /**
-     * Get the state init BOC for this wallet.
-     *
-     * The implementation currently returns null until state init retrieval is added to the engine.
-     *
-     * @return State init as base64-encoded BOC, or null if not available
-     * @throws io.ton.walletkit.WalletKitBridgeException if state init retrieval fails
-     */
-    suspend fun stateInit(): String? {
-        // TODO: Implement state init retrieval when available in engine
-        // Reference implementation: wallet.getSateInit()?.toString()
-        return null
-    }
 
     /**
      * Handle a TON Connect URL (e.g., from QR code scan or deep link).

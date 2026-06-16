@@ -22,8 +22,16 @@
 package io.ton.walletkit.gasless
 
 /**
- * Handle to a gasless provider registered in the JS bridge. Obtain via
- * [io.ton.walletkit.ITONWalletKit.tonApiGaslessProvider], then pass to
- * [ITONGaslessManager.registerProvider].
+ * Identifies a gasless provider by its [name] (the provider id used by the JS bridge).
+ *
+ * The gasless manager references providers by identifier rather than by the whole provider object.
+ * Built-in providers expose a concrete identifier (e.g.
+ * [io.ton.walletkit.gasless.tonapi.TONApiGaslessProviderIdentifier]); use
+ * [AnyTONGaslessProviderIdentifier] to refer to a provider by a raw id string.
  */
-data class TONGaslessProvider(val providerId: String)
+interface TONGaslessProviderIdentifier {
+    val name: String
+}
+
+/** Type-erased gasless provider identifier carrying just the provider [name]. */
+data class AnyTONGaslessProviderIdentifier(override val name: String) : TONGaslessProviderIdentifier

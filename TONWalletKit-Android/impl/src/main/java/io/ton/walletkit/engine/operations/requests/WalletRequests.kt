@@ -50,6 +50,27 @@ internal data class GetSignedSignMessageRequest(
 )
 
 @Serializable
+internal data class GetSignedSendTransactionRequest(
+    val walletId: String,
+    val input: JsonElement,
+    val fakeSignature: Boolean? = null,
+)
+
+@Serializable
+internal data class GetSignedSignDataRequest(
+    val walletId: String,
+    val input: JsonElement,
+    val fakeSignature: Boolean? = null,
+)
+
+@Serializable
+internal data class GetSignedTonProofRequest(
+    val walletId: String,
+    val input: JsonElement,
+    val fakeSignature: Boolean? = null,
+)
+
+@Serializable
 internal data class CreateSignerFromMnemonicRequest(
     val mnemonic: List<String>,
     val mnemonicType: String,

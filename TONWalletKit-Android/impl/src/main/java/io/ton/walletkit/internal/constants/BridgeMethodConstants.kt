@@ -78,6 +78,18 @@ internal object BridgeMethodConstants {
     /** Method name for proactively signing a set of messages (used by gasless relay flows). */
     const val METHOD_GET_SIGNED_SIGN_MESSAGE = "getSignedSignMessage"
 
+    /** Method name for getting a wallet's state init (base64 BOC). */
+    const val METHOD_GET_WALLET_STATE_INIT = "getWalletStateInit"
+
+    /** Method name for producing a signed send-transaction BoC. */
+    const val METHOD_GET_SIGNED_SEND_TRANSACTION = "getSignedSendTransaction"
+
+    /** Method name for producing signed sign-data. */
+    const val METHOD_GET_SIGNED_SIGN_DATA = "getSignedSignData"
+
+    /** Method name for producing a signed TON proof. */
+    const val METHOD_GET_SIGNED_TON_PROOF = "getSignedTonProof"
+
     /**
      * Method name for removing a wallet.
      */

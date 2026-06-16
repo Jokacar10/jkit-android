@@ -36,39 +36,54 @@ import io.ton.walletkit.api.generated.TONNetwork
  * Gasless lets a wallet submit on-chain transactions without paying TON for gas: a relayer
  * co-signs and covers the gas, taking a jetton fee in return. The flow is
  * [getQuote] (sign the returned messages) → [sendTransaction].
+ *
+ * Providers are registered as objects but referenced everywhere else by their
+ * [TONGaslessProviderIdentifier].
  */
 interface ITONGaslessManager {
-    /** Register a provider returned from [io.ton.walletkit.ITONWalletKit.tonApiGaslessProvider]. */
-    suspend fun registerProvider(provider: TONGaslessProvider)
+    /**
+     * Register a provider. Accepts any [ITONGaslessProvider] — the SDK's built-in provider
+     * returned from [io.ton.walletkit.ITONWalletKit.tonApiGaslessProvider], or a custom conformer.
+     */
+    suspend fun registerProvider(provider: ITONGaslessProvider)
 
-    /** Set the default provider used when no provider is specified. */
-    suspend fun setDefaultProvider(provider: TONGaslessProvider)
+    /** Set the default provider used when no identifier is specified. */
+    suspend fun setDefaultProvider(identifier: TONGaslessProviderIdentifier)
 
     /** All currently-registered providers. */
-    suspend fun providers(): List<TONGaslessProvider>
+    suspend fun providers(): List<ITONGaslessProvider>
 
-    /** Returns true if [provider] is currently registered. */
-    suspend fun hasProvider(provider: TONGaslessProvider): Boolean
+    /** Returns true if a provider with the given [identifier] is currently registered. */
+    suspend fun hasProvider(identifier: TONGaslessProviderIdentifier): Boolean
 
-    /** Static metadata (display name, logo, url) for [provider], or the default provider. */
-    suspend fun getMetadata(provider: TONGaslessProvider? = null): TONGaslessProviderMetadata
+    /** Returns a handle to the provider with [identifier]. */
+    suspend fun provider(identifier: TONGaslessProviderIdentifier): ITONGaslessProvider?
+
+    /** Static metadata (display name, logo, url) for [identifier], or the default provider. */
+    suspend fun getMetadata(identifier: TONGaslessProviderIdentifier? = null): TONGaslessProviderMetadata
 
     /**
      * Fetch the relayer's config — the relay address and the assets it accepts as fee payment.
      * [network] defaults to the provider's first supported network.
      */
-    suspend fun getConfig(network: TONNetwork? = null, provider: TONGaslessProvider? = null): TONGaslessConfig
+    suspend fun getConfig(
+        network: TONNetwork? = null,
+        identifier: TONGaslessProviderIdentifier? = null,
+    ): TONGaslessConfig
 
     /**
      * Quote fees and obtain relayer-wrapped messages for signing. Pass the returned
      * [TONGaslessQuote.messages] to the wallet's sign-message flow to obtain a signed internal BoC,
      * then submit it via [sendTransaction].
      */
-    suspend fun getQuote(params: TONGaslessQuoteParams, provider: TONGaslessProvider? = null): TONGaslessQuote
+    suspend fun getQuote(
+        params: TONGaslessQuoteParams,
+        identifier: TONGaslessProviderIdentifier? = null,
+    ): TONGaslessQuote
 
     /** Submit a signed transaction BoC to the relayer for on-chain execution. */
     suspend fun sendTransaction(
         params: TONGaslessSendParams,
-        provider: TONGaslessProvider? = null,
+        identifier: TONGaslessProviderIdentifier? = null,
     ): TONGaslessSendResponse
 }

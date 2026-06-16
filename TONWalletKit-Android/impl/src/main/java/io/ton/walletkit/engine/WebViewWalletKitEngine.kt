@@ -42,6 +42,8 @@ import io.ton.walletkit.api.generated.TONNFTsRequest
 import io.ton.walletkit.api.generated.TONNFTsResponse
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
+import io.ton.walletkit.api.generated.TONPreparedSignData
+import io.ton.walletkit.api.generated.TONProofMessage
 import io.ton.walletkit.api.generated.TONRawStackItem
 import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
@@ -113,7 +115,10 @@ import io.ton.walletkit.engine.operations.getNfts
 import io.ton.walletkit.engine.operations.getRegisteredGaslessProviders
 import io.ton.walletkit.engine.operations.getRegisteredStakingProviders
 import io.ton.walletkit.engine.operations.getRegisteredSwapProviders
+import io.ton.walletkit.engine.operations.getSignedSendTransaction
+import io.ton.walletkit.engine.operations.getSignedSignData
 import io.ton.walletkit.engine.operations.getSignedSignMessage
+import io.ton.walletkit.engine.operations.getSignedTonProof
 import io.ton.walletkit.engine.operations.getStakedBalance
 import io.ton.walletkit.engine.operations.getStakingProviderInfo
 import io.ton.walletkit.engine.operations.getStakingProviderMetadata
@@ -127,6 +132,7 @@ import io.ton.walletkit.engine.operations.getWallet
 import io.ton.walletkit.engine.operations.getWalletAddress
 import io.ton.walletkit.engine.operations.getWalletNetwork
 import io.ton.walletkit.engine.operations.getWalletPublicKey
+import io.ton.walletkit.engine.operations.getWalletStateInit
 import io.ton.walletkit.engine.operations.getWallets
 import io.ton.walletkit.engine.operations.handleNewTransaction
 import io.ton.walletkit.engine.operations.handleTonConnectRequest
@@ -566,6 +572,26 @@ internal class WebViewWalletKitEngine private constructor(
 
     override suspend fun getSignedSignMessage(walletId: String, request: TONTransactionRequest): String =
         rpcClient.getSignedSignMessage(walletId, request)
+
+    override suspend fun getWalletStateInit(walletId: String): String = rpcClient.getWalletStateInit(walletId)
+
+    override suspend fun getSignedSendTransaction(
+        walletId: String,
+        input: TONTransactionRequest,
+        fakeSignature: Boolean?,
+    ): String = rpcClient.getSignedSendTransaction(walletId, input, fakeSignature)
+
+    override suspend fun getSignedSignData(
+        walletId: String,
+        input: TONPreparedSignData,
+        fakeSignature: Boolean?,
+    ): String = rpcClient.getSignedSignData(walletId, input, fakeSignature)
+
+    override suspend fun getSignedTonProof(
+        walletId: String,
+        input: TONProofMessage,
+        fakeSignature: Boolean?,
+    ): String = rpcClient.getSignedTonProof(walletId, input, fakeSignature)
 
     override suspend fun createOmnistonSwapProvider(config: TONOmnistonSwapProviderConfig?): String =
         rpcClient.createOmnistonSwapProvider(config)

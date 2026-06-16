@@ -23,10 +23,11 @@ package io.ton.walletkit
 
 /**
  * Discriminator for the domain a provider belongs to.
- * Used to tell swap, staking, and streaming providers apart at runtime.
+ * Used to tell swap, staking, streaming, and gasless providers apart at runtime.
  */
 enum class TONProviderType {
     Swap,
     Staking,
     Streaming,
+    Gasless,
 }

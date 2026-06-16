@@ -25,13 +25,16 @@ import io.ton.walletkit.api.generated.*
 import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.model.TONBalance
 import io.ton.walletkit.model.TONBase64
-import io.ton.walletkit.model.TONHex
 import io.ton.walletkit.model.TONUserFriendlyAddress
+import io.ton.walletkit.model.TONWalletAdapter
 
 /**
  * TON wallet instance for transaction management and dApp interactions.
+ *
+ * Inherits the account-level adapter surface ([TONWalletAdapter]) — `publicKey()`, `network()`,
+ * `address(testnet)`, `stateInit()`, and the signing primitives.
  */
-interface ITONWallet {
+interface ITONWallet : TONWalletAdapter {
     /**
      * Unique wallet identifier.
      */
@@ -52,9 +55,6 @@ interface ITONWallet {
      * Get wallet balance.
      */
     suspend fun balance(): TONBalance
-
-    /** Get this wallet's public key (hex). */
-    suspend fun publicKey(): TONHex
 
     /** Sign a set of messages as a sign-message bundle, returning the signed internal BoC (used by gasless relay flows). */
     suspend fun signMessage(

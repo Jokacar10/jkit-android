@@ -37,7 +37,7 @@ import kotlinx.serialization.Serializable
  * @param apy Annual Percentage Yield in basis points (100 = 1%)
  * @param rawInstantUnstakeAvailable
  * @param instantUnstakeAvailable Amount available for instant unstake
- * @param exchangeRate Exchange rate between stakeToken and receiveToken (e.g. 1 TON = 0.95 tsTON). Undefined when there is no receiveToken (direct/custodial staking).
+ * @param exchangeRate Exchange rate between stakeToken and receiveToken (e.g. 1 GRAM = 0.95 tsTON). Undefined when there is no receiveToken (direct/custodial staking).
  */
 @Serializable
 data class TONStakingProviderInfo(
@@ -53,7 +53,7 @@ data class TONStakingProviderInfo(
     @SerialName(value = "instantUnstakeAvailable")
     var instantUnstakeAvailable: kotlin.String? = null,
 
-    /* Exchange rate between stakeToken and receiveToken (e.g. 1 TON = 0.95 tsTON). Undefined when there is no receiveToken (direct/custodial staking). */
+    /* Exchange rate between stakeToken and receiveToken (e.g. 1 GRAM = 0.95 tsTON). Undefined when there is no receiveToken (direct/custodial staking). */
     @SerialName(value = "exchangeRate")
     var exchangeRate: kotlin.String? = null,
 

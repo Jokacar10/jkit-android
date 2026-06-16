@@ -34,7 +34,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Request parameters for transferring TON to another address.
+ * Request parameters for transferring GRAM to another address.
  *
  * @param transferAmount
  * @param recipientAddress

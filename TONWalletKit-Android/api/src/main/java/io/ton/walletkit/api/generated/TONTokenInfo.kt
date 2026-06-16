@@ -32,13 +32,13 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Display information for a token (TON, Jetton, or NFT).
+ * Display information for a token (GRAM, Jetton, or NFT).
  *
  * @param name Display name of the token
  * @param description Human-readable description of the token
  * @param image
  * @param animation
- * @param symbol Ticker symbol of the token (e.g., \"TON\", \"USDT\")
+ * @param symbol Ticker symbol of the token (e.g., \"GRAM\", \"USDT\")
  */
 @Serializable
 data class TONTokenInfo(
@@ -57,7 +57,7 @@ data class TONTokenInfo(
     @SerialName(value = "animation")
     var animation: TONTokenAnimation? = null,
 
-    /* Ticker symbol of the token (e.g., \"TON\", \"USDT\") */
+    /* Ticker symbol of the token (e.g., \"GRAM\", \"USDT\") */
     @SerialName(value = "symbol")
     var symbol: kotlin.String? = null,
 

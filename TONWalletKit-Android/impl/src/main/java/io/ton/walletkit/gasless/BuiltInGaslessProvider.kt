@@ -30,40 +30,27 @@ import io.ton.walletkit.api.generated.TONGaslessSendResponse
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.engine.WalletKitEngine
 
-internal class TONGaslessManager(
+/**
+ * Built-in, JS-backed implementation of [ITONGaslessProvider]. Talks to the JS engine directly.
+ *
+ * Users never construct this: it's created by the SDK (via [io.ton.walletkit.ITONWalletKit.tonApiGaslessProvider]).
+ *
+ * @suppress Internal implementation.
+ */
+internal class BuiltInGaslessProvider(
+    override val identifier: TONGaslessProviderIdentifier,
     private val engine: WalletKitEngine,
-) : ITONGaslessManager {
+) : ITONGaslessProvider {
 
-    override suspend fun registerProvider(provider: ITONGaslessProvider) =
-        engine.registerGaslessProvider(provider.identifier.name)
+    override suspend fun metadata(): TONGaslessProviderMetadata =
+        engine.getGaslessMetadata(identifier.name)
 
-    override suspend fun setDefaultProvider(identifier: TONGaslessProviderIdentifier) =
-        engine.setDefaultGaslessProvider(identifier.name)
+    override suspend fun getConfig(network: TONNetwork?): TONGaslessConfig =
+        engine.getGaslessConfig(network, identifier.name)
 
-    override suspend fun providers(): List<ITONGaslessProvider> =
-        engine.getRegisteredGaslessProviders().map { BuiltInGaslessProvider(AnyTONGaslessProviderIdentifier(it), engine) }
+    override suspend fun getQuote(params: TONGaslessQuoteParams): TONGaslessQuote =
+        engine.getGaslessQuote(params, identifier.name)
 
-    override suspend fun hasProvider(identifier: TONGaslessProviderIdentifier): Boolean =
-        engine.hasGaslessProvider(identifier.name)
-
-    override suspend fun provider(identifier: TONGaslessProviderIdentifier): ITONGaslessProvider =
-        BuiltInGaslessProvider(identifier, engine)
-
-    override suspend fun getMetadata(identifier: TONGaslessProviderIdentifier?): TONGaslessProviderMetadata =
-        engine.getGaslessMetadata(identifier?.name)
-
-    override suspend fun getConfig(
-        network: TONNetwork?,
-        identifier: TONGaslessProviderIdentifier?,
-    ): TONGaslessConfig = engine.getGaslessConfig(network, identifier?.name)
-
-    override suspend fun getQuote(
-        params: TONGaslessQuoteParams,
-        identifier: TONGaslessProviderIdentifier?,
-    ): TONGaslessQuote = engine.getGaslessQuote(params, identifier?.name)
-
-    override suspend fun sendTransaction(
-        params: TONGaslessSendParams,
-        identifier: TONGaslessProviderIdentifier?,
-    ): TONGaslessSendResponse = engine.gaslessSendTransaction(params, identifier?.name)
+    override suspend fun sendTransaction(params: TONGaslessSendParams): TONGaslessSendResponse =
+        engine.gaslessSendTransaction(params, identifier.name)
 }

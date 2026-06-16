@@ -58,7 +58,7 @@ class CustomWalletAdapterTest {
         var lastTransactionRequest: TONTransactionRequest? = null
 
         override fun identifier(): String = adapterId
-        override fun publicKey(): TONHex = TONHex(pubKey)
+        override suspend fun publicKey(): TONHex = TONHex(pubKey)
         override fun network(): TONNetwork = net
         override fun address(testnet: Boolean): TONUserFriendlyAddress = TONUserFriendlyAddress(addr)
 
@@ -153,7 +153,7 @@ class CustomWalletAdapterTest {
     }
 
     @Test
-    fun `adapter exposes identifier publicKey network address synchronously`() {
+    fun `adapter exposes identifier publicKey network address`() = runTest {
         val adapter = MockWalletAdapter()
 
         assertEquals("adapter-1", adapter.identifier())
