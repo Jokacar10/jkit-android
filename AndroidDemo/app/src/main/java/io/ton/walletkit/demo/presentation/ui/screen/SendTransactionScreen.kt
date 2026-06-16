@@ -22,11 +22,21 @@
 package io.ton.walletkit.demo.presentation.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,159 +45,354 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
+import io.ton.walletkit.ITONWallet
+import io.ton.walletkit.ITONWalletKit
 import io.ton.walletkit.demo.designsystem.components.button.TonButton
-import io.ton.walletkit.demo.designsystem.components.segmentedcontrol.TonSegmentedControl
 import io.ton.walletkit.demo.designsystem.components.text.TonText
 import io.ton.walletkit.demo.designsystem.components.toggle.TonSwitch
 import io.ton.walletkit.demo.designsystem.theme.SmoothCornerShape
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
+import io.ton.walletkit.demo.presentation.model.FeeAsset
+import io.ton.walletkit.demo.presentation.model.SendableToken
 import io.ton.walletkit.demo.presentation.model.WalletSummary
 import io.ton.walletkit.demo.presentation.ui.sheet.components.SheetErrorBox
 import io.ton.walletkit.demo.presentation.ui.sheet.components.SheetHeader
 import io.ton.walletkit.demo.presentation.ui.sheet.components.SheetTextField
 import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetScaffold
-import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetSection
-import io.ton.walletkit.demo.presentation.util.abbreviated
-import io.ton.walletkit.demo.presentation.viewmodel.SendCurrency
+import io.ton.walletkit.demo.presentation.viewmodel.SendTokensViewModel
+
+private enum class PickerMode { None, Token, FeeAsset }
 
 @Composable
 fun SendTransactionScreen(
     wallet: WalletSummary,
+    walletKit: ITONWalletKit,
     onBack: () -> Unit,
-    onSend: (recipient: String, amount: String, comment: String, currency: SendCurrency, gasless: Boolean) -> Unit,
-    error: String?,
-    isLoading: Boolean,
 ) {
-    var currency by remember { mutableStateOf(SendCurrency.TON) }
-    var recipient by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
-    var comment by remember { mutableStateOf("") }
-    var gasless by remember { mutableStateOf(false) }
+    var tonWallet by remember(wallet.address) { mutableStateOf<ITONWallet?>(null) }
+    var resolving by remember(wallet.address) { mutableStateOf(true) }
 
-    val recipientValid = recipient.isEmpty() || isValidAddress(recipient)
-    val amountValid = amount.isEmpty() || isValidAmount(amount)
-    val tonTooLarge = currency == SendCurrency.TON && amount.isNotEmpty() && isAmountTooLarge(amount, wallet.balance)
-    val canSend = !isLoading &&
-        isValidAddress(recipient) &&
-        isValidAmount(amount) &&
-        !tonTooLarge
+    LaunchedEffect(wallet.address) {
+        resolving = true
+        tonWallet = walletKit.getWallets().firstOrNull { it.address().value == wallet.address }
+        resolving = false
+    }
+
+    when {
+        resolving -> SendStatusBox("Loading wallet…")
+        tonWallet == null -> SendStatusBox("Could not resolve the active wallet.", onBack)
+        else -> SendTokensContent(tonWallet!!, walletKit, onBack)
+    }
+}
+
+@Composable
+private fun SendTokensContent(
+    wallet: ITONWallet,
+    walletKit: ITONWalletKit,
+    onBack: () -> Unit,
+) {
+    val viewModel: SendTokensViewModel = viewModel(
+        key = "send:${wallet.address().value}",
+        factory = SendTokensViewModel.factory(wallet, walletKit),
+    )
+    val state by viewModel.state.collectAsState()
+    var picker by remember { mutableStateOf(PickerMode.None) }
+
+    LaunchedEffect(state.sent) {
+        if (state.sent) onBack()
+    }
+
+    when (picker) {
+        PickerMode.Token -> AssetPicker(
+            title = "Select token",
+            rows = state.tokens.map { token ->
+                AssetRowData(token.imageSource, token.symbol, token.name, token.symbol, token.displayBalance, token.id == state.selectedToken?.id) {
+                    viewModel.selectToken(token)
+                    picker = PickerMode.None
+                }
+            },
+            onClose = { picker = PickerMode.None },
+        )
+
+        PickerMode.FeeAsset -> AssetPicker(
+            title = "Fee asset",
+            rows = state.feeAssets.map { asset ->
+                AssetRowData(asset.imageSource, asset.symbol, asset.symbol, shortAddress(asset.address), null, asset.address == state.selectedFeeAsset?.address) {
+                    viewModel.selectFeeAsset(asset)
+                    picker = PickerMode.None
+                }
+            },
+            onClose = { picker = PickerMode.None },
+        )
+
+        PickerMode.None -> SendForm(
+            state = state,
+            viewModel = viewModel,
+            onBack = onBack,
+            openTokenPicker = { picker = PickerMode.Token },
+            openFeePicker = { picker = PickerMode.FeeAsset },
+        )
+    }
+}
+
+@Composable
+private fun SendForm(
+    state: SendTokensViewModel.UiState,
+    viewModel: SendTokensViewModel,
+    onBack: () -> Unit,
+    openTokenPicker: () -> Unit,
+    openFeePicker: () -> Unit,
+) {
+    val token = state.selectedToken
 
     TonConnectSheetScaffold(
         footer = {
             TonText(
-                text = if (gasless) {
-                    "The relayer covers the TON gas — you pay the network fee in USDT."
-                } else {
-                    "A small amount of TON is used as the network fee."
-                },
+                text = "Transfers are irreversible. Double-check the recipient address before sending.",
                 style = TonTheme.typography.caption2Medium,
                 color = TonTheme.colors.textTertiary,
                 modifier = Modifier.fillMaxWidth(),
             )
             TonButton(
-                text = when {
-                    isLoading -> "Sending…"
-                    amount.isNotEmpty() -> "Send $amount ${currency.label}"
-                    else -> "Send ${currency.label}"
-                },
-                onClick = { onSend(recipient.trim(), amount, comment, currency, gasless) },
-                enabled = canSend,
+                text = if (state.isSending) "Sending…" else state.sendButtonTitle,
+                onClick = viewModel::send,
+                enabled = state.canSend,
             )
         },
     ) {
         SheetHeader(title = "Send", onClose = onBack)
 
-        TonSegmentedControl(
-            selection = currency,
-            items = SendCurrency.entries,
-            title = { it.label },
-            onSelect = {
-                currency = it
-                if (it == SendCurrency.TON) gasless = false
-            },
-            modifier = Modifier.fillMaxWidth(),
+        TokenSelectorCard(token, onClick = openTokenPicker)
+
+        SheetTextField(
+            value = state.recipient,
+            onValueChange = viewModel::setRecipient,
+            label = "Recipient address",
+            placeholder = "EQ… / UQ…",
         )
 
-        TonConnectSheetSection(label = "From") {
-            TonText(wallet.name, style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textPrimary)
-            TonText(wallet.address.abbreviated(), style = TonTheme.typography.subheadline2, color = TonTheme.colors.textSecondary)
+        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TonText(
+                    "Amount (${token?.symbol ?: ""})",
+                    style = TonTheme.typography.bodySemibold,
+                    color = TonTheme.colors.textPrimary,
+                    modifier = Modifier.weight(1f),
+                )
+                TonText(
+                    "Max",
+                    style = TonTheme.typography.subheadline2,
+                    color = TonTheme.colors.textBrand,
+                    modifier = Modifier
+                        .clip(SmoothCornerShape(8.dp))
+                        .clickable { viewModel.useMax() }
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                )
+            }
+            SheetTextField(
+                value = state.amount,
+                onValueChange = viewModel::setAmount,
+                label = "",
+                placeholder = "0.0",
+                keyboardType = KeyboardType.Decimal,
+                trailing = token?.symbol,
+                supporting = token?.requiredAmountInfo,
+            )
+        }
+
+        if (state.canUseGasless) {
+            GaslessCard(state, viewModel, openFeePicker)
+        }
+
+        state.error?.let { SheetErrorBox(it) }
+    }
+}
+
+@Composable
+private fun TokenSelectorCard(token: SendableToken?, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(SmoothCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .background(TonTheme.colors.bgSecondary)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        AssetIcon(token?.imageSource, token?.symbol ?: "?")
+        Column(modifier = Modifier.weight(1f)) {
+            TonText(token?.name ?: "Select token", style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textPrimary)
             TonText(
-                "Balance: ${wallet.balance ?: "0"} TON",
+                "Balance: ${token?.displayBalance ?: "0"} ${token?.symbol ?: ""}",
                 style = TonTheme.typography.subheadline2,
                 color = TonTheme.colors.textSecondary,
             )
         }
+        TonText("▾", style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textSecondary)
+    }
+}
 
-        SheetTextField(
-            value = recipient,
-            onValueChange = { recipient = it },
-            label = "Recipient",
-            placeholder = "EQ… / UQ…",
-            isError = !recipientValid,
-            supporting = if (!recipientValid) "Invalid TON address" else null,
-        )
+@Composable
+private fun GaslessCard(
+    state: SendTokensViewModel.UiState,
+    viewModel: SendTokensViewModel,
+    openFeePicker: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(SmoothCornerShape(12.dp))
+            .background(TonTheme.colors.bgSecondary)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                TonText("Gasless", style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textPrimary)
+                TonText(
+                    "Pay the network fee in a jetton",
+                    style = TonTheme.typography.subheadline2,
+                    color = TonTheme.colors.textSecondary,
+                )
+            }
+            TonSwitch(checked = state.gaslessEnabled, onCheckedChange = viewModel::setGaslessEnabled)
+        }
 
-        SheetTextField(
-            value = amount,
-            onValueChange = { amount = it },
-            label = "Amount",
-            placeholder = "0",
-            keyboardType = KeyboardType.Decimal,
-            trailing = currency.label,
-            isError = !amountValid || tonTooLarge,
-            supporting = when {
-                !amountValid -> "Invalid amount"
-                tonTooLarge -> "Insufficient balance"
-                else -> null
-            },
-        )
+        if (state.gaslessEnabled) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(SmoothCornerShape(8.dp))
+                    .clickable(onClick = openFeePicker)
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TonText("Fee asset", style = TonTheme.typography.body, color = TonTheme.colors.textSecondary, modifier = Modifier.weight(1f))
+                TonText(
+                    state.selectedFeeAsset?.symbol ?: "Select",
+                    style = TonTheme.typography.bodySemibold,
+                    color = if (state.selectedFeeAsset == null) TonTheme.colors.textSecondary else TonTheme.colors.textPrimary,
+                )
+                TonText(" ▾", style = TonTheme.typography.subheadline2, color = TonTheme.colors.textSecondary)
+            }
 
-        if (currency == SendCurrency.USDT) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TonText("Gas fee", style = TonTheme.typography.body, color = TonTheme.colors.textSecondary, modifier = Modifier.weight(1f))
+                TonText(
+                    when {
+                        state.gaslessError != null -> "—"
+                        state.isQuoting -> "Calculating…"
+                        else -> state.gaslessFeeText ?: "—"
+                    },
+                    style = TonTheme.typography.bodySemibold,
+                    color = TonTheme.colors.textPrimary,
+                )
+            }
+
+            state.gaslessError?.let {
+                TonText(it, style = TonTheme.typography.subheadline2, color = TonTheme.colors.textError)
+            }
+        }
+    }
+}
+
+private data class AssetRowData(
+    val imageSource: String?,
+    val placeholderSymbol: String,
+    val title: String,
+    val subtitle: String,
+    val trailing: String?,
+    val isSelected: Boolean,
+    val onClick: () -> Unit,
+)
+
+@Composable
+private fun AssetPicker(title: String, rows: List<AssetRowData>, onClose: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp)
+            .padding(top = 16.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        SheetHeader(title = title, onClose = onClose)
+        rows.forEach { row ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(SmoothCornerShape(12.dp))
-                    .background(TonTheme.colors.bgSecondary)
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                    .clickable(onClick = row.onClick)
+                    .padding(vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                AssetIcon(row.imageSource, row.placeholderSymbol)
                 Column(modifier = Modifier.weight(1f)) {
-                    TonText("Gasless", style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textPrimary)
-                    TonText(
-                        "Pay the fee in USDT, no TON required",
-                        style = TonTheme.typography.subheadline2,
-                        color = TonTheme.colors.textSecondary,
-                    )
+                    TonText(row.title, style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textPrimary)
+                    TonText(row.subtitle, style = TonTheme.typography.subheadline2, color = TonTheme.colors.textSecondary)
                 }
-                TonSwitch(checked = gasless, onCheckedChange = { gasless = it })
+                row.trailing?.let {
+                    TonText(it, style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textPrimary)
+                }
+                if (row.isSelected) {
+                    TonText("✓", style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textBrand)
+                }
             }
-        } else {
-            SheetTextField(
-                value = comment,
-                onValueChange = { comment = it },
-                label = "Comment (optional)",
-                placeholder = "Add a message…",
-            )
         }
-
-        error?.let { SheetErrorBox(it) }
     }
 }
 
-private fun isValidAddress(address: String): Boolean = address.length > MIN_ADDRESS_LENGTH &&
-    (address.startsWith(ADDRESS_MAIN_PREFIX) || address.startsWith(ADDRESS_TEST_PREFIX))
+@Composable
+private fun AssetIcon(imageSource: String?, symbol: String) {
+    if (!imageSource.isNullOrEmpty()) {
+        AsyncImage(
+            model = imageSource,
+            contentDescription = symbol,
+            modifier = Modifier
+                .size(44.dp)
+                .clip(CircleShape),
+        )
+    } else {
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .clip(CircleShape)
+                .background(TonTheme.colors.bgFillTertiary),
+            contentAlignment = Alignment.Center,
+        ) {
+            TonText(
+                symbol.take(3).uppercase(),
+                style = TonTheme.typography.subheadline2,
+                color = TonTheme.colors.textSecondary,
+            )
+        }
+    }
+}
 
-private fun isValidAmount(amount: String): Boolean = runCatching {
-    (amount.toDoubleOrNull() ?: return false) > 0
-}.getOrDefault(false)
+@Composable
+private fun SendStatusBox(message: String, onBack: (() -> Unit)? = null) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        TonText(
+            message,
+            style = TonTheme.typography.body,
+            color = TonTheme.colors.textSecondary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        onBack?.let { TonButton(text = "Close", onClick = it) }
+    }
+}
 
-private fun isAmountTooLarge(amount: String, balance: String?): Boolean = runCatching {
-    val amountValue = amount.toDoubleOrNull() ?: return false
-    val balanceValue = balance?.toDoubleOrNull() ?: return true
-    amountValue > balanceValue
-}.getOrDefault(true)
-
-private const val MIN_ADDRESS_LENGTH = 10
-private const val ADDRESS_MAIN_PREFIX = "EQ"
-private const val ADDRESS_TEST_PREFIX = "UQ"
+private fun shortAddress(address: String): String = if (address.length > 8) "${address.take(4)}…${address.takeLast(4)}" else address

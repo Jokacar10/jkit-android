@@ -157,10 +157,8 @@ class WalletKitViewModel @Inject constructor(
     )
 
     private val walletOperationsViewModel = WalletOperationsViewModel(
-        walletKit = { walletKit ?: error("ITONWalletKit not initialized") },
         getWalletByAddress = { address -> lifecycleManager.tonWallets[address] },
         onWalletSwitched = { address -> handleWalletSwitched(address) },
-        onTransactionInitiated = { address -> onLocalTransactionInitiated(address) },
     )
 
     // NFTs ViewModel for active wallet
@@ -432,11 +430,6 @@ class WalletKitViewModel @Inject constructor(
             val walletName = lifecycleManager.walletMetadata[address]?.name ?: wallet.address().value ?: address
             eventLogger.log(R.string.wallet_event_switched_wallet, walletName)
         }
-    }
-
-    private fun onLocalTransactionInitiated(walletAddress: String) {
-        val walletName = state.value.wallets.firstOrNull { it.address == walletAddress }?.name ?: walletAddress
-        eventLogger.log(R.string.wallet_event_transaction_initiated, walletName)
     }
 
     private fun onTonConnectRequestApproved() {
@@ -948,17 +941,6 @@ class WalletKitViewModel @Inject constructor(
         if (wallet != null) {
             uiCoordinator.openStakingSheet(wallet)
         }
-    }
-
-    fun sendLocalTransaction(
-        walletAddress: String,
-        recipient: String,
-        amount: String,
-        comment: String = "",
-        currency: SendCurrency = SendCurrency.TON,
-        gasless: Boolean = false,
-    ) {
-        walletOperationsViewModel.sendLocalTransaction(walletAddress, recipient, amount, comment, currency, gasless)
     }
 
     fun toggleWalletSwitcher() {
