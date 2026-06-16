@@ -148,9 +148,9 @@ class WalletOperationsViewModel(
     private suspend fun sendUsdtGasless(wallet: ITONWallet, recipient: String, amount: String) {
         val gaslessManager = walletKit().gasless()
         val provider = walletKit().tonApiGaslessProvider()
-        if (!gaslessManager.hasProvider(provider)) {
+        if (!gaslessManager.hasProvider(provider.identifier)) {
             gaslessManager.registerProvider(provider)
-            gaslessManager.setDefaultProvider(provider)
+            gaslessManager.setDefaultProvider(provider.identifier)
         }
 
         val config = gaslessManager.getConfig(network = wallet.network)

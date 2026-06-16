@@ -44,6 +44,8 @@ import io.ton.walletkit.api.generated.TONNFTsRequest
 import io.ton.walletkit.api.generated.TONNFTsResponse
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
+import io.ton.walletkit.api.generated.TONPreparedSignData
+import io.ton.walletkit.api.generated.TONProofMessage
 import io.ton.walletkit.api.generated.TONRawStackItem
 import io.ton.walletkit.api.generated.TONSendTransactionApprovalResponse
 import io.ton.walletkit.api.generated.TONSendTransactionRequestEvent
@@ -550,6 +552,30 @@ internal interface WalletKitEngine : RequestHandler {
 
     /** Sign a transaction request as a sign-message bundle, returning the signed internal BoC (base64). */
     suspend fun getSignedSignMessage(walletId: String, request: TONTransactionRequest): String
+
+    /** Get a wallet's state init (base64 BOC) for contract deployment. */
+    suspend fun getWalletStateInit(walletId: String): String
+
+    /** Produce a signed send-transaction external message BoC (base64). */
+    suspend fun getSignedSendTransaction(
+        walletId: String,
+        input: TONTransactionRequest,
+        fakeSignature: Boolean?,
+    ): String
+
+    /** Produce signed sign-data (hex). */
+    suspend fun getSignedSignData(
+        walletId: String,
+        input: TONPreparedSignData,
+        fakeSignature: Boolean?,
+    ): String
+
+    /** Produce a signed TON proof (hex). */
+    suspend fun getSignedTonProof(
+        walletId: String,
+        input: TONProofMessage,
+        fakeSignature: Boolean?,
+    ): String
 
     // ── Swap ──
 

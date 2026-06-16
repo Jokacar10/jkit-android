@@ -53,7 +53,7 @@ internal class BridgeWalletAdapter(
 
     override fun identifier(): String = adapterId
 
-    override fun publicKey(): TONHex = cachedPublicKey
+    override suspend fun publicKey(): TONHex = cachedPublicKey
 
     override fun network(): TONNetwork = cachedNetwork
 

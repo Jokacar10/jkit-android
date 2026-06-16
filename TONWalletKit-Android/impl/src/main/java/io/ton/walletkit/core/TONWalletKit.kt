@@ -43,9 +43,11 @@ import io.ton.walletkit.core.streaming.TONStreamingManager
 import io.ton.walletkit.core.streaming.TONStreamingProviderImpl
 import io.ton.walletkit.engine.WalletKitEngine
 import io.ton.walletkit.engine.WebViewWalletKitEngine
+import io.ton.walletkit.gasless.BuiltInGaslessProvider
 import io.ton.walletkit.gasless.ITONGaslessManager
 import io.ton.walletkit.gasless.TONGaslessManager
-import io.ton.walletkit.gasless.TONGaslessProvider
+import io.ton.walletkit.gasless.tonapi.TONApiGaslessProvider
+import io.ton.walletkit.gasless.tonapi.TONApiGaslessProviderIdentifier
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.util.WalletKitUtils
 import io.ton.walletkit.listener.TONBridgeEventsHandler
@@ -73,8 +75,6 @@ import kotlinx.serialization.json.Json
 
 /**
  * Main entry point for TON Wallet Kit SDK.
- *
- * Mirrors the canonical TON Wallet Kit specification for cross-platform consistency.
  *
  * Initialize the SDK by calling [initialize] with your configuration.
  * Then add event handlers using [addEventsHandler] when you're ready to receive events.
@@ -485,10 +485,10 @@ internal class TONWalletKit private constructor(
 
     override suspend fun swap(): ITONSwapManager = swapManager
 
-    override suspend fun tonApiGaslessProvider(config: TONTonApiGaslessProviderConfig?): TONGaslessProvider {
+    override suspend fun tonApiGaslessProvider(config: TONTonApiGaslessProviderConfig?): TONApiGaslessProvider {
         checkNotDestroyed()
         val providerId = engine.createTonApiGaslessProvider(config)
-        return TONGaslessProvider(providerId)
+        return BuiltInGaslessProvider(TONApiGaslessProviderIdentifier(providerId), engine)
     }
 
     override suspend fun gasless(): ITONGaslessManager = gaslessManager

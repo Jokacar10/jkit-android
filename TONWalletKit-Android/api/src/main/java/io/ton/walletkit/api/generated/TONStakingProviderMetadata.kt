@@ -38,7 +38,7 @@ import kotlinx.serialization.Serializable
  *
  * @param name Human-readable provider name (e.g. \"Tonstakers\")
  * @param supportedUnstakeModes Supported unstake modes for this provider
- * @param supportsReversedQuote Whether provider supports reversed quote format (e.g., passing TON instead of tsTON for unstake)
+ * @param supportsReversedQuote Whether provider supports reversed quote format (e.g., passing GRAM instead of tsTON for unstake)
  * @param stakeToken
  * @param receiveToken
  * @param contractAddress
@@ -54,7 +54,7 @@ data class TONStakingProviderMetadata(
     @SerialName(value = "supportedUnstakeModes")
     var supportedUnstakeModes: kotlin.collections.List<@Contextual TONUnstakeMode>,
 
-    /* Whether provider supports reversed quote format (e.g., passing TON instead of tsTON for unstake) */
+    /* Whether provider supports reversed quote format (e.g., passing GRAM instead of tsTON for unstake) */
     @SerialName(value = "supportsReversedQuote")
     var supportsReversedQuote: kotlin.Boolean,
 

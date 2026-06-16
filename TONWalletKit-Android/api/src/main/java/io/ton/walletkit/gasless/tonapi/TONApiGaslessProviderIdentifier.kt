@@ -19,39 +19,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-@file:Suppress(
-    "ArrayInDataClass",
-    "EnumEntryName",
-    "RemoveRedundantQualifierName",
-    "UnusedImport",
-)
+package io.ton.walletkit.gasless.tonapi
 
-package io.ton.walletkit.api.generated
+import io.ton.walletkit.gasless.ITONGaslessProvider
+import io.ton.walletkit.gasless.TONGaslessProviderIdentifier
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+/** Identifier for the built-in TonAPI gasless provider. */
+class TONApiGaslessProviderIdentifier(override val name: String = "tonApiGasless") :
+    TONGaslessProviderIdentifier
 
-/**
- *
- *
- * @param ticker
- * @param decimals
- * @param address 'ton' for native GRAM, otherwise contract address in friendly format
- */
-@Serializable
-data class TONStakingTokenInfo(
-
-    @SerialName(value = "ticker")
-    var ticker: kotlin.String,
-
-    @SerialName(value = "decimals")
-    var decimals: kotlin.Int,
-
-    /* 'ton' for native GRAM, otherwise contract address in friendly format */
-    @SerialName(value = "address")
-    var address: kotlin.String,
-
-) {
-
-    companion object
-}
+/** Typed handle for the built-in TonAPI gasless provider. */
+typealias TONApiGaslessProvider = ITONGaslessProvider

@@ -94,7 +94,7 @@ interface MockScenario {
         val address = TONUserFriendlyAddress("EQDTest${signerId.hashCode().toString(16).padStart(40, '0')}")
         return object : TONWalletAdapter {
             override fun identifier() = adapterId
-            override fun publicKey() = publicKey
+            override suspend fun publicKey() = publicKey
             override fun network() = resolvedNetwork
             override fun address(testnet: Boolean) = address
             override suspend fun stateInit() = TONBase64("")
