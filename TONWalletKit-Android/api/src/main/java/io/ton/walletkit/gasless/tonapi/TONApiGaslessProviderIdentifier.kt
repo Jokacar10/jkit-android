@@ -25,7 +25,7 @@ import io.ton.walletkit.gasless.ITONGaslessProvider
 import io.ton.walletkit.gasless.TONGaslessProviderIdentifier
 
 /** Identifier for the built-in TonAPI gasless provider. */
-class TONApiGaslessProviderIdentifier(override val name: String = "tonApiGasless") :
+class TONApiGaslessProviderIdentifier(override val name: String = "tonapi") :
     TONGaslessProviderIdentifier
 
 /** Typed handle for the built-in TonAPI gasless provider. */
