@@ -42,15 +42,15 @@ import kotlinx.serialization.Serializable
 data class TONTonCenterStreamingProviderConfig(
 
     @SerialName(value = "network")
-    val network: TONNetwork,
+    var network: TONNetwork,
 
     /* Optional custom WebSocket endpoint URL for the TonCenter v2 streaming API. If omitted, it defaults to the official mainnet or testnet URL based on the network context. */
     @SerialName(value = "endpoint")
-    val endpoint: kotlin.String? = null,
+    var endpoint: kotlin.String? = null,
 
     /* Optional API key for authenticating requests to TonCenter. Highly recommended to avoid rate limiting on the streaming endpoint. */
     @SerialName(value = "apiKey")
-    val apiKey: kotlin.String? = null,
+    var apiKey: kotlin.String? = null,
 
 ) {
 

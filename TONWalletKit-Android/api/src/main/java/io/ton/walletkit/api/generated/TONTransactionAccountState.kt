@@ -47,30 +47,30 @@ import kotlinx.serialization.Serializable
 data class TONTransactionAccountState(
 
     @SerialName(value = "balance")
-    val balance: kotlin.String,
+    var balance: kotlin.String,
 
     /* The state hash of the account */
     @SerialName(value = "hash")
-    val hash: kotlin.String? = null,
+    var hash: kotlin.String? = null,
 
     /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
     @SerialName(value = "extraCurrencies")
-    val extraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+    var extraCurrencies: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
 
     @Contextual @SerialName(value = "accountStatus")
-    val accountStatus: TONAccountStatus? = null,
+    var accountStatus: TONAccountStatus? = null,
 
     /* The hash of the frozen account state, if the account is frozen */
     @SerialName(value = "frozenHash")
-    val frozenHash: kotlin.String? = null,
+    var frozenHash: kotlin.String? = null,
 
     /* The hash of the contract's data section */
     @SerialName(value = "dataHash")
-    val dataHash: kotlin.String? = null,
+    var dataHash: kotlin.String? = null,
 
     /* The hash of the smart contract code */
     @SerialName(value = "codeHash")
-    val codeHash: kotlin.String? = null,
+    var codeHash: kotlin.String? = null,
 
 ) {
 

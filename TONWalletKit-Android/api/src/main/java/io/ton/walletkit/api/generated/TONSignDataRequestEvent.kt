@@ -56,55 +56,55 @@ open class TONSignDataRequestEvent(
 
     /* Unique identifier for the bridge event */
     @SerialName(value = "id")
-    val id: kotlin.String,
+    var id: kotlin.String,
 
     @SerialName(value = "payload")
-    val payload: TONSignDataPayload,
+    var payload: TONSignDataPayload,
 
     @SerialName(value = "preview")
-    val preview: TONSignDataRequestEventPreview,
+    var preview: TONSignDataRequestEventPreview,
 
     @SerialName(value = "from")
-    val from: kotlin.String? = null,
+    var from: kotlin.String? = null,
 
     @SerialName(value = "walletAddress")
-    val walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
+    var walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress? = null,
 
     /* Wallet identifier associated with the event */
     @SerialName(value = "walletId")
-    val walletId: kotlin.String? = null,
+    var walletId: kotlin.String? = null,
 
     /* Domain of the dApp that initiated the event */
     @SerialName(value = "domain")
-    val domain: kotlin.String? = null,
+    var domain: kotlin.String? = null,
 
     /* Whether the event originated from JS Bridge (injected provider) */
     @SerialName(value = "isJsBridge")
-    val isJsBridge: kotlin.Boolean? = null,
+    var isJsBridge: kotlin.Boolean? = null,
 
     /* Browser tab ID for JS Bridge events */
     @SerialName(value = "tabId")
-    val tabId: kotlin.String? = null,
+    var tabId: kotlin.String? = null,
 
     /* Session identifier for the connection */
     @SerialName(value = "sessionId")
-    val sessionId: kotlin.String? = null,
+    var sessionId: kotlin.String? = null,
 
     @SerialName(value = "isLocal")
-    val isLocal: kotlin.Boolean? = null,
+    var isLocal: kotlin.Boolean? = null,
 
     @SerialName(value = "messageId")
-    val messageId: kotlin.String? = null,
+    var messageId: kotlin.String? = null,
 
     @SerialName(value = "traceId")
-    val traceId: kotlin.String? = null,
+    var traceId: kotlin.String? = null,
 
     @SerialName(value = "dAppInfo")
-    val dAppInfo: TONDAppInfo? = null,
+    var dAppInfo: TONDAppInfo? = null,
 
     /* Raw TonConnect return strategy string. */
     @SerialName(value = "returnStrategy")
-    val returnStrategy: kotlin.String? = null,
+    var returnStrategy: kotlin.String? = null,
 
 ) {
 

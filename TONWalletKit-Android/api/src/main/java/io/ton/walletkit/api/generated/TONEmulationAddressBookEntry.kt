@@ -43,15 +43,15 @@ import kotlinx.serialization.Serializable
 data class TONEmulationAddressBookEntry(
 
     @SerialName(value = "userFriendly")
-    val userFriendly: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var userFriendly: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     /* List of known interfaces implemented by the contract */
     @SerialName(value = "interfaces")
-    val interfaces: kotlin.collections.List<kotlin.String>,
+    var interfaces: kotlin.collections.List<kotlin.String>,
 
     /* DNS domain name associated with the address, if any */
     @SerialName(value = "domain")
-    val domain: kotlin.String? = null,
+    var domain: kotlin.String? = null,
 
 ) {
 

@@ -117,7 +117,10 @@ sealed class {{classname}} {
 {{/vendorExtensions.x-single-field-variant}}
 {{^vendorExtensions.x-empty-variant}}{{^vendorExtensions.x-single-field-variant}}
                 is {{#lambda.titlecase}}{{vendorExtensions.x-enum-case-name}}{{/lambda.titlecase}} ->
-                    jsonEncoder.json.encodeToJsonElement(serializer<{{{dataType}}}>(), value.value)
+                    JsonObject(
+                        jsonEncoder.json.encodeToJsonElement(serializer<{{{dataType}}}>(), value.value).jsonObject +
+                            (DISCRIMINATOR_FIELD to JsonPrimitive("{{vendorExtensions.x-enum-case-raw-value}}")),
+                    )
 {{/vendorExtensions.x-single-field-variant}}{{/vendorExtensions.x-empty-variant}}
 {{/vendorExtensions.x-enum-case-name}}
 {{/vars}}

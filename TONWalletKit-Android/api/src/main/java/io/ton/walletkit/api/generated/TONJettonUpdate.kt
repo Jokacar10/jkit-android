@@ -48,27 +48,27 @@ import kotlinx.serialization.Serializable
 data class TONJettonUpdate(
 
     @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    var status: TONStreamingUpdateStatus,
 
     @SerialName(value = "masterAddress")
-    val masterAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var masterAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "walletAddress")
-    val walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var walletAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "ownerAddress")
-    val ownerAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var ownerAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "rawBalance")
-    val rawBalance: kotlin.String,
+    var rawBalance: kotlin.String,
 
     /* Decimals mapped from metadata if available */
     @SerialName(value = "decimals")
-    val decimals: kotlin.Double? = null,
+    var decimals: kotlin.Double? = null,
 
     /* Human readable formatted balance if decimals are known */
     @SerialName(value = "balance")
-    val balance: kotlin.String? = null,
+    var balance: kotlin.String? = null,
     @SerialName("type")
     val type: kotlin.String = "jettons",
 ) {

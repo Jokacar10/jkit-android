@@ -41,7 +41,7 @@ data class TONTransactionAddressMetadataEntry(
 
     /* Token information associated with this address, if any */
     @SerialName(value = "tokenInfo")
-    val tokenInfo: kotlin.collections.List<TONTransactionTokenInfo>? = null,
+    var tokenInfo: kotlin.collections.List<TONTransactionTokenInfo>? = null,
 
 ) {
 

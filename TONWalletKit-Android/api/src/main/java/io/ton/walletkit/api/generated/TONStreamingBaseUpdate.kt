@@ -42,10 +42,10 @@ import kotlinx.serialization.Serializable
 data class TONStreamingBaseUpdate(
 
     @Contextual @SerialName(value = "type")
-    val type: TONStreamingWatchType,
+    var type: TONStreamingWatchType,
 
     @Contextual @SerialName(value = "status")
-    val status: TONStreamingUpdateStatus,
+    var status: TONStreamingUpdateStatus,
 
 ) {
 

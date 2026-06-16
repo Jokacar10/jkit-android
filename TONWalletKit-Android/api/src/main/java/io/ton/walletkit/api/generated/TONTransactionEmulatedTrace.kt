@@ -52,41 +52,41 @@ data class TONTransactionEmulatedTrace(
 
     /* Masterchain block sequence number where emulation was performed */
     @SerialName(value = "mcBlockSeqno")
-    val mcBlockSeqno: kotlin.Int,
+    var mcBlockSeqno: kotlin.Int,
 
     @SerialName(value = "trace")
-    val trace: TONTransactionTraceNode,
+    var trace: TONTransactionTraceNode,
 
     /* Map of transaction hashes to transaction details */
     @Contextual @SerialName(value = "transactions")
-    val transactions: kotlin.collections.Map<kotlin.String, TONTransaction>,
+    var transactions: kotlin.collections.Map<kotlin.String, TONTransaction>,
 
     /* List of high-level actions extracted from the trace */
     @SerialName(value = "actions")
-    val actions: kotlin.collections.List<TONTransactionTraceAction>,
+    var actions: kotlin.collections.List<TONTransactionTraceAction>,
 
     @Contextual @SerialName(value = "randSeed")
-    val randSeed: io.ton.walletkit.model.TONHex,
+    var randSeed: io.ton.walletkit.model.TONHex,
 
     /* Whether the trace is incomplete due to limits or errors */
     @SerialName(value = "isIncomplete")
-    val isIncomplete: kotlin.Boolean,
+    var isIncomplete: kotlin.Boolean,
 
     /* Map of code cell hashes to their Base64-encoded content */
     @Contextual @SerialName(value = "codeCells")
-    val codeCells: kotlin.collections.Map<kotlin.String, io.ton.walletkit.model.TONBase64>,
+    var codeCells: kotlin.collections.Map<kotlin.String, io.ton.walletkit.model.TONBase64>,
 
     /* Map of data cell hashes to their Base64-encoded content */
     @Contextual @SerialName(value = "dataCells")
-    val dataCells: kotlin.collections.Map<kotlin.String, io.ton.walletkit.model.TONBase64>,
+    var dataCells: kotlin.collections.Map<kotlin.String, io.ton.walletkit.model.TONBase64>,
 
     /* Metadata about addresses, including indexing and associated token info. */
     @Contextual @SerialName(value = "metadata")
-    val metadata: kotlin.collections.Map<kotlin.String, TONTransactionAddressMetadataEntry>,
+    var metadata: kotlin.collections.Map<kotlin.String, TONTransactionAddressMetadataEntry>,
 
     /* Map of raw addresses to their metadata entries. */
     @Contextual @SerialName(value = "addressBook")
-    val addressBook: kotlin.collections.Map<kotlin.String, TONAddressBookEntry>,
+    var addressBook: kotlin.collections.Map<kotlin.String, TONAddressBookEntry>,
 
 ) {
 

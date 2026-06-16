@@ -42,10 +42,10 @@ import kotlinx.serialization.Serializable
 data class TONUserNFTsRequest(
 
     @SerialName(value = "ownerAddress")
-    val ownerAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
+    var ownerAddress: io.ton.walletkit.model.TONUserFriendlyAddress,
 
     @SerialName(value = "pagination")
-    val pagination: TONPagination? = null,
+    var pagination: TONPagination? = null,
 
 ) {
 

@@ -42,11 +42,11 @@ data class TONDeDustReferralOptions(
 
     /* The address of the referrer */
     @SerialName(value = "referralAddress")
-    val referralAddress: kotlin.String? = null,
+    var referralAddress: kotlin.String? = null,
 
     /* Referral fee in basis points (max 100 = 1%) */
     @SerialName(value = "referralFeeBps")
-    val referralFeeBps: kotlin.Int? = null,
+    var referralFeeBps: kotlin.Int? = null,
 
 ) {
 

@@ -40,7 +40,7 @@ import kotlinx.serialization.Serializable
 data class TONJettonsRequest(
 
     @SerialName(value = "pagination")
-    val pagination: TONPagination,
+    var pagination: TONPagination,
 
 ) {
 

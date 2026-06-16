@@ -89,13 +89,22 @@ sealed class TONEmbeddedRequestEvent {
 
             val jsonElement = when (value) {
                 is SendTransaction ->
-                    jsonEncoder.json.encodeToJsonElement(serializer<TONEmbeddedSendTransactionRequestEvent>(), value.value)
+                    JsonObject(
+                        jsonEncoder.json.encodeToJsonElement(serializer<TONEmbeddedSendTransactionRequestEvent>(), value.value).jsonObject +
+                            (DISCRIMINATOR_FIELD to JsonPrimitive("sendTransaction")),
+                    )
 
                 is SignMessage ->
-                    jsonEncoder.json.encodeToJsonElement(serializer<TONEmbeddedSignMessageRequestEvent>(), value.value)
+                    JsonObject(
+                        jsonEncoder.json.encodeToJsonElement(serializer<TONEmbeddedSignMessageRequestEvent>(), value.value).jsonObject +
+                            (DISCRIMINATOR_FIELD to JsonPrimitive("signMessage")),
+                    )
 
                 is SignData ->
-                    jsonEncoder.json.encodeToJsonElement(serializer<TONEmbeddedSignDataRequestEvent>(), value.value)
+                    JsonObject(
+                        jsonEncoder.json.encodeToJsonElement(serializer<TONEmbeddedSignDataRequestEvent>(), value.value).jsonObject +
+                            (DISCRIMINATOR_FIELD to JsonPrimitive("signData")),
+                    )
             }
             jsonEncoder.encodeJsonElement(jsonElement)
         }

@@ -48,31 +48,31 @@ import kotlinx.serialization.Serializable
 data class TONDeDustRouteStep(
 
     @SerialName(value = "pool_address")
-    val poolAddress: kotlin.String,
+    var poolAddress: kotlin.String,
 
     @SerialName(value = "is_stable")
-    val isStable: kotlin.Boolean,
+    var isStable: kotlin.Boolean,
 
     @SerialName(value = "in_minter")
-    val inMinter: kotlin.String,
+    var inMinter: kotlin.String,
 
     @SerialName(value = "out_minter")
-    val outMinter: kotlin.String,
+    var outMinter: kotlin.String,
 
     @SerialName(value = "in_amount")
-    val inAmount: kotlin.String,
+    var inAmount: kotlin.String,
 
     @SerialName(value = "out_amount")
-    val outAmount: kotlin.String,
+    var outAmount: kotlin.String,
 
     @SerialName(value = "network_fee")
-    val networkFee: kotlin.String,
+    var networkFee: kotlin.String,
 
     @SerialName(value = "protocol_slug")
-    val protocolSlug: kotlin.String,
+    var protocolSlug: kotlin.String,
 
     @SerialName(value = "stonfi_extra_details")
-    val stonfiExtraDetails: TONDeDustRouteStepStonfiExtraDetails? = null,
+    var stonfiExtraDetails: TONDeDustRouteStepStonfiExtraDetails? = null,
 
 ) {
 

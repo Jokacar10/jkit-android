@@ -41,11 +41,11 @@ import kotlinx.serialization.Serializable
 data class TONEmulationStoragePhase(
 
     @SerialName(value = "storageFeesCollected")
-    val storageFeesCollected: kotlin.String,
+    var storageFeesCollected: kotlin.String,
 
     /* Account status change applied during the storage phase */
     @SerialName(value = "statusChange")
-    val statusChange: kotlin.String,
+    var statusChange: kotlin.String,
 
 ) {
 

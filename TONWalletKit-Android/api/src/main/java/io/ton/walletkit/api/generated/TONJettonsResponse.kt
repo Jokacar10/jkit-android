@@ -43,11 +43,11 @@ data class TONJettonsResponse(
 
     /* Map of raw addresses to their metadata entries. */
     @Contextual @SerialName(value = "addressBook")
-    val addressBook: kotlin.collections.Map<kotlin.String, TONAddressBookEntry>,
+    var addressBook: kotlin.collections.Map<kotlin.String, TONAddressBookEntry>,
 
     /* List of Jettons */
     @SerialName(value = "jettons")
-    val jettons: kotlin.collections.List<TONJetton>,
+    var jettons: kotlin.collections.List<TONJetton>,
 
 ) {
 

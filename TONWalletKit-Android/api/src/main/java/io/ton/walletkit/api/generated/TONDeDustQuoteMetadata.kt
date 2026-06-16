@@ -45,7 +45,7 @@ data class TONDeDustQuoteMetadata(
 
     /* Slippage used for the quote in basis points */
     @SerialName(value = "slippageBps")
-    val slippageBps: kotlin.Int,
+    var slippageBps: kotlin.Int,
 
 ) {
 

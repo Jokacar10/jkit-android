@@ -23,10 +23,12 @@ package io.ton.walletkit.demo.designsystem.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import io.ton.walletkit.demo.designsystem.tokens.TonColors
 import io.ton.walletkit.demo.designsystem.tokens.TonTypography
 import io.ton.walletkit.demo.designsystem.tokens.darkTonColors
@@ -41,6 +43,21 @@ private val LocalTonTypography = staticCompositionLocalOf<TonTypography> {
     error("TonTypography not provided. Wrap your UI in TonTheme { ... }")
 }
 
+// Fallback scheme for call sites still on Material defaults: the app is always white, so pin every
+// surface to white (else an unset Scaffold/TopAppBar containerColor paints Material's #FFFBFE).
+private val WhiteMaterialColors = lightColorScheme(
+    background = Color.White,
+    surface = Color.White,
+    surfaceVariant = Color.White,
+    surfaceBright = Color.White,
+    surfaceDim = Color.White,
+    surfaceContainerLowest = Color.White,
+    surfaceContainerLow = Color.White,
+    surfaceContainer = Color.White,
+    surfaceContainerHigh = Color.White,
+    surfaceContainerHighest = Color.White,
+)
+
 @Composable
 fun TonTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -52,8 +69,8 @@ fun TonTheme(
         LocalTonColors provides colors,
         LocalTonTypography provides typography,
     ) {
-        // Compose call sites that haven't migrated yet still see a sane MaterialTheme.
-        MaterialTheme(content = content)
+        // Compose call sites that haven't migrated yet still see a sane (all-white) MaterialTheme.
+        MaterialTheme(colorScheme = WhiteMaterialColors, content = content)
     }
 }
 

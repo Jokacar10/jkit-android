@@ -29,6 +29,7 @@
 package io.ton.walletkit.api.generated
 
 import io.ton.walletkit.model.TONBase64
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -45,20 +46,20 @@ import kotlinx.serialization.Serializable
 data class TONTonTransferItem(
 
     @SerialName(value = "address")
-    val address: kotlin.String,
+    var address: kotlin.String,
 
     @SerialName(value = "amount")
-    val amount: kotlin.String,
+    var amount: kotlin.String,
 
-    @SerialName(value = "payload")
-    val payload: io.ton.walletkit.model.TONBase64? = null,
+    @Contextual @SerialName(value = "payload")
+    var payload: io.ton.walletkit.model.TONBase64? = null,
 
-    @SerialName(value = "stateInit")
-    val stateInit: io.ton.walletkit.model.TONBase64? = null,
+    @Contextual @SerialName(value = "stateInit")
+    var stateInit: io.ton.walletkit.model.TONBase64? = null,
 
     /* Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages. */
     @SerialName(value = "extraCurrency")
-    val extraCurrency: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
+    var extraCurrency: kotlin.collections.Map<kotlin.String, kotlin.String>? = null,
     @SerialName("type")
     val type: kotlin.String = "ton",
 ) {

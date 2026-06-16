@@ -45,23 +45,23 @@ data class TONTokenImage(
 
     /* Original image URL */
     @SerialName(value = "url")
-    val url: kotlin.String? = null,
+    var url: kotlin.String? = null,
 
     /* Small thumbnail URL (typically 64x64 or similar) */
     @SerialName(value = "smallUrl")
-    val smallUrl: kotlin.String? = null,
+    var smallUrl: kotlin.String? = null,
 
     /* Medium-sized image URL (typically 256x256 or similar) */
     @SerialName(value = "mediumUrl")
-    val mediumUrl: kotlin.String? = null,
+    var mediumUrl: kotlin.String? = null,
 
     /* Large image URL (typically 512x512 or higher) */
     @SerialName(value = "largeUrl")
-    val largeUrl: kotlin.String? = null,
+    var largeUrl: kotlin.String? = null,
 
     /* Raw image data encoded in Base64 */
     @SerialName(value = "data")
-    val `data`: kotlin.String? = null,
+    var `data`: kotlin.String? = null,
 
 ) {
 

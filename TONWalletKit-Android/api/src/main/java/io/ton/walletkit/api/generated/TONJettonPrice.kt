@@ -42,11 +42,11 @@ data class TONJettonPrice(
 
     /* Price in smallest units of the currency */
     @SerialName(value = "value")
-    val `value`: kotlin.String,
+    var `value`: kotlin.String,
 
     /* Currency code (e.g., \"USD\", \"EUR\") */
     @SerialName(value = "currency")
-    val currency: kotlin.String,
+    var currency: kotlin.String,
 
 ) {
 

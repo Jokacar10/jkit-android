@@ -278,6 +278,12 @@ data class TONWalletKitConfiguration(
     data class SignDataFeature(
         val types: List<SignDataType>,
     ) : Feature
+
+    /**
+     * Embedded-request feature configuration.
+     */
+    @Serializable
+    object EmbeddedRequestFeature : Feature
 }
 
 /**

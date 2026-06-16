@@ -43,15 +43,15 @@ import kotlinx.serialization.Serializable
 data class TONSignDataApprovalResponse(
 
     @Contextual @SerialName(value = "signature")
-    val signature: io.ton.walletkit.model.TONHex,
+    var signature: io.ton.walletkit.model.TONHex,
 
     /* Timestamp when the data was signed */
     @SerialName(value = "timestamp")
-    val timestamp: kotlin.Int,
+    var timestamp: kotlin.Int,
 
     /* Domain associated with the sign request */
     @SerialName(value = "domain")
-    val domain: kotlin.String,
+    var domain: kotlin.String,
 
 ) {
 
