@@ -42,6 +42,9 @@ internal class BuiltInGaslessProvider(
     private val engine: WalletKitEngine,
 ) : ITONGaslessProvider {
 
+    override suspend fun supportedNetworks(): List<TONNetwork> =
+        engine.getGaslessProviderSupportedNetworks(identifier.name)
+
     override suspend fun metadata(): TONGaslessProviderMetadata =
         engine.getGaslessMetadata(identifier.name)
 

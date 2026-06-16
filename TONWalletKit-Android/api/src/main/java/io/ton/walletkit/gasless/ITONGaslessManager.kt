@@ -47,6 +47,9 @@ interface ITONGaslessManager {
      */
     suspend fun registerProvider(provider: ITONGaslessProvider)
 
+    /** Unregister [provider]; no-op if it isn't currently registered. */
+    suspend fun removeProvider(provider: ITONGaslessProvider)
+
     /** Set the default provider used when no identifier is specified. */
     suspend fun setDefaultProvider(identifier: TONGaslessProviderIdentifier)
 

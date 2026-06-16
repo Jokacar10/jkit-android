@@ -352,11 +352,17 @@ internal object BridgeMethodConstants {
     /** Register a previously created gasless provider with the gasless manager. */
     const val METHOD_REGISTER_GASLESS_PROVIDER = "registerGaslessProvider"
 
+    /** Unregister a previously registered gasless provider. */
+    const val METHOD_REMOVE_GASLESS_PROVIDER = "removeGaslessProvider"
+
     /** Set the default gasless provider. */
     const val METHOD_SET_DEFAULT_GASLESS_PROVIDER = "setDefaultGaslessProvider"
 
     /** Get all registered gasless provider IDs. */
     const val METHOD_GET_REGISTERED_GASLESS_PROVIDERS = "getRegisteredGaslessProviders"
+
+    /** Get the networks a registered gasless provider supports. */
+    const val METHOD_GET_GASLESS_PROVIDER_SUPPORTED_NETWORKS = "getGaslessProviderSupportedNetworks"
 
     /** Check if a gasless provider is registered. */
     const val METHOD_HAS_GASLESS_PROVIDER = "hasGaslessProvider"
