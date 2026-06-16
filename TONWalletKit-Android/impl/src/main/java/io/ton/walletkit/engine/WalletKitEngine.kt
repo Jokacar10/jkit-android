@@ -624,9 +624,13 @@ internal interface WalletKitEngine : RequestHandler {
 
     suspend fun registerGaslessProvider(providerId: String)
 
+    suspend fun removeGaslessProvider(providerId: String)
+
     suspend fun setDefaultGaslessProvider(providerId: String)
 
     suspend fun getRegisteredGaslessProviders(): List<String>
+
+    suspend fun getGaslessProviderSupportedNetworks(providerId: String): List<TONNetwork>
 
     suspend fun hasGaslessProvider(providerId: String): Boolean
 

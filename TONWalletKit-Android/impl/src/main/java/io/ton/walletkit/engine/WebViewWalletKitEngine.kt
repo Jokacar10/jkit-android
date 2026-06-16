@@ -106,6 +106,7 @@ import io.ton.walletkit.engine.operations.gaslessSendTransaction
 import io.ton.walletkit.engine.operations.getBalance
 import io.ton.walletkit.engine.operations.getGaslessConfig
 import io.ton.walletkit.engine.operations.getGaslessMetadata
+import io.ton.walletkit.engine.operations.getGaslessProviderSupportedNetworks
 import io.ton.walletkit.engine.operations.getGaslessQuote
 import io.ton.walletkit.engine.operations.getJettonBalance
 import io.ton.walletkit.engine.operations.getJettonWalletAddress
@@ -149,6 +150,7 @@ import io.ton.walletkit.engine.operations.rejectConnect
 import io.ton.walletkit.engine.operations.rejectSignData
 import io.ton.walletkit.engine.operations.rejectSignMessage
 import io.ton.walletkit.engine.operations.rejectTransaction
+import io.ton.walletkit.engine.operations.removeGaslessProvider
 import io.ton.walletkit.engine.operations.removeStakingProvider
 import io.ton.walletkit.engine.operations.removeSwapProvider
 import io.ton.walletkit.engine.operations.removeWallet
@@ -653,10 +655,15 @@ internal class WebViewWalletKitEngine private constructor(
 
     override suspend fun registerGaslessProvider(providerId: String) = rpcClient.registerGaslessProvider(providerId)
 
+    override suspend fun removeGaslessProvider(providerId: String) = rpcClient.removeGaslessProvider(providerId)
+
     override suspend fun setDefaultGaslessProvider(providerId: String) =
         rpcClient.setDefaultGaslessProvider(providerId)
 
     override suspend fun getRegisteredGaslessProviders(): List<String> = rpcClient.getRegisteredGaslessProviders()
+
+    override suspend fun getGaslessProviderSupportedNetworks(providerId: String): List<TONNetwork> =
+        rpcClient.getGaslessProviderSupportedNetworks(providerId)
 
     override suspend fun hasGaslessProvider(providerId: String): Boolean = rpcClient.hasGaslessProvider(providerId)
 

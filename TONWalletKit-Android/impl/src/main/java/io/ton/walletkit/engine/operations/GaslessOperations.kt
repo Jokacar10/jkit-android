@@ -35,13 +35,16 @@ import io.ton.walletkit.engine.operations.requests.CreateTonApiGaslessProviderRe
 import io.ton.walletkit.engine.operations.requests.GaslessSendTransactionRequest
 import io.ton.walletkit.engine.operations.requests.GetGaslessConfigRequest
 import io.ton.walletkit.engine.operations.requests.GetGaslessMetadataRequest
+import io.ton.walletkit.engine.operations.requests.GetGaslessProviderSupportedNetworksRequest
 import io.ton.walletkit.engine.operations.requests.GetGaslessQuoteRequest
 import io.ton.walletkit.engine.operations.requests.HasGaslessProviderRequest
 import io.ton.walletkit.engine.operations.requests.RegisterGaslessProviderRequest
+import io.ton.walletkit.engine.operations.requests.RemoveGaslessProviderRequest
 import io.ton.walletkit.engine.operations.requests.SetDefaultGaslessProviderRequest
 import io.ton.walletkit.engine.operations.responses.HasProviderResponse
 import io.ton.walletkit.engine.operations.responses.ProviderIdResponse
 import io.ton.walletkit.engine.operations.responses.ProviderIdsResponse
+import io.ton.walletkit.engine.operations.responses.SupportedNetworksResponse
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import kotlinx.serialization.json.Json
 
@@ -56,6 +59,16 @@ internal suspend fun BridgeRpcClient.createTonApiGaslessProvider(config: TONTonA
 internal suspend fun BridgeRpcClient.registerGaslessProvider(providerId: String) {
     send(BridgeMethodConstants.METHOD_REGISTER_GASLESS_PROVIDER, RegisterGaslessProviderRequest(providerId))
 }
+
+internal suspend fun BridgeRpcClient.removeGaslessProvider(providerId: String) {
+    send(BridgeMethodConstants.METHOD_REMOVE_GASLESS_PROVIDER, RemoveGaslessProviderRequest(providerId))
+}
+
+internal suspend fun BridgeRpcClient.getGaslessProviderSupportedNetworks(providerId: String): List<TONNetwork> =
+    callTyped<SupportedNetworksResponse>(
+        BridgeMethodConstants.METHOD_GET_GASLESS_PROVIDER_SUPPORTED_NETWORKS,
+        GetGaslessProviderSupportedNetworksRequest(providerId),
+    ).networks
 
 internal suspend fun BridgeRpcClient.setDefaultGaslessProvider(providerId: String) {
     send(BridgeMethodConstants.METHOD_SET_DEFAULT_GASLESS_PROVIDER, SetDefaultGaslessProviderRequest(providerId))

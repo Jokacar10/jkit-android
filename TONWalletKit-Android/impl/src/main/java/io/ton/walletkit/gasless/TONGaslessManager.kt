@@ -37,6 +37,9 @@ internal class TONGaslessManager(
     override suspend fun registerProvider(provider: ITONGaslessProvider) =
         engine.registerGaslessProvider(provider.identifier.name)
 
+    override suspend fun removeProvider(provider: ITONGaslessProvider) =
+        engine.removeGaslessProvider(provider.identifier.name)
+
     override suspend fun setDefaultProvider(identifier: TONGaslessProviderIdentifier) =
         engine.setDefaultGaslessProvider(identifier.name)
 

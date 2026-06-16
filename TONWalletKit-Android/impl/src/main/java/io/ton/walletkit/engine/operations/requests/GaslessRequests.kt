@@ -41,12 +41,22 @@ internal data class RegisterGaslessProviderRequest(
 )
 
 @Serializable
+internal data class RemoveGaslessProviderRequest(
+    val providerId: String,
+)
+
+@Serializable
 internal data class SetDefaultGaslessProviderRequest(
     val providerId: String,
 )
 
 @Serializable
 internal data class HasGaslessProviderRequest(
+    val providerId: String,
+)
+
+@Serializable
+internal data class GetGaslessProviderSupportedNetworksRequest(
     val providerId: String,
 )
 

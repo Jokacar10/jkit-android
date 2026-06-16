@@ -43,6 +43,9 @@ interface ITONGaslessProvider {
     /** Typed provider identifier. */
     val identifier: TONGaslessProviderIdentifier
 
+    /** Networks this provider can operate on. */
+    suspend fun supportedNetworks(): List<TONNetwork>
+
     /** Static descriptive metadata (name, logo, url). */
     suspend fun metadata(): TONGaslessProviderMetadata
 

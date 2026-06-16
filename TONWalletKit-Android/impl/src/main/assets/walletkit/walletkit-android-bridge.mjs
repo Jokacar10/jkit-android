@@ -46124,8 +46124,15 @@ async function createTonApiGaslessProvider(args) {
 async function registerGaslessProvider(args) {
 	(await getGasless()).registerProvider(get(args.providerId));
 }
+async function removeGaslessProvider(args) {
+	const gasless = await getGasless();
+	gasless.removeProvider(gasless.getProvider(args.providerId));
+}
 async function setDefaultGaslessProvider(args) {
 	(await getGasless()).setDefaultProvider(args.providerId);
+}
+async function getGaslessProviderSupportedNetworks(args) {
+	return { networks: (await getGasless()).getProvider(args.providerId).getSupportedNetworks() };
 }
 async function getRegisteredGaslessProviders() {
 	return { providerIds: (await getGasless()).getProviders().map((provider) => provider.providerId) };
@@ -46280,9 +46287,11 @@ var api = {
 	registerKotlinSwapProvider,
 	createTonApiGaslessProvider,
 	registerGaslessProvider,
+	removeGaslessProvider,
 	setDefaultGaslessProvider,
 	getRegisteredGaslessProviders,
 	hasGaslessProvider,
+	getGaslessProviderSupportedNetworks,
 	getGaslessMetadata,
 	getGaslessConfig,
 	getGaslessQuote,
