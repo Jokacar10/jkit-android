@@ -50,8 +50,6 @@ import io.ton.walletkit.gasless.tonapi.TONApiGaslessProvider
 import io.ton.walletkit.gasless.tonapi.TONApiGaslessProviderIdentifier
 import io.ton.walletkit.internal.constants.BridgeMethodConstants
 import io.ton.walletkit.internal.util.WalletKitUtils
-import io.ton.walletkit.jettons.ITONJettonsManager
-import io.ton.walletkit.jettons.TONJettonsManager
 import io.ton.walletkit.listener.TONBridgeEventsHandler
 import io.ton.walletkit.model.ITONWalletAdapter
 import io.ton.walletkit.model.KeyPair
@@ -133,8 +131,6 @@ internal class TONWalletKit private constructor(
     private val swapManager: ITONSwapManager = TONSwapManager(engine)
 
     private val gaslessManager: ITONGaslessManager = TONGaslessManager(engine)
-
-    private val jettonsManager: ITONJettonsManager = TONJettonsManager(engine)
 
     companion object {
         /**
@@ -495,8 +491,6 @@ internal class TONWalletKit private constructor(
     }
 
     override suspend fun gasless(): ITONGaslessManager = gaslessManager
-
-    override suspend fun jettons(): ITONJettonsManager = jettonsManager
 
     override fun staking(): ITONStakingManager {
         checkNotDestroyed()

@@ -43,7 +43,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -52,7 +51,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import io.ton.walletkit.ITONWallet
 import io.ton.walletkit.ITONWalletKit
-import io.ton.walletkit.api.WalletVersions
 import io.ton.walletkit.demo.designsystem.components.button.TonButton
 import io.ton.walletkit.demo.designsystem.components.text.TonText
 import io.ton.walletkit.demo.designsystem.components.toggle.TonSwitch
@@ -84,13 +82,10 @@ fun SendTransactionScreen(
         resolving = false
     }
 
-    // tonapi's gasless relay only supports W5 (v5r1) wallets, so gasless is offered only for those.
-    val gaslessSupported = wallet.version.equals(WalletVersions.V5R1, ignoreCase = true)
-
     when {
         resolving -> SendStatusBox("Loading wallet…")
         tonWallet == null -> SendStatusBox("Could not resolve the active wallet.", onBack)
-        else -> SendTokensContent(tonWallet!!, walletKit, gaslessSupported, onBack)
+        else -> SendTokensContent(tonWallet!!, walletKit, onBack)
     }
 }
 
@@ -98,27 +93,17 @@ fun SendTransactionScreen(
 private fun SendTokensContent(
     wallet: ITONWallet,
     walletKit: ITONWalletKit,
-    gaslessSupported: Boolean,
     onBack: () -> Unit,
 ) {
     val viewModel: SendTokensViewModel = viewModel(
         key = "send:${wallet.address().value}",
-        factory = SendTokensViewModel.factory(wallet, walletKit, gaslessSupported),
+        factory = SendTokensViewModel.factory(wallet, walletKit),
     )
     val state by viewModel.state.collectAsState()
     var picker by remember { mutableStateOf(PickerMode.None) }
 
     LaunchedEffect(state.sent) {
-        if (state.sent) {
-            viewModel.acknowledgeSent()
-            onBack()
-        }
-    }
-
-    // Resolve fee-asset metadata (ticker / icon / decimals) once the fee list appears, so the picker
-    // rows and the inline selected-asset label fill in from short addresses to tickers as they load.
-    LaunchedEffect(state.feeAssets.size) {
-        if (state.feeAssets.isNotEmpty()) viewModel.loadFeeAssetMetadata()
+        if (state.sent) onBack()
     }
 
     when (picker) {
@@ -270,16 +255,12 @@ private fun GaslessCard(
             Column(modifier = Modifier.weight(1f)) {
                 TonText("Gasless", style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textPrimary)
                 TonText(
-                    if (state.gaslessSupported) "Pay the network fee in a jetton" else "Requires a W5 (v5r1) wallet",
+                    "Pay the network fee in a jetton",
                     style = TonTheme.typography.subheadline2,
                     color = TonTheme.colors.textSecondary,
                 )
             }
-            if (state.gaslessSupported) {
-                TonSwitch(checked = state.gaslessEnabled, onCheckedChange = viewModel::setGaslessEnabled)
-            } else {
-                TonSwitch(checked = false, onCheckedChange = {}, modifier = Modifier.alpha(0.4f))
-            }
+            TonSwitch(checked = state.gaslessEnabled, onCheckedChange = viewModel::setGaslessEnabled)
         }
 
         if (state.gaslessEnabled) {

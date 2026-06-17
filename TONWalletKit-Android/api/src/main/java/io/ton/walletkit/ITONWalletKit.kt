@@ -37,7 +37,6 @@ import io.ton.walletkit.config.TONWalletKitConfiguration
 import io.ton.walletkit.gasless.ITONGaslessManager
 import io.ton.walletkit.gasless.tonapi.TONApiGaslessProvider
 import io.ton.walletkit.internal.TONWalletKitFactory
-import io.ton.walletkit.jettons.ITONJettonsManager
 import io.ton.walletkit.listener.TONBridgeEventsHandler
 import io.ton.walletkit.model.ITONWalletAdapter
 import io.ton.walletkit.model.KeyPair
@@ -214,13 +213,6 @@ interface ITONWalletKit {
 
     /** Get the gasless manager for registering providers and relaying gasless transactions. */
     suspend fun gasless(): ITONGaslessManager
-
-    // ── Jettons ──
-
-    /**
-     * Get the jettons manager for resolving jetton metadata and a user's jetton holdings.
-     */
-    suspend fun jettons(): ITONJettonsManager
 
     // ── Staking ──
 

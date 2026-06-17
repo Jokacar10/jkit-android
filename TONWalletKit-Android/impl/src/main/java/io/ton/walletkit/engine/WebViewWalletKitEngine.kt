@@ -32,8 +32,6 @@ import io.ton.walletkit.api.generated.TONEmulationResult
 import io.ton.walletkit.api.generated.TONGaslessQuoteParams
 import io.ton.walletkit.api.generated.TONGaslessSendParams
 import io.ton.walletkit.api.generated.TONGetMethodResult
-import io.ton.walletkit.api.generated.TONJetton
-import io.ton.walletkit.api.generated.TONJettonInfo
 import io.ton.walletkit.api.generated.TONJettonsResponse
 import io.ton.walletkit.api.generated.TONJettonsTransferRequest
 import io.ton.walletkit.api.generated.TONMasterchainInfo
@@ -105,14 +103,12 @@ import io.ton.walletkit.engine.operations.createTransferTonTransaction
 import io.ton.walletkit.engine.operations.createWalletAdapter
 import io.ton.walletkit.engine.operations.disconnectSession
 import io.ton.walletkit.engine.operations.gaslessSendTransaction
-import io.ton.walletkit.engine.operations.getAddressJettons
 import io.ton.walletkit.engine.operations.getBalance
 import io.ton.walletkit.engine.operations.getGaslessConfig
 import io.ton.walletkit.engine.operations.getGaslessMetadata
 import io.ton.walletkit.engine.operations.getGaslessProviderSupportedNetworks
 import io.ton.walletkit.engine.operations.getGaslessQuote
 import io.ton.walletkit.engine.operations.getJettonBalance
-import io.ton.walletkit.engine.operations.getJettonInfo
 import io.ton.walletkit.engine.operations.getJettonWalletAddress
 import io.ton.walletkit.engine.operations.getJettons
 import io.ton.walletkit.engine.operations.getNft
@@ -165,7 +161,6 @@ import io.ton.walletkit.engine.operations.setDefaultGaslessProvider
 import io.ton.walletkit.engine.operations.setDefaultStakingProvider
 import io.ton.walletkit.engine.operations.setDefaultSwapProvider
 import io.ton.walletkit.engine.operations.sign
-import io.ton.walletkit.engine.operations.validateJettonAddress
 import io.ton.walletkit.engine.operations.walletClientAccountState
 import io.ton.walletkit.engine.operations.walletClientAccountStates
 import io.ton.walletkit.engine.operations.walletClientBackResolveDnsWallet
@@ -682,19 +677,6 @@ internal class WebViewWalletKitEngine private constructor(
 
     override suspend fun gaslessSendTransaction(params: TONGaslessSendParams, providerId: String?) =
         rpcClient.gaslessSendTransaction(params, providerId)
-
-    override suspend fun jettonInfo(address: String, network: TONNetwork): TONJettonInfo? =
-        rpcClient.getJettonInfo(address, network)
-
-    override suspend fun addressJettons(
-        userAddress: String,
-        network: TONNetwork,
-        offset: Int,
-        limit: Int,
-    ): List<TONJetton> = rpcClient.getAddressJettons(userAddress, network, offset, limit)
-
-    override suspend fun validateJettonAddress(address: String): Boolean =
-        rpcClient.validateJettonAddress(address)
 
     override suspend fun createTonStakersStakingProvider(chainConfig: Map<String, TONTonStakersChainConfig>?): String =
         rpcClient.createTonStakersStakingProvider(chainConfig)

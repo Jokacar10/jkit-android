@@ -46,16 +46,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
-import java.math.BigInteger
 
 /**
  * Drives the "send any token" sheet — pick TON or any held jetton, optionally pay the
- * network fee gaslessly in a jetton.
+ * network fee gaslessly in a jetton. Mirrors the iOS `SendTokensViewModel`.
  */
 class SendTokensViewModel(
     private val wallet: ITONWallet,
     private val kit: ITONWalletKit,
-    private val gaslessSupported: Boolean,
 ) : ViewModel() {
 
     data class UiState(
@@ -67,7 +65,6 @@ class SendTokensViewModel(
         val sent: Boolean = false,
         val error: String? = null,
         val gaslessEnabled: Boolean = false,
-        val gaslessSupported: Boolean = false,
         val feeAssets: List<FeeAsset> = emptyList(),
         val selectedFeeAsset: FeeAsset? = null,
         val isQuoting: Boolean = false,
@@ -89,14 +86,12 @@ class SendTokensViewModel(
             }
     }
 
-    private val _state = MutableStateFlow(UiState(gaslessSupported = gaslessSupported))
+    private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state.asStateFlow()
 
     private var relayAddress: TONUserFriendlyAddress? = null
+    private var jettonMeta: Map<String, FeeAsset> = emptyMap()
     private var quoteJob: Job? = null
-
-    /** Resolved fee-asset metadata keyed by master address, so re-opening the picker reuses it. */
-    private val resolvedFeeAssets = mutableMapOf<String, FeeAsset>()
 
     init {
         loadTokens()
@@ -135,6 +130,10 @@ class SendTokensViewModel(
                 }
             }.onFailure { Log.e(TAG, "Failed to load jettons", it) }
 
+            jettonMeta = tokens.filter { !it.isNativeTON }.associate { token ->
+                token.masterAddress!! to FeeAsset(token.masterAddress, token.symbol, token.decimals, token.imageSource)
+            }
+
             _state.update { it.copy(tokens = tokens, selectedToken = it.selectedToken ?: tokens.firstOrNull()) }
         }
     }
@@ -168,25 +167,13 @@ class SendTokensViewModel(
     }
 
     fun useMax() {
-        val current = _state.value
-        val token = current.selectedToken ?: return
-        val feeAsset = current.selectedFeeAsset
-        val relay = relayAddress
-        if (current.gaslessEnabled && current.canUseGasless && relay != null &&
-            feeAsset != null && feeAsset.address == token.masterAddress
-        ) {
-            computeGaslessMax(token, feeAsset, relay)
-            return
-        }
-        _state.update { it.copy(amount = token.displayBalance) }
+        _state.update { it.copy(amount = it.selectedToken?.displayBalance ?: "") }
         scheduleQuote()
     }
 
     fun setGaslessEnabled(enabled: Boolean) {
-        // tonapi's gasless relay only supports W5 (v5r1) wallets; never enable it on others.
-        val on = enabled && gaslessSupported
-        _state.update { it.copy(gaslessEnabled = on, gaslessError = null, gaslessFeeText = null) }
-        if (on) loadGaslessConfig() else quoteJob?.cancel()
+        _state.update { it.copy(gaslessEnabled = enabled, gaslessError = null, gaslessFeeText = null) }
+        if (enabled) loadGaslessConfig() else quoteJob?.cancel()
     }
 
     fun selectFeeAsset(asset: FeeAsset) {
@@ -196,15 +183,6 @@ class SendTokensViewModel(
 
     fun clearError() {
         _state.update { it.copy(error = null) }
-    }
-
-    /**
-     * Clear the one-shot "sent" flag after the UI has navigated away. The view model is retained per
-     * wallet (the send sheet shares the wallet screen's store owner), so without this a stale `sent`
-     * from a previous successful send would immediately dismiss the sheet the next time it opens.
-     */
-    fun acknowledgeSent() {
-        _state.update { it.copy(sent = false) }
     }
 
     // MARK: - Sending
@@ -246,7 +224,7 @@ class SendTokensViewModel(
         val feeAsset = current.selectedFeeAsset ?: error("Fee asset not selected")
         val relay = relayAddress ?: error("Gasless config not loaded")
         val gasless = ensureGasless()
-        val quote = quote(gasless, token, feeAsset, current.recipient, toRaw(current.amount, token.decimals), relay)
+        val quote = quote(gasless, token, feeAsset, current, relay)
         val internalBoc = wallet.signedSignMessage(
             TONTransactionRequest(messages = quote.messages, validUntil = quote.validUntil, network = wallet.network()),
         )
@@ -268,7 +246,7 @@ class SendTokensViewModel(
                 val config = gasless.getConfig(network = wallet.network())
                 relayAddress = config.relayAddress
                 val assets = config.supportedAssets.map { supported ->
-                    resolvedFeeAssets[supported.address.value]
+                    jettonMeta[supported.address.value]
                         ?: FeeAsset(supported.address.value, shortAddress(supported.address.value), TON_DECIMALS, null)
                 }
                 _state.update { state ->
@@ -281,42 +259,6 @@ class SendTokensViewModel(
             }.onFailure {
                 Log.e(TAG, "Failed to load gasless config", it)
                 _state.update { it.copy(gaslessError = "Failed to load gasless configuration") }
-            }
-        }
-    }
-
-    /**
-     * Resolve fee-asset jetton metadata (ticker / decimals / icon) via [ITONWalletKit.jettons].
-     */
-    fun loadFeeAssetMetadata() {
-        val pending = _state.value.feeAssets.filter { it.address !in resolvedFeeAssets }
-        if (pending.isEmpty()) return
-        viewModelScope.launch {
-            val manager = kit.jettons()
-            val network = wallet.network()
-            pending.forEach { asset ->
-                launch {
-                    runCatching {
-                        val info = manager.jettonInfo(TONUserFriendlyAddress(asset.address), network)
-                            ?: return@launch
-                        val symbol = info.symbol.ifEmpty { info.name }.ifEmpty { asset.symbol }
-                        val resolved = asset.copy(
-                            symbol = symbol,
-                            decimals = info.decimals ?: asset.decimals,
-                            imageSource = info.image ?: asset.imageSource,
-                        )
-                        resolvedFeeAssets[resolved.address] = resolved
-                        _state.update { state ->
-                            state.copy(
-                                feeAssets = state.feeAssets.map { if (it.address == resolved.address) resolved else it },
-                                selectedFeeAsset = state.selectedFeeAsset
-                                    ?.takeIf { it.address == resolved.address }
-                                    ?.let { resolved }
-                                    ?: state.selectedFeeAsset,
-                            )
-                        }
-                    }.onFailure { Log.e(TAG, "Failed to load jetton info for ${asset.address}", it) }
-                }
             }
         }
     }
@@ -338,14 +280,7 @@ class SendTokensViewModel(
             _state.update { it.copy(isQuoting = true, gaslessError = null) }
             runCatching {
                 val gasless = ensureGasless()
-                val quote = quote(
-                    gasless,
-                    token,
-                    current.selectedFeeAsset,
-                    current.recipient,
-                    toRaw(current.amount, token.decimals),
-                    relayAddress!!,
-                )
+                val quote = quote(gasless, token, current.selectedFeeAsset, current, relayAddress!!)
                 _state.update {
                     it.copy(isQuoting = false, gaslessFeeText = formatFee(quote.fee, current.selectedFeeAsset))
                 }
@@ -358,59 +293,18 @@ class SendTokensViewModel(
         }
     }
 
-    /**
-     * Compute "max" for a gasless transfer whose fee is paid in the jetton being sent: probe the relay
-     * for the (amount- and recipient-independent) fee, then set the amount to balance − fee. Probing
-     * with an affordable amount avoids the HTTP 400 the relay returns when transfer + fee > balance.
-     */
-    private fun computeGaslessMax(token: SendableToken, feeAsset: FeeAsset, relay: TONUserFriendlyAddress) {
-        quoteJob?.cancel()
-        quoteJob = viewModelScope.launch {
-            _state.update { it.copy(isQuoting = true, gaslessError = null) }
-            runCatching {
-                val gasless = ensureGasless()
-                val balanceRaw = toRaw(token.displayBalance, token.decimals).toBigInteger()
-                // Fee is gas-based — independent of amount and recipient — so probe with half the balance
-                // (always affordable) to our own address when no recipient has been entered yet.
-                val recipient = _state.value.recipient.trim().takeIf { isValidRecipient(it) }
-                    ?: wallet.address().value
-                val probeAmount = (balanceRaw / BigInteger.valueOf(2)).max(BigInteger.ONE)
-                val feeRaw = quote(gasless, token, feeAsset, recipient, probeAmount.toString(), relay)
-                    .fee.toBigIntegerOrNull() ?: BigInteger.ZERO
-                val maxRaw = balanceRaw - feeRaw
-                if (maxRaw <= BigInteger.ZERO) {
-                    _state.update {
-                        it.copy(
-                            isQuoting = false,
-                            gaslessFeeText = null,
-                            gaslessError = "Balance too low to cover the gasless fee",
-                        )
-                    }
-                    return@launch
-                }
-                // Set the amount only; the fee is shown by scheduleQuote() once a recipient is entered.
-                _state.update { it.copy(amount = formatRaw(maxRaw.toString(), token.decimals), isQuoting = false) }
-                scheduleQuote()
-            }.onFailure {
-                Log.e(TAG, "Failed to compute gasless max", it)
-                _state.update { it.copy(isQuoting = false, gaslessError = "Failed to estimate gasless fee") }
-            }
-        }
-    }
-
     private suspend fun quote(
         gasless: ITONGaslessManager,
         token: SendableToken,
         feeAsset: FeeAsset,
-        recipient: String,
-        transferAmountRaw: String,
+        current: UiState,
         relay: TONUserFriendlyAddress,
     ): TONGaslessQuote {
         val transfer = wallet.transferJettonTransaction(
             TONJettonsTransferRequest(
                 jettonAddress = TONUserFriendlyAddress(token.masterAddress!!),
-                transferAmount = transferAmountRaw,
-                recipientAddress = TONUserFriendlyAddress(recipient.trim()),
+                transferAmount = toRaw(current.amount, token.decimals),
+                recipientAddress = TONUserFriendlyAddress(current.recipient.trim()),
                 responseDestination = relay,
             ),
         )
@@ -464,15 +358,12 @@ class SendTokensViewModel(
         private const val TON_DECIMALS = 9
         private const val QUOTE_DEBOUNCE_MS = 400L
 
+        /** Mainnet USDT jetton master — preferred default gasless fee asset, mirroring the iOS/JS demo. */
         private const val USDT_MASTER_MAINNET = "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs"
 
-        fun factory(
-            wallet: ITONWallet,
-            kit: ITONWalletKit,
-            gaslessSupported: Boolean,
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+        fun factory(wallet: ITONWallet, kit: ITONWalletKit): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T = SendTokensViewModel(wallet, kit, gaslessSupported) as T
+            override fun <T : ViewModel> create(modelClass: Class<T>): T = SendTokensViewModel(wallet, kit) as T
         }
     }
 }
