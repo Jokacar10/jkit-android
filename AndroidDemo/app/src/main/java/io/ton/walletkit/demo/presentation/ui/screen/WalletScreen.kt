@@ -452,6 +452,7 @@ fun WalletScreen(
                 WalletKitInvestigationScreen(
                     onBack = { subScreen = HomeSubScreen.None },
                     onConnect = actions::onHandleUrl,
+                    walletKit = walletKit,
                 )
             }
             HomeSubScreen.None -> Unit
