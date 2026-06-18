@@ -30,7 +30,6 @@ import io.ton.walletkit.demo.presentation.model.SignDataRequestUi
 import io.ton.walletkit.demo.presentation.model.SignMessageRequestUi
 import io.ton.walletkit.demo.presentation.model.TransactionRequestUi
 import io.ton.walletkit.demo.presentation.model.WalletSummary
-import io.ton.walletkit.demo.presentation.viewmodel.SendCurrency
 import io.ton.walletkit.demo.presentation.viewmodel.WalletKitViewModel
 import javax.inject.Inject
 
@@ -106,15 +105,6 @@ class WalletActionsImpl @Inject constructor(
     override fun onConfirmSignerApproval() = viewModel.confirmSignerApproval()
 
     override fun onCancelSignerApproval() = viewModel.cancelSignerApproval()
-
-    override fun onSendTransaction(
-        walletAddress: String,
-        recipient: String,
-        amount: String,
-        comment: String,
-        currency: SendCurrency,
-        gasless: Boolean,
-    ) = viewModel.sendLocalTransaction(walletAddress, recipient, amount, comment, currency, gasless)
 
     override fun onRefreshTransactions(address: String) = viewModel.refreshTransactions(address)
 

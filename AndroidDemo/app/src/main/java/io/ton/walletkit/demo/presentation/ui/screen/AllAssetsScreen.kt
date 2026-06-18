@@ -25,6 +25,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -53,12 +54,12 @@ fun AllAssetsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(TonTheme.colors.bgSecondary),
+            .background(TonTheme.colors.bgPrimary),
     ) {
         SubScreenTopBar(title = "My assets", onBack = onBack)
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
+            contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             items(items = assets, key = { it.id }) { asset ->

@@ -50,7 +50,7 @@ fun AllNFTsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(TonTheme.colors.bgSecondary),
+            .background(TonTheme.colors.bgPrimary),
     ) {
         SubScreenTopBar(title = "NFTs", onBack = onBack)
         LazyVerticalGrid(

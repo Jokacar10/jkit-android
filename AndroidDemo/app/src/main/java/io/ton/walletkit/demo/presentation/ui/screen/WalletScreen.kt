@@ -26,20 +26,25 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,6 +57,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -63,17 +69,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.ton.walletkit.ITONWalletKit
 import io.ton.walletkit.api.generated.TONNFT
-import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.demo.R
+import io.ton.walletkit.demo.designsystem.components.text.TonText
 import io.ton.walletkit.demo.designsystem.icons.TonIcon
 import io.ton.walletkit.demo.designsystem.icons.TonIconImage
 import io.ton.walletkit.demo.designsystem.theme.TonTheme
@@ -93,7 +102,6 @@ import io.ton.walletkit.demo.presentation.ui.components.QuickActionsCard
 import io.ton.walletkit.demo.presentation.ui.components.wallet.home.WalletHomeAssetIcon
 import io.ton.walletkit.demo.presentation.ui.components.wallet.home.WalletHomeAssetItem
 import io.ton.walletkit.demo.presentation.ui.components.wallet.home.WalletHomeContent
-import io.ton.walletkit.demo.presentation.ui.components.wallet.home.WalletHomeHeader
 import io.ton.walletkit.demo.presentation.ui.components.wallet.home.WalletHomeNFTPreview
 import io.ton.walletkit.demo.presentation.ui.dialog.SignerConfirmationDialog
 import io.ton.walletkit.demo.presentation.ui.dialog.UrlPromptDialog
@@ -112,6 +120,7 @@ import io.ton.walletkit.demo.presentation.ui.sheet.TransferJettonSheet
 import io.ton.walletkit.demo.presentation.ui.sheet.WalletDetailsSheet
 import io.ton.walletkit.demo.presentation.ui.sheet.WalletsBottomSheet
 import io.ton.walletkit.demo.presentation.util.JettonFormatters
+import io.ton.walletkit.demo.presentation.util.QrScanner
 import io.ton.walletkit.demo.presentation.viewmodel.NFTsListViewModel
 import io.ton.walletkit.demo.presentation.viewmodel.SwapViewModel
 
@@ -196,14 +205,6 @@ private fun nftPreviewFrom(nft: TONNFT): WalletHomeNFTPreview {
         address = nft.address.value,
         imageUrl = info?.image?.mediumUrl ?: info?.image?.url,
     )
-}
-
-private fun networkLabelFor(network: TONNetwork?): String = when (network?.chainId) {
-    io.ton.walletkit.api.ChainIds.MAINNET -> "MainNet"
-    io.ton.walletkit.api.ChainIds.TESTNET -> "TestNet"
-    io.ton.walletkit.api.ChainIds.TETRA -> "Tetra"
-    null -> "MainNet"
-    else -> "TON"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -323,12 +324,8 @@ fun WalletScreen(
 
                 is SheetState.SendTransaction -> SendTransactionScreen(
                     wallet = sheet.wallet,
+                    walletKit = walletKit,
                     onBack = actions::onDismissSheet,
-                    onSend = { recipient, amount, comment, currency, gasless ->
-                        actions.onSendTransaction(sheet.wallet.address, recipient, amount, comment, currency, gasless)
-                    },
-                    error = state.error,
-                    isLoading = state.isSendingTransaction,
                 )
 
                 is SheetState.Staking -> StakingSheet(
@@ -398,7 +395,6 @@ fun WalletScreen(
     val activeIndex = state.wallets.indexOfFirst { it.address == state.activeWalletAddress }
     val homeTitle = if (activeIndex >= 0) "Wallet ${activeIndex + 1}" else "Wallet"
     val homeAddress = activeWallet?.address.orEmpty()
-    val homeNetworkLabel = networkLabelFor(activeWallet?.network)
     val nftsList by (nftsViewModel?.nfts?.collectAsState() ?: remember { mutableStateOf(emptyList<TONNFT>()) })
 
     LaunchedEffect(nftsViewModel) {
@@ -410,16 +406,15 @@ fun WalletScreen(
     val assetItems = remember(activeWallet?.balance, state.jettons) {
         buildAssetList(activeWallet?.balance, state.jettons, MAX_FRACTION_DIGITS, MAX_ASSETS)
     }
-    val hasMoreAssets = state.jettons.size > (MAX_ASSETS - 1)
     val nftPreviews = remember(nftsList) {
         nftsList.take(MAX_NFTS).map(::nftPreviewFrom)
     }
-    val hasMoreNFTs = nftsList.size > MAX_NFTS
 
     var showWalletsSheet by remember { mutableStateOf(false) }
     var subScreen by remember { mutableStateOf<HomeSubScreen>(HomeSubScreen.None) }
     val walletsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
 
     // Reset the sub-screen on wallet switch so the user lands on home for the
     // new wallet (mirrors iOS NavigationStack popping on `.id(active.id)`).
@@ -467,17 +462,49 @@ fun WalletScreen(
     }
 
     Scaffold(
+        containerColor = TonTheme.colors.bgPrimary,
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = TonTheme.colors.bgPrimary,
+                ),
+                navigationIcon = {
+                    IconButton(onClick = {
+                        QrScanner.scan(
+                            context = context,
+                            onResult = actions::onHandleUrl,
+                            onError = { Toast.makeText(context, "Scan failed", Toast.LENGTH_SHORT).show() },
+                        )
+                    }) {
+                        TonIconImage(
+                            icon = TonIcon.Scan,
+                            size = 24.dp,
+                            tint = TonTheme.colors.textPrimary,
+                        )
+                    }
+                },
                 title = {
                     if (activeWallet != null) {
-                        WalletHomeHeader(
-                            title = homeTitle,
-                            networkLabel = homeNetworkLabel,
-                            truncatedAddress = WalletHomeTopBar.shortAddress(homeAddress),
-                            onClick = { showWalletsSheet = true },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        Row(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(TonTheme.colors.bgSecondary)
+                                .clickable { showWalletsSheet = true }
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            TonText(
+                                text = homeTitle,
+                                style = TonTheme.typography.bodySemibold,
+                                color = TonTheme.colors.textPrimary,
+                            )
+                            TonIconImage(
+                                icon = TonIcon.ChevronDown,
+                                size = 20.dp,
+                                tint = TonTheme.colors.textSecondary,
+                            )
+                        }
                     } else {
                         Text(
                             text = stringResource(R.string.wallet_screen_title),
@@ -489,7 +516,7 @@ fun WalletScreen(
                 actions = {
                     IconButton(onClick = { subScreen = HomeSubScreen.Investigation }) {
                         TonIconImage(
-                            icon = TonIcon.Settings24,
+                            icon = TonIcon.SettingsControl,
                             size = 24.dp,
                             tint = TonTheme.colors.textPrimary,
                         )
@@ -515,13 +542,16 @@ fun WalletScreen(
                 totalBalance = totalBalance,
                 balanceSuffix = " TON",
                 balanceMaxFractionDigits = MAX_FRACTION_DIGITS,
+                truncatedAddress = WalletHomeTopBar.shortAddress(homeAddress),
+                onCopyAddress = {
+                    clipboard.setText(AnnotatedString(homeAddress))
+                    Toast.makeText(context, "Address copied", Toast.LENGTH_SHORT).show()
+                },
                 assets = assetItems,
                 nfts = nftPreviews,
-                hasMoreAssets = hasMoreAssets,
-                hasMoreNFTs = hasMoreNFTs,
-                onDeposit = { activeWallet?.let { actions.onWalletDetails(it.address) } },
                 onSend = { activeWallet?.let { actions.onSendFromWallet(it.address) } },
-                onReceive = { activeWallet?.let { actions.onWalletDetails(it.address) } },
+                onSwap = { actions.onSwapClick() },
+                onStake = { activeWallet?.let { actions.onStakeFromWallet(it.address) } },
                 onShowAllAssets = { subScreen = HomeSubScreen.AllAssets },
                 onShowAllNFTs = { subScreen = HomeSubScreen.AllNFTs },
                 onNFTTap = { preview ->

@@ -157,10 +157,8 @@ class WalletKitViewModel @Inject constructor(
     )
 
     private val walletOperationsViewModel = WalletOperationsViewModel(
-        walletKit = { walletKit ?: error("ITONWalletKit not initialized") },
         getWalletByAddress = { address -> lifecycleManager.tonWallets[address] },
         onWalletSwitched = { address -> handleWalletSwitched(address) },
-        onTransactionInitiated = { address -> onLocalTransactionInitiated(address) },
     )
 
     // NFTs ViewModel for active wallet
@@ -434,11 +432,6 @@ class WalletKitViewModel @Inject constructor(
         }
     }
 
-    private fun onLocalTransactionInitiated(walletAddress: String) {
-        val walletName = state.value.wallets.firstOrNull { it.address == walletAddress }?.name ?: walletAddress
-        eventLogger.log(R.string.wallet_event_transaction_initiated, walletName)
-    }
-
     private fun onTonConnectRequestApproved() {
         when (val action = pendingTonConnectAction) {
             is TonConnectAction.Connect -> {
@@ -533,8 +526,10 @@ class WalletKitViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshWallets() {
-        _state.update { it.copy(isLoadingWallets = true) }
+    suspend fun refreshWallets(silent: Boolean = false) {
+        if (!silent) {
+            _state.update { it.copy(isLoadingWallets = true) }
+        }
         Log.d(
             LOG_TAG,
             "refreshWallets: start active=${state.value.activeWalletAddress} cached=${lifecycleManager.tonWallets.keys}",
@@ -580,7 +575,9 @@ class WalletKitViewModel @Inject constructor(
             val fallback = uiString(R.string.wallet_error_load_default)
             _state.update { it.copy(error = error.message ?: fallback) }
         }
-        _state.update { it.copy(isLoadingWallets = false) }
+        if (!silent) {
+            _state.update { it.copy(isLoadingWallets = false) }
+        }
         Log.d(
             LOG_TAG,
             "refreshWallets: done active=${_state.value.activeWalletAddress} wallets=${_state.value.wallets.map { it.address }}",
@@ -944,17 +941,6 @@ class WalletKitViewModel @Inject constructor(
         if (wallet != null) {
             uiCoordinator.openStakingSheet(wallet)
         }
-    }
-
-    fun sendLocalTransaction(
-        walletAddress: String,
-        recipient: String,
-        amount: String,
-        comment: String = "",
-        currency: SendCurrency = SendCurrency.TON,
-        gasless: Boolean = false,
-    ) {
-        walletOperationsViewModel.sendLocalTransaction(walletAddress, recipient, amount, comment, currency, gasless)
     }
 
     fun toggleWalletSwitcher() {
@@ -1547,7 +1533,7 @@ class WalletKitViewModel @Inject constructor(
         balanceRefreshJob = viewModelScope.launch {
             while (true) {
                 delay(BALANCE_REFRESH_MS)
-                refreshWallets()
+                refreshWallets(silent = true)
             }
         }
     }
