@@ -151,15 +151,14 @@ class WalletKitViewModel @Inject constructor(
         getWalletByAddress = { address -> lifecycleManager.tonWallets[address] },
         onRequestApproved = { onTonConnectRequestApproved() },
         onRequestRejected = { onTonConnectRequestRejected() },
+        onRequestFailed = { message -> onTonConnectRequestFailed(message) },
         onSessionsChanged = { viewModelScope.launch { sessionsViewModel.refresh() } },
         onEmbeddedRequest = { followUp -> handleSdkEvent(followUp) },
     )
 
     private val walletOperationsViewModel = WalletOperationsViewModel(
-        walletKit = { walletKit ?: error("ITONWalletKit not initialized") },
         getWalletByAddress = { address -> lifecycleManager.tonWallets[address] },
         onWalletSwitched = { address -> handleWalletSwitched(address) },
-        onTransactionInitiated = { address -> onLocalTransactionInitiated(address) },
     )
 
     // NFTs ViewModel for active wallet
@@ -428,14 +427,9 @@ class WalletKitViewModel @Inject constructor(
         }
 
         if (logSwitch) {
-            val walletName = lifecycleManager.walletMetadata[address]?.name ?: wallet.address?.value ?: address
+            val walletName = lifecycleManager.walletMetadata[address]?.name ?: wallet.address().value ?: address
             eventLogger.log(R.string.wallet_event_switched_wallet, walletName)
         }
-    }
-
-    private fun onLocalTransactionInitiated(walletAddress: String) {
-        val walletName = state.value.wallets.firstOrNull { it.address == walletAddress }?.name ?: walletAddress
-        eventLogger.log(R.string.wallet_event_transaction_initiated, walletName)
     }
 
     private fun onTonConnectRequestApproved() {
@@ -477,6 +471,12 @@ class WalletKitViewModel @Inject constructor(
             null -> Unit
         }
         pendingTonConnectAction = null
+    }
+
+    private fun onTonConnectRequestFailed(message: String) {
+        pendingTonConnectAction = null
+        dismissSheet()
+        eventLogger.showTemporaryStatus(uiString(R.string.wallet_status_transaction_failed, message))
     }
 
     private fun onTonConnectRequestRejected() {
@@ -526,8 +526,10 @@ class WalletKitViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshWallets() {
-        _state.update { it.copy(isLoadingWallets = true) }
+    suspend fun refreshWallets(silent: Boolean = false) {
+        if (!silent) {
+            _state.update { it.copy(isLoadingWallets = true) }
+        }
         Log.d(
             LOG_TAG,
             "refreshWallets: start active=${state.value.activeWalletAddress} cached=${lifecycleManager.tonWallets.keys}",
@@ -573,7 +575,9 @@ class WalletKitViewModel @Inject constructor(
             val fallback = uiString(R.string.wallet_error_load_default)
             _state.update { it.copy(error = error.message ?: fallback) }
         }
-        _state.update { it.copy(isLoadingWallets = false) }
+        if (!silent) {
+            _state.update { it.copy(isLoadingWallets = false) }
+        }
         Log.d(
             LOG_TAG,
             "refreshWallets: done active=${_state.value.activeWalletAddress} wallets=${_state.value.wallets.map { it.address }}",
@@ -710,7 +714,7 @@ class WalletKitViewModel @Inject constructor(
                 val newWallet = result.getOrNull()
 
                 var newAddress: String? = null
-                newWallet?.address?.let { address ->
+                newWallet?.address()?.let { address ->
                     newAddress = address.value
                     lifecycleManager.tonWallets[address.value] = newWallet
 
@@ -794,7 +798,7 @@ class WalletKitViewModel @Inject constructor(
 
             if (result.isSuccess) {
                 val (newWallet, generatedMnemonic) = result.getOrThrow()
-                val newAddress = newWallet.address.value
+                val newAddress = newWallet.address().value
                 lifecycleManager.tonWallets[newAddress] = newWallet
                 lifecycleManager.walletMetadata[newAddress] = pendingMetadata
 
@@ -937,10 +941,6 @@ class WalletKitViewModel @Inject constructor(
         if (wallet != null) {
             uiCoordinator.openStakingSheet(wallet)
         }
-    }
-
-    fun sendLocalTransaction(walletAddress: String, recipient: String, amount: String, comment: String = "") {
-        walletOperationsViewModel.sendLocalTransaction(walletAddress, recipient, amount, comment)
     }
 
     fun toggleWalletSwitcher() {
@@ -1158,7 +1158,7 @@ class WalletKitViewModel @Inject constructor(
     fun removeWallet(address: String) {
         viewModelScope.launch {
             // SDK keys wallets by walletId; our cache maps address → ITONWallet.
-            val walletId = lifecycleManager.tonWallets[address]?.id
+            val walletId = lifecycleManager.tonWallets[address]?.identifier()
             if (walletId == null) {
                 _state.update { it.copy(error = uiString(R.string.wallet_error_wallet_not_found)) }
                 return@launch
@@ -1391,7 +1391,6 @@ class WalletKitViewModel @Inject constructor(
 
     private fun onTransactionRequest(request: TONWalletTransactionRequest) {
         Log.d(LOG_TAG, "=== onTransactionRequest called ===")
-        // Extract wallet address from active wallet
         val walletAddress = state.value.activeWalletAddress ?: ""
         val dAppInfo = request.event.dAppInfo
         val fallbackDAppName = uiString(R.string.wallet_event_generic_dapp)
@@ -1399,7 +1398,6 @@ class WalletKitViewModel @Inject constructor(
 
         Log.d(LOG_TAG, "Transaction request - walletAddress: $walletAddress, dAppName: ${dAppInfo?.name}")
 
-        // Check balance before showing transaction UI (like web demo-wallet does)
         viewModelScope.launch {
             val wallet = lifecycleManager.tonWallets[walletAddress]
             if (wallet != null) {
@@ -1412,36 +1410,21 @@ class WalletKitViewModel @Inject constructor(
 
                     if (balance.value.toBigInteger() < totalAmount) {
                         Log.d(LOG_TAG, "Insufficient balance - auto-rejecting transaction")
-                        // Use NonCancellable to ensure rejection completes even if Activity goes to background
                         withContext(NonCancellable) {
-                            // Use BAD_REQUEST_ERROR (1) for insufficient balance, matching web demo-wallet
                             request.reject("Insufficient balance", BAD_REQUEST_ERROR_CODE)
                         }
                         return@launch
                     }
                 } catch (e: Exception) {
                     Log.e(LOG_TAG, "Failed to check balance, proceeding with transaction UI", e)
-                    // Continue to show the UI even if balance check fails
                 }
             }
 
-            // Map actual transaction messages from request
             val messages = txRequest.messages.map { msg ->
-                // Try to decode comment from payload if it's a simple text comment
-                val comment = try {
-                    msg.payload?.let { _ ->
-                        // Simple text comments are base64 encoded with opcode 0
-                        // For now, we'll just show null - full decoding can be added later
-                        null
-                    }
-                } catch (_: Exception) {
-                    null
-                }
-
                 TransactionMessageUi(
                     to = msg.address,
                     amount = msg.amount,
-                    comment = comment,
+                    comment = null,
                     payload = msg.payload?.value,
                     stateInit = msg.stateInit?.value,
                 )
@@ -1460,7 +1443,6 @@ class WalletKitViewModel @Inject constructor(
 
             Log.d(LOG_TAG, "Setting sheet to Transaction state with ${messages.size} messages")
             uiCoordinator.setSheet(SheetState.Transaction(uiRequest))
-            Log.d(LOG_TAG, "Sheet state updated: ${state.value.sheetState}")
             val eventDAppName = dAppInfo?.name ?: fallbackDAppName
             eventLogger.log(R.string.wallet_event_transaction_request, eventDAppName)
         }
@@ -1551,7 +1533,7 @@ class WalletKitViewModel @Inject constructor(
         balanceRefreshJob = viewModelScope.launch {
             while (true) {
                 delay(BALANCE_REFRESH_MS)
-                refreshWallets()
+                refreshWallets(silent = true)
             }
         }
     }
@@ -1838,7 +1820,7 @@ class WalletKitViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val kit = getKit()
-                val allWalletIds = lifecycleManager.tonWallets.values.map { it.id }
+                val allWalletIds = lifecycleManager.tonWallets.values.map { it.identifier() }
                 allWalletIds.forEach { walletId ->
                     runCatching { kit.removeWallet(walletId) }.onFailure {
                         Log.w(LOG_TAG, "Failed to remove wallet during reset", it)

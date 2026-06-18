@@ -69,7 +69,6 @@ interface WalletActions {
     fun onRejectSignMessage(request: SignMessageRequestUi)
     fun onConfirmSignerApproval()
     fun onCancelSignerApproval()
-    fun onSendTransaction(walletAddress: String, recipient: String, amount: String, comment: String)
     fun onRefreshTransactions(address: String)
     fun onTransactionClick(transactionHash: String, walletAddress: String)
     fun onHandleUrl(url: String)

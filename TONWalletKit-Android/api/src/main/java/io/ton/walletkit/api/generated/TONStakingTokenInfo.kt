@@ -36,7 +36,7 @@ import kotlinx.serialization.Serializable
  *
  * @param ticker
  * @param decimals
- * @param address 'ton' for native TON, otherwise contract address in friendly format
+ * @param address 'ton' for native GRAM, otherwise contract address in friendly format
  */
 @Serializable
 data class TONStakingTokenInfo(
@@ -47,7 +47,7 @@ data class TONStakingTokenInfo(
     @SerialName(value = "decimals")
     var decimals: kotlin.Int,
 
-    /* 'ton' for native TON, otherwise contract address in friendly format */
+    /* 'ton' for native GRAM, otherwise contract address in friendly format */
     @SerialName(value = "address")
     var address: kotlin.String,
 

@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.Flow
 interface ITONStreamingManager {
     suspend fun hasProvider(network: TONNetwork): Boolean
 
-    suspend fun register(provider: ITONStreamingProvider)
+    suspend fun registerProvider(provider: ITONStreamingProvider)
 
     suspend fun connect()
 

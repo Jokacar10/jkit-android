@@ -40,7 +40,7 @@ import kotlinx.serialization.Serializable
  * @param userAddress
  * @param network
  * @param unstakeMode
- * @param isReversed If true, for unstake requests the amount is specified in the staking coin (e.g. TON) instead of the Liquid Staking Token (e.g. tsTON).
+ * @param isReversed If true, for unstake requests the amount is specified in the staking coin (e.g. GRAM) instead of the Liquid Staking Token (e.g. tsTON).
  * @param providerOptions Provider-specific options
  */
 @Serializable

@@ -106,13 +106,6 @@ class WalletActionsImpl @Inject constructor(
 
     override fun onCancelSignerApproval() = viewModel.cancelSignerApproval()
 
-    override fun onSendTransaction(
-        walletAddress: String,
-        recipient: String,
-        amount: String,
-        comment: String,
-    ) = viewModel.sendLocalTransaction(walletAddress, recipient, amount, comment)
-
     override fun onRefreshTransactions(address: String) = viewModel.refreshTransactions(address)
 
     override fun onTransactionClick(transactionHash: String, walletAddress: String) = viewModel.showTransactionDetail(transactionHash, walletAddress)

@@ -29,14 +29,14 @@ import io.ton.walletkit.engine.WalletKitEngine
 import io.ton.walletkit.engine.model.WalletAccount
 import io.ton.walletkit.model.KeyPair
 import io.ton.walletkit.model.TONBalance
+import io.ton.walletkit.model.TONBase64
+import io.ton.walletkit.model.TONHex
 import io.ton.walletkit.model.TONUserFriendlyAddress
 import io.ton.walletkit.session.TONConnectSession
 import kotlinx.serialization.json.Json
 
 /**
  * Represents a TON wallet with balance and state management.
- *
- * Mirrors the canonical TON Wallet contract interface for cross-platform consistency.
  *
  * Use [TONWallet.add] to create a new wallet from mnemonic data.
  *
@@ -53,13 +53,10 @@ import kotlinx.serialization.json.Json
  * wallet.connect("tc://...")
  * wallet.remove()
  * ```
- *
- * @property id Unique wallet identifier (opaque hash from bridge)
- * @property address Wallet address in user-friendly format
  */
 internal class TONWallet internal constructor(
-    override val id: String,
-    override val address: TONUserFriendlyAddress,
+    private val id: String,
+    private val address: TONUserFriendlyAddress,
     private val network: TONNetwork,
     private val engine: WalletKitEngine,
     private val account: WalletAccount,
@@ -67,7 +64,7 @@ internal class TONWallet internal constructor(
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    override val client: TONAPIClient = BridgedJSAPIClient(
+    private val apiClient: TONAPIClient = BridgedJSAPIClient(
         walletId = id,
         engine = engine,
         network = network,
@@ -185,10 +182,7 @@ internal class TONWallet internal constructor(
      * @return NFT details
      * @throws WalletKitBridgeException if NFT retrieval fails
      */
-    override suspend fun nft(address: TONUserFriendlyAddress): TONNFT {
-        return engine.getNft(address.value)
-            ?: throw WalletKitBridgeException("NFT not found: ${address.value}")
-    }
+    override suspend fun nft(address: TONUserFriendlyAddress): TONNFT? = engine.getNft(address.value)
 
     /**
      * Get balance of a specific jetton.
@@ -224,36 +218,49 @@ internal class TONWallet internal constructor(
     override suspend fun transferJettonTransaction(request: TONJettonsTransferRequest): TONTransactionRequest =
         engine.createTransferJettonTransaction(id, request)
 
-    /**
-     * Get jettons owned by this wallet.
-     *
-     * @param request Request with pagination
-     * @return Response with jettons and address book
-     * @throws WalletKitBridgeException if jetton retrieval fails
-     */
-    override suspend fun jettons(request: TONJettonsRequest): TONJettonsResponse {
-        val limit = request.pagination?.limit ?: 100
-        val offset = request.pagination?.offset ?: 0
+    // ── Adapter surface (inherited from ITONWalletAdapter via ITONWallet) ──
+
+    override fun identifier(): String = id
+
+    override suspend fun publicKey(): TONHex = TONHex(engine.getWalletPublicKey(id))
+
+    override fun network(): TONNetwork = network
+
+    override fun client(): TONAPIClient = apiClient
+
+    override fun address(testnet: Boolean): TONUserFriendlyAddress = address
+
+    override suspend fun stateInit(): TONBase64 = TONBase64(engine.getWalletStateInit(id))
+
+    override suspend fun signedSendTransaction(
+        input: TONTransactionRequest,
+        fakeSignature: Boolean?,
+    ): TONBase64 = TONBase64(engine.getSignedSendTransaction(id, input, fakeSignature))
+
+    override suspend fun signedSignMessage(
+        input: TONTransactionRequest,
+        fakeSignature: Boolean?,
+    ): TONBase64 = TONBase64(engine.getSignedSignMessage(id, input))
+
+    override suspend fun signedSignData(
+        input: TONPreparedSignData,
+        fakeSignature: Boolean?,
+    ): TONHex = TONHex(engine.getSignedSignData(id, input, fakeSignature))
+
+    override suspend fun signedTonProof(
+        input: TONProofMessage,
+        fakeSignature: Boolean?,
+    ): TONHex = TONHex(engine.getSignedTonProof(id, input, fakeSignature))
+
+    override suspend fun jettons(request: TONJettonsRequest?): TONJettonsResponse {
+        val limit = request?.pagination?.limit ?: 100
+        val offset = request?.pagination?.offset ?: 0
         return engine.getJettons(id, limit, offset)
     }
 
     // ========================================================================
     // Additional methods (not in ITONWallet interface)
     // ========================================================================
-
-    /**
-     * Get the state init BOC for this wallet.
-     *
-     * The implementation currently returns null until state init retrieval is added to the engine.
-     *
-     * @return State init as base64-encoded BOC, or null if not available
-     * @throws io.ton.walletkit.WalletKitBridgeException if state init retrieval fails
-     */
-    suspend fun stateInit(): String? {
-        // TODO: Implement state init retrieval when available in engine
-        // Reference implementation: wallet.getSateInit()?.toString()
-        return null
-    }
 
     /**
      * Handle a TON Connect URL (e.g., from QR code scan or deep link).

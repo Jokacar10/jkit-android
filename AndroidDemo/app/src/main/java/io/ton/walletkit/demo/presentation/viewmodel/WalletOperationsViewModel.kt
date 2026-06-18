@@ -25,24 +25,18 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ton.walletkit.ITONWallet
-import io.ton.walletkit.ITONWalletKit
-import io.ton.walletkit.api.generated.TONTransferRequest
-import io.ton.walletkit.demo.presentation.util.TonFormatter
-import io.ton.walletkit.model.TONUserFriendlyAddress
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel for wallet operations like switching wallets and sending local transactions.
- * Handles operations that require an active wallet context.
+ * ViewModel for wallet-context operations such as switching the active wallet.
+ * Sending tokens is handled by [SendTokensViewModel].
  */
 class WalletOperationsViewModel(
-    private val walletKit: () -> ITONWalletKit,
     private val getWalletByAddress: (String) -> ITONWallet?,
     private val onWalletSwitched: (String) -> Unit = {},
-    private val onTransactionInitiated: (String) -> Unit = {},
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(WalletOperationsState())
@@ -72,76 +66,6 @@ class WalletOperationsViewModel(
             onWalletSwitched(address)
 
             Log.d(TAG, "Switched to wallet: $address")
-        }
-    }
-
-    /**
-     * Send a local transaction (TON transfer).
-     * This creates a transaction request that will trigger the approval flow.
-     *
-     * This uses the standard JS WalletKit API:
-     * 1. wallet.createTransferTonTransaction(params) - creates transaction content
-     * 2. kit.handleNewTransaction(wallet, transaction) - triggers approval flow
-     *
-     * @param walletAddress The sender wallet address
-     * @param recipient The recipient address
-     * @param amount The amount in TON (will be converted to nanoTON)
-     * @param comment Optional comment for the transaction
-     */
-    fun sendLocalTransaction(
-        walletAddress: String,
-        recipient: String,
-        amount: String,
-        comment: String = "",
-    ) {
-        viewModelScope.launch {
-            _state.value = _state.value.copy(isSendingTransaction = true, error = null)
-
-            val wallet = getWalletByAddress(walletAddress)
-            if (wallet == null) {
-                _state.value = _state.value.copy(
-                    isSendingTransaction = false,
-                    error = "Wallet not found",
-                )
-                return@launch
-            }
-
-            // Convert TON to nanoTON
-            val amountInNano = try {
-                TonFormatter.tonToNano(amount)
-            } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    isSendingTransaction = false,
-                    error = "Invalid amount: ${e.message}",
-                )
-                return@launch
-            }
-
-            runCatching {
-                // Step 1: Create transaction request
-                val request = TONTransferRequest(
-                    recipientAddress = TONUserFriendlyAddress(recipient),
-                    transferAmount = amountInNano,
-                    comment = comment.takeIf { it.isNotBlank() },
-                )
-                val transactionRequest = wallet.transferTONTransaction(request)
-
-                // Step 2: Send the transaction directly
-                wallet.send(transactionRequest)
-            }.onSuccess {
-                _state.value = _state.value.copy(
-                    isSendingTransaction = false,
-                    successMessage = "Transaction initiated",
-                )
-                onTransactionInitiated(walletAddress)
-                Log.d(TAG, "Local transaction initiated from $walletAddress")
-            }.onFailure { error ->
-                Log.e(TAG, "Failed to send local transaction", error)
-                _state.value = _state.value.copy(
-                    isSendingTransaction = false,
-                    error = error.message ?: "Failed to send transaction",
-                )
-            }
         }
     }
 

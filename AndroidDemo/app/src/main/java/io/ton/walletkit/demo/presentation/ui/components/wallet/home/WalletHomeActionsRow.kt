@@ -30,13 +30,11 @@ import io.ton.walletkit.demo.designsystem.components.button.TonActionButton
 import io.ton.walletkit.demo.designsystem.components.button.TonActionButtonStyle
 import io.ton.walletkit.demo.designsystem.icons.TonIcon
 
-// Three secondary action buttons (Deposit / Send / Receive). Each takes weight=1 so
-// they share width equally — matches iOS HStack(spacing: 8) under TONActionButton.
 @Composable
 fun WalletHomeActionsRow(
-    onDeposit: () -> Unit,
     onSend: () -> Unit,
-    onReceive: () -> Unit,
+    onSwap: () -> Unit,
+    onStake: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -44,24 +42,24 @@ fun WalletHomeActionsRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         TonActionButton(
-            icon = TonIcon.CirclePlus,
-            title = "Deposit",
-            style = TonActionButtonStyle.Secondary,
-            onClick = onDeposit,
-            modifier = Modifier.weight(1f),
-        )
-        TonActionButton(
             icon = TonIcon.Send,
             title = "Send",
-            style = TonActionButtonStyle.Secondary,
+            style = TonActionButtonStyle.Tertiary,
             onClick = onSend,
             modifier = Modifier.weight(1f),
         )
         TonActionButton(
-            icon = TonIcon.ArrowDownCircle,
-            title = "Receive",
-            style = TonActionButtonStyle.Secondary,
-            onClick = onReceive,
+            icon = TonIcon.SwitchVertical24,
+            title = "Swap",
+            style = TonActionButtonStyle.Tertiary,
+            onClick = onSwap,
+            modifier = Modifier.weight(1f),
+        )
+        TonActionButton(
+            icon = TonIcon.Stake,
+            title = "Stake",
+            style = TonActionButtonStyle.Tertiary,
+            onClick = onStake,
             modifier = Modifier.weight(1f),
         )
     }

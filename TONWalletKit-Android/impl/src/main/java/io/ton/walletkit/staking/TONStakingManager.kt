@@ -43,7 +43,7 @@ internal class TONStakingManager(
     private val engine: WalletKitEngine,
 ) : ITONStakingManager {
 
-    override suspend fun register(provider: ITONStakingProvider<*, *>) {
+    override suspend fun registerProvider(provider: ITONStakingProvider<*, *>) {
         if (provider is BuiltInStakingProvider<*, *>) {
             // Built-in JS-backed provider: the JS side already has the instance; just register its name.
             engine.registerStakingProvider(provider.identifier.name)
@@ -60,7 +60,7 @@ internal class TONStakingManager(
         }
     }
 
-    override suspend fun remove(provider: ITONStakingProvider<*, *>) {
+    override suspend fun removeProvider(provider: ITONStakingProvider<*, *>) {
         val name = provider.identifier.name
         engine.removeStakingProvider(name)
         // Local Kotlin registry is keyed by the same name; safe to drop unconditionally.

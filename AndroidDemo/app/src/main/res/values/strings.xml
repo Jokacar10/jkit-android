@@ -271,6 +271,7 @@
     <string name="wallet_error_reject_transaction">Failed to reject transaction</string>
     <string name="wallet_event_sign_data_approved">✅ Sign data approved</string>
     <string name="wallet_status_signed_success">✅ Signed successfully</string>
+    <string name="wallet_status_transaction_failed">⚠️ Transaction failed: %1$s</string>
     <string name="wallet_status_walletkit_ready">WalletKit ready</string>
     <string name="wallet_event_sign_data_failed">❌ Sign data approval failed: %1$s</string>
     <string name="wallet_error_approve_sign_request">Failed to approve sign request</string>

@@ -46,6 +46,7 @@ class TonConnectViewModel(
     private val getWalletByAddress: (String) -> ITONWallet?,
     private val onRequestApproved: () -> Unit = {},
     private val onRequestRejected: () -> Unit = {},
+    private val onRequestFailed: (String) -> Unit = {},
     private val onSessionsChanged: () -> Unit = {},
     private val onEmbeddedRequest: (TONWalletKitEvent) -> Unit = {},
 ) : ViewModel() {
@@ -207,6 +208,7 @@ class TonConnectViewModel(
                     isProcessing = false,
                     error = error.message ?: "Failed to approve transaction",
                 )
+                onRequestFailed(error.message ?: "Failed to approve transaction")
             }
         }
     }

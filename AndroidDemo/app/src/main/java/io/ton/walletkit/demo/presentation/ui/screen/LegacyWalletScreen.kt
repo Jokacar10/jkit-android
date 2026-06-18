@@ -214,12 +214,8 @@ fun LegacyWalletScreen(
 
                 is SheetState.SendTransaction -> SendTransactionScreen(
                     wallet = sheet.wallet,
+                    walletKit = walletKit,
                     onBack = actions::onDismissSheet,
-                    onSend = { recipient, amount, comment ->
-                        actions.onSendTransaction(sheet.wallet.address, recipient, amount, comment)
-                    },
-                    error = state.error,
-                    isLoading = state.isSendingTransaction,
                 )
 
                 is SheetState.Staking -> StakingSheet(

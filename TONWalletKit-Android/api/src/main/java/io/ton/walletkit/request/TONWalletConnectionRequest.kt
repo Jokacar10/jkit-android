@@ -44,8 +44,8 @@ class TONWalletConnectionRequest(
         response: TONConnectionApprovalResponse? = null,
     ): TONWalletKitEvent? {
         val updatedEvent = event.copy(
-            walletId = wallet.id,
-            walletAddress = wallet.address,
+            walletId = wallet.identifier(),
+            walletAddress = wallet.address(),
         )
         val embedded = handler.approveConnect(updatedEvent, response) ?: return null
         return when (embedded) {

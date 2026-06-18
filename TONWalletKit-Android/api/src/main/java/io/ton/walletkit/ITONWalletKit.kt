@@ -29,14 +29,17 @@ import io.ton.walletkit.api.generated.TONDeDustSwapProviderConfig
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONOmnistonSwapProviderConfig
 import io.ton.walletkit.api.generated.TONSignatureDomain
+import io.ton.walletkit.api.generated.TONTonApiGaslessProviderConfig
 import io.ton.walletkit.api.generated.TONTonApiStreamingProviderConfig
 import io.ton.walletkit.api.generated.TONTonCenterStreamingProviderConfig
 import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.config.TONWalletKitConfiguration
+import io.ton.walletkit.gasless.ITONGaslessManager
+import io.ton.walletkit.gasless.tonapi.TONApiGaslessProvider
 import io.ton.walletkit.internal.TONWalletKitFactory
 import io.ton.walletkit.listener.TONBridgeEventsHandler
+import io.ton.walletkit.model.ITONWalletAdapter
 import io.ton.walletkit.model.KeyPair
-import io.ton.walletkit.model.TONWalletAdapter
 import io.ton.walletkit.model.WalletSigner
 import io.ton.walletkit.model.WalletSignerInfo
 import io.ton.walletkit.request.TONWalletConnectionRequest
@@ -104,7 +107,7 @@ interface ITONWalletKit {
         workchain: Int = WalletKitConstants.DEFAULT_WORKCHAIN,
         walletId: Long = WalletKitConstants.DEFAULT_WALLET_ID_V5R1,
         domain: TONSignatureDomain? = null,
-    ): TONWalletAdapter
+    ): ITONWalletAdapter
 
     /**
      * Create a V4R2 wallet adapter.
@@ -117,19 +120,19 @@ interface ITONWalletKit {
         workchain: Int = WalletKitConstants.DEFAULT_WORKCHAIN,
         walletId: Long = WalletKitConstants.DEFAULT_WALLET_ID_V4R2,
         domain: TONSignatureDomain? = null,
-    ): TONWalletAdapter
+    ): ITONWalletAdapter
 
     // ── Add wallet ──
 
     /**
-     * Add a wallet using a [TONWalletAdapter].
+     * Add a wallet using a [ITONWalletAdapter].
      */
-    suspend fun addWallet(adapter: TONWalletAdapter): ITONWallet
+    suspend fun addWallet(adapter: ITONWalletAdapter): ITONWallet
 
     suspend fun getWallets(): List<ITONWallet>
 
     /**
-     * Get a wallet by its ID (from [TONWalletAdapter.identifier]).
+     * Get a wallet by its ID (from [ITONWalletAdapter.identifier]).
      */
     suspend fun getWallet(walletId: String): ITONWallet?
 
@@ -200,6 +203,16 @@ interface ITONWalletKit {
      * Get the swap manager for registering providers and executing swaps.
      */
     suspend fun swap(): ITONSwapManager
+
+    // ── Gasless ──
+
+    /**
+     * Create a TonAPI gasless provider. Register the returned handle with [gasless] before quoting.
+     */
+    suspend fun tonApiGaslessProvider(config: TONTonApiGaslessProviderConfig? = null): TONApiGaslessProvider
+
+    /** Get the gasless manager for registering providers and relaying gasless transactions. */
+    suspend fun gasless(): ITONGaslessManager
 
     // ── Staking ──
 

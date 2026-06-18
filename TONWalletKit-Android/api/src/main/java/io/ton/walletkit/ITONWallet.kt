@@ -22,153 +22,43 @@
 package io.ton.walletkit
 
 import io.ton.walletkit.api.generated.*
-import io.ton.walletkit.client.TONAPIClient
+import io.ton.walletkit.model.ITONWalletAdapter
 import io.ton.walletkit.model.TONBalance
 import io.ton.walletkit.model.TONUserFriendlyAddress
 
-/**
- * TON wallet instance for transaction management and dApp interactions.
- */
-interface ITONWallet {
-    /**
-     * Unique wallet identifier.
-     */
-    val id: String
-
-    /**
-     * Wallet address in user-friendly format.
-     */
-    val address: TONUserFriendlyAddress
-
-    /** API client backing this wallet — exposes per-wallet network and RPC. */
-    val client: TONAPIClient
-
-    /**
-     * Get wallet balance.
-     */
+interface ITONWallet : ITONWalletAdapter {
     suspend fun balance(): TONBalance
 
-    /**
-     * Create a TON transfer transaction.
-     *
-     * @param request Transfer request with recipient, amount, and optional comment
-     * @return Transaction request ready for sending or preview
-     */
     suspend fun transferTONTransaction(request: TONTransferRequest): TONTransactionRequest
 
-    /**
-     * Create a multi-recipient TON transfer transaction.
-     *
-     * @param requests List of transfer requests
-     * @return Transaction request ready for sending or preview
-     */
     suspend fun transferTONTransaction(requests: List<TONTransferRequest>): TONTransactionRequest
 
-    /**
-     * Send a transaction to the blockchain.
-     *
-     * @param transactionRequest Transaction request from transferTON/NFT/Jetton methods
-     * @return Broadcast response (boc, normalizedBoc, normalizedHash).
-     */
-    suspend fun send(transactionRequest: TONTransactionRequest): TONSendTransactionResponse
-
-    /**
-     * Get transaction preview with fee estimation.
-     *
-     * @param transactionRequest Transaction request to preview
-     * @param options Optional preview options (mode, relayGas)
-     * @return Preview with estimated fees and trace
-     */
     suspend fun preview(
         transactionRequest: TONTransactionRequest,
         options: TONTransactionPreviewOptions? = null,
     ): TONTransactionEmulatedPreview
 
-    /**
-     * Create an NFT transfer transaction.
-     *
-     * @param request NFT transfer request with recipient and optional comment
-     * @return Transaction request ready for sending or preview
-     */
+    suspend fun send(transactionRequest: TONTransactionRequest): TONSendTransactionResponse
+
     suspend fun transferNFTTransaction(request: TONNFTTransferRequest): TONTransactionRequest
 
-    /**
-     * Create an NFT transfer transaction with raw parameters.
-     *
-     * @param request Raw NFT transfer request with full control
-     * @return Transaction request ready for sending or preview
-     */
     suspend fun transferNFTTransaction(request: TONNFTRawTransferRequest): TONTransactionRequest
 
-    /**
-     * Get NFTs owned by this wallet.
-     *
-     * @param request Request with pagination and optional filters
-     * @return Response with NFTs and address book
-     */
     suspend fun nfts(request: TONNFTsRequest): TONNFTsResponse
 
-    /**
-     * Get a single NFT by address.
-     *
-     * @param address NFT contract address
-     * @return NFT details
-     */
-    suspend fun nft(address: TONUserFriendlyAddress): TONNFT
+    suspend fun nft(address: TONUserFriendlyAddress): TONNFT?
 
-    /**
-     * Get balance of a specific jetton.
-     *
-     * @param jettonAddress Jetton master contract address
-     * @return Balance in jetton units
-     */
     suspend fun jettonBalance(jettonAddress: TONUserFriendlyAddress): TONBalance
 
-    /**
-     * Get jetton wallet address for a specific jetton.
-     *
-     * Each user has a unique jetton wallet contract for each jetton they hold.
-     *
-     * @param jettonAddress Jetton master contract address
-     * @return Jetton wallet contract address
-     */
     suspend fun jettonWalletAddress(jettonAddress: TONUserFriendlyAddress): TONUserFriendlyAddress
 
-    /**
-     * Create a jetton transfer transaction.
-     *
-     * @param request Jetton transfer request
-     * @return Transaction request ready for sending or preview
-     */
     suspend fun transferJettonTransaction(request: TONJettonsTransferRequest): TONTransactionRequest
 
-    /**
-     * Get jettons owned by this wallet.
-     *
-     * @param request Request with pagination
-     * @return Response with jettons and address book
-     */
-    suspend fun jettons(request: TONJettonsRequest): TONJettonsResponse
+    suspend fun jettons(request: TONJettonsRequest? = null): TONJettonsResponse
 }
 
-/**
- * Get NFTs with a simple limit parameter.
- *
- * @param limit Maximum number of NFTs to return
- * @return Response with NFTs and address book
- */
-suspend fun ITONWallet.nfts(limit: Int): TONNFTsResponse {
-    val request = TONNFTsRequest(pagination = TONPagination(limit = limit))
-    return nfts(request)
-}
+suspend fun ITONWallet.nfts(limit: Int): TONNFTsResponse =
+    nfts(TONNFTsRequest(pagination = TONPagination(limit = limit)))
 
-/**
- * Get jettons with a simple limit parameter.
- *
- * @param limit Maximum number of jettons to return
- * @return Response with jettons and address book
- */
-suspend fun ITONWallet.jettons(limit: Int): TONJettonsResponse {
-    val request = TONJettonsRequest(pagination = TONPagination(limit = limit))
-    return jettons(request)
-}
+suspend fun ITONWallet.jettons(limit: Int): TONJettonsResponse =
+    jettons(TONJettonsRequest(pagination = TONPagination(limit = limit)))

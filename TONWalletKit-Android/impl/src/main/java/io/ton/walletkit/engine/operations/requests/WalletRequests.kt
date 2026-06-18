@@ -24,6 +24,7 @@ package io.ton.walletkit.engine.operations.requests
 import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONSignatureDomain
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 /**
  * Internal bridge request models for wallet operations.
@@ -40,6 +41,33 @@ internal data class AddressRequest(
 @Serializable
 internal data class WalletIdRequest(
     val walletId: String,
+)
+
+@Serializable
+internal data class GetSignedSignMessageRequest(
+    val walletId: String,
+    val request: JsonElement,
+)
+
+@Serializable
+internal data class GetSignedSendTransactionRequest(
+    val walletId: String,
+    val input: JsonElement,
+    val fakeSignature: Boolean? = null,
+)
+
+@Serializable
+internal data class GetSignedSignDataRequest(
+    val walletId: String,
+    val input: JsonElement,
+    val fakeSignature: Boolean? = null,
+)
+
+@Serializable
+internal data class GetSignedTonProofRequest(
+    val walletId: String,
+    val input: JsonElement,
+    val fakeSignature: Boolean? = null,
 )
 
 @Serializable
