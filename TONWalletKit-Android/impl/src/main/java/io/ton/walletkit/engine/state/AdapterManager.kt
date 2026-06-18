@@ -21,7 +21,7 @@
  */
 package io.ton.walletkit.engine.state
 
-import io.ton.walletkit.model.TONWalletAdapter
+import io.ton.walletkit.model.ITONWalletAdapter
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
@@ -40,13 +40,13 @@ import java.util.concurrent.ConcurrentHashMap
  * @suppress Internal component. Exposed via [WebViewWalletKitEngine] only.
  */
 internal class AdapterManager {
-    private val adapters = ConcurrentHashMap<String, TONWalletAdapter>()
+    private val adapters = ConcurrentHashMap<String, ITONWalletAdapter>()
     private val mutex = Mutex()
 
     /**
      * Register a wallet adapter and obtain a unique ID for the JS bridge.
      */
-    suspend fun registerAdapter(adapter: TONWalletAdapter): String = mutex.withLock {
+    suspend fun registerAdapter(adapter: ITONWalletAdapter): String = mutex.withLock {
         val adapterId = buildString {
             append("native_adapter_")
             append(System.currentTimeMillis())
@@ -60,7 +60,7 @@ internal class AdapterManager {
     /**
      * Look up an adapter by ID.
      */
-    fun getAdapter(adapterId: String): TONWalletAdapter? = adapters[adapterId]
+    fun getAdapter(adapterId: String): ITONWalletAdapter? = adapters[adapterId]
 
     /**
      * Remove an adapter from the registry.

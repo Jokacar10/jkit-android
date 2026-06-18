@@ -131,7 +131,7 @@ class WalletKitDemoApp :
                 return
             }
 
-            val existingAddresses = kit.getWallets().mapNotNull { it.address?.value }.toMutableSet()
+            val existingAddresses = kit.getWallets().mapNotNull { it.address().value }.toMutableSet()
             Log.d(TAG, "Loading ${storedWallets.size} stored wallets into SDK")
 
             for ((address, walletRecord) in storedWallets) {
@@ -320,7 +320,7 @@ object TONWalletKitHelper {
                                 apiKey = tonCenterApiKey,
                             ),
                         )
-                        kit.streaming().register(streamingProvider)
+                        kit.streaming().registerProvider(streamingProvider)
                     } catch (e: Exception) {
                         Log.e("WalletKitDemoApp", "Streaming init ERROR network=${network.chainId} - ${e.message}", e)
                     }

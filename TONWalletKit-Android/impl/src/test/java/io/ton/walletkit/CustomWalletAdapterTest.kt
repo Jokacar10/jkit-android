@@ -25,11 +25,12 @@ import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONPreparedSignData
 import io.ton.walletkit.api.generated.TONProofMessage
 import io.ton.walletkit.api.generated.TONTransactionRequest
+import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.config.TONWalletKitConfiguration
+import io.ton.walletkit.model.ITONWalletAdapter
 import io.ton.walletkit.model.TONBase64
 import io.ton.walletkit.model.TONHex
 import io.ton.walletkit.model.TONUserFriendlyAddress
-import io.ton.walletkit.model.TONWalletAdapter
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -38,7 +39,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Tests for the user-implementable [TONWalletAdapter] contract — in particular the
+ * Tests for the user-implementable [ITONWalletAdapter] contract — in particular the
  * `signedSignMessage` method added for TON-1240 parity with iOS `TONWalletAdapterProtocol`.
  *
  * Mirrors iOS `TONWalletAdapterTests` / `TONWalletAdapterJSAdapterTests` at the interface layer.
@@ -50,7 +51,7 @@ class CustomWalletAdapterTest {
         private val pubKey: String = "0xpub",
         private val net: TONNetwork = TONNetwork(chainId = "-239"),
         private val addr: String = "EQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqB2N",
-    ) : TONWalletAdapter {
+    ) : ITONWalletAdapter {
         var stateInitCalls = 0
         var signedSendTransactionCalls = 0
         var signedSignMessageCalls = 0
@@ -58,8 +59,9 @@ class CustomWalletAdapterTest {
         var lastTransactionRequest: TONTransactionRequest? = null
 
         override fun identifier(): String = adapterId
-        override fun publicKey(): TONHex = TONHex(pubKey)
+        override suspend fun publicKey(): TONHex = TONHex(pubKey)
         override fun network(): TONNetwork = net
+        override fun client(): TONAPIClient = throw NotImplementedError()
         override fun address(testnet: Boolean): TONUserFriendlyAddress = TONUserFriendlyAddress(addr)
 
         override suspend fun stateInit(): TONBase64 {
@@ -153,7 +155,7 @@ class CustomWalletAdapterTest {
     }
 
     @Test
-    fun `adapter exposes identifier publicKey network address synchronously`() {
+    fun `adapter exposes identifier publicKey network address`() = runTest {
         val adapter = MockWalletAdapter()
 
         assertEquals("adapter-1", adapter.identifier())

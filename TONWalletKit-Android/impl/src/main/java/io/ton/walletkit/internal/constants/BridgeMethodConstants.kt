@@ -72,6 +72,24 @@ internal object BridgeMethodConstants {
     /** Method name for getting a wallet's network. */
     const val METHOD_GET_WALLET_NETWORK = "getWalletNetwork"
 
+    /** Method name for getting a wallet's public key. */
+    const val METHOD_GET_WALLET_PUBLIC_KEY = "getWalletPublicKey"
+
+    /** Method name for proactively signing a set of messages (used by gasless relay flows). */
+    const val METHOD_GET_SIGNED_SIGN_MESSAGE = "getSignedSignMessage"
+
+    /** Method name for getting a wallet's state init (base64 BOC). */
+    const val METHOD_GET_WALLET_STATE_INIT = "getWalletStateInit"
+
+    /** Method name for producing a signed send-transaction BoC. */
+    const val METHOD_GET_SIGNED_SEND_TRANSACTION = "getSignedSendTransaction"
+
+    /** Method name for producing signed sign-data. */
+    const val METHOD_GET_SIGNED_SIGN_DATA = "getSignedSignData"
+
+    /** Method name for producing a signed TON proof. */
+    const val METHOD_GET_SIGNED_TON_PROOF = "getSignedTonProof"
+
     /**
      * Method name for removing a wallet.
      */
@@ -325,6 +343,41 @@ internal object BridgeMethodConstants {
      * Kotlin-implemented [io.ton.walletkit.swap.ITONSwapProvider] via reverse-RPC.
      */
     const val METHOD_REGISTER_KOTLIN_SWAP_PROVIDER = "registerKotlinSwapProvider"
+
+    // Gasless methods
+
+    /** Create a TonAPI gasless provider instance. */
+    const val METHOD_CREATE_TONAPI_GASLESS_PROVIDER = "createTonApiGaslessProvider"
+
+    /** Register a previously created gasless provider with the gasless manager. */
+    const val METHOD_REGISTER_GASLESS_PROVIDER = "registerGaslessProvider"
+
+    /** Unregister a previously registered gasless provider. */
+    const val METHOD_REMOVE_GASLESS_PROVIDER = "removeGaslessProvider"
+
+    /** Set the default gasless provider. */
+    const val METHOD_SET_DEFAULT_GASLESS_PROVIDER = "setDefaultGaslessProvider"
+
+    /** Get all registered gasless provider IDs. */
+    const val METHOD_GET_REGISTERED_GASLESS_PROVIDERS = "getRegisteredGaslessProviders"
+
+    /** Get the networks a registered gasless provider supports. */
+    const val METHOD_GET_GASLESS_PROVIDER_SUPPORTED_NETWORKS = "getGaslessProviderSupportedNetworks"
+
+    /** Check if a gasless provider is registered. */
+    const val METHOD_HAS_GASLESS_PROVIDER = "hasGaslessProvider"
+
+    /** Get static metadata for a registered gasless provider. */
+    const val METHOD_GET_GASLESS_METADATA = "getGaslessMetadata"
+
+    /** Fetch the relayer config (relay address + accepted fee assets). */
+    const val METHOD_GET_GASLESS_CONFIG = "getGaslessConfig"
+
+    /** Quote fees and obtain relayer-wrapped messages for signing. */
+    const val METHOD_GET_GASLESS_QUOTE = "getGaslessQuote"
+
+    /** Submit a signed transaction BoC to the relayer. */
+    const val METHOD_GASLESS_SEND_TRANSACTION = "gaslessSendTransaction"
 
     // Staking methods
 

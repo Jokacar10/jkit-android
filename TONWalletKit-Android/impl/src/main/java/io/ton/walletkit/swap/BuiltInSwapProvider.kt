@@ -51,7 +51,7 @@ internal class BuiltInSwapProvider<TQuoteOptions, TSwapOptions>(
     override suspend fun supportedNetworks(): List<TONNetwork> =
         engine.getSwapProviderSupportedNetworks(identifier.name)
 
-    override suspend fun quote(params: TONSwapQuoteParams<TQuoteOptions>): TONSwapQuote {
+    override suspend fun getQuote(params: TONSwapQuoteParams<TQuoteOptions>): TONSwapQuote {
         val jsonOptions = params.providerOptions?.let {
             Json.encodeToJsonElement(SwapSerializers.quoteSerializer(identifier), it)
         }

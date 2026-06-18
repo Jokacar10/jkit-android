@@ -39,7 +39,7 @@ import kotlinx.serialization.Serializable
  * @param address
  * @param status
  * @param rawBalance
- * @param balance Balance formatted in TON (10^9 nanotons = 1 TON).
+ * @param balance Balance formatted in GRAM (10^9 nano units = 1 GRAM).
  * @param extraCurrencies Map of extra currency IDs to their amounts. Extra currencies are additional tokens that can be attached to TON messages.
  * @param code Base64-encoded contract code BOC. Omitted if the contract is not deployed.
  * @param `data` Base64-encoded contract data BOC. Omitted if the contract is not deployed.
@@ -58,7 +58,7 @@ data class TONAccountState(
     @SerialName(value = "rawBalance")
     var rawBalance: kotlin.String,
 
-    /* Balance formatted in TON (10^9 nanotons = 1 TON). */
+    /* Balance formatted in GRAM (10^9 nano units = 1 GRAM). */
     @SerialName(value = "balance")
     var balance: kotlin.String,
 

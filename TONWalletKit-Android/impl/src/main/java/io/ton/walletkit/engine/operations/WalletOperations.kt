@@ -23,7 +23,10 @@ package io.ton.walletkit.engine.operations
 
 import io.ton.walletkit.WalletKitBridgeException
 import io.ton.walletkit.api.generated.TONNetwork
+import io.ton.walletkit.api.generated.TONPreparedSignData
+import io.ton.walletkit.api.generated.TONProofMessage
 import io.ton.walletkit.api.generated.TONSignatureDomain
+import io.ton.walletkit.api.generated.TONTransactionRequest
 import io.ton.walletkit.engine.infrastructure.BridgeRpcClient
 import io.ton.walletkit.engine.infrastructure.callTyped
 import io.ton.walletkit.engine.infrastructure.callTypedOrNull
@@ -32,6 +35,10 @@ import io.ton.walletkit.engine.operations.requests.CreateAdapterRequest
 import io.ton.walletkit.engine.operations.requests.CreateSignerFromCustomRequest
 import io.ton.walletkit.engine.operations.requests.CreateSignerFromMnemonicRequest
 import io.ton.walletkit.engine.operations.requests.CreateSignerFromSecretKeyRequest
+import io.ton.walletkit.engine.operations.requests.GetSignedSendTransactionRequest
+import io.ton.walletkit.engine.operations.requests.GetSignedSignDataRequest
+import io.ton.walletkit.engine.operations.requests.GetSignedSignMessageRequest
+import io.ton.walletkit.engine.operations.requests.GetSignedTonProofRequest
 import io.ton.walletkit.engine.operations.requests.WalletIdRequest
 import io.ton.walletkit.engine.operations.responses.AdapterInfoResponse
 import io.ton.walletkit.engine.operations.responses.AddWalletResponse
@@ -98,6 +105,62 @@ internal suspend fun BridgeRpcClient.getWalletAddress(walletId: String): String 
 
 internal suspend fun BridgeRpcClient.getWalletNetwork(walletId: String): TONNetwork =
     callTyped(BridgeMethodConstants.METHOD_GET_WALLET_NETWORK, WalletIdRequest(walletId = walletId))
+
+internal suspend fun BridgeRpcClient.getWalletPublicKey(walletId: String): String =
+    callTyped(BridgeMethodConstants.METHOD_GET_WALLET_PUBLIC_KEY, WalletIdRequest(walletId = walletId))
+
+internal suspend fun BridgeRpcClient.getSignedSignMessage(
+    walletId: String,
+    request: TONTransactionRequest,
+): String = callTyped(
+    BridgeMethodConstants.METHOD_GET_SIGNED_SIGN_MESSAGE,
+    GetSignedSignMessageRequest(
+        walletId = walletId,
+        request = json.encodeToJsonElement(TONTransactionRequest.serializer(), request),
+    ),
+)
+
+internal suspend fun BridgeRpcClient.getWalletStateInit(walletId: String): String =
+    callTyped(BridgeMethodConstants.METHOD_GET_WALLET_STATE_INIT, WalletIdRequest(walletId = walletId))
+
+internal suspend fun BridgeRpcClient.getSignedSendTransaction(
+    walletId: String,
+    input: TONTransactionRequest,
+    fakeSignature: Boolean?,
+): String = callTyped(
+    BridgeMethodConstants.METHOD_GET_SIGNED_SEND_TRANSACTION,
+    GetSignedSendTransactionRequest(
+        walletId = walletId,
+        input = json.encodeToJsonElement(TONTransactionRequest.serializer(), input),
+        fakeSignature = fakeSignature,
+    ),
+)
+
+internal suspend fun BridgeRpcClient.getSignedSignData(
+    walletId: String,
+    input: TONPreparedSignData,
+    fakeSignature: Boolean?,
+): String = callTyped(
+    BridgeMethodConstants.METHOD_GET_SIGNED_SIGN_DATA,
+    GetSignedSignDataRequest(
+        walletId = walletId,
+        input = json.encodeToJsonElement(TONPreparedSignData.serializer(), input),
+        fakeSignature = fakeSignature,
+    ),
+)
+
+internal suspend fun BridgeRpcClient.getSignedTonProof(
+    walletId: String,
+    input: TONProofMessage,
+    fakeSignature: Boolean?,
+): String = callTyped(
+    BridgeMethodConstants.METHOD_GET_SIGNED_TON_PROOF,
+    GetSignedTonProofRequest(
+        walletId = walletId,
+        input = json.encodeToJsonElement(TONProofMessage.serializer(), input),
+        fakeSignature = fakeSignature,
+    ),
+)
 
 internal suspend fun BridgeRpcClient.removeWallet(walletId: String) {
     send(BridgeMethodConstants.METHOD_REMOVE_WALLET, WalletIdRequest(walletId = walletId))

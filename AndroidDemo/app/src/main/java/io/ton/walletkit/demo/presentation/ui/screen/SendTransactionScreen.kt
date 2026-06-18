@@ -21,188 +21,261 @@
  */
 package io.ton.walletkit.demo.presentation.ui.screen
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.ton.walletkit.demo.R
+import io.ton.walletkit.demo.designsystem.components.button.TonButton
+import io.ton.walletkit.demo.designsystem.components.segmentedcontrol.TonSegmentedControl
+import io.ton.walletkit.demo.designsystem.components.text.TonText
+import io.ton.walletkit.demo.designsystem.components.toggle.TonSwitch
+import io.ton.walletkit.demo.designsystem.icons.TonIcon
+import io.ton.walletkit.demo.designsystem.icons.TonIconImage
+import io.ton.walletkit.demo.designsystem.theme.SmoothCornerShape
+import io.ton.walletkit.demo.designsystem.theme.TonTheme
 import io.ton.walletkit.demo.presentation.model.WalletSummary
-import io.ton.walletkit.demo.presentation.ui.preview.PreviewData
+import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetScaffold
+import io.ton.walletkit.demo.presentation.ui.sheet.components.TonConnectSheetSection
+import io.ton.walletkit.demo.presentation.util.abbreviated
+import io.ton.walletkit.demo.presentation.viewmodel.SendCurrency
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Send sheet — design-system styled, matching the TonConnect transaction sheets. Picks the asset
+ * (TON / USDT), and for USDT offers a gasless toggle that routes the send through the relayer so
+ * the user pays the network fee in USDT instead of TON.
+ */
 @Composable
 fun SendTransactionScreen(
     wallet: WalletSummary,
     onBack: () -> Unit,
-    onSend: (recipient: String, amount: String, comment: String) -> Unit,
+    onSend: (recipient: String, amount: String, comment: String, currency: SendCurrency, gasless: Boolean) -> Unit,
     error: String?,
     isLoading: Boolean,
 ) {
+    var currency by remember { mutableStateOf(SendCurrency.TON) }
     var recipient by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
     var comment by remember { mutableStateOf("") }
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scrollState = rememberScrollState()
+    var gasless by remember { mutableStateOf(false) }
 
-    LaunchedEffect(error) {
-        error?.let {
-            snackbarHostState.showSnackbar(it)
-        }
-    }
+    val recipientValid = recipient.isEmpty() || isValidAddress(recipient)
+    val amountValid = amount.isEmpty() || isValidAmount(amount)
+    val tonTooLarge = currency == SendCurrency.TON && amount.isNotEmpty() && isAmountTooLarge(amount, wallet.balance)
+    val canSend = !isLoading &&
+        isValidAddress(recipient) &&
+        isValidAmount(amount) &&
+        !tonTooLarge
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.send_title),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold,
-                    )
+    TonConnectSheetScaffold(
+        footer = {
+            TonText(
+                text = if (gasless) {
+                    "The relayer covers the TON gas — you pay the network fee in USDT."
+                } else {
+                    "A small amount of TON is used as the network fee."
                 },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.send_back_content_description))
-                    }
+                style = TonTheme.typography.caption2Medium,
+                color = TonTheme.colors.textTertiary,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            TonButton(
+                text = when {
+                    isLoading -> "Sending…"
+                    amount.isNotEmpty() -> "Send $amount ${currency.label}"
+                    else -> "Send ${currency.label}"
                 },
+                onClick = { onSend(recipient.trim(), amount, comment, currency, gasless) },
+                enabled = canSend,
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(scrollState)
-                .padding(horizontal = SEND_SCREEN_HORIZONTAL_PADDING, vertical = SEND_SCREEN_VERTICAL_PADDING),
-            verticalArrangement = Arrangement.spacedBy(SEND_SCREEN_SECTION_SPACING),
-        ) {
-            // Wallet Info
-            Column(verticalArrangement = Arrangement.spacedBy(SEND_SCREEN_SECTION_GAP)) {
-                Text(
-                    stringResource(R.string.send_from_label),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    wallet.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    stringResource(R.string.send_balance_format, wallet.balance ?: DEFAULT_BALANCE_FALLBACK),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+    ) {
+        // Header
+        Box(modifier = Modifier.fillMaxWidth()) {
+            TonText(
+                text = "Send",
+                style = TonTheme.typography.title2,
+                color = TonTheme.colors.textPrimary,
+                modifier = Modifier.align(Alignment.Center),
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(28.dp)
+                    .clip(CircleShape)
+                    .background(TonTheme.colors.bgSecondary)
+                    .clickable(role = Role.Button, onClick = onBack),
+                contentAlignment = Alignment.Center,
+            ) {
+                TonIconImage(icon = TonIcon.Close, size = 12.dp, tint = TonTheme.colors.textSecondary)
             }
+        }
 
-            // Recipient Address
-            OutlinedTextField(
-                value = recipient,
-                onValueChange = { recipient = it },
-                label = { Text(stringResource(R.string.send_recipient_label)) },
-                placeholder = { Text(stringResource(R.string.send_recipient_placeholder)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                isError = recipient.isNotEmpty() && !isValidAddress(recipient),
-                supportingText = {
-                    if (recipient.isNotEmpty() && !isValidAddress(recipient)) {
-                        Text(stringResource(R.string.send_recipient_error))
-                    }
-                },
+        // Asset picker
+        TonSegmentedControl(
+            selection = currency,
+            items = SendCurrency.entries,
+            title = { it.label },
+            onSelect = {
+                currency = it
+                if (it == SendCurrency.TON) gasless = false
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        // From
+        TonConnectSheetSection(label = "From") {
+            TonText(wallet.name, style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textPrimary)
+            TonText(wallet.address.abbreviated(), style = TonTheme.typography.subheadline2, color = TonTheme.colors.textSecondary)
+            TonText(
+                "Balance: ${wallet.balance ?: "0"} TON",
+                style = TonTheme.typography.subheadline2,
+                color = TonTheme.colors.textSecondary,
             )
+        }
 
-            // Amount
-            OutlinedTextField(
-                value = amount,
-                onValueChange = { amount = it },
-                label = { Text(stringResource(R.string.send_amount_label)) },
-                placeholder = { Text(stringResource(R.string.send_amount_placeholder)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                isError = amount.isNotEmpty() && !isValidAmount(amount),
-                supportingText = {
-                    if (amount.isNotEmpty() && !isValidAmount(amount)) {
-                        Text(stringResource(R.string.send_amount_error))
-                    } else if (amount.isNotEmpty() && isAmountTooLarge(amount, wallet.balance)) {
-                        Text(stringResource(R.string.send_amount_insufficient))
-                    }
-                },
-            )
+        // Recipient
+        SendField(
+            value = recipient,
+            onValueChange = { recipient = it },
+            label = "Recipient",
+            placeholder = "EQ… / UQ…",
+            isError = !recipientValid,
+            supporting = if (!recipientValid) "Invalid TON address" else null,
+        )
 
-            // Comment (Optional)
-            OutlinedTextField(
+        // Amount
+        SendField(
+            value = amount,
+            onValueChange = { amount = it },
+            label = "Amount",
+            placeholder = "0",
+            keyboardType = KeyboardType.Decimal,
+            trailing = currency.label,
+            isError = !amountValid || tonTooLarge,
+            supporting = when {
+                !amountValid -> "Invalid amount"
+                tonTooLarge -> "Insufficient balance"
+                else -> null
+            },
+        )
+
+        // Gasless toggle (USDT only)
+        if (currency == SendCurrency.USDT) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(SmoothCornerShape(12.dp))
+                    .background(TonTheme.colors.bgSecondary)
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    TonText("Gasless", style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textPrimary)
+                    TonText(
+                        "Pay the fee in USDT, no TON required",
+                        style = TonTheme.typography.subheadline2,
+                        color = TonTheme.colors.textSecondary,
+                    )
+                }
+                TonSwitch(checked = gasless, onCheckedChange = { gasless = it })
+            }
+        } else {
+            // Comment is only carried on regular (non-gasless) transfers.
+            SendField(
                 value = comment,
                 onValueChange = { comment = it },
-                label = { Text(stringResource(R.string.send_comment_label)) },
-                placeholder = { Text(stringResource(R.string.send_comment_placeholder)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = false,
-                maxLines = 3,
-                supportingText = {
-                    Text(stringResource(R.string.helper_comment_visibility))
-                },
+                label = "Comment (optional)",
+                placeholder = "Add a message…",
             )
+        }
 
-            Spacer(modifier = Modifier.height(SEND_BUTTON_TOP_SPACING))
-
-            // Send Button
-            Button(
-                onClick = { onSend(recipient, amount, comment) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isLoading &&
-                    recipient.isNotEmpty() &&
-                    isValidAddress(recipient) &&
-                    amount.isNotEmpty() &&
-                    isValidAmount(amount) &&
-                    !isAmountTooLarge(amount, wallet.balance),
+        // Error
+        error?.let {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(SmoothCornerShape(12.dp))
+                    .background(TonTheme.colors.bgBrandSubtle)
+                    .padding(16.dp),
             ) {
-                Text(
-                    if (isLoading) {
-                        stringResource(R.string.send_button_loading)
-                    } else {
-                        stringResource(R.string.send_button_default)
-                    },
+                TonText(it, style = TonTheme.typography.subheadline2, color = TonTheme.colors.textError)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SendField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    trailing: String? = null,
+    isError: Boolean = false,
+    supporting: String? = null,
+) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        TonText(label, style = TonTheme.typography.footnoteCaps, color = TonTheme.colors.textSecondary)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(SmoothCornerShape(12.dp))
+                .background(TonTheme.colors.bgSecondary)
+                .border(
+                    width = 1.dp,
+                    color = if (isError) TonTheme.colors.textError else Color.Transparent,
+                    shape = SmoothCornerShape(12.dp),
+                )
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(modifier = Modifier.weight(1f)) {
+                if (value.isEmpty()) {
+                    TonText(placeholder, style = TonTheme.typography.body, color = TonTheme.colors.textTertiary)
+                }
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    textStyle = TonTheme.typography.body.style.copy(color = TonTheme.colors.textPrimary),
+                    cursorBrush = SolidColor(TonTheme.colors.bgBrand),
+                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
-
-            // Info
-            Text(
-                stringResource(R.string.send_info_message),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            trailing?.let {
+                TonText(it, style = TonTheme.typography.bodySemibold, color = TonTheme.colors.textSecondary)
+            }
+        }
+        supporting?.let {
+            TonText(
+                it,
+                style = TonTheme.typography.caption2Medium,
+                color = if (isError) TonTheme.colors.textError else TonTheme.colors.textTertiary,
             )
         }
     }
@@ -211,39 +284,16 @@ fun SendTransactionScreen(
 private fun isValidAddress(address: String): Boolean = address.length > MIN_ADDRESS_LENGTH &&
     (address.startsWith(ADDRESS_MAIN_PREFIX) || address.startsWith(ADDRESS_TEST_PREFIX))
 
-private fun isValidAmount(amount: String): Boolean {
-    return runCatching {
-        val value = amount.toDoubleOrNull() ?: return false
-        value > 0
-    }.getOrDefault(false)
-}
+private fun isValidAmount(amount: String): Boolean = runCatching {
+    (amount.toDoubleOrNull() ?: return false) > 0
+}.getOrDefault(false)
 
-private fun isAmountTooLarge(amount: String, balance: String?): Boolean {
-    return runCatching {
-        val amountValue = amount.toDoubleOrNull() ?: return false
-        val balanceValue = balance?.toDoubleOrNull() ?: return true
-        amountValue > balanceValue
-    }.getOrDefault(true)
-}
+private fun isAmountTooLarge(amount: String, balance: String?): Boolean = runCatching {
+    val amountValue = amount.toDoubleOrNull() ?: return false
+    val balanceValue = balance?.toDoubleOrNull() ?: return true
+    amountValue > balanceValue
+}.getOrDefault(true)
 
-private val SEND_SCREEN_HORIZONTAL_PADDING = 20.dp
-private val SEND_SCREEN_VERTICAL_PADDING = 16.dp
-private val SEND_SCREEN_SECTION_SPACING = 24.dp
-private val SEND_SCREEN_SECTION_GAP = 8.dp
-private val SEND_BUTTON_TOP_SPACING = 16.dp
-private const val DEFAULT_BALANCE_FALLBACK = "0"
 private const val MIN_ADDRESS_LENGTH = 10
 private const val ADDRESS_MAIN_PREFIX = "EQ"
 private const val ADDRESS_TEST_PREFIX = "UQ"
-
-@Preview(showBackground = true)
-@Composable
-private fun SendTransactionScreenPreview() {
-    SendTransactionScreen(
-        wallet = PreviewData.wallet.copy(balance = "12.50"),
-        onBack = {},
-        onSend = { _, _, _ -> },
-        error = null,
-        isLoading = false,
-    )
-}

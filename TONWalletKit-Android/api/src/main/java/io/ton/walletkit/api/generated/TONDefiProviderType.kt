@@ -32,9 +32,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Discriminator for DeFi-style providers (swap quotes, staking, gasless relayers).
+ * Discriminator for DeFi-style providers (swap quotes, staking, gasless relayers, crypto onramp).
  *
- * Values: swap,staking,gasless
+ * Values: swap,staking,gasless,cryptoMinusOnramp
  */
 @Serializable
 enum class TONDefiProviderType(val value: kotlin.String) {
@@ -47,6 +47,9 @@ enum class TONDefiProviderType(val value: kotlin.String) {
 
     @SerialName(value = "gasless")
     gasless("gasless"),
+
+    @SerialName(value = "crypto-onramp")
+    cryptoMinusOnramp("crypto-onramp"),
     ;
 
     /**

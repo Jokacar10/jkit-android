@@ -25,20 +25,19 @@ import io.ton.walletkit.api.generated.TONNetwork
 import io.ton.walletkit.api.generated.TONPreparedSignData
 import io.ton.walletkit.api.generated.TONProofMessage
 import io.ton.walletkit.api.generated.TONTransactionRequest
+import io.ton.walletkit.client.TONAPIClient
 import io.ton.walletkit.config.TONWalletKitConfiguration
 
-/**
- * Wallet adapter interface for wrapping existing wallet implementations.
- */
-interface TONWalletAdapter {
-    /** Stable unique wallet identifier. */
+interface ITONWalletAdapter {
     fun identifier(): String
 
-    fun publicKey(): TONHex
+    suspend fun publicKey(): TONHex
 
     fun network(): TONNetwork
 
-    fun address(testnet: Boolean): TONUserFriendlyAddress
+    fun client(): TONAPIClient
+
+    fun address(testnet: Boolean = false): TONUserFriendlyAddress
 
     /** State init (base64 BOC) for contract deployment. */
     suspend fun stateInit(): TONBase64

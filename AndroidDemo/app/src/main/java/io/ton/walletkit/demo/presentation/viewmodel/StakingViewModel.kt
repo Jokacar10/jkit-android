@@ -141,7 +141,7 @@ class StakingViewModel(
                     TONStakingQuoteParams<JsonElement>(
                         direction = s.direction,
                         amount = s.amount,
-                        userAddress = wallet.address,
+                        userAddress = wallet.address(),
                         network = network,
                         unstakeMode = if (s.direction == TONStakingQuoteDirection.unstake) s.unstakeMode else null,
                     ),
@@ -171,7 +171,7 @@ class StakingViewModel(
                 val tx = manager.buildStakeTransaction(
                     TONStakeParams<JsonElement>(
                         quote = quote,
-                        userAddress = wallet.address,
+                        userAddress = wallet.address(),
                     ),
                 )
                 wallet.send(tx)
@@ -249,7 +249,7 @@ class StakingViewModel(
         return runCatching {
             val walletBalanceNano = wallet.balance().value
             val balance = manager.getStakedBalance(
-                userAddress = wallet.address,
+                userAddress = wallet.address(),
                 network = network,
             )
             _state.update {
@@ -288,7 +288,7 @@ class StakingViewModel(
 
         val manager = kit.staking()
         val provider = kit.tonStakersStakingProvider(DemoApiConfig.tonStakersProviderConfig())
-        manager.register(provider)
+        manager.registerProvider(provider)
         manager.setDefaultProvider(provider.identifier)
 
         runCatching {

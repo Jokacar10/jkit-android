@@ -61,18 +61,18 @@ internal class TONStreamingManager(
         }
     }
 
-    override suspend fun register(provider: ITONStreamingProvider) {
+    override suspend fun registerProvider(provider: ITONStreamingProvider) {
         if (provider is TONStreamingProviderImpl) {
             engine.callBridgeMethod(
                 BridgeMethodConstants.METHOD_REGISTER_STREAMING_PROVIDER,
-                buildJsonObject { put("providerId", provider.id) },
+                buildJsonObject { put("providerId", provider.identifier) },
             )
         } else {
-            engine.kotlinStreamingProviderManager.register(provider.id, provider)
+            engine.kotlinStreamingProviderManager.register(provider.identifier, provider)
             engine.callBridgeMethod(
                 BridgeMethodConstants.METHOD_REGISTER_KOTLIN_STREAMING_PROVIDER,
                 buildJsonObject {
-                    put("providerId", provider.id)
+                    put("providerId", provider.identifier)
                     put("network", buildJsonObject { put("chainId", provider.network.chainId) })
                 },
             )
