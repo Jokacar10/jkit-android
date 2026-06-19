@@ -320,12 +320,13 @@ internal interface WalletKitEngine : RequestHandler {
      *
      * @param event Typed event from the transaction request
      * @param response Optional pre-computed approval response
+     * @return The finalized approval response.
      * @throws WalletKitBridgeException if approval or signing fails
      */
     override suspend fun approveTransaction(
         event: TONSendTransactionRequestEvent,
         response: TONSendTransactionApprovalResponse?,
-    )
+    ): TONSendTransactionApprovalResponse
 
     /**
      * Reject a transaction request.
@@ -346,12 +347,13 @@ internal interface WalletKitEngine : RequestHandler {
      *
      * @param event Typed event from the sign data request
      * @param response Optional pre-computed approval response
+     * @return The finalized approval response.
      * @throws WalletKitBridgeException if approval or signing fails
      */
     override suspend fun approveSignData(
         event: TONSignDataRequestEvent,
         response: TONSignDataApprovalResponse?,
-    )
+    ): TONSignDataApprovalResponse
 
     /**
      * Reject a data signing request.
@@ -375,7 +377,7 @@ internal interface WalletKitEngine : RequestHandler {
     override suspend fun approveSignMessage(
         event: TONSignMessageRequestEvent,
         response: TONSignMessageApprovalResponse?,
-    )
+    ): TONSignMessageApprovalResponse
 
     /**
      * Reject a sign-message request.
