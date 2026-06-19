@@ -36,10 +36,12 @@ class TONWalletSignMessageRequest(
     val event: TONSignMessageRequestEvent,
     private val handler: RequestHandler,
 ) {
+    /** Approve and sign the message; the signed BoC is returned to the dApp (not broadcast). */
     suspend fun approve(response: TONSignMessageApprovalResponse? = null) {
         handler.approveSignMessage(event, response)
     }
 
+    /** Reject the sign-message request. */
     suspend fun reject(reason: String? = null, errorCode: Int? = null) {
         handler.rejectSignMessage(event, reason, errorCode)
     }
