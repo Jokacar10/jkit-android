@@ -45,7 +45,8 @@ enum class RealBridgeIframeCase {
     CROSS_ORIGIN_DATA,
     SRCDOC,
     SANDBOXED,
-    RAW_JS_INTERFACE;
+    RAW_JS_INTERFACE,
+    ;
 
     val shortTitle: String
         get() = when (this) {
@@ -271,8 +272,7 @@ enum class RealBridgeIframeCase {
             })();
         """.trimIndent()
 
-        private fun frameStyle(v: String) =
-            "$v.style.cssText='width:100%;border:0;min-height:150px;background:#fff;border-radius:8px;margin-top:6px';"
+        private fun frameStyle(v: String) = "$v.style.cssText='width:100%;border:0;min-height:150px;background:#fff;border-radius:8px;margin-top:6px';"
 
         /** A script that, run inside a frame, renders an overlay and auto-fires a real signData. */
         fun realSendScript(label: String, note: String): String =
