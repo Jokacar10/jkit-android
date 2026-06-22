@@ -447,7 +447,7 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun approveTransaction(
         event: TONSendTransactionRequestEvent,
         response: TONSendTransactionApprovalResponse?,
-    ) = rpcClient.approveTransaction(event, response)
+    ): TONSendTransactionApprovalResponse = rpcClient.approveTransaction(event, response)
 
     override suspend fun rejectTransaction(
         event: TONSendTransactionRequestEvent,
@@ -458,7 +458,7 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun approveSignData(
         event: TONSignDataRequestEvent,
         response: TONSignDataApprovalResponse?,
-    ) = rpcClient.approveSignData(event, response)
+    ): TONSignDataApprovalResponse = rpcClient.approveSignData(event, response)
 
     override suspend fun rejectSignData(
         event: TONSignDataRequestEvent,
@@ -469,7 +469,7 @@ internal class WebViewWalletKitEngine private constructor(
     override suspend fun approveSignMessage(
         event: TONSignMessageRequestEvent,
         response: TONSignMessageApprovalResponse?,
-    ) = rpcClient.approveSignMessage(event, response)
+    ): TONSignMessageApprovalResponse = rpcClient.approveSignMessage(event, response)
 
     override suspend fun rejectSignMessage(
         event: TONSignMessageRequestEvent,
